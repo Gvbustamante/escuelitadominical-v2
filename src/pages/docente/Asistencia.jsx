@@ -5,6 +5,7 @@ import { useMisClases } from '../../lib/useMisClases'
 import Spinner from '../../components/Spinner'
 import RewardBurst from '../../components/RewardBurst'
 import ResumenAsistenciaMensual from '../../components/ResumenAsistenciaMensual'
+import ProgresoNinoModal from '../../components/ProgresoNinoModal'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -22,6 +23,7 @@ export default function Asistencia() {
   const [savedAt, setSavedAt] = useState(null)
   const [tab, setTab] = useState('hoy')
   const [toast, setToast] = useState(null)
+  const [progresoNino, setProgresoNino] = useState(null)
   const celebradoRef = useRef(false)
 
   const load = useCallback(async () => {
@@ -122,19 +124,29 @@ export default function Asistencia() {
                 {ninos.map((n, i) => {
                   const presente = !!marcados[n.id]
                   return (
-                    <button
-                      key={n.id}
-                      onClick={() => toggle(n.id)}
-                      className={`animate-pop-in flex flex-col items-center gap-2 rounded-blob p-4 text-center shadow-pop transition-transform active:translate-y-1 active:shadow-none ${
-                        presente ? 'bg-grass-400 text-white' : 'bg-white text-ink'
-                      }`}
-                      style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
-                    >
-                      <span key={presente ? 'p' : 'a'} className="animate-pop-in text-4xl">
-                        {presente ? '✅' : '🧒'}
-                      </span>
-                      <span className="font-bold leading-tight">{n.nombre_completo}</span>
-                    </button>
+                    <div key={n.id} className="animate-pop-in relative" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
+                      <button
+                        onClick={() => toggle(n.id)}
+                        className={`flex w-full flex-col items-center gap-2 rounded-blob p-4 text-center shadow-pop transition-transform active:translate-y-1 active:shadow-none ${
+                          presente ? 'bg-grass-400 text-white' : 'bg-white text-ink'
+                        }`}
+                      >
+                        <span key={presente ? 'p' : 'a'} className="animate-pop-in text-4xl">
+                          {presente ? '✅' : '🧒'}
+                        </span>
+                        <span className="font-bold leading-tight">{n.nombre_completo}</span>
+                      </button>
+                      {presente && (
+                        <button
+                          onClick={() => setProgresoNino(n)}
+                          title="Registrar progreso"
+                          aria-label={`Registrar progreso de ${n.nombre_completo}`}
+                          className="animate-pop-in absolute -right-2 -top-2 flex h-9 w-9 items-center justify-center rounded-full bg-white text-lg shadow-soft ring-2 ring-grass-200 transition-transform hover:scale-110 active:scale-95"
+                        >
+                          🌱
+                        </button>
+                      )}
+                    </div>
                   )
                 })}
               </div>
@@ -149,6 +161,8 @@ export default function Asistencia() {
           )}
         </>
       )}
+
+      <ProgresoNinoModal nino={progresoNino} nivelId={nivelId} open={!!progresoNino} onClose={() => setProgresoNino(null)} />
     </div>
   )
 }
