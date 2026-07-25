@@ -78,7 +78,10 @@ function DocenteGuide() {
         Ve a <strong>Agenda</strong> → <em>+ Nuevo evento</em> para avisar de un paseo o actividad especial próxima.
       </Step>
       <Step number="5" icon="🌱" title="Registra el progreso de cada niño" color="coral">
-        Ve a <strong>Progreso</strong>, elige un niño y anota cómo se comportó, cómo se sintió y qué logró ese día.
+        Ve a <strong>Progreso</strong>, elige un niño y anota cómo se comportó, cómo se sintió y qué logró ese día. Ahí
+        mismo puedes darle una <strong>estrella ⭐</strong> como reconocimiento por algo que hizo bien. Cada niño va
+        desbloqueando insignias a medida que junta estrellas (🐣 → 🦊 → 🦁 → 🦋 → 🌟 → 👑), y tanto tú como sus padres
+        pueden ver su insignia actual y cuánto le falta para la siguiente.
       </Step>
       <Step number="6" icon="🙏" title="Publica un devocional" color="sunshine">
         Ve a <strong>Devocionales</strong> → <em>+ Nuevo devocional</em>.
@@ -108,7 +111,10 @@ function PadreGuide() {
         En <strong>Agenda</strong> ves paseos, presentaciones y fechas importantes de la clase de tu hijo/a.
       </Step>
       <Step number="5" icon="🌱" title="Mira su progreso" color="coral">
-        En <strong>Progreso</strong> ves cómo se comportó, cómo se sintió y qué logró tu hijo/a en cada clase.
+        En <strong>Progreso</strong> ves cómo se comportó, cómo se sintió y qué logró tu hijo/a en cada clase. También
+        aparece su <strong>insignia actual</strong> (🐣 → 🦊 → 🦁 → 🦋 → 🌟 → 👑) y sus <strong>estrellas ⭐</strong>: la
+        docente se las va dando como reconocimiento, y ahí puedes ver cuántas lleva y qué le falta para la siguiente
+        insignia.
       </Step>
       <Step number="6" icon="🙏" title="Lean juntos un devocional" color="sunshine">
         En <strong>Devocionales</strong> hay reflexiones cortas pensadas para niños que pueden leer juntos en casa.
@@ -165,7 +171,7 @@ const ROLES = [
   },
 ]
 
-function RolesTab() {
+function RolesTab({ role }) {
   const badge = {
     sky: 'bg-sky-100 text-sky-700',
     grass: 'bg-grass-100 text-grass-700',
@@ -174,9 +180,11 @@ function RolesTab() {
     grape: 'bg-grape-100 text-grape-700',
   }
 
+  const roles = role === 'padre' ? ROLES.filter((r) => !['Admin', 'Coordinador'].includes(r.nombre)) : ROLES
+
   return (
     <div className="flex max-w-2xl flex-col gap-4">
-      {ROLES.map((r) => (
+      {roles.map((r) => (
         <div key={r.nombre} className="card">
           <div className="flex items-center gap-3">
             <span className={`flex h-11 w-11 items-center justify-center rounded-full text-2xl ${badge[r.color]}`}>{r.icon}</span>
@@ -227,7 +235,7 @@ export default function Tutorial() {
           </div>
         </>
       ) : (
-        <RolesTab />
+        <RolesTab role={profile.role} />
       )}
     </div>
   )
