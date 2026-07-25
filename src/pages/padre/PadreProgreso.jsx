@@ -3,10 +3,12 @@ import { supabase } from '../../lib/supabaseClient'
 import { useMisHijos } from '../../lib/useMisHijos'
 import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
+import RewardsPanel from '../../components/RewardsPanel'
 
 export default function PadreProgreso() {
   const hijos = useMisHijos()
   const [notasPorHijo, setNotasPorHijo] = useState(null)
+  const [estrellasPorHijo, setEstrellasPorHijo] = useState({})
   const [selectedId, setSelectedId] = useState(null)
 
   useEffect(() => {
@@ -15,6 +17,7 @@ export default function PadreProgreso() {
       const ids = hijos.map((h) => h.id)
       if (ids.length === 0) {
         setNotasPorHijo({})
+        setEstrellasPorHijo({})
         return
       }
       const { data } = await supabase.from('progreso_notas').select('*').in('nino_id', ids).order('fecha', { ascending: false })
@@ -24,6 +27,18 @@ export default function PadreProgreso() {
         grouped[n.nino_id].push(n)
       })
       setNotasPorHijo(grouped)
+
+      const { data: estrellas } = await supabase
+        .from('reconocimientos')
+        .select('*')
+        .in('nino_id', ids)
+        .order('created_at', { ascending: false })
+      const groupedEstrellas = {}
+      ;(estrellas || []).forEach((r) => {
+        groupedEstrellas[r.nino_id] = groupedEstrellas[r.nino_id] || []
+        groupedEstrellas[r.nino_id].push(r)
+      })
+      setEstrellasPorHijo(groupedEstrellas)
     }
     load()
   }, [hijos])
@@ -44,7 +59,8 @@ export default function PadreProgreso() {
       {hijosAMostrar.map((h) => (
         <div key={h.id}>
           <h2 className="mb-2 text-xl font-bold">{h.nombre_completo}</h2>
-          <div className="flex flex-col gap-3">
+          <RewardsPanel estrellas={(estrellasPorHijo[h.id] || []).length} recientes={estrellasPorHijo[h.id] || []} />
+          <div className="mt-4 flex flex-col gap-3">
             {(notasPorHijo[h.id] || []).map((nota) => (
               <div key={nota.id} className="card">
                 <p className="text-sm font-bold text-ink/40">{nota.fecha}</p>

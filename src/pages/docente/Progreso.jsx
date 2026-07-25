@@ -4,6 +4,9 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useMisClases } from '../../lib/useMisClases'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
+import RewardsPanel from '../../components/RewardsPanel'
+import RewardBurst from '../../components/RewardBurst'
+import { badgeActual, mensajeAleatorio, playSound } from '../../lib/gamification'
 
 const COMPORTAMIENTOS = ['Excelente', 'Bueno', 'Regular', 'Necesita apoyo']
 const EMOCIONES = ['😊 Feliz', '🤩 Emocionado', '😐 Tranquilo', '😢 Triste', '😡 Molesto', '😴 Cansado']
@@ -17,10 +20,13 @@ export default function Progreso() {
   const { clases, nivelId, setNivelId } = useMisClases()
   const [ninos, setNinos] = useState(null)
   const [notasPorNino, setNotasPorNino] = useState({})
+  const [estrellasPorNino, setEstrellasPorNino] = useState({})
   const [modalNino, setModalNino] = useState(null)
   const [historialNino, setHistorialNino] = useState(null)
   const [form, setForm] = useState({ fecha: hoyISO(), comportamiento: '', emocion: '', logros: '' })
   const [busy, setBusy] = useState(false)
+  const [busyEstrella, setBusyEstrella] = useState(null)
+  const [toast, setToast] = useState(null)
 
   const load = useCallback(async () => {
     if (!nivelId) return
@@ -30,6 +36,11 @@ export default function Progreso() {
       .select('*')
       .eq('nivel_id', nivelId)
       .order('fecha', { ascending: false })
+    const { data: estrellas } = await supabase
+      .from('reconocimientos')
+      .select('*')
+      .eq('nivel_id', nivelId)
+      .order('created_at', { ascending: false })
     setNinos(n || [])
     const grouped = {}
     ;(notas || []).forEach((nota) => {
@@ -37,6 +48,12 @@ export default function Progreso() {
       grouped[nota.nino_id].push(nota)
     })
     setNotasPorNino(grouped)
+    const groupedEstrellas = {}
+    ;(estrellas || []).forEach((r) => {
+      groupedEstrellas[r.nino_id] = groupedEstrellas[r.nino_id] || []
+      groupedEstrellas[r.nino_id].push(r)
+    })
+    setEstrellasPorNino(groupedEstrellas)
   }, [nivelId])
 
   useEffect(() => {
@@ -62,11 +79,29 @@ export default function Progreso() {
     load()
   }
 
+  async function darEstrella(nino, motivo) {
+    setBusyEstrella(nino.id)
+    const { error } = await supabase.from('reconocimientos').insert({
+      nino_id: nino.id,
+      nivel_id: nivelId,
+      motivo: motivo || null,
+      otorgado_por: user.id,
+    })
+    setBusyEstrella(null)
+    if (!error) {
+      playSound('estrella')
+      setToast({ key: Date.now(), message: `${mensajeAleatorio()} · ${nino.nombre_completo.split(' ')[0]}` })
+      load()
+    }
+  }
+
   if (!clases) return <Spinner />
   if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
 
   return (
     <div className="flex flex-col gap-6">
+      <RewardBurst toast={toast} />
+
       <div>
         <h1 className="text-3xl font-bold">Progreso 🌱</h1>
         <p className="text-ink/50">Comportamiento, emociones y logros de cada niño/a</p>
@@ -86,7 +121,9 @@ export default function Progreso() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ninos.map((n) => {
             const notas = notasPorNino[n.id] || []
+            const estrellas = estrellasPorNino[n.id] || []
             const ultima = notas[0]
+            const badge = badgeActual(estrellas.length)
             return (
               <div key={n.id} className="card">
                 <h3 className="text-lg font-bold">{n.nombre_completo}</h3>
@@ -99,7 +136,21 @@ export default function Progreso() {
                 ) : (
                   <p className="mt-2 text-sm text-ink/40">Sin notas todavía</p>
                 )}
-                <div className="mt-4 flex gap-2">
+
+                <div className="mt-3 flex items-center justify-between gap-2 rounded-full bg-sunshine-50 px-3 py-2">
+                  <span className="truncate text-sm font-extrabold text-sunshine-700">
+                    {badge.emoji} {estrellas.length} ⭐
+                  </span>
+                  <button
+                    disabled={busyEstrella === n.id}
+                    onClick={() => darEstrella(n)}
+                    className="shrink-0 rounded-full bg-sunshine-400 px-3 py-1 text-xs font-extrabold text-white transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+                  >
+                    +1 ⭐
+                  </button>
+                </div>
+
+                <div className="mt-3 flex gap-2">
                   <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openNew(n)}>
                     + Nota
                   </button>
@@ -167,7 +218,15 @@ export default function Progreso() {
       </Modal>
 
       <Modal open={!!historialNino} onClose={() => setHistorialNino(null)} title={`Historial — ${historialNino?.nombre_completo || ''}`}>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
+          {historialNino && (
+            <RewardsPanel
+              estrellas={(estrellasPorNino[historialNino.id] || []).length}
+              recientes={estrellasPorNino[historialNino.id] || []}
+              busy={busyEstrella === historialNino.id}
+              onAward={() => darEstrella(historialNino)}
+            />
+          )}
           {(notasPorNino[historialNino?.id] || []).map((nota) => (
             <div key={nota.id} className="rounded-2xl bg-ink/5 p-3">
               <p className="text-sm font-bold text-ink/50">{nota.fecha}</p>
