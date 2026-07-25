@@ -17,9 +17,9 @@ function diaDelAnio() {
 }
 
 const THEMES = [
-  { from: '#0a5f80', to: '#1cade4', text: '#ffffff', sub: 'rgba(255,255,255,0.82)', bubble: 'rgba(255,255,255,0.4)', pill: 'rgba(255,255,255,0.22)' },
-  { from: '#ff4d6d', to: '#c81e3d', text: '#ffffff', sub: 'rgba(255,255,255,0.82)', bubble: 'rgba(255,255,255,0.4)', pill: 'rgba(255,255,255,0.22)' },
-  { from: '#ffd54d', to: '#ff6a35', text: '#4a2600', sub: 'rgba(74,38,0,0.72)', bubble: 'rgba(255,255,255,0.5)', pill: 'rgba(255,255,255,0.35)' },
+  { accent: '#1cade4', glow: 'rgba(28,173,228,0.28)', label: '#0b76a0', chip: 'bg-sky-50' },
+  { accent: '#f0296f', glow: 'rgba(240,41,111,0.24)', label: '#c81856', chip: 'bg-coral-50' },
+  { accent: '#ff9500', glow: 'rgba(255,149,0,0.26)', label: '#c96b00', chip: 'bg-sunshine-50' },
 ]
 
 const INTROS = [
@@ -31,15 +31,6 @@ const INTROS = [
 ]
 
 const GREETINGS = ['Hola', '¿Qué tal', 'Hola de nuevo']
-
-const BUBBLES = [
-  { side: 'left', top: '8%', size: 46, delay: '0s', dur: '7s' },
-  { side: 'left', top: '48%', size: 30, delay: '1.4s', dur: '8.5s' },
-  { side: 'left', top: '80%', size: 60, delay: '0.7s', dur: '9.5s' },
-  { side: 'right', top: '14%', size: 36, delay: '0.9s', dur: '8s' },
-  { side: 'right', top: '52%', size: 58, delay: '0.2s', dur: '7.5s' },
-  { side: 'right', top: '82%', size: 28, delay: '1.8s', dur: '9s' },
-]
 
 export default function CitaDelDia() {
   const { profile } = useAuth()
@@ -131,67 +122,50 @@ export default function CitaDelDia() {
 
   return (
     <div
-      className="cd-card relative overflow-hidden rounded-blob p-6 shadow-card sm:p-8"
-      style={{ '--cd-from': theme.from, '--cd-to': theme.to }}
+      className="relative overflow-hidden rounded-blob bg-white p-6 shadow-card sm:p-7"
+      style={{ borderLeft: `6px solid ${theme.accent}` }}
     >
       <style>{`
-        @keyframes cd-pan { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
-        @keyframes cd-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
-        @keyframes cd-greet { 0% { transform: scale(2.6); opacity: 0; } 55% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes cd-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .cd-card {
-          background: linear-gradient(135deg, var(--cd-from), var(--cd-to));
-          background-size: 220% 220%;
-          animation: cd-pan 12s ease-in-out infinite alternate;
-        }
-        .cd-bubble { animation: cd-float ease-in-out infinite; }
-        .cd-greet { animation: cd-greet 1s cubic-bezier(0.22, 1, 0.36, 1) both; transform-origin: left center; }
-        .cd-body { animation: cd-in 0.6s ease-out 0.15s both; }
+        @keyframes cd-greet { 0% { transform: scale(2.2); opacity: 0; } 55% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes cd-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes cd-sparkle { 0%, 100% { opacity: 0.25; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.05); } }
+        @keyframes cd-glow { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.65; } }
+        .cd-greet { animation: cd-greet 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; transform-origin: left center; }
+        .cd-body { animation: cd-in 0.5s ease-out 0.1s both; }
+        .cd-sparkle { animation: cd-sparkle 2.6s ease-in-out infinite; }
+        .cd-glow { animation: cd-glow 3.2s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) {
-          .cd-card, .cd-bubble, .cd-greet, .cd-body { animation: none !important; }
+          .cd-greet, .cd-body, .cd-sparkle, .cd-glow { animation: none !important; }
         }
       `}</style>
 
-      {BUBBLES.map((b, i) => (
-        <span
-          key={i}
-          className="cd-bubble pointer-events-none absolute rounded-full"
-          style={{
-            [b.side]: '-10px',
-            top: b.top,
-            width: b.size,
-            height: b.size,
-            background: theme.bubble,
-            filter: 'blur(6px)',
-            animationDuration: b.dur,
-            animationDelay: b.delay,
-          }}
-        />
-      ))}
+      <div className="cd-glow pointer-events-none absolute -left-8 -top-8 h-36 w-36 rounded-full blur-3xl" style={{ background: theme.glow }} />
+      <span className="cd-sparkle pointer-events-none absolute right-8 top-5 text-base" style={{ animationDelay: '0.5s' }}>
+        ✨
+      </span>
+      <span className="cd-sparkle pointer-events-none absolute right-20 top-12 text-xs" style={{ animationDelay: '1.3s' }}>
+        ✨
+      </span>
 
-      <div className="relative">
-        {primerNombre && (
-          <span
-            className="cd-greet mb-3 inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-extrabold backdrop-blur-sm"
-            style={{ background: theme.pill, color: theme.text }}
-          >
-            👋 {greeting}, {primerNombre}
-          </span>
-        )}
+      <div className="relative flex items-start gap-4">
+        <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl ${theme.chip}`}>📖</div>
+        <div className="min-w-0 flex-1">
+          {primerNombre && (
+            <span className="cd-greet mb-2 inline-flex items-center gap-1 rounded-full bg-ink/5 px-3 py-1 text-xs font-extrabold text-ink/60">
+              👋 {greeting}, {primerNombre}
+            </span>
+          )}
 
-        <div className="cd-body">
-          <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: theme.sub }}>
-            📖 Versículo del día
-          </p>
-          <p className="mt-2 text-sm font-bold" style={{ color: theme.sub }}>
-            {intro(primerNombre)}:
-          </p>
-          <p className="mt-1 text-xl font-extrabold italic leading-snug sm:text-2xl" style={{ color: theme.text }}>
-            "{cita.texto}"
-          </p>
-          <p className="mt-2 text-sm font-bold" style={{ color: theme.sub }}>
-            — {cita.referencia}
-          </p>
+          <div className="cd-body">
+            <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: theme.label }}>
+              Versículo del día
+            </p>
+            <p className="mt-1 text-sm font-bold text-ink/50">{intro(primerNombre)}:</p>
+            <p className="mt-1 text-lg font-extrabold italic leading-snug text-ink sm:text-xl">"{cita.texto}"</p>
+            <p className="mt-2 text-sm font-bold" style={{ color: theme.label }}>
+              — {cita.referencia}
+            </p>
+          </div>
         </div>
       </div>
     </div>

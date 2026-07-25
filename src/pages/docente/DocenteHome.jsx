@@ -33,7 +33,10 @@ export default function DocenteHome() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
+      <div className="relative">
+        <span className="animate-float-soft pointer-events-none absolute -right-2 -top-6 text-5xl opacity-10 sm:text-6xl" aria-hidden="true">
+          🌟
+        </span>
         <h1 className="text-3xl font-bold">¡Hola, miss {profile.nombre_completo.split(' ')[0]}! 🌟</h1>
         <p className="text-ink/50">Tus clases asignadas</p>
       </div>
@@ -47,8 +50,8 @@ export default function DocenteHome() {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {clases.map((c) => (
-          <div key={c.id} className="card">
+        {clases.map((c, i) => (
+          <div key={c.id} className="card animate-pop-in transition-transform duration-200 hover:-translate-y-1" style={{ animationDelay: `${i * 80}ms` }}>
             <span className={`badge ${BADGE_CLASSES[c.color] || BADGE_CLASSES.sky}`}>{c.edad_min}-{c.edad_max} años</span>
             <h3 className="mt-2 text-xl font-bold">{c.nombre}</h3>
             <p className="text-ink/50">{c.count} niños activos</p>
@@ -57,17 +60,20 @@ export default function DocenteHome() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Link to="/asistencia" className="card-link flex items-center gap-3">
-          <span className="text-3xl">✅</span>
-          <p className="font-bold">Tomar asistencia</p>
+        <Link to="/asistencia" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '80ms' }}>
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grass-100 text-2xl">✅</span>
+          <p className="flex-1 font-bold">Tomar asistencia</p>
+          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
         </Link>
-        <Link to="/actividades" className="card-link flex items-center gap-3">
-          <span className="text-3xl">🎨</span>
-          <p className="font-bold">Subir actividad</p>
+        <Link to="/actividades" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '160ms' }}>
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sunshine-100 text-2xl">🎨</span>
+          <p className="flex-1 font-bold">Subir actividad</p>
+          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
         </Link>
-        <Link to="/agenda" className="card-link flex items-center gap-3">
-          <span className="text-3xl">📅</span>
-          <p className="font-bold">Agendar evento</p>
+        <Link to="/agenda" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '240ms' }}>
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grape-100 text-2xl">📅</span>
+          <p className="flex-1 font-bold">Agendar evento</p>
+          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
         </Link>
       </div>
     </div>

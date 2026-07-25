@@ -22,7 +22,10 @@ export default function PadreHome() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
+      <div className="relative">
+        <span className="animate-float-soft pointer-events-none absolute -right-2 -top-6 text-5xl opacity-10 sm:text-6xl" aria-hidden="true">
+          💛
+        </span>
         <h1 className="text-3xl font-bold">¡Hola, {profile.nombre_completo.split(' ')[0]}! 💛</h1>
         <p className="text-ink/50">Así está tu familia en la escuelita</p>
       </div>
@@ -34,8 +37,8 @@ export default function PadreHome() {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {hijos.map((h) => (
-          <div key={h.id} className="card">
+        {hijos.map((h, i) => (
+          <div key={h.id} className="card animate-pop-in transition-transform duration-200 hover:-translate-y-1" style={{ animationDelay: `${i * 80}ms` }}>
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-xl font-bold">{h.nombre_completo}</h3>
