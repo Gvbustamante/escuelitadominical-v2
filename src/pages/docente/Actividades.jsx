@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useMisClases } from '../../lib/useMisClases'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
+import ActivityFiles from '../../components/ActivityFiles'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -87,10 +88,6 @@ export default function Actividades() {
     load()
   }
 
-  function fileUrl(path) {
-    return supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
-  }
-
   if (!clases) return <Spinner />
   if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
 
@@ -118,34 +115,24 @@ export default function Actividades() {
         <Spinner />
       ) : (
         <div className="flex flex-col gap-4">
-          {actividades.map((a) => (
-            <div key={a.id} className="card">
+          {actividades.map((a, i) => (
+            <div
+              key={a.id}
+              className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
+              style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
+            >
               <div className="flex items-start justify-between">
                 <h3 className="text-lg font-bold">{a.titulo}</h3>
                 <span className="text-sm text-ink/40">{a.fecha}</span>
               </div>
               {a.descripcion && <p className="mt-1 text-ink/70">{a.descripcion}</p>}
               {(a.versiculo_clave || a.historia_biblica) && (
-                <div className="mt-3 rounded-2xl bg-sunshine-50 p-3">
+                <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
                   {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
                   {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
                 </div>
               )}
-              {a.actividad_archivos?.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {a.actividad_archivos.map((f) => (
-                    <a
-                      key={f.id}
-                      href={fileUrl(f.storage_path)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
-                    >
-                      📎 {f.nombre_archivo}
-                    </a>
-                  ))}
-                </div>
-              )}
+              <ActivityFiles archivos={a.actividad_archivos} />
               <p className="mt-3 text-sm font-bold text-coral-500">
                 {a.actividad_reacciones?.length || 0} reacciones ❤️
               </p>

@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useMisHijos } from '../../lib/useMisHijos'
 import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
+import ActivityFiles from '../../components/ActivityFiles'
 
 const REACCIONES = ['❤️', '👏', '🙌', '😍']
 
@@ -47,10 +48,6 @@ export default function PadreActividades() {
     load()
   }
 
-  function fileUrl(path) {
-    return supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
-  }
-
   if (!hijos || !actividades) return <Spinner />
 
   return (
@@ -63,10 +60,14 @@ export default function PadreActividades() {
       <HijoSelector hijos={hijos} selectedId={selectedId} onChange={setSelectedId} />
 
       <div className="flex flex-col gap-4">
-        {actividades.map((a) => {
+        {actividades.map((a, i) => {
           const mia = a.actividad_reacciones.find((r) => r.padre_id === user.id)
           return (
-            <div key={a.id} className="card">
+            <div
+              key={a.id}
+              className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
+              style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
+            >
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-lg font-bold">{a.titulo}</h3>
@@ -76,33 +77,19 @@ export default function PadreActividades() {
               </div>
               {a.descripcion && <p className="mt-1 text-ink/70">{a.descripcion}</p>}
               {(a.versiculo_clave || a.historia_biblica) && (
-                <div className="mt-3 rounded-2xl bg-sunshine-50 p-3">
+                <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
                   {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
                   {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
                 </div>
               )}
-              {a.actividad_archivos?.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {a.actividad_archivos.map((f) => (
-                    <a
-                      key={f.id}
-                      href={fileUrl(f.storage_path)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
-                    >
-                      📎 {f.nombre_archivo}
-                    </a>
-                  ))}
-                </div>
-              )}
+              <ActivityFiles archivos={a.actividad_archivos} />
               <div className="mt-4 flex items-center gap-2">
                 {REACCIONES.map((r) => (
                   <button
                     key={r}
                     onClick={() => reaccionar(a.id, r)}
-                    className={`rounded-full px-3 py-2 text-xl transition-transform active:scale-90 ${
-                      mia?.tipo === r ? 'bg-coral-100 ring-2 ring-coral-400' : 'bg-ink/5 hover:bg-ink/10'
+                    className={`rounded-full px-3 py-2 text-xl transition-transform duration-150 active:scale-90 ${
+                      mia?.tipo === r ? 'animate-pop-in scale-110 bg-coral-100 ring-2 ring-coral-400' : 'bg-ink/5 hover:scale-110 hover:bg-ink/10'
                     }`}
                   >
                     {r}
