@@ -1,0 +1,455 @@
+import { useEffect, useState, useCallback, useMemo } from 'react'
+import { supabase } from '../../lib/supabaseClient'
+import { crearUsuario } from '../../lib/invite'
+import Spinner from '../../components/Spinner'
+import Modal from '../../components/Modal'
+import { BADGE_CLASSES } from '../../lib/colors'
+
+function calcularEdad(fecha) {
+  if (!fecha) return '—'
+  const nacimiento = new Date(fecha)
+  const hoy = new Date()
+  let edad = hoy.getFullYear() - nacimiento.getFullYear()
+  const m = hoy.getMonth() - nacimiento.getMonth()
+  if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edad--
+  return edad
+}
+
+export default function Ninos() {
+  const [ninos, setNinos] = useState(null)
+  const [niveles, setNiveles] = useState([])
+  const [padresPorNino, setPadresPorNino] = useState({})
+  const [filtro, setFiltro] = useState('activos')
+  const [busqueda, setBusqueda] = useState('')
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState({ nombre_completo: '', fecha_nacimiento: '', nivel_id: '', alergias: '', notas: '' })
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const [inviteModal, setInviteModal] = useState(null)
+  const [modoVinculo, setModoVinculo] = useState('nueva')
+  const [inviteForm, setInviteForm] = useState({ cedula: '', nombre_completo: '', parentesco: '' })
+  const [inviteMsg, setInviteMsg] = useState('')
+  const [inviteBusy, setInviteBusy] = useState(false)
+  const [creado, setCreado] = useState(null)
+  const [todosPerfiles, setTodosPerfiles] = useState([])
+  const [busquedaPerfil, setBusquedaPerfil] = useState('')
+  const [perfilSeleccionado, setPerfilSeleccionado] = useState(null)
+  const [parentescoExistente, setParentescoExistente] = useState('')
+
+  const load = useCallback(async () => {
+    const [{ data: n }, { data: niv }, { data: np }] = await Promise.all([
+      supabase.from('ninos').select('*').order('nombre_completo'),
+      supabase.from('niveles').select('*').eq('activo', true),
+      supabase.from('ninos_padres').select('nino_id, parentesco, padre:profiles(nombre_completo)'),
+    ])
+    setNinos(n || [])
+    setNiveles(niv || [])
+    const grouped = {}
+    ;(np || []).forEach((row) => {
+      grouped[row.nino_id] = grouped[row.nino_id] || []
+      grouped[row.nino_id].push(row)
+    })
+    setPadresPorNino(grouped)
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const nivelesById = useMemo(() => Object.fromEntries(niveles.map((n) => [n.id, n])), [niveles])
+
+  const filtrados = useMemo(() => {
+    if (!ninos) return []
+    return ninos
+      .filter((n) => (filtro === 'activos' ? n.activo : filtro === 'inactivos' ? !n.activo : true))
+      .filter((n) => n.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()))
+  }, [ninos, filtro, busqueda])
+
+  function openNew() {
+    setEditing(null)
+    setForm({ nombre_completo: '', fecha_nacimiento: '', nivel_id: '', alergias: '', notas: '' })
+    setError('')
+    setModalOpen(true)
+  }
+
+  function openEdit(nino) {
+    setEditing(nino)
+    setForm({
+      nombre_completo: nino.nombre_completo,
+      fecha_nacimiento: nino.fecha_nacimiento || '',
+      nivel_id: nino.nivel_id || '',
+      alergias: nino.alergias || '',
+      notas: nino.notas || '',
+    })
+    setError('')
+    setModalOpen(true)
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setBusy(true)
+    setError('')
+    const payload = {
+      nombre_completo: form.nombre_completo,
+      fecha_nacimiento: form.fecha_nacimiento || null,
+      nivel_id: form.nivel_id || null,
+      alergias: form.alergias || null,
+      notas: form.notas || null,
+    }
+    const { error } = editing
+      ? await supabase.from('ninos').update(payload).eq('id', editing.id)
+      : await supabase.from('ninos').insert(payload)
+
+    setBusy(false)
+    if (error) return setError(error.message)
+    setModalOpen(false)
+    load()
+  }
+
+  async function toggleActivo(nino) {
+    await supabase.from('ninos').update({ activo: !nino.activo }).eq('id', nino.id)
+    load()
+  }
+
+  function openInvite(nino) {
+    setInviteModal(nino)
+    setModoVinculo('nueva')
+    setInviteForm({ cedula: '', nombre_completo: '', parentesco: '' })
+    setInviteMsg('')
+    setCreado(null)
+    setBusquedaPerfil('')
+    setPerfilSeleccionado(null)
+    setParentescoExistente('')
+    supabase.from('profiles').select('*').order('nombre_completo').then(({ data }) => setTodosPerfiles(data || []))
+  }
+
+  async function handleInviteNueva(e) {
+    e.preventDefault()
+    setInviteBusy(true)
+    setInviteMsg('')
+    try {
+      const { password } = await crearUsuario({
+        cedula: inviteForm.cedula,
+        nombre_completo: inviteForm.nombre_completo,
+        role: 'padre',
+        nino_id: inviteModal.id,
+        parentesco: inviteForm.parentesco,
+      })
+      setCreado({ cedula: inviteForm.cedula, password, nombre: inviteForm.nombre_completo })
+      load()
+    } catch (err) {
+      setInviteMsg('❌ ' + err.message)
+    }
+    setInviteBusy(false)
+  }
+
+  async function handleVincularExistente(e) {
+    e.preventDefault()
+    if (!perfilSeleccionado) return
+    setInviteBusy(true)
+    setInviteMsg('')
+    const { error } = await supabase.from('ninos_padres').insert({
+      nino_id: inviteModal.id,
+      padre_id: perfilSeleccionado.id,
+      parentesco: parentescoExistente || null,
+    })
+    setInviteBusy(false)
+    if (error) {
+      setInviteMsg('❌ ' + error.message)
+      return
+    }
+    setInviteMsg(`✅ ${perfilSeleccionado.nombre_completo} vinculado/a como padre/madre.`)
+    load()
+  }
+
+  const yaVinculadosIds = new Set((padresPorNino[inviteModal?.id] || []).map((p) => p.padre?.id).filter(Boolean))
+  const perfilesFiltrados = todosPerfiles
+    .filter((p) => !yaVinculadosIds.has(p.id))
+    .filter(
+      (p) =>
+        p.nombre_completo.toLowerCase().includes(busquedaPerfil.toLowerCase()) ||
+        (p.cedula || '').includes(busquedaPerfil),
+    )
+    .slice(0, 8)
+
+  if (!ninos) return <Spinner />
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Niños 🧒</h1>
+          <p className="text-ink/50">{filtrados.length} de {ninos.length} en total</p>
+        </div>
+        <button className="btn-primary" onClick={openNew}>
+          + Nuevo niño/a
+        </button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <input
+          className="input max-w-xs"
+          placeholder="Buscar por nombre..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
+        <div className="flex gap-2">
+          {[
+            ['activos', 'Activos'],
+            ['inactivos', 'Inactivos'],
+            ['todos', 'Todos'],
+          ].map(([v, label]) => (
+            <button
+              key={v}
+              onClick={() => setFiltro(v)}
+              className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {filtrados.map((nino) => {
+          const nivel = nivelesById[nino.nivel_id]
+          const padres = padresPorNino[nino.id] || []
+          return (
+            <div key={nino.id} className={`card ${!nino.activo ? 'opacity-50' : ''}`}>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h3 className="text-lg font-bold">{nino.nombre_completo}</h3>
+                  <p className="text-sm text-ink/50">{calcularEdad(nino.fecha_nacimiento)} años</p>
+                </div>
+                {nivel && <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>}
+              </div>
+              {nino.alergias && (
+                <p className="mt-2 rounded-xl bg-coral-50 px-3 py-1 text-xs font-bold text-coral-600">
+                  ⚠️ Alergias: {nino.alergias}
+                </p>
+              )}
+              <p className="mt-2 text-xs font-bold uppercase text-ink/40">Padres/encargados</p>
+              {padres.length === 0 ? (
+                <p className="text-sm text-ink/40">Sin vincular</p>
+              ) : (
+                <ul className="text-sm">
+                  {padres.map((p, i) => (
+                    <li key={i}>
+                      {p.padre?.nombre_completo} {p.parentesco && `(${p.parentesco})`}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openEdit(nino)}>
+                  Editar
+                </button>
+                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openInvite(nino)}>
+                  + Padre
+                </button>
+                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => toggleActivo(nino)}>
+                  {nino.activo ? 'Desactivar' : 'Activar'}
+                </button>
+              </div>
+            </div>
+          )
+        })}
+        {filtrados.length === 0 && <p className="text-ink/40">No hay niños que coincidan.</p>}
+      </div>
+
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar niño/a' : 'Nuevo niño/a'}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div>
+            <label className="label">Nombre completo</label>
+            <input
+              required
+              className="input"
+              value={form.nombre_completo}
+              onChange={(e) => setForm({ ...form, nombre_completo: e.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="label">Fecha de nacimiento</label>
+              <input
+                type="date"
+                className="input"
+                value={form.fecha_nacimiento}
+                onChange={(e) => setForm({ ...form, fecha_nacimiento: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label">Clase</label>
+              <select
+                className="input"
+                value={form.nivel_id}
+                onChange={(e) => setForm({ ...form, nivel_id: e.target.value })}
+              >
+                <option value="">Sin asignar</option>
+                {niveles.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="label">Alergias / condiciones</label>
+            <input
+              className="input"
+              value={form.alergias}
+              onChange={(e) => setForm({ ...form, alergias: e.target.value })}
+              placeholder="Ej. Alergia al maní"
+            />
+          </div>
+          <div>
+            <label className="label">Notas</label>
+            <textarea
+              className="input"
+              rows={3}
+              value={form.notas}
+              onChange={(e) => setForm({ ...form, notas: e.target.value })}
+            />
+          </div>
+          {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
+          <button disabled={busy} className="btn-primary justify-center">
+            {busy ? 'Guardando...' : 'Guardar'}
+          </button>
+        </form>
+      </Modal>
+
+      <Modal open={!!inviteModal} onClose={() => setInviteModal(null)} title={`Padre/madre de ${inviteModal?.nombre_completo || ''}`}>
+        {creado ? (
+          <div className="flex flex-col gap-4 text-center">
+            <span className="text-4xl">✅</span>
+            <p className="font-bold">Cuenta creada para {creado.nombre}</p>
+            <div className="rounded-chunky bg-grass-50 p-4">
+              <p className="text-xs font-extrabold uppercase text-ink/40">Cédula (usuario)</p>
+              <p className="text-xl font-extrabold text-grass-700">{creado.cedula}</p>
+              <p className="mt-2 text-xs font-extrabold uppercase text-ink/40">Contraseña</p>
+              <p className="text-xl font-extrabold text-grass-700">{creado.password}</p>
+            </div>
+            <p className="text-sm text-ink/50">Comunícale estos datos para que pueda entrar.</p>
+            <button className="btn-primary justify-center" onClick={() => setInviteModal(null)}>
+              Listo
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setModoVinculo('nueva')}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${modoVinculo === 'nueva' ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                Crear cuenta nueva
+              </button>
+              <button
+                type="button"
+                onClick={() => setModoVinculo('existente')}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${modoVinculo === 'existente' ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                Ya tiene cuenta
+              </button>
+            </div>
+
+            {modoVinculo === 'nueva' ? (
+              <form onSubmit={handleInviteNueva} className="flex flex-col gap-4">
+                <div>
+                  <label className="label">Nombre del padre/madre</label>
+                  <input
+                    required
+                    className="input"
+                    value={inviteForm.nombre_completo}
+                    onChange={(e) => setInviteForm({ ...inviteForm, nombre_completo: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="label">Cédula</label>
+                  <input
+                    required
+                    className="input"
+                    value={inviteForm.cedula}
+                    onChange={(e) => setInviteForm({ ...inviteForm, cedula: e.target.value })}
+                    placeholder="Ej. 001-1234567-8"
+                  />
+                </div>
+                <div>
+                  <label className="label">Parentesco</label>
+                  <input
+                    className="input"
+                    placeholder="Mamá, papá, abuela..."
+                    value={inviteForm.parentesco}
+                    onChange={(e) => setInviteForm({ ...inviteForm, parentesco: e.target.value })}
+                  />
+                </div>
+                {inviteMsg && <p className="text-sm font-bold">{inviteMsg}</p>}
+                <button disabled={inviteBusy} className="btn-primary justify-center">
+                  {inviteBusy ? 'Creando...' : 'Crear cuenta'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVincularExistente} className="flex flex-col gap-4">
+                <p className="text-sm text-ink/50">
+                  Para cuando el padre/madre ya es docente, coordinador/a, o ya tiene cuenta con otro hijo/a.
+                </p>
+                <div>
+                  <label className="label">Buscar por nombre o cédula</label>
+                  <input
+                    className="input"
+                    value={busquedaPerfil}
+                    onChange={(e) => {
+                      setBusquedaPerfil(e.target.value)
+                      setPerfilSeleccionado(null)
+                    }}
+                    placeholder="Escribe para buscar..."
+                  />
+                </div>
+                {busquedaPerfil && !perfilSeleccionado && (
+                  <div className="flex max-h-40 flex-col overflow-y-auto rounded-2xl border-2 border-ink/10">
+                    {perfilesFiltrados.map((p) => (
+                      <button
+                        type="button"
+                        key={p.id}
+                        onClick={() => {
+                          setPerfilSeleccionado(p)
+                          setBusquedaPerfil(p.nombre_completo)
+                        }}
+                        className="flex items-center justify-between px-3 py-2 text-left text-sm font-bold hover:bg-sky-50"
+                      >
+                        <span>{p.nombre_completo}</span>
+                        <span className="text-xs font-normal text-ink/40">{p.role}</span>
+                      </button>
+                    ))}
+                    {perfilesFiltrados.length === 0 && (
+                      <p className="px-3 py-2 text-sm text-ink/40">Sin resultados.</p>
+                    )}
+                  </div>
+                )}
+                {perfilSeleccionado && (
+                  <div>
+                    <label className="label">Parentesco</label>
+                    <input
+                      className="input"
+                      placeholder="Mamá, papá, abuela..."
+                      value={parentescoExistente}
+                      onChange={(e) => setParentescoExistente(e.target.value)}
+                    />
+                  </div>
+                )}
+                {inviteMsg && <p className="text-sm font-bold">{inviteMsg}</p>}
+                <button disabled={inviteBusy || !perfilSeleccionado} className="btn-primary justify-center">
+                  {inviteBusy ? 'Vinculando...' : 'Vincular'}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
+      </Modal>
+    </div>
+  )
+}

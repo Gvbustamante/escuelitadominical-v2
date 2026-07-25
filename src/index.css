@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    @apply font-body bg-cream text-ink;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display font-extrabold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-extrabold shadow-soft
+           transition-all duration-150 ease-out hover:scale-[1.03] active:scale-95 select-none disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-sky-400 text-white hover:bg-sky-500;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-ink border-2 border-ink/10 hover:bg-ink/5;
+  }
+  .btn-success {
+    @apply btn bg-grass-400 text-white hover:bg-grass-500;
+  }
+  .btn-danger {
+    @apply btn bg-coral-400 text-white hover:bg-coral-500;
+  }
+  .card {
+    @apply bg-white rounded-blob shadow-card border-2 border-sky-50 p-6;
+  }
+  .card-link {
+    @apply card transition-transform duration-150 ease-out hover:scale-[1.02] cursor-pointer;
+  }
+  .input {
+    @apply w-full rounded-chunky border-2 border-ink/10 bg-white px-4 py-3 text-lg text-ink
+           transition-colors duration-150 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-100;
+  }
+  .label {
+    @apply block text-xs font-extrabold text-ink/50 mb-1.5 uppercase tracking-wider;
+  }
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-bold;
+  }
+}
