@@ -6,6 +6,7 @@ import Spinner from '../../components/Spinner'
 import RewardBurst from '../../components/RewardBurst'
 import ResumenAsistenciaMensual from '../../components/ResumenAsistenciaMensual'
 import ProgresoNinoModal from '../../components/ProgresoNinoModal'
+import AlertasAusencia from '../../components/AlertasAusencia'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -95,6 +96,12 @@ export default function Asistencia() {
         >
           Resumen del mes
         </button>
+        <button
+          onClick={() => setTab('ausencias')}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'ausencias' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+        >
+          Ausencias
+        </button>
       </div>
 
       <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
@@ -107,6 +114,8 @@ export default function Asistencia() {
 
       {tab === 'mes' ? (
         <ResumenAsistenciaMensual nivelId={nivelId} ninos={ninos} />
+      ) : tab === 'ausencias' ? (
+        <AlertasAusencia nivelId={nivelId} ninos={ninos} />
       ) : (
         <>
           <input type="date" className="input max-w-xs" value={fecha} onChange={(e) => setFecha(e.target.value)} />

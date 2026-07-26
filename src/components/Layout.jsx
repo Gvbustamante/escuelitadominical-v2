@@ -15,7 +15,7 @@ const NAV = {
     { to: '/agenda', label: 'Agenda', icon: '📅' },
     { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
     { to: '/citas-biblicas', label: 'Versículos', icon: '📖' },
-    { to: '/foro', label: 'Foro', icon: '💬' },
+    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
     { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
   coordinador: [
@@ -28,7 +28,7 @@ const NAV = {
     { to: '/agenda', label: 'Agenda', icon: '📅' },
     { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
     { to: '/citas-biblicas', label: 'Versículos', icon: '📖' },
-    { to: '/foro', label: 'Foro', icon: '💬' },
+    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
     { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
   docente: [
@@ -38,7 +38,7 @@ const NAV = {
     { to: '/progreso', label: 'Progreso', icon: '🌱' },
     { to: '/agenda', label: 'Agenda', icon: '📅' },
     { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
-    { to: '/foro', label: 'Foro', icon: '💬' },
+    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
     { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
   padre: [
@@ -47,7 +47,7 @@ const NAV = {
     { to: '/progreso', label: 'Progreso', icon: '🌱' },
     { to: '/agenda', label: 'Agenda', icon: '📅' },
     { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
-    { to: '/foro', label: 'Foro', icon: '💬' },
+    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
     { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
 }
