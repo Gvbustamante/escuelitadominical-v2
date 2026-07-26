@@ -240,12 +240,23 @@ export default function Landing() {
           sin enredos ni papeles perdidos, sin necesidad de ser expertos en tecnología.
         </p>
         <p className="mt-4 text-lg leading-relaxed text-ink/70">
+          La idea la llevaba en el corazón desde hacía tiempo. La primera vez que me senté a construirla
+          fue un mes antes de que naciera mi segundo hijo, así que no pude seguir. Cuando quise retomarla,
+          ya no pude entrar a ese proyecto, se había perdido. Pasaron casi dos años hasta que volví a
+          encontrar espacio en mi agenda, y esta vez la empecé desde cero.
+        </p>
+        <p className="mt-4 text-lg leading-relaxed text-ink/70">
           Access Kids es un trabajo hecho con cariño, entregado como ofrenda al Señor. Para que la Palabra
           se enseñe de una forma bonita, y para que cada niño y niña disfrute más su tiempo en la iglesia.
         </p>
-        <p className="mt-5 text-sm font-extrabold uppercase tracking-wide text-coral-500">
+        <a
+          href="https://gobeapp.com/gise/"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-5 inline-block text-sm font-extrabold uppercase tracking-wide text-coral-500 hover:underline"
+        >
           Gisella Bustamante, creadora de Access Kids
-        </p>
+        </a>
       </section>
 
       {/* OFRENDA */}
