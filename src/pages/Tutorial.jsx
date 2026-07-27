@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import GobeLogo from '../components/GobeLogo'
 
 function Step({ number, icon, title, children, color = 'sky' }) {
   const bg = {
@@ -240,10 +241,10 @@ export default function Tutorial() {
 
       <div className="card max-w-2xl">
         <p className="label mb-3">Acerca de Access Kids</p>
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-2xl font-extrabold text-sky-600">
-            G
-          </div>
+        <div className="flex flex-wrap items-center gap-4">
+          <a href="https://gobeapp.com" target="_blank" rel="noreferrer" className="shrink-0">
+            <GobeLogo className="h-8 w-auto" />
+          </a>
           <div>
             <a
               href="https://gobeapp.com"
