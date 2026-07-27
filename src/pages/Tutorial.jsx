@@ -237,6 +237,31 @@ export default function Tutorial() {
       ) : (
         <RolesTab role={profile.role} />
       )}
+
+      <div className="card max-w-2xl">
+        <p className="label mb-3">Acerca de Access Kids</p>
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-2xl font-extrabold text-sky-600">
+            G
+          </div>
+          <div>
+            <a
+              href="https://gobeapp.com"
+              target="_blank"
+              rel="noreferrer"
+              className="font-extrabold text-sky-600 hover:underline"
+            >
+              Gobe App Technology
+            </a>
+            <p className="text-sm text-ink/60">
+              Creado por{' '}
+              <a href="https://gobeapp.com/gise/" target="_blank" rel="noreferrer" className="font-bold text-coral-500 hover:underline">
+                Gisella Bustamante
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

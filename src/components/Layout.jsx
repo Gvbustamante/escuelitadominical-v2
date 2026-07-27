@@ -121,6 +121,14 @@ export default function Layout() {
             <span>🚪</span>
             <span className="hidden md:block">Salir</span>
           </button>
+          <a
+            href="https://gobeapp.com"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1 hidden text-center text-[10px] font-bold uppercase tracking-wide text-ink/30 hover:text-sky-500 md:block"
+          >
+            Gobe App Technology
+          </a>
         </div>
       </aside>
 
