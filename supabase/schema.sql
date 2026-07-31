@@ -476,3 +476,112 @@ create policy "borrar mensaje propio o staff" on public.foro_mensajes for delete
     autor_id = auth.uid()
     or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
   );
+
+-- ---------- RECONOCIMIENTOS (estrellas de gamificación) ----------
+
+create table public.reconocimientos (
+  id uuid primary key default gen_random_uuid(),
+  nino_id uuid references public.ninos(id) on delete cascade,
+  nivel_id uuid references public.niveles(id),
+  tipo text not null default 'estrella' check (tipo = 'estrella'),
+  motivo text,
+  otorgado_por uuid references public.profiles(id),
+  created_at timestamptz not null default now()
+);
+comment on table public.reconocimientos is 'Estrellas que un docente/admin otorga a un niño. Capa de gamificación, no reemplaza progreso_notas.';
+
+alter table public.reconocimientos enable row level security;
+
+create policy "leer reconocimientos" on public.reconocimientos for select to authenticated
+  using (
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    or exists (select 1 from public.ninos_padres np where np.nino_id = reconocimientos.nino_id and np.padre_id = auth.uid())
+  );
+create policy "otorgar reconocimientos" on public.reconocimientos for insert to authenticated
+  with check (
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = reconocimientos.nivel_id and dn.docente_id = auth.uid())
+  );
+create policy "borrar reconocimiento propio o staff" on public.reconocimientos for delete to authenticated
+  using (
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or otorgado_por = auth.uid()
+  );
+
+-- ---------- PETICIONES DE ORACIÓN ----------
+
+create table public.peticiones_oracion (
+  id uuid primary key default gen_random_uuid(),
+  autor_id uuid references public.profiles(id),
+  texto text not null,
+  privado boolean not null default true,
+  created_at timestamptz not null default now()
+);
+comment on table public.peticiones_oracion is 'Peticiones de oración de docentes/padres. privado=true visible solo para staff y el autor; privado=false visible para toda la comunidad.';
+
+alter table public.peticiones_oracion enable row level security;
+
+create policy "leer peticiones" on public.peticiones_oracion for select to authenticated
+  using (
+    privado = false
+    or autor_id = auth.uid()
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+  );
+create policy "crear peticion propia" on public.peticiones_oracion for insert to authenticated
+  with check (autor_id = auth.uid());
+create policy "actualizar peticion propia o staff" on public.peticiones_oracion for update to authenticated
+  using (
+    autor_id = auth.uid()
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+  )
+  with check (
+    autor_id = auth.uid()
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+  );
+create policy "borrar peticion propia o staff" on public.peticiones_oracion for delete to authenticated
+  using (
+    autor_id = auth.uid()
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+  );
+
+-- ---------- CONFIG_IGLESIA (logo y nombre personalizables) ----------
+
+create table public.config_iglesia (
+  id uuid primary key default gen_random_uuid(),
+  nombre_iglesia text,
+  logo_url text,
+  updated_at timestamptz not null default now()
+);
+comment on table public.config_iglesia is 'Configuracion general de la iglesia/escuelita (una sola fila). Logo personalizable por el admin.';
+
+alter table public.config_iglesia enable row level security;
+
+create policy "lectura publica de config_iglesia" on public.config_iglesia for select to anon, authenticated using (true);
+create policy "staff administra config_iglesia" on public.config_iglesia for all to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+
+insert into storage.buckets (id, name, public)
+values ('logos', 'logos', true)
+on conflict (id) do nothing;
+
+create policy "lectura publica de logos" on storage.objects for select
+  using (bucket_id = 'logos');
+
+create policy "staff sube logos" on storage.objects for insert to authenticated
+  with check (
+    bucket_id = 'logos'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+  );
+
+create policy "staff actualiza logos" on storage.objects for update to authenticated
+  using (
+    bucket_id = 'logos'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+  );
+
+create policy "staff elimina logos" on storage.objects for delete to authenticated
+  using (
+    bucket_id = 'logos'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+  );

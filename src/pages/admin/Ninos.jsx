@@ -5,6 +5,12 @@ import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import { BADGE_CLASSES } from '../../lib/colors'
 
+function generarCodigoFacil(nombreNino) {
+  const base = (nombreNino || 'familia').trim().split(' ')[0].toLowerCase().normalize('NFD').replace(/[^a-z]/g, '')
+  const numero = Math.floor(100 + Math.random() * 900)
+  return `${base || 'familia'}${numero}`
+}
+
 function calcularEdad(fecha) {
   if (!fecha) return '—'
   const nacimiento = new Date(fecha)
@@ -369,14 +375,27 @@ export default function Ninos() {
                   />
                 </div>
                 <div>
-                  <label className="label">Cédula</label>
-                  <input
-                    required
-                    className="input"
-                    value={inviteForm.cedula}
-                    onChange={(e) => setInviteForm({ ...inviteForm, cedula: e.target.value })}
-                    placeholder="Ej. 001-1234567-8"
-                  />
+                  <label className="label">Cédula (o un código fácil, si no la sabes)</label>
+                  <div className="flex gap-2">
+                    <input
+                      required
+                      className="input"
+                      value={inviteForm.cedula}
+                      onChange={(e) => setInviteForm({ ...inviteForm, cedula: e.target.value })}
+                      placeholder="Ej. 001-1234567-8"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setInviteForm({ ...inviteForm, cedula: generarCodigoFacil(inviteModal?.nombre_completo) })}
+                      className="btn-secondary shrink-0 !px-3 !text-sm"
+                    >
+                      🎲 Generar
+                    </button>
+                  </div>
+                  <p className="mt-1 text-xs text-ink/40">
+                    No siempre es la mamá o el papá quien recoge al niño/a. Si no sabes su cédula, genera un código
+                    fácil y úsalo como usuario — funciona igual.
+                  </p>
                 </div>
                 <div>
                   <label className="label">Parentesco</label>
