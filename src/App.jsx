@@ -19,6 +19,7 @@ import AsistenciaAdmin from './pages/admin/AsistenciaAdmin'
 import ActividadesAdmin from './pages/admin/ActividadesAdmin'
 import AgendaAdmin from './pages/admin/AgendaAdmin'
 import CitasBiblicasAdmin from './pages/admin/CitasBiblicasAdmin'
+import Ajustes from './pages/admin/Ajustes'
 
 import DocenteHome from './pages/docente/DocenteHome'
 import Asistencia from './pages/docente/Asistencia'
@@ -101,6 +102,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={STAFF}>
               <CitasBiblicasAdmin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ajustes"
+          element={
+            <ProtectedRoute roles={STAFF}>
+              <Ajustes />
             </ProtectedRoute>
           }
         />

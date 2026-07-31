@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import AppLogo from '../components/AppLogo'
 
 export default function Login() {
   const { session, signIn, loading } = useAuth()
@@ -28,7 +29,7 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-sky-100 p-4">
       <div className="card w-full max-w-md">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <span className="text-6xl">📖</span>
+          <AppLogo emojiClassName="text-6xl" imgClassName="h-16 w-16 object-contain" />
           <h1 className="text-3xl uppercase text-sky-500">
             Access <span className="text-coral-500">Kids</span>
           </h1>

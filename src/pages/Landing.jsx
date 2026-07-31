@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import AppLogo from '../components/AppLogo'
 
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xdaqpawn'
 
@@ -87,7 +88,7 @@ export default function Landing() {
 
         {/* titulo */}
         <div className="lp-in relative mx-auto max-w-2xl px-6 text-center">
-          <span className="text-6xl">📖</span>
+          <AppLogo emojiClassName="text-6xl" imgClassName="mx-auto h-20 w-20 object-contain" />
           <h1 className="mt-3 text-4xl uppercase tracking-tight text-sky-600 sm:text-6xl">
             Access <span className="text-coral-500">Kids</span>
           </h1>
