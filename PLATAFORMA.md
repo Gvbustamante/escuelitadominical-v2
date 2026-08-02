@@ -34,6 +34,51 @@ Las cuentas de `docente` y `padre` (y `coordinador`) **solo las crea alguien con
 
 Cada ruta de la app está protegida por rol vía `<ProtectedRoute roles={[...]}>` (`src/components/ProtectedRoute.jsx`) y por Row Level Security en la base de datos (doble candado: UI + base de datos).
 
+### 2.1 Dónde viven los roles en el código (para poder cambiarlos)
+
+**No existe una tabla `roles` ni una config central.** Los 4 roles (`admin`, `coordinador`, `docente`, `padre`) están escritos como texto literal, repetidos en varios archivos independientes. Cambiar el set de roles (agregar, quitar o renombrar uno) significa editar **todos** estos puntos a la vez y de forma consistente — si se olvida uno, queda una inconsistencia entre lo que permite la base de datos y lo que muestra/permite la UI.
+
+**A. Base de datos (`supabase/schema.sql`)**
+
+| Qué | Dónde | Línea |
+|---|---|---|
+| Lista oficial de roles válidos (constraint de la tabla) | `role text not null check (role in ('admin','coordinador','docente','padre'))` | `schema.sql:11` |
+| Quién puede invitar y a quién (reglas de jerarquía) | función `admin_create_invited_user`: valida `caller_role`, `p_role`, y que un `coordinador` solo invite `docente`/`padre` | `schema.sql:359`, `363`, `367-368` |
+| Reglas de acceso por rol (RLS) — quién lee/escribe cada tabla | ~50 políticas `create policy ... using (... p.role in (...))`, una por tabla/operación | `schema.sql:168` a `586` (todo el bloque `-- SEGURIDAD (RLS)`) |
+| Reglas de acceso a archivos subidos (Storage) | políticas sobre `storage.objects` para los buckets `actividades` y `logos` | `schema.sql:326`, `333`, `574`, `580`, `586` |
+
+**B. Frontend — enrutamiento (`src/App.jsx`)**
+
+| Qué | Dónde | Línea |
+|---|---|---|
+| Grupo "staff" (acceso amplio) | `const STAFF = ['admin', 'coordinador']` | `App.jsx:35` |
+| Qué roles pueden entrar a cada pantalla | prop `roles={...}` en cada `<ProtectedRoute>` (ej. `roles={STAFF}`, `roles={[...STAFF, 'docente', 'padre']}`) | `App.jsx:61-129` |
+| Qué componente se muestra según el rol logueado (mismo path, distinta pantalla) | funciones `RoleSwitchHome`, `RoleSwitchAsistencia`, `RoleSwitchActividades`, `RoleSwitchAgenda`, `RoleSwitchProgreso` — comparan `profile.role === 'docente' / 'padre'` | `App.jsx:147-174` |
+
+**C. Frontend — navegación y componentes**
+
+| Qué | Dónde | Línea |
+|---|---|---|
+| Menú lateral: qué links ve cada rol | objeto `NAV = { admin: [...], coordinador: [...], docente: [...], padre: [...] }` | `src/components/Layout.jsx:8-56` |
+| Etiqueta visible del rol ("Administrador", "Docente", etc.) | objeto `ROLE_LABEL` | `src/components/Layout.jsx:58-63` |
+| Filtro final de acceso a cada ruta (chequea `roles.includes(profile.role)`) | `src/components/ProtectedRoute.jsx:21` |
+| Copia local de `STAFF` (⚠️ duplicada, no importada de `App.jsx`) para saber si mostrar controles de admin en la "cita del día" | `src/components/CitaDelDia.jsx:6, 37` |
+
+**D. Frontend — alta de usuarios**
+
+| Qué | Dónde |
+|---|---|
+| Formulario/llamada que crea un usuario con un rol específico, pasándolo al RPC de la base de datos | `src/lib/invite.js` (parámetro `role` → `p_role`), invocado desde las pantallas de invitar en `src/pages/admin/Docentes.jsx`, `Ninos.jsx` (padres), etc. |
+
+**Resumen para tocarlos con cuidado:** si vas a cambiar los roles (p. ej. a un modelo `admin` / `líder` / `profesor`), el checklist es:
+1. Cambiar el `check` de `role` en `schema.sql:11`.
+2. Reescribir las reglas de jerarquía en `admin_create_invited_user` (quién invita a quién).
+3. Reescribir **todas** las políticas RLS que mencionan los roles viejos (bloque completo de seguridad).
+4. Actualizar `STAFF` y los `roles={...}` de cada ruta en `App.jsx`.
+5. Actualizar `NAV` y `ROLE_LABEL` en `Layout.jsx`.
+6. Actualizar la copia duplicada de `STAFF` en `CitaDelDia.jsx` (y revisar si hay más copias sueltas antes de dar por cerrado el cambio — conviene buscar `role in (` y `profile.role` en todo el repo).
+7. Ajustar las pantallas y textos de invitación (`src/lib/invite.js` y las páginas que la usan) para el nuevo set de roles.
+
 ## 3. Stack tecnológico
 
 | Capa | Tecnología | Versión (package.json) |
