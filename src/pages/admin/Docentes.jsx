@@ -4,6 +4,7 @@ import { crearUsuario } from '../../lib/invite'
 import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
+import VistaToggle from '../../components/VistaToggle'
 
 const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente' }
 const ROLE_BADGE = {
@@ -15,6 +16,8 @@ const ROLE_BADGE = {
 export default function Docentes() {
   const { profile } = useAuth()
   const [staff, setStaff] = useState(null)
+  const [clasesPorDocente, setClasesPorDocente] = useState({})
+  const [vista, setVista] = useState('tarjetas')
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState({ cedula: '', nombre_completo: '', role: 'docente' })
   const [error, setError] = useState('')
@@ -22,12 +25,18 @@ export default function Docentes() {
   const [busy, setBusy] = useState(false)
 
   const load = useCallback(async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .in('role', ['admin', 'coordinador', 'docente'])
-      .order('role')
+    const [{ data }, { data: asignaciones }] = await Promise.all([
+      supabase.from('profiles').select('*').in('role', ['admin', 'coordinador', 'docente']).order('role'),
+      supabase.from('docentes_niveles').select('docente_id, nivel:niveles(nombre)'),
+    ])
     setStaff(data || [])
+    const clases = {}
+    ;(asignaciones || []).forEach((a) => {
+      if (!a.nivel?.nombre) return
+      clases[a.docente_id] = clases[a.docente_id] || []
+      clases[a.docente_id].push(a.nivel.nombre)
+    })
+    setClasesPorDocente(clases)
   }, [])
 
   useEffect(() => {
@@ -71,27 +80,85 @@ export default function Docentes() {
           <h1 className="text-3xl font-bold">Equipo 🍎</h1>
           <p className="text-ink/50">Docentes, coordinadores y administradores</p>
         </div>
-        <button className="btn-primary" onClick={openInvite}>
-          + Agregar
-        </button>
+        <div className="flex items-center gap-3">
+          <VistaToggle vista={vista} onChange={setVista} />
+          <button className="btn-primary" onClick={openInvite}>
+            + Agregar
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {staff.map((p) => (
-          <div key={p.id} className={`card ${!p.activo ? 'opacity-50' : ''}`}>
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="text-lg font-bold">{p.nombre_completo}</h3>
-              <span className={`badge ${ROLE_BADGE[p.role]}`}>{ROLE_LABEL[p.role]}</span>
+      {vista === 'tarjetas' ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {staff.map((p) => (
+            <div key={p.id} className={`card ${!p.activo ? 'opacity-50' : ''}`}>
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="text-lg font-bold">{p.nombre_completo}</h3>
+                <span className={`badge ${ROLE_BADGE[p.role]}`}>{ROLE_LABEL[p.role]}</span>
+              </div>
+              {p.cedula && <p className="text-sm text-ink/50">Cédula: {p.cedula}</p>}
+              {p.role === 'docente' && (
+                <p className="mt-2 text-sm text-ink/50">
+                  Clases: {clasesPorDocente[p.id]?.join(', ') || 'Sin asignar'}
+                </p>
+              )}
+              {profile.role === 'admin' && p.id !== profile.id && (
+                <button className="btn-secondary mt-4 w-full !py-2 !text-sm" onClick={() => toggleActivo(p)}>
+                  {p.activo ? 'Desactivar' : 'Activar'}
+                </button>
+              )}
             </div>
-            {p.cedula && <p className="text-sm text-ink/50">Cédula: {p.cedula}</p>}
-            {profile.role === 'admin' && p.id !== profile.id && (
-              <button className="btn-secondary mt-4 w-full !py-2 !text-sm" onClick={() => toggleActivo(p)}>
-                {p.activo ? 'Desactivar' : 'Activar'}
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="card overflow-x-auto p-0">
+          <table className="w-full text-left">
+            <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
+              <tr>
+                <th className="px-4 py-3">Nombre</th>
+                <th className="px-4 py-3">Rol</th>
+                <th className="px-4 py-3">Cédula</th>
+                <th className="px-4 py-3">Clases</th>
+                <th className="px-4 py-3">Estado</th>
+                <th className="px-4 py-3">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {staff.map((p) => (
+                <tr key={p.id} className={`border-t border-ink/5 ${!p.activo ? 'opacity-50' : ''}`}>
+                  <td className="px-4 py-3 font-bold">{p.nombre_completo}</td>
+                  <td className="px-4 py-3">
+                    <span className={`badge ${ROLE_BADGE[p.role]}`}>{ROLE_LABEL[p.role]}</span>
+                  </td>
+                  <td className="px-4 py-3 text-ink/60">{p.cedula || '—'}</td>
+                  <td className="px-4 py-3 text-ink/60">
+                    {p.role === 'docente' ? clasesPorDocente[p.id]?.join(', ') || 'Sin asignar' : '—'}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`badge ${p.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
+                      {p.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {profile.role === 'admin' && p.id !== profile.id && (
+                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => toggleActivo(p)}>
+                        {p.activo ? 'Desactivar' : 'Activar'}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {staff.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-6 text-center text-ink/40">
+                    Aún no hay nadie en el equipo.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Agregar al equipo">
         {creado ? (
