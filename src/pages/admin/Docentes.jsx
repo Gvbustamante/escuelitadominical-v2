@@ -33,7 +33,12 @@ export default function Docentes() {
 
   const load = useCallback(async () => {
     const [{ data }, { data: asignaciones }] = await Promise.all([
-      supabase.from('profiles').select('*').in('role', ['admin', 'coordinador', 'docente']).order('role'),
+      supabase
+        .from('profiles')
+        .select('*')
+        .in('role', ['admin', 'coordinador', 'docente'])
+        .order('role')
+        .order('nombre_completo'),
       supabase.from('docentes_niveles').select('docente_id, nivel:niveles(nombre)'),
     ])
     setStaff(data || [])

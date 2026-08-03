@@ -26,10 +26,12 @@ export default function Devocionales() {
   const [mes, setMes] = useState(hoyYYYYMM())
   const [verTodos, setVerTodos] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '' })
   const [imagen, setImagen] = useState(null)
   const [preview, setPreview] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
 
   const load = useCallback(async () => {
     let query = supabase.from('devocionales_ninos').select('*, nivel:niveles(nombre)').order('fecha', { ascending: false })
@@ -48,9 +50,26 @@ export default function Devocionales() {
   }, [load, puedeCrear])
 
   function openNew() {
+    setEditing(null)
     setForm({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '' })
     setImagen(null)
     setPreview(null)
+    setError('')
+    setModalOpen(true)
+  }
+
+  function openEdit(d) {
+    setEditing(d)
+    setForm({
+      titulo: d.titulo,
+      versiculo: d.versiculo || '',
+      contenido: d.contenido,
+      fecha: d.fecha,
+      nivel_id: d.nivel_id || '',
+    })
+    setImagen(null)
+    setPreview(null)
+    setError('')
     setModalOpen(true)
   }
 
@@ -64,25 +83,44 @@ export default function Devocionales() {
   async function handleSubmit(e) {
     e.preventDefault()
     setBusy(true)
-    const { data: devocional, error } = await supabase
-      .from('devocionales_ninos')
-      .insert({
-        titulo: form.titulo,
-        versiculo: form.versiculo || null,
-        contenido: form.contenido,
-        fecha: form.fecha,
-        nivel_id: form.nivel_id || null,
-        creado_por: user.id,
-      })
-      .select()
-      .single()
+    setError('')
 
-    if (!error && imagen) {
-      const path = `devocionales/${devocional.id}/${Date.now()}-${imagen.name}`
+    const payload = {
+      titulo: form.titulo,
+      versiculo: form.versiculo || null,
+      contenido: form.contenido,
+      fecha: form.fecha,
+      nivel_id: form.nivel_id || null,
+    }
+
+    let devocionalId = editing?.id
+    if (editing) {
+      const { error: updError } = await supabase.from('devocionales_ninos').update(payload).eq('id', editing.id)
+      if (updError) {
+        setError(updError.message)
+        setBusy(false)
+        return
+      }
+    } else {
+      const { data: devocional, error: insError } = await supabase
+        .from('devocionales_ninos')
+        .insert({ ...payload, creado_por: user.id })
+        .select()
+        .single()
+      if (insError) {
+        setError(insError.message)
+        setBusy(false)
+        return
+      }
+      devocionalId = devocional.id
+    }
+
+    if (imagen) {
+      const path = `devocionales/${devocionalId}/${Date.now()}-${imagen.name}`
       const { error: upError } = await supabase.storage.from('actividades').upload(path, imagen)
       if (!upError) {
         const imagen_url = supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
-        await supabase.from('devocionales_ninos').update({ imagen_url }).eq('id', devocional.id)
+        await supabase.from('devocionales_ninos').update({ imagen_url }).eq('id', devocionalId)
       }
     }
 
@@ -127,7 +165,14 @@ export default function Devocionales() {
             )}
             <div className="flex items-start justify-between">
               <h3 className="text-lg font-bold">{d.titulo}</h3>
-              <span className="text-sm text-ink/40">{d.fecha}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-ink/40">{d.fecha}</span>
+                {puedeCrear && (
+                  <button onClick={() => openEdit(d)} className="text-lg text-ink/30 hover:text-sky-500">
+                    ✏️
+                  </button>
+                )}
+              </div>
             </div>
             {d.nivel?.nombre && <p className="text-xs font-bold uppercase text-sky-500">{d.nivel.nombre}</p>}
             {d.versiculo && <p className="mt-2 italic text-ink/70">📖 "{d.versiculo}"</p>}
@@ -141,7 +186,7 @@ export default function Devocionales() {
         )}
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nuevo devocional">
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar devocional' : 'Nuevo devocional'}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="label">Título</label>
@@ -185,12 +230,15 @@ export default function Devocionales() {
             </div>
           </div>
           <div>
-            <label className="label">Imagen (opcional)</label>
+            <label className="label">{editing ? 'Cambiar imagen (opcional)' : 'Imagen (opcional)'}</label>
             <input type="file" accept="image/*" className="input" onChange={handleImagen} />
-            {preview && <img src={preview} alt="" className="mt-2 h-32 w-full rounded-2xl object-cover" />}
+            {(preview || (editing && editing.imagen_url)) && (
+              <img src={preview || editing.imagen_url} alt="" className="mt-2 h-32 w-full rounded-2xl object-cover" />
+            )}
           </div>
+          {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
           <button disabled={busy} className="btn-primary justify-center">
-            {busy ? 'Publicando...' : 'Publicar devocional'}
+            {busy ? 'Guardando...' : editing ? 'Guardar cambios' : 'Publicar devocional'}
           </button>
         </form>
       </Modal>
