@@ -4,6 +4,8 @@ import { crearUsuario } from '../../lib/invite'
 import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
+import DetalleDocenteModal from '../../components/DetalleDocenteModal'
 import VistaToggle from '../../components/VistaToggle'
 
 const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente' }
@@ -23,6 +25,10 @@ export default function Docentes() {
   const [error, setError] = useState('')
   const [creado, setCreado] = useState(null)
   const [busy, setBusy] = useState(false)
+
+  const [detallePersona, setDetallePersona] = useState(null)
+  const [confirmDesactivar, setConfirmDesactivar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
 
   const load = useCallback(async () => {
     const [{ data }, { data: asignaciones }] = await Promise.all([
@@ -71,6 +77,21 @@ export default function Docentes() {
     load()
   }
 
+  function handleToggleClick(person) {
+    if (person.activo) {
+      setConfirmDesactivar(person)
+    } else {
+      toggleActivo(person)
+    }
+  }
+
+  async function confirmarDesactivar() {
+    setConfirmBusy(true)
+    await toggleActivo(confirmDesactivar)
+    setConfirmBusy(false)
+    setConfirmDesactivar(null)
+  }
+
   if (!staff) return <Spinner />
 
   return (
@@ -102,11 +123,16 @@ export default function Docentes() {
                   Clases: {clasesPorDocente[p.id]?.join(', ') || 'Sin asignar'}
                 </p>
               )}
-              {profile.role === 'admin' && p.id !== profile.id && (
-                <button className="btn-secondary mt-4 w-full !py-2 !text-sm" onClick={() => toggleActivo(p)}>
-                  {p.activo ? 'Desactivar' : 'Activar'}
+              <div className="mt-4 flex gap-2">
+                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => setDetallePersona(p)}>
+                  Ver detalle
                 </button>
-              )}
+                {profile.role === 'admin' && p.id !== profile.id && (
+                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => handleToggleClick(p)}>
+                    {p.activo ? 'Desactivar' : 'Activar'}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -140,11 +166,16 @@ export default function Docentes() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {profile.role === 'admin' && p.id !== profile.id && (
-                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => toggleActivo(p)}>
-                        {p.activo ? 'Desactivar' : 'Activar'}
+                    <div className="flex flex-wrap gap-2">
+                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetallePersona(p)}>
+                        Ver detalle
                       </button>
-                    )}
+                      {profile.role === 'admin' && p.id !== profile.id && (
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(p)}>
+                          {p.activo ? 'Desactivar' : 'Activar'}
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -217,6 +248,27 @@ export default function Docentes() {
           </form>
         )}
       </Modal>
+
+      <DetalleDocenteModal
+        persona={detallePersona}
+        clases={detallePersona ? clasesPorDocente[detallePersona.id] || [] : []}
+        open={!!detallePersona}
+        onClose={() => setDetallePersona(null)}
+      />
+
+      <ConfirmModal
+        open={!!confirmDesactivar}
+        onClose={() => setConfirmDesactivar(null)}
+        onConfirm={confirmarDesactivar}
+        busy={confirmBusy}
+        title="¿Desactivar a esta persona?"
+        confirmLabel="Sí, desactivar"
+        message={
+          confirmDesactivar
+            ? `${confirmDesactivar.nombre_completo} dejará de aparecer como activo/a en el equipo. Puedes reactivarlo/a cuando quieras.`
+            : ''
+        }
+      />
     </div>
   )
 }

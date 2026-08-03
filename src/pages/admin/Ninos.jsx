@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabaseClient'
 import { crearUsuario } from '../../lib/invite'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
+import DetalleNinoModal from '../../components/DetalleNinoModal'
 import VistaToggle from '../../components/VistaToggle'
 import { BADGE_CLASSES } from '../../lib/colors'
 
@@ -46,6 +48,10 @@ export default function Ninos() {
   const [busquedaPerfil, setBusquedaPerfil] = useState('')
   const [perfilSeleccionado, setPerfilSeleccionado] = useState(null)
   const [parentescoExistente, setParentescoExistente] = useState('')
+
+  const [detalleNino, setDetalleNino] = useState(null)
+  const [confirmDesactivar, setConfirmDesactivar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
 
   const load = useCallback(async () => {
     const [{ data: n }, { data: niv }, { data: np }] = await Promise.all([
@@ -120,6 +126,21 @@ export default function Ninos() {
   async function toggleActivo(nino) {
     await supabase.from('ninos').update({ activo: !nino.activo }).eq('id', nino.id)
     load()
+  }
+
+  function handleToggleClick(nino) {
+    if (nino.activo) {
+      setConfirmDesactivar(nino)
+    } else {
+      toggleActivo(nino)
+    }
+  }
+
+  async function confirmarDesactivar() {
+    setConfirmBusy(true)
+    await toggleActivo(confirmDesactivar)
+    setConfirmBusy(false)
+    setConfirmDesactivar(null)
   }
 
   function openInvite(nino) {
@@ -256,13 +277,16 @@ export default function Ninos() {
                   </ul>
                 )}
                 <div className="mt-4 flex flex-wrap gap-2">
+                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => setDetalleNino(nino)}>
+                    Ver detalle
+                  </button>
                   <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openEdit(nino)}>
                     Editar
                   </button>
                   <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openInvite(nino)}>
                     + Padre
                   </button>
-                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => toggleActivo(nino)}>
+                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => handleToggleClick(nino)}>
                     {nino.activo ? 'Desactivar' : 'Activar'}
                   </button>
                 </div>
@@ -315,13 +339,16 @@ export default function Ninos() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-2">
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetalleNino(nino)}>
+                          Ver detalle
+                        </button>
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nino)}>
                           Editar
                         </button>
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openInvite(nino)}>
                           + Padre
                         </button>
-                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => toggleActivo(nino)}>
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(nino)}>
                           {nino.activo ? 'Desactivar' : 'Activar'}
                         </button>
                       </div>
@@ -544,6 +571,28 @@ export default function Ninos() {
           </div>
         )}
       </Modal>
+
+      <DetalleNinoModal
+        nino={detalleNino}
+        nivel={detalleNino ? nivelesById[detalleNino.nivel_id] : null}
+        padres={detalleNino ? padresPorNino[detalleNino.id] || [] : []}
+        open={!!detalleNino}
+        onClose={() => setDetalleNino(null)}
+      />
+
+      <ConfirmModal
+        open={!!confirmDesactivar}
+        onClose={() => setConfirmDesactivar(null)}
+        onConfirm={confirmarDesactivar}
+        busy={confirmBusy}
+        title="¿Desactivar a este niño/a?"
+        confirmLabel="Sí, desactivar"
+        message={
+          confirmDesactivar
+            ? `${confirmDesactivar.nombre_completo} dejará de aparecer en las listas activas. Puedes reactivarlo/a cuando quieras.`
+            : ''
+        }
+      />
     </div>
   )
 }

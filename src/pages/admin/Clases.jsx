@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 
 const COLOR_OPTIONS = ['sky', 'grass', 'sunshine', 'coral', 'grape']
@@ -18,6 +19,8 @@ export default function Clases() {
   const [selectedDocentes, setSelectedDocentes] = useState([])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [confirmDesactivar, setConfirmDesactivar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
 
   const load = useCallback(async () => {
     const [{ data: n }, { data: d }, { data: a }] = await Promise.all([
@@ -101,6 +104,21 @@ export default function Clases() {
     load()
   }
 
+  function handleToggleClick(nivel) {
+    if (nivel.activo) {
+      setConfirmDesactivar(nivel)
+    } else {
+      toggleActivo(nivel)
+    }
+  }
+
+  async function confirmarDesactivar() {
+    setConfirmBusy(true)
+    await toggleActivo(confirmDesactivar)
+    setConfirmBusy(false)
+    setConfirmDesactivar(null)
+  }
+
   if (!niveles) return <Spinner />
 
   return (
@@ -134,7 +152,7 @@ export default function Clases() {
                   Editar
                 </button>
                 {profile.role === 'admin' && (
-                  <button className="btn-secondary flex-1 !py-2" onClick={() => toggleActivo(nivel)}>
+                  <button className="btn-secondary flex-1 !py-2" onClick={() => handleToggleClick(nivel)}>
                     {nivel.activo ? 'Desactivar' : 'Activar'}
                   </button>
                 )}
@@ -213,6 +231,20 @@ export default function Clases() {
           </button>
         </form>
       </Modal>
+
+      <ConfirmModal
+        open={!!confirmDesactivar}
+        onClose={() => setConfirmDesactivar(null)}
+        onConfirm={confirmarDesactivar}
+        busy={confirmBusy}
+        title="¿Desactivar esta clase?"
+        confirmLabel="Sí, desactivar"
+        message={
+          confirmDesactivar
+            ? `"${confirmDesactivar.nombre}" dejará de aparecer como clase activa. Puedes reactivarla cuando quieras.`
+            : ''
+        }
+      />
     </div>
   )
 }
