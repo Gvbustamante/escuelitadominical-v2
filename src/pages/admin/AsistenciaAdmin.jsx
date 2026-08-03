@@ -1,101 +1,96 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import { useAuth } from '../../contexts/AuthContext'
 import Skeleton from '../../components/Skeleton'
-
-function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
-}
+import ResumenAsistenciaMensual from '../../components/ResumenAsistenciaMensual'
+import ProgresoNinoModal from '../../components/ProgresoNinoModal'
+import TomarAsistenciaModal from '../../components/TomarAsistenciaModal'
 
 export default function AsistenciaAdmin() {
-  const [fecha, setFecha] = useState(hoyISO())
-  const [niveles, setNiveles] = useState([])
+  const { user } = useAuth()
+  const [niveles, setNiveles] = useState(null)
   const [nivelId, setNivelId] = useState('')
-  const [registros, setRegistros] = useState(null)
+  const [ninos, setNinos] = useState(null)
+  const [progresoNino, setProgresoNino] = useState(null)
+  const [tomarOpen, setTomarOpen] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
-    supabase.from('niveles').select('*').eq('activo', true).then(({ data }) => setNiveles(data || []))
+    supabase
+      .from('niveles')
+      .select('*')
+      .eq('activo', true)
+      .order('nombre')
+      .then(({ data }) => {
+        setNiveles(data || [])
+        setNivelId((data || [])[0]?.id || '')
+      })
   }, [])
 
-  const load = useCallback(async () => {
-    let query = supabase
-      .from('asistencia')
-      .select('*, nino:ninos(nombre_completo), nivel:niveles(nombre)')
-      .eq('fecha', fecha)
-      .order('created_at')
-    if (nivelId) query = query.eq('nivel_id', nivelId)
-    const { data } = await query
-    setRegistros(data || [])
-  }, [fecha, nivelId])
+  const loadNinos = useCallback(async () => {
+    if (!nivelId) return
+    const { data } = await supabase.from('ninos').select('*').eq('nivel_id', nivelId).eq('activo', true).order('nombre_completo')
+    setNinos(data || [])
+  }, [nivelId])
 
   useEffect(() => {
-    load()
-  }, [load])
+    loadNinos()
+  }, [loadNinos])
 
-  const presentes = registros?.filter((r) => r.presente).length ?? 0
+  if (!niveles) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div>
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="mt-2 h-4 w-64" />
+        </div>
+        <Skeleton className="h-12 w-64" />
+        <Skeleton className="h-72 w-full" />
+      </div>
+    )
+  }
+
+  if (niveles.length === 0) return <p className="card text-ink/50">Todavía no hay clases creadas.</p>
+
+  const nivelActual = niveles.find((n) => n.id === nivelId)
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl font-bold">Asistencia ✅</h1>
-        <p className="text-ink/50">Vista general de todas las clases</p>
-      </div>
-
-      <div className="flex flex-wrap gap-3">
-        <input type="date" className="input max-w-xs" value={fecha} onChange={(e) => setFecha(e.target.value)} />
-        <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
-          <option value="">Todas las clases</option>
-          {niveles.map((n) => (
-            <option key={n.id} value={n.id}>
-              {n.nombre}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {!registros ? (
-        <div className="card flex flex-col gap-2 p-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-10 w-full" />
-          ))}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Asistencia ✅</h1>
+          <p className="text-ink/50">Tabla mensual por clase</p>
         </div>
-      ) : (
-        <>
-          <p className="font-bold text-ink/60">
-            {presentes} presentes de {registros.length} registrados
-          </p>
-          <div className="card overflow-x-auto p-0">
-            <table className="w-full text-left">
-              <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
-                <tr>
-                  <th className="px-4 py-3">Niño/a</th>
-                  <th className="px-4 py-3">Clase</th>
-                  <th className="px-4 py-3">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {registros.map((r) => (
-                  <tr key={r.id} className="border-t border-ink/5">
-                    <td className="px-4 py-3 font-bold">{r.nino?.nombre_completo}</td>
-                    <td className="px-4 py-3 text-ink/60">{r.nivel?.nombre}</td>
-                    <td className="px-4 py-3">
-                      <span className={`badge ${r.presente ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
-                        {r.presente ? 'Presente' : 'Ausente'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {registros.length === 0 && (
-                  <tr>
-                    <td colSpan={3} className="px-4 py-6 text-center text-ink/40">
-                      Sin registros para esta fecha.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
+        <button className="btn-primary" onClick={() => setTomarOpen(true)}>
+          + Tomar asistencia
+        </button>
+      </div>
+
+      <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
+        {niveles.map((n) => (
+          <option key={n.id} value={n.id}>
+            {n.nombre}
+          </option>
+        ))}
+      </select>
+
+      <ResumenAsistenciaMensual key={`${nivelId}-${refreshKey}`} nivelId={nivelId} ninos={ninos} />
+
+      <TomarAsistenciaModal
+        open={tomarOpen}
+        onClose={() => setTomarOpen(false)}
+        nivelId={nivelId}
+        nivelNombre={nivelActual?.nombre}
+        ninos={ninos}
+        userId={user.id}
+        onProgreso={(n) => setProgresoNino(n)}
+        onSaved={() => {
+          setTomarOpen(false)
+          setRefreshKey((k) => k + 1)
+        }}
+      />
+
+      <ProgresoNinoModal nino={progresoNino} nivelId={nivelId} open={!!progresoNino} onClose={() => setProgresoNino(null)} />
     </div>
   )
 }

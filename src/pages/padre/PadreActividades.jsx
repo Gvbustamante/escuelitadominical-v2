@@ -26,6 +26,7 @@ export default function PadreActividades() {
       .from('actividades')
       .select('*, nivel:niveles(nombre), actividad_archivos(*), actividad_reacciones(*)')
       .in('nivel_id', nivelIds)
+      .lte('fecha', new Date().toISOString().slice(0, 10))
       .order('fecha', { ascending: false })
     setActividades(data || [])
   }, [hijos, selectedId])
