@@ -11,12 +11,17 @@ Este documento describe **todo** lo que compone la plataforma: qué es, cómo es
 **Access Kids** es un sistema de gestión para escuelas dominicales cristianas (ministerio infantil de una iglesia). Cubre el ciclo completo de un domingo y de la semana:
 
 - Registro de niños y organización por clases/niveles.
-- Control de asistencia.
-- Actividades con archivos multimedia, versículo clave e historia bíblica.
-- Agenda de eventos.
-- Devocionales para niños.
+- Control de asistencia, con vista de tabla mensual (nombres × días) y un modal para tomarla/editarla por clase y fecha.
+- Actividades con archivos multimedia (miniaturas), versículo clave e historia bíblica, editables, con vista de lista o de **calendario mensual** ("plan del mes") — los padres solo ven las actividades ya dadas, no las futuras.
+- Agenda de eventos, con vista de calendario.
+- Devocionales para niños, con imagen opcional, editables y filtrables por mes.
 - Progreso individual del niño (comportamiento, emoción, logros) con notas del docente.
 - Gamificación (estrellas y medallas) para motivar a los niños.
+- **Panorama del día** en el inicio del admin ("Cobertura de hoy"): qué clase tiene docente asignado y si ya se tomó asistencia, para detectar huecos antes de que sea un problema.
+- **Bitácora de clase**: constancia con foto de que el salón quedó en buen estado y de qué refrigerio se dio a los niños, por clase y fecha.
+- **Inventario de materiales**: qué hay disponible (general, para niños o para una clase), con foto, cantidad y aviso cuando queda poco.
+- **WhatsApp de contacto**: cada docente y cada padre puede tener un número guardado, con un botón que abre directo el chat (`wa.me`) — editable desde "Ver detalle".
+- Nombre y logo de la iglesia personalizables (Ajustes), que reemplazan el branding "Access Kids" en el menú y la pantalla de ingreso.
 - Un portal para padres, donde ven todo lo relacionado a sus hijos.
 - Comunidad: foro, versículo del día, peticiones de oración.
 - Multi-tenant "por fork": cada iglesia tiene su propio proyecto de Supabase y su propio despliegue, sin compartir datos con otras iglesias (ver sección 8).
@@ -110,19 +115,29 @@ Tipografías: `Baloo 2` (display, títulos) y `Nunito` (body), configuradas en `
 │   │   ├── invite.js            # llama al RPC admin_create_invited_user
 │   │   ├── gamification.js      # lógica de medallas/estrellas (sin backend, todo en frontend)
 │   │   ├── colors.js            # helpers de color por nivel/clase
+│   │   ├── configIglesia.js     # caché compartida de config_iglesia (logo/nombre), hook useConfigIglesia()
+│   │   ├── whatsapp.js          # whatsappLink(telefono) → URL de wa.me o null
 │   │   ├── useCountUp.js        # hook de animación numérica
 │   │   ├── useMisClases.js      # hook: clases asignadas al docente logueado
 │   │   └── useMisHijos.js       # hook: hijos vinculados al padre logueado
-│   ├── components/              # piezas reutilizables (Layout, Modal, StatCard, RewardsPanel, etc.)
+│   ├── components/              # piezas reutilizables: Layout, Modal, ConfirmModal, Skeleton,
+│   │                             #   VistaToggle (tarjetas/lista/calendario), CalendarioAgenda,
+│   │                             #   TomarAsistenciaModal, DetalleNinoModal, DetalleDocenteModal,
+│   │                             #   PadreContacto (WhatsApp editable), AppLogo, AppName, CoberturaHoy,
+│   │                             #   StatCard, RewardsPanel, etc.
 │   └── pages/
 │       ├── Landing.jsx, Login.jsx, CompleteProfile.jsx, Tutorial.jsx
 │       ├── Devocionales.jsx, Foro.jsx, MiFamilia.jsx   # comunes a varios roles
-│       ├── admin/                # pantallas exclusivas admin/coordinador
-│       ├── docente/               # pantallas exclusivas docente
+│       ├── admin/                # AdminHome, Ninos, Clases, Docentes, AsistenciaAdmin,
+│       │                         # ActividadesAdmin, AgendaAdmin, CitasBiblicasAdmin, Ajustes,
+│       │                         # BitacoraAdmin, Materiales
+│       ├── docente/               # DocenteHome, Asistencia, Actividades, Agenda, Progreso, Bitacora
 │       └── padre/                 # pantallas exclusivas padre
 ├── supabase/
 │   ├── schema.sql                # esquema completo: tablas, RLS, funciones, storage, seed de versículos
-│   └── primer_admin.sql          # script para crear la primera cuenta admin de una iglesia nueva
+│   ├── primer_admin.sql          # script para crear la primera cuenta admin de una iglesia nueva
+│   └── actualizacion_evidencias_materiales.sql  # ejemplo de "fragmento de SQL suelto" (ver sección 6.6):
+│                                                  # imagen en devocionales, bitácora, materiales
 ├── materiales/                   # PDFs de referencia/demo del producto
 ├── .github/workflows/deploy.yml  # CI/CD a GitHub Pages
 ├── netlify.toml                  # config alternativa de despliegue en Netlify
@@ -161,6 +176,24 @@ El admin/coordinador le comparte a mano la cédula (usuario) y la contraseña te
 ### 5.5 Gamificación
 `src/lib/gamification.js` define localmente 6 niveles de medalla (`🐣` a `👑`) según cantidad de "estrellas" (tabla `reconocimientos`, otorgadas por docente/admin a un niño), con mensajes motivacionales aleatorios. Es solo lógica de presentación — no hay tablas de "nivel" en la base de datos, se calcula todo a partir del conteo de `reconocimientos`.
 
+### 5.6 Asistencia: tabla mensual + modal para tomarla
+Tanto el admin (`AsistenciaAdmin.jsx`) como el docente (`docente/Asistencia.jsx`) muestran como vista principal una **tabla mensual** (`ResumenAsistenciaMensual.jsx`: niños en filas, días con asistencia tomada en columnas) para una clase y mes elegidos. El botón **"+ Tomar asistencia"** abre `TomarAsistenciaModal.jsx`: se elige la fecha, se marca presente/ausente por niño (con confeti si todos están presentes) y se guarda con un `upsert` sobre `asistencia` (única por `nino_id`+`fecha`). El admin puede tomar asistencia de cualquier clase — útil cuando falta el docente titular.
+
+### 5.7 Cobertura de hoy (panorama del admin)
+`CoberturaHoy.jsx`, en el inicio del admin, cruza `niveles` + `docentes_niveles` + `ninos` + `asistencia` de hoy para mostrar, por clase: quién es el docente asignado, cuántos niños tiene y si ya se registró asistencia — resaltando en rojo las clases sin docente y en amarillo las que aún no tienen asistencia del día. Es puramente de lectura sobre tablas existentes, sin tabla propia.
+
+### 5.8 Plan de actividades (calendario mensual)
+`ActividadesAdmin.jsx` tiene un `VistaToggle` con una tercera opción "🗓️ Plan del mes" que reutiliza `CalendarioAgenda.jsx` (el mismo calendario de Agenda) para planear/repasar qué se enseña cada domingo, además de la vista de lista de siempre.
+
+### 5.9 WhatsApp de contacto
+No hay columna `whatsapp` dedicada: se reutiliza `profiles.telefono` (existía desde el inicio del esquema, sin uso previo en la UI). `src/lib/whatsapp.js` expone `whatsappLink(telefono)`, que limpia el número y arma un link `https://wa.me/...`. Se edita desde `DetalleDocenteModal.jsx` (equipo) y `PadreContacto.jsx` (padres, embebido en `DetalleNinoModal.jsx` y directo en la tarjeta de cada niño en `Ninos.jsx`), con un botón "💬 Abrir chat de WhatsApp" cuando hay un número guardado.
+
+### 5.10 Bitácora de clase y Materiales
+- **Bitácora** (`bitacora_clase`, rutas `/bitacora`): el docente deja constancia, por clase y fecha, de si el salón quedó en buen estado (con foto) y qué refrigerio se dio (con foto) — una foto por cada cosa, no una galería. El admin ve el historial por mes y clase en `BitacoraAdmin.jsx`.
+- **Materiales** (`materiales`, ruta `/materiales`, solo admin/coordinador): inventario simple con nombre, categoría (general / para niños / para una clase), cantidad, foto y aviso visual cuando la cantidad es baja (≤ 2).
+
+Ambas son tablas que **no existían** en el `schema.sql` original — ver sección 6.6 sobre cómo se agregaron a un proyecto ya desplegado.
+
 ## 6. Modelo de datos (Supabase / Postgres)
 
 Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado para copiar/pegar una sola vez en el SQL Editor de un proyecto Supabase nuevo.
@@ -169,7 +202,7 @@ Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado 
 
 | Tabla | Propósito | Relaciones clave |
 |---|---|---|
-| `profiles` | Un registro por usuario autenticado (espejo de `auth.users`), con `role`, `nombre_completo`, `cedula`, `telefono`, `activo` | `id` = `auth.users.id` |
+| `profiles` | Un registro por usuario autenticado (espejo de `auth.users`), con `role`, `nombre_completo`, `cedula`, `telefono` (reutilizado como WhatsApp de contacto, ver 5.9), `activo` | `id` = `auth.users.id` |
 | `niveles` | Clases/niveles (por edad), con nombre, rango de edad, color | — |
 | `docentes_niveles` | Tabla puente: qué docente da clase en qué nivel (M:N) | `profiles` ↔ `niveles` |
 | `ninos` | Niños inscritos | `nivel_id` → `niveles` |
@@ -180,12 +213,14 @@ Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado 
 | `actividad_reacciones` | Reacciones (emoji) de un padre a una actividad, única por padre+actividad | `actividades`, `profiles` |
 | `agenda` | Eventos calendario, opcionalmente ligados a un nivel | `niveles`, `creado_por` → `profiles` |
 | `progreso_notas` | Notas de progreso de un niño (comportamiento, emoción, logros) | `ninos`, `niveles`, `docente_id` |
-| `devocionales_ninos` | Devocionales para niños (título, versículo, contenido) | `niveles`, `creado_por` |
+| `devocionales_ninos` | Devocionales para niños (título, versículo, contenido, `imagen_url` opcional) | `niveles`, `creado_por` |
 | `citas_biblicas` | Pool de versículos + `fecha_mostrar` para la "cita del día" | — |
 | `reconocimientos` | Estrellas otorgadas a un niño (capa de gamificación) | `ninos`, `niveles`, `otorgado_por` |
 | `foros` / `foro_mensajes` | Foro de comunidad, general o ligado a un evento de agenda | `foros` ↔ `agenda`, `profiles` |
 | `peticiones_oracion` | Peticiones de oración, públicas o privadas (solo staff + autor) | `profiles` |
 | `config_iglesia` | Fila única con nombre y logo personalizados de la iglesia | — |
+| `bitacora_clase` | Constancia por clase y fecha: `salon_ok` + `salon_foto_url`, `refrigerio_detalle` + `refrigerio_foto_url` (única por `nivel_id`+`fecha`) | `niveles`, `docente_id` → `profiles` |
+| `materiales` | Inventario: `nombre`, `categoria` (general/niños/clase), `cantidad`, `foto_url` | `nivel_id` → `niveles` (opcional) |
 
 ### 6.2 Seguridad (Row Level Security)
 Todas las tablas tienen RLS habilitado. El patrón general:
@@ -194,7 +229,7 @@ Todas las tablas tienen RLS habilitado. El patrón general:
 - Cada política se apoya en subconsultas `exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in (...))` para saber el rol del usuario actual.
 
 ### 6.3 Storage (buckets)
-- `actividades`: archivos adjuntos a actividades (fotos/videos). Lectura pública, escritura solo staff (`admin`/`coordinador`/`docente`).
+- `actividades`: archivos adjuntos a actividades (fotos/videos), **reutilizado también** para las fotos de devocionales (`devocionales/...`), bitácora (`bitacora/...`) y materiales (`materiales/...`) — no se crearon buckets nuevos para estas features, solo prefijos de ruta distintos dentro del mismo bucket público. Lectura pública, escritura solo staff (`admin`/`coordinador`/`docente`).
 - `logos`: logo personalizado de la iglesia. Lectura pública, escritura solo staff.
 
 ### 6.4 Funciones de base de datos
@@ -202,6 +237,9 @@ Todas las tablas tienen RLS habilitado. El patrón general:
 
 ### 6.5 Datos semilla
 `schema.sql` inserta 15 versículos bíblicos iniciales en `citas_biblicas` para que la app tenga contenido desde el día uno.
+
+### 6.6 Actualizaciones incrementales a un proyecto ya desplegado
+`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplo real: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
 
 ## 7. Variables de entorno
 
@@ -234,8 +272,9 @@ npm run preview              # sirve el build de dist/ localmente
 ## 10. Despliegue
 
 - **GitHub Pages** (principal): cada push a `main` dispara `.github/workflows/deploy.yml`, que hace `npm ci && npm run build` y publica `dist/` vía `actions/deploy-pages`. Requiere los secrets `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` configurados en el repo y "Pages → Source: GitHub Actions".
-- **Netlify** (alternativa): `netlify.toml` define `npm run build` con `publish = "dist"` y trae hardcodeadas las credenciales de un proyecto Supabase **experimental** (no productivo) para pruebas rápidas.
+- **Netlify** (alternativa): `netlify.toml` define `npm run build` con `publish = "dist"` y trae hardcodeadas las credenciales de un proyecto Supabase **experimental** (no productivo) para pruebas rápidas. Es normal (y esperado) que varios despliegues distintos — por ejemplo un sitio en GitHub Pages y otro en Netlify — apunten al **mismo** proyecto Supabase si ambos usan las mismas variables de entorno; en ese caso comparten datos en tiempo real, no son instancias independientes.
 - El build es un sitio 100% estático (SPA), no requiere servidor Node en producción — cualquier hosting de estáticos sirve.
+- ⚠️ Cualquier cambio directo a la base de datos (borrar datos, correr SQL) afecta **a todos** los sitios desplegados que apunten a ese mismo proyecto Supabase, sin importar en qué plataforma estén hospedados.
 
 ## 11. Convenciones de nombres
 
