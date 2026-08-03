@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
-import Spinner from '../../components/Spinner'
+import Skeleton from '../../components/Skeleton'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -53,7 +53,11 @@ export default function AsistenciaAdmin() {
       </div>
 
       {!registros ? (
-        <Spinner />
+        <div className="card flex flex-col gap-2 p-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-10 w-full" />
+          ))}
+        </div>
       ) : (
         <>
           <p className="font-bold text-ink/60">

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import StatCard from '../../components/StatCard'
-import Spinner from '../../components/Spinner'
+import Skeleton from '../../components/Skeleton'
 import CitaDelDia from '../../components/CitaDelDia'
 import CoberturaHoy from '../../components/CoberturaHoy'
 
@@ -35,7 +35,28 @@ export default function AdminHome() {
     load()
   }, [])
 
-  if (!stats) return <Spinner />
+  if (!stats) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div>
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="mt-2 h-4 w-48" />
+        </div>
+        <Skeleton className="h-32 w-full rounded-blob" />
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
+        </div>
+        <Skeleton className="h-64 w-full" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6">

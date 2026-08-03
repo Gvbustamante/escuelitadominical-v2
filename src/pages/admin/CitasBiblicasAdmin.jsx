@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
-import Spinner from '../../components/Spinner'
+import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 
@@ -123,7 +123,24 @@ export default function CitasBiblicasAdmin() {
     setConfirmDesactivar(null)
   }
 
-  if (!citas) return <Spinner />
+  if (!citas) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="mt-2 h-4 w-64" />
+          </div>
+          <Skeleton className="h-12 w-40" />
+        </div>
+        <div className="flex flex-col gap-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   const hoy = hoyStr()
 
