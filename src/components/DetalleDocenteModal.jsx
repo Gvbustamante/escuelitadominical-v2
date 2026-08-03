@@ -11,28 +11,47 @@ const ROLE_BADGE = {
 }
 
 export default function DetalleDocenteModal({ persona, clases = [], open, onClose, onSaved }) {
-  const [telefono, setTelefono] = useState('')
+  const [form, setForm] = useState({ nombre_completo: '', cedula: '', telefono: '' })
   const [busy, setBusy] = useState(false)
   const [ok, setOk] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (open && persona) {
-      setTelefono(persona.telefono || '')
+      setForm({
+        nombre_completo: persona.nombre_completo || '',
+        cedula: persona.cedula || '',
+        telefono: persona.telefono || '',
+      })
       setOk(false)
+      setError('')
     }
   }, [open, persona])
 
   if (!persona) return null
 
-  async function guardarTelefono() {
+  async function guardar() {
     setBusy(true)
-    await supabase.from('profiles').update({ telefono: telefono || null }).eq('id', persona.id)
+    setOk(false)
+    setError('')
+    const { error: saveError } = await supabase
+      .from('profiles')
+      .update({
+        nombre_completo: form.nombre_completo,
+        cedula: form.cedula || null,
+        telefono: form.telefono || null,
+      })
+      .eq('id', persona.id)
     setBusy(false)
+    if (saveError) {
+      setError(saveError.code === '23505' ? 'Ya hay otra cuenta con esa cédula.' : saveError.message)
+      return
+    }
     setOk(true)
     onSaved?.()
   }
 
-  const link = whatsappLink(persona.telefono)
+  const link = whatsappLink(form.telefono)
 
   return (
     <Modal open={open} onClose={onClose} title={`Detalle — ${persona.nombre_completo}`}>
@@ -45,25 +64,39 @@ export default function DetalleDocenteModal({ persona, clases = [], open, onClos
         </div>
 
         <div>
-          <p className="text-xs font-extrabold uppercase text-ink/40">Cédula</p>
-          <p className="font-bold">{persona.cedula || '—'}</p>
+          <label className="label">Nombre completo</label>
+          <input
+            className="input"
+            value={form.nombre_completo}
+            onChange={(e) => setForm({ ...form, nombre_completo: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <label className="label">Cédula</label>
+          <input className="input" value={form.cedula} onChange={(e) => setForm({ ...form, cedula: e.target.value })} />
         </div>
 
         <div>
           <label className="label">WhatsApp (con código de país, ej. 18091234567)</label>
-          <div className="flex gap-2">
-            <input className="input" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej. 18091234567" />
-            <button type="button" onClick={guardarTelefono} disabled={busy} className="btn-secondary shrink-0 !px-4 !text-sm">
-              {busy ? '...' : 'Guardar'}
-            </button>
-          </div>
-          {ok && <p className="mt-1 text-xs font-bold text-grass-600">Guardado ✔️</p>}
+          <input
+            className="input"
+            value={form.telefono}
+            onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+            placeholder="Ej. 18091234567"
+          />
           {link && (
             <a href={link} target="_blank" rel="noreferrer" className="btn-success mt-3 w-full justify-center !py-2 !text-sm">
               💬 Abrir chat de WhatsApp
             </a>
           )}
         </div>
+
+        {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
+        {ok && <p className="text-sm font-bold text-grass-600">Guardado ✔️</p>}
+        <button type="button" onClick={guardar} disabled={busy} className="btn-primary justify-center">
+          {busy ? 'Guardando...' : 'Guardar cambios'}
+        </button>
 
         {persona.role === 'docente' && (
           <div>
