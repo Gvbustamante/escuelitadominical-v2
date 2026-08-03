@@ -8,23 +8,35 @@ function hoyISO() {
   return new Date().toISOString().slice(0, 10)
 }
 
+function hoyYYYYMM() {
+  return new Date().toISOString().slice(0, 7)
+}
+
+function diasEnMes(yyyyMM) {
+  const [y, m] = yyyyMM.split('-').map(Number)
+  return new Date(y, m, 0).getDate()
+}
+
 export default function Devocionales() {
   const { user, profile } = useAuth()
   const puedeCrear = ['admin', 'coordinador', 'docente'].includes(profile.role)
 
   const [devocionales, setDevocionales] = useState(null)
   const [niveles, setNiveles] = useState([])
+  const [mes, setMes] = useState(hoyYYYYMM())
+  const [verTodos, setVerTodos] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '' })
   const [busy, setBusy] = useState(false)
 
   const load = useCallback(async () => {
-    const { data } = await supabase
-      .from('devocionales_ninos')
-      .select('*, nivel:niveles(nombre)')
-      .order('fecha', { ascending: false })
+    let query = supabase.from('devocionales_ninos').select('*, nivel:niveles(nombre)').order('fecha', { ascending: false })
+    if (!verTodos) {
+      query = query.gte('fecha', `${mes}-01`).lte('fecha', `${mes}-${String(diasEnMes(mes)).padStart(2, '0')}`)
+    }
+    const { data } = await query
     setDevocionales(data || [])
-  }, [])
+  }, [mes, verTodos])
 
   useEffect(() => {
     load()
@@ -70,6 +82,18 @@ export default function Devocionales() {
         )}
       </div>
 
+      <div className="flex flex-wrap items-center gap-3">
+        {!verTodos && (
+          <input type="month" className="input max-w-xs" value={mes} onChange={(e) => setMes(e.target.value)} />
+        )}
+        <button
+          onClick={() => setVerTodos((v) => !v)}
+          className={`rounded-full px-4 py-2 text-sm font-bold ${verTodos ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+        >
+          {verTodos ? 'Ver por mes' : 'Ver todos'}
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {devocionales.map((d) => (
           <div key={d.id} className="card">
@@ -82,7 +106,11 @@ export default function Devocionales() {
             <p className="mt-2 whitespace-pre-line text-ink/70">{d.contenido}</p>
           </div>
         ))}
-        {devocionales.length === 0 && <p className="card text-ink/50">Todavía no hay devocionales publicados.</p>}
+        {devocionales.length === 0 && (
+          <p className="card text-ink/50">
+            {verTodos ? 'Todavía no hay devocionales publicados.' : 'No hay devocionales publicados este mes.'}
+          </p>
+        )}
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nuevo devocional">

@@ -15,8 +15,10 @@ export default function ActividadesAdmin() {
   const [nivelId, setNivelId] = useState('')
   const [actividades, setActividades] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '' })
   const [archivos, setArchivos] = useState([])
+  const [previews, setPreviews] = useState([])
   const [busy, setBusy] = useState(false)
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
@@ -48,10 +50,33 @@ export default function ActividadesAdmin() {
   }, [load])
 
   function openNew() {
+    setEditing(null)
     setForm({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '' })
     setArchivos([])
+    setPreviews([])
     setError('')
     setModalOpen(true)
+  }
+
+  function openEdit(actividad) {
+    setEditing(actividad)
+    setForm({
+      titulo: actividad.titulo,
+      descripcion: actividad.descripcion || '',
+      fecha: actividad.fecha,
+      versiculo_clave: actividad.versiculo_clave || '',
+      historia_biblica: actividad.historia_biblica || '',
+    })
+    setArchivos([])
+    setPreviews([])
+    setError('')
+    setModalOpen(true)
+  }
+
+  function handleArchivos(files) {
+    const lista = Array.from(files)
+    setArchivos(lista)
+    setPreviews(lista.filter((f) => f.type.startsWith('image/')).map((f) => URL.createObjectURL(f)))
   }
 
   async function handleSubmit(e) {
@@ -59,34 +84,44 @@ export default function ActividadesAdmin() {
     setBusy(true)
     setError('')
 
-    const { data: actividad, error: actError } = await supabase
-      .from('actividades')
-      .insert({
-        nivel_id: nivelId,
-        docente_id: user.id,
-        titulo: form.titulo,
-        descripcion: form.descripcion,
-        fecha: form.fecha,
-        versiculo_clave: form.versiculo_clave || null,
-        historia_biblica: form.historia_biblica || null,
-      })
-      .select()
-      .single()
+    const payload = {
+      titulo: form.titulo,
+      descripcion: form.descripcion,
+      fecha: form.fecha,
+      versiculo_clave: form.versiculo_clave || null,
+      historia_biblica: form.historia_biblica || null,
+    }
 
-    if (actError) {
-      setError(actError.message)
-      setBusy(false)
-      return
+    let actividadId = editing?.id
+    if (editing) {
+      const { error: updError } = await supabase.from('actividades').update(payload).eq('id', editing.id)
+      if (updError) {
+        setError(updError.message)
+        setBusy(false)
+        return
+      }
+    } else {
+      const { data: actividad, error: actError } = await supabase
+        .from('actividades')
+        .insert({ ...payload, nivel_id: nivelId, docente_id: user.id })
+        .select()
+        .single()
+      if (actError) {
+        setError(actError.message)
+        setBusy(false)
+        return
+      }
+      actividadId = actividad.id
     }
 
     for (let i = 0; i < archivos.length; i++) {
       const file = archivos[i]
       setProgreso(`Subiendo ${i + 1} de ${archivos.length}...`)
-      const path = `${nivelId}/${actividad.id}/${Date.now()}-${file.name}`
+      const path = `${nivelId}/${actividadId}/${Date.now()}-${file.name}`
       const { error: upError } = await supabase.storage.from('actividades').upload(path, file)
       if (!upError) {
         await supabase.from('actividad_archivos').insert({
-          actividad_id: actividad.id,
+          actividad_id: actividadId,
           storage_path: path,
           nombre_archivo: file.name,
           tipo: file.type,
@@ -142,6 +177,9 @@ export default function ActividadesAdmin() {
                 <h3 className="text-lg font-bold">{a.titulo}</h3>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-ink/40">{a.fecha}</span>
+                  <button onClick={() => openEdit(a)} className="text-lg text-ink/30 hover:text-sky-500">
+                    ✏️
+                  </button>
                   <button onClick={() => eliminar(a.id)} className="text-lg text-ink/30 hover:text-coral-500">
                     🗑️
                   </button>
@@ -162,7 +200,7 @@ export default function ActividadesAdmin() {
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nueva actividad">
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar actividad' : 'Nueva actividad'}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="label">Título</label>
@@ -200,14 +238,22 @@ export default function ActividadesAdmin() {
             />
           </div>
           <div>
-            <label className="label">Archivos (fotos, PDFs, etc.)</label>
-            <input type="file" multiple className="input" onChange={(e) => setArchivos(Array.from(e.target.files))} />
+            <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
+            <input type="file" multiple className="input" onChange={(e) => handleArchivos(e.target.files)} />
+            {previews.length > 0 && (
+              <div className="mt-2 grid grid-cols-4 gap-2">
+                {previews.map((src, i) => (
+                  <img key={i} src={src} alt="" className="aspect-square w-full rounded-xl object-cover" />
+                ))}
+              </div>
+            )}
             {archivos.length > 0 && <p className="mt-1 text-sm text-ink/50">{archivos.length} archivo(s) seleccionado(s)</p>}
+            {editing && <ActivityFiles archivos={editing.actividad_archivos} />}
           </div>
           {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
           <button disabled={busy} className="btn-primary justify-center">
-            {busy ? 'Guardando...' : 'Publicar actividad'}
+            {busy ? 'Guardando...' : editing ? 'Guardar cambios' : 'Publicar actividad'}
           </button>
         </form>
       </Modal>
