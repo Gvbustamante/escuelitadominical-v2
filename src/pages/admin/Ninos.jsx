@@ -1,8 +1,11 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { crearUsuario } from '../../lib/invite'
-import Spinner from '../../components/Spinner'
+import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
+import DetalleNinoModal from '../../components/DetalleNinoModal'
+import VistaToggle from '../../components/VistaToggle'
 import { BADGE_CLASSES } from '../../lib/colors'
 
 function generarCodigoFacil(nombreNino) {
@@ -27,6 +30,7 @@ export default function Ninos() {
   const [padresPorNino, setPadresPorNino] = useState({})
   const [filtro, setFiltro] = useState('activos')
   const [busqueda, setBusqueda] = useState('')
+  const [vista, setVista] = useState('tarjetas')
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
@@ -44,6 +48,10 @@ export default function Ninos() {
   const [busquedaPerfil, setBusquedaPerfil] = useState('')
   const [perfilSeleccionado, setPerfilSeleccionado] = useState(null)
   const [parentescoExistente, setParentescoExistente] = useState('')
+
+  const [detalleNino, setDetalleNino] = useState(null)
+  const [confirmDesactivar, setConfirmDesactivar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
 
   const load = useCallback(async () => {
     const [{ data: n }, { data: niv }, { data: np }] = await Promise.all([
@@ -120,6 +128,21 @@ export default function Ninos() {
     load()
   }
 
+  function handleToggleClick(nino) {
+    if (nino.activo) {
+      setConfirmDesactivar(nino)
+    } else {
+      toggleActivo(nino)
+    }
+  }
+
+  async function confirmarDesactivar() {
+    setConfirmBusy(true)
+    await toggleActivo(confirmDesactivar)
+    setConfirmBusy(false)
+    setConfirmDesactivar(null)
+  }
+
   function openInvite(nino) {
     setInviteModal(nino)
     setModoVinculo('nueva')
@@ -181,7 +204,24 @@ export default function Ninos() {
     )
     .slice(0, 8)
 
-  if (!ninos) return <Spinner />
+  if (!ninos) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Skeleton className="h-8 w-40" />
+            <Skeleton className="mt-2 h-4 w-32" />
+          </div>
+          <Skeleton className="h-12 w-40" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-44 w-full" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -195,76 +235,155 @@ export default function Ninos() {
         </button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <input
-          className="input max-w-xs"
-          placeholder="Buscar por nombre..."
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
-        <div className="flex gap-2">
-          {[
-            ['activos', 'Activos'],
-            ['inactivos', 'Inactivos'],
-            ['todos', 'Todos'],
-          ].map(([v, label]) => (
-            <button
-              key={v}
-              onClick={() => setFiltro(v)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
-            >
-              {label}
-            </button>
-          ))}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <input
+            className="input max-w-xs"
+            placeholder="Buscar por nombre..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+          <div className="flex gap-2">
+            {[
+              ['activos', 'Activos'],
+              ['inactivos', 'Inactivos'],
+              ['todos', 'Todos'],
+            ].map(([v, label]) => (
+              <button
+                key={v}
+                onClick={() => setFiltro(v)}
+                className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
+        <VistaToggle vista={vista} onChange={setVista} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtrados.map((nino) => {
-          const nivel = nivelesById[nino.nivel_id]
-          const padres = padresPorNino[nino.id] || []
-          return (
-            <div key={nino.id} className={`card ${!nino.activo ? 'opacity-50' : ''}`}>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h3 className="text-lg font-bold">{nino.nombre_completo}</h3>
-                  <p className="text-sm text-ink/50">{calcularEdad(nino.fecha_nacimiento)} años</p>
+      {vista === 'tarjetas' ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filtrados.map((nino) => {
+            const nivel = nivelesById[nino.nivel_id]
+            const padres = padresPorNino[nino.id] || []
+            return (
+              <div key={nino.id} className={`card ${!nino.activo ? 'opacity-50' : ''}`}>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h3 className="text-lg font-bold">{nino.nombre_completo}</h3>
+                    <p className="text-sm text-ink/50">{calcularEdad(nino.fecha_nacimiento)} años</p>
+                  </div>
+                  {nivel && <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>}
                 </div>
-                {nivel && <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>}
+                {nino.alergias && (
+                  <p className="mt-2 rounded-xl bg-coral-50 px-3 py-1 text-xs font-bold text-coral-600">
+                    ⚠️ Alergias: {nino.alergias}
+                  </p>
+                )}
+                <p className="mt-2 text-xs font-bold uppercase text-ink/40">Padres/encargados</p>
+                {padres.length === 0 ? (
+                  <p className="text-sm text-ink/40">Sin vincular</p>
+                ) : (
+                  <ul className="text-sm">
+                    {padres.map((p, i) => (
+                      <li key={i}>
+                        {p.padre?.nombre_completo} {p.parentesco && `(${p.parentesco})`}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => setDetalleNino(nino)}>
+                    Ver detalle
+                  </button>
+                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openEdit(nino)}>
+                    Editar
+                  </button>
+                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openInvite(nino)}>
+                    + Padre
+                  </button>
+                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => handleToggleClick(nino)}>
+                    {nino.activo ? 'Desactivar' : 'Activar'}
+                  </button>
+                </div>
               </div>
-              {nino.alergias && (
-                <p className="mt-2 rounded-xl bg-coral-50 px-3 py-1 text-xs font-bold text-coral-600">
-                  ⚠️ Alergias: {nino.alergias}
-                </p>
+            )
+          })}
+          {filtrados.length === 0 && <p className="text-ink/40">No hay niños que coincidan.</p>}
+        </div>
+      ) : (
+        <div className="card overflow-x-auto p-0">
+          <table className="w-full text-left">
+            <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
+              <tr>
+                <th className="px-4 py-3">Nombre</th>
+                <th className="px-4 py-3">Edad</th>
+                <th className="px-4 py-3">Clase</th>
+                <th className="px-4 py-3">Alergias</th>
+                <th className="px-4 py-3">Padres/encargados</th>
+                <th className="px-4 py-3">Estado</th>
+                <th className="px-4 py-3">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtrados.map((nino) => {
+                const nivel = nivelesById[nino.nivel_id]
+                const padres = padresPorNino[nino.id] || []
+                return (
+                  <tr key={nino.id} className={`border-t border-ink/5 ${!nino.activo ? 'opacity-50' : ''}`}>
+                    <td className="px-4 py-3 font-bold">{nino.nombre_completo}</td>
+                    <td className="px-4 py-3 text-ink/60">{calcularEdad(nino.fecha_nacimiento)}</td>
+                    <td className="px-4 py-3">
+                      {nivel ? (
+                        <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>
+                      ) : (
+                        <span className="text-ink/40">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-ink/60">
+                      {nino.alergias ? <span className="font-bold text-coral-600">⚠️ {nino.alergias}</span> : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-ink/60">
+                      {padres.length === 0
+                        ? 'Sin vincular'
+                        : padres.map((p) => p.padre?.nombre_completo).filter(Boolean).join(', ')}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`badge ${nino.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
+                        {nino.activo ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetalleNino(nino)}>
+                          Ver detalle
+                        </button>
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nino)}>
+                          Editar
+                        </button>
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openInvite(nino)}>
+                          + Padre
+                        </button>
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(nino)}>
+                          {nino.activo ? 'Desactivar' : 'Activar'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+              {filtrados.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-6 text-center text-ink/40">
+                    No hay niños que coincidan.
+                  </td>
+                </tr>
               )}
-              <p className="mt-2 text-xs font-bold uppercase text-ink/40">Padres/encargados</p>
-              {padres.length === 0 ? (
-                <p className="text-sm text-ink/40">Sin vincular</p>
-              ) : (
-                <ul className="text-sm">
-                  {padres.map((p, i) => (
-                    <li key={i}>
-                      {p.padre?.nombre_completo} {p.parentesco && `(${p.parentesco})`}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openEdit(nino)}>
-                  Editar
-                </button>
-                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openInvite(nino)}>
-                  + Padre
-                </button>
-                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => toggleActivo(nino)}>
-                  {nino.activo ? 'Desactivar' : 'Activar'}
-                </button>
-              </div>
-            </div>
-          )
-        })}
-        {filtrados.length === 0 && <p className="text-ink/40">No hay niños que coincidan.</p>}
-      </div>
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar niño/a' : 'Nuevo niño/a'}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -469,6 +588,28 @@ export default function Ninos() {
           </div>
         )}
       </Modal>
+
+      <DetalleNinoModal
+        nino={detalleNino}
+        nivel={detalleNino ? nivelesById[detalleNino.nivel_id] : null}
+        padres={detalleNino ? padresPorNino[detalleNino.id] || [] : []}
+        open={!!detalleNino}
+        onClose={() => setDetalleNino(null)}
+      />
+
+      <ConfirmModal
+        open={!!confirmDesactivar}
+        onClose={() => setConfirmDesactivar(null)}
+        onConfirm={confirmarDesactivar}
+        busy={confirmBusy}
+        title="¿Desactivar a este niño/a?"
+        confirmLabel="Sí, desactivar"
+        message={
+          confirmDesactivar
+            ? `${confirmDesactivar.nombre_completo} dejará de aparecer en las listas activas. Puedes reactivarlo/a cuando quieras.`
+            : ''
+        }
+      />
     </div>
   )
 }

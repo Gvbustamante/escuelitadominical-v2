@@ -2,8 +2,11 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { crearUsuario } from '../../lib/invite'
 import { useAuth } from '../../contexts/AuthContext'
-import Spinner from '../../components/Spinner'
+import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
+import DetalleDocenteModal from '../../components/DetalleDocenteModal'
+import VistaToggle from '../../components/VistaToggle'
 
 const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente' }
 const ROLE_BADGE = {
@@ -15,19 +18,31 @@ const ROLE_BADGE = {
 export default function Docentes() {
   const { profile } = useAuth()
   const [staff, setStaff] = useState(null)
+  const [clasesPorDocente, setClasesPorDocente] = useState({})
+  const [vista, setVista] = useState('tarjetas')
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState({ cedula: '', nombre_completo: '', role: 'docente' })
   const [error, setError] = useState('')
   const [creado, setCreado] = useState(null)
   const [busy, setBusy] = useState(false)
 
+  const [detallePersona, setDetallePersona] = useState(null)
+  const [confirmDesactivar, setConfirmDesactivar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
+
   const load = useCallback(async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .in('role', ['admin', 'coordinador', 'docente'])
-      .order('role')
+    const [{ data }, { data: asignaciones }] = await Promise.all([
+      supabase.from('profiles').select('*').in('role', ['admin', 'coordinador', 'docente']).order('role'),
+      supabase.from('docentes_niveles').select('docente_id, nivel:niveles(nombre)'),
+    ])
     setStaff(data || [])
+    const clases = {}
+    ;(asignaciones || []).forEach((a) => {
+      if (!a.nivel?.nombre) return
+      clases[a.docente_id] = clases[a.docente_id] || []
+      clases[a.docente_id].push(a.nivel.nombre)
+    })
+    setClasesPorDocente(clases)
   }, [])
 
   useEffect(() => {
@@ -62,7 +77,39 @@ export default function Docentes() {
     load()
   }
 
-  if (!staff) return <Spinner />
+  function handleToggleClick(person) {
+    if (person.activo) {
+      setConfirmDesactivar(person)
+    } else {
+      toggleActivo(person)
+    }
+  }
+
+  async function confirmarDesactivar() {
+    setConfirmBusy(true)
+    await toggleActivo(confirmDesactivar)
+    setConfirmBusy(false)
+    setConfirmDesactivar(null)
+  }
+
+  if (!staff) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Skeleton className="h-8 w-40" />
+            <Skeleton className="mt-2 h-4 w-56" />
+          </div>
+          <Skeleton className="h-12 w-40" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -71,27 +118,95 @@ export default function Docentes() {
           <h1 className="text-3xl font-bold">Equipo 🍎</h1>
           <p className="text-ink/50">Docentes, coordinadores y administradores</p>
         </div>
-        <button className="btn-primary" onClick={openInvite}>
-          + Agregar
-        </button>
+        <div className="flex items-center gap-3">
+          <VistaToggle vista={vista} onChange={setVista} />
+          <button className="btn-primary" onClick={openInvite}>
+            + Agregar
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {staff.map((p) => (
-          <div key={p.id} className={`card ${!p.activo ? 'opacity-50' : ''}`}>
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="text-lg font-bold">{p.nombre_completo}</h3>
-              <span className={`badge ${ROLE_BADGE[p.role]}`}>{ROLE_LABEL[p.role]}</span>
+      {vista === 'tarjetas' ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {staff.map((p) => (
+            <div key={p.id} className={`card ${!p.activo ? 'opacity-50' : ''}`}>
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="text-lg font-bold">{p.nombre_completo}</h3>
+                <span className={`badge ${ROLE_BADGE[p.role]}`}>{ROLE_LABEL[p.role]}</span>
+              </div>
+              {p.cedula && <p className="text-sm text-ink/50">Cédula: {p.cedula}</p>}
+              {p.role === 'docente' && (
+                <p className="mt-2 text-sm text-ink/50">
+                  Clases: {clasesPorDocente[p.id]?.join(', ') || 'Sin asignar'}
+                </p>
+              )}
+              <div className="mt-4 flex gap-2">
+                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => setDetallePersona(p)}>
+                  Ver detalle
+                </button>
+                {profile.role === 'admin' && p.id !== profile.id && (
+                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => handleToggleClick(p)}>
+                    {p.activo ? 'Desactivar' : 'Activar'}
+                  </button>
+                )}
+              </div>
             </div>
-            {p.cedula && <p className="text-sm text-ink/50">Cédula: {p.cedula}</p>}
-            {profile.role === 'admin' && p.id !== profile.id && (
-              <button className="btn-secondary mt-4 w-full !py-2 !text-sm" onClick={() => toggleActivo(p)}>
-                {p.activo ? 'Desactivar' : 'Activar'}
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="card overflow-x-auto p-0">
+          <table className="w-full text-left">
+            <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
+              <tr>
+                <th className="px-4 py-3">Nombre</th>
+                <th className="px-4 py-3">Rol</th>
+                <th className="px-4 py-3">Cédula</th>
+                <th className="px-4 py-3">Clases</th>
+                <th className="px-4 py-3">Estado</th>
+                <th className="px-4 py-3">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {staff.map((p) => (
+                <tr key={p.id} className={`border-t border-ink/5 ${!p.activo ? 'opacity-50' : ''}`}>
+                  <td className="px-4 py-3 font-bold">{p.nombre_completo}</td>
+                  <td className="px-4 py-3">
+                    <span className={`badge ${ROLE_BADGE[p.role]}`}>{ROLE_LABEL[p.role]}</span>
+                  </td>
+                  <td className="px-4 py-3 text-ink/60">{p.cedula || '—'}</td>
+                  <td className="px-4 py-3 text-ink/60">
+                    {p.role === 'docente' ? clasesPorDocente[p.id]?.join(', ') || 'Sin asignar' : '—'}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`badge ${p.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
+                      {p.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-2">
+                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetallePersona(p)}>
+                        Ver detalle
+                      </button>
+                      {profile.role === 'admin' && p.id !== profile.id && (
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(p)}>
+                          {p.activo ? 'Desactivar' : 'Activar'}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {staff.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-6 text-center text-ink/40">
+                    Aún no hay nadie en el equipo.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Agregar al equipo">
         {creado ? (
@@ -150,6 +265,27 @@ export default function Docentes() {
           </form>
         )}
       </Modal>
+
+      <DetalleDocenteModal
+        persona={detallePersona}
+        clases={detallePersona ? clasesPorDocente[detallePersona.id] || [] : []}
+        open={!!detallePersona}
+        onClose={() => setDetallePersona(null)}
+      />
+
+      <ConfirmModal
+        open={!!confirmDesactivar}
+        onClose={() => setConfirmDesactivar(null)}
+        onConfirm={confirmarDesactivar}
+        busy={confirmBusy}
+        title="¿Desactivar a esta persona?"
+        confirmLabel="Sí, desactivar"
+        message={
+          confirmDesactivar
+            ? `${confirmDesactivar.nombre_completo} dejará de aparecer como activo/a en el equipo. Puedes reactivarlo/a cuando quieras.`
+            : ''
+        }
+      />
     </div>
   )
 }

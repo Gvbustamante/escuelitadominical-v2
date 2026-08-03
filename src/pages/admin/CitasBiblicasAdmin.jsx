@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
-import Spinner from '../../components/Spinner'
+import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
 
 function hoyStr() {
   return new Date().toISOString().slice(0, 10)
@@ -14,6 +15,9 @@ export default function CitasBiblicasAdmin() {
   const [form, setForm] = useState({ texto: '', referencia: '', activo: true, fecha_mostrar: '' })
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [confirmEliminar, setConfirmEliminar] = useState(null)
+  const [confirmDesactivar, setConfirmDesactivar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -88,9 +92,15 @@ export default function CitasBiblicasAdmin() {
   }
 
   async function eliminar(cita) {
-    if (!confirm('¿Eliminar esta cita bíblica?')) return
     await supabase.from('citas_biblicas').delete().eq('id', cita.id)
     load()
+  }
+
+  async function confirmarEliminar() {
+    setConfirmBusy(true)
+    await eliminar(confirmEliminar)
+    setConfirmBusy(false)
+    setConfirmEliminar(null)
   }
 
   async function toggleActivo(cita) {
@@ -98,7 +108,39 @@ export default function CitasBiblicasAdmin() {
     load()
   }
 
-  if (!citas) return <Spinner />
+  function handleToggleClick(cita) {
+    if (cita.activo) {
+      setConfirmDesactivar(cita)
+    } else {
+      toggleActivo(cita)
+    }
+  }
+
+  async function confirmarDesactivar() {
+    setConfirmBusy(true)
+    await toggleActivo(confirmDesactivar)
+    setConfirmBusy(false)
+    setConfirmDesactivar(null)
+  }
+
+  if (!citas) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="mt-2 h-4 w-64" />
+          </div>
+          <Skeleton className="h-12 w-40" />
+        </div>
+        <div className="flex flex-col gap-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   const hoy = hoyStr()
 
@@ -143,13 +185,13 @@ export default function CitasBiblicasAdmin() {
                     Quitar fecha
                   </button>
                 )}
-                <button className="btn-secondary !py-2 !text-sm" onClick={() => toggleActivo(c)}>
+                <button className="btn-secondary !py-2 !text-sm" onClick={() => handleToggleClick(c)}>
                   {c.activo ? 'Desactivar' : 'Activar'}
                 </button>
                 <button className="btn-secondary !py-2 !text-sm" onClick={() => openEdit(c)}>
                   Editar
                 </button>
-                <button className="btn-secondary !py-2 !text-sm !text-coral-600" onClick={() => eliminar(c)}>
+                <button className="btn-secondary !py-2 !text-sm !text-coral-600" onClick={() => setConfirmEliminar(c)}>
                   🗑️
                 </button>
               </div>
@@ -207,6 +249,26 @@ export default function CitasBiblicasAdmin() {
           </button>
         </form>
       </Modal>
+
+      <ConfirmModal
+        open={!!confirmDesactivar}
+        onClose={() => setConfirmDesactivar(null)}
+        onConfirm={confirmarDesactivar}
+        busy={confirmBusy}
+        title="¿Desactivar esta cita?"
+        confirmLabel="Sí, desactivar"
+        message="Dejará de estar disponible para elegirla como cita del día. Puedes reactivarla cuando quieras."
+      />
+
+      <ConfirmModal
+        open={!!confirmEliminar}
+        onClose={() => setConfirmEliminar(null)}
+        onConfirm={confirmarEliminar}
+        busy={confirmBusy}
+        title="¿Eliminar esta cita bíblica?"
+        confirmLabel="Sí, eliminar"
+        message="Esta acción no se puede deshacer."
+      />
     </div>
   )
 }

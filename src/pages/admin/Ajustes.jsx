@@ -1,10 +1,11 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import Spinner from '../../components/Spinner'
-import AppLogo, { notifyLogoChanged } from '../../components/AppLogo'
+import AppLogo from '../../components/AppLogo'
+import { useConfigIglesia, refreshConfigIglesia } from '../../lib/configIglesia'
 
 export default function Ajustes() {
-  const [config, setConfig] = useState(null)
+  const config = useConfigIglesia()
   const [nombreIglesia, setNombreIglesia] = useState('')
   const [preview, setPreview] = useState(null)
   const [file, setFile] = useState(null)
@@ -13,15 +14,9 @@ export default function Ajustes() {
   const [ok, setOk] = useState('')
   const inputRef = useRef(null)
 
-  const load = useCallback(async () => {
-    const { data } = await supabase.from('config_iglesia').select('*').limit(1).maybeSingle()
-    setConfig(data)
-    setNombreIglesia(data?.nombre_iglesia || '')
-  }, [])
-
   useEffect(() => {
-    load()
-  }, [load])
+    setNombreIglesia(config?.nombre_iglesia || '')
+  }, [config])
 
   function handleFile(e) {
     const f = e.target.files?.[0]
@@ -62,8 +57,7 @@ export default function Ajustes() {
     setOk('¡Guardado! Los cambios ya se ven en toda la plataforma.')
     setFile(null)
     setPreview(null)
-    await load()
-    notifyLogoChanged()
+    await refreshConfigIglesia()
   }
 
   async function handleQuitarLogo() {
@@ -83,8 +77,7 @@ export default function Ajustes() {
     setOk('Logo quitado. Volviste al ícono por defecto.')
     setFile(null)
     setPreview(null)
-    await load()
-    notifyLogoChanged()
+    await refreshConfigIglesia()
   }
 
   if (config === null) return <Spinner />

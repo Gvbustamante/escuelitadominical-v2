@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
-import Spinner from '../../components/Spinner'
+import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 
 const COLOR_OPTIONS = ['sky', 'grass', 'sunshine', 'coral', 'grape']
@@ -18,6 +19,8 @@ export default function Clases() {
   const [selectedDocentes, setSelectedDocentes] = useState([])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [confirmDesactivar, setConfirmDesactivar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
 
   const load = useCallback(async () => {
     const [{ data: n }, { data: d }, { data: a }] = await Promise.all([
@@ -101,7 +104,39 @@ export default function Clases() {
     load()
   }
 
-  if (!niveles) return <Spinner />
+  function handleToggleClick(nivel) {
+    if (nivel.activo) {
+      setConfirmDesactivar(nivel)
+    } else {
+      toggleActivo(nivel)
+    }
+  }
+
+  async function confirmarDesactivar() {
+    setConfirmBusy(true)
+    await toggleActivo(confirmDesactivar)
+    setConfirmBusy(false)
+    setConfirmDesactivar(null)
+  }
+
+  if (!niveles) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Skeleton className="h-8 w-40" />
+            <Skeleton className="mt-2 h-4 w-56" />
+          </div>
+          <Skeleton className="h-12 w-40" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 w-full" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -134,7 +169,7 @@ export default function Clases() {
                   Editar
                 </button>
                 {profile.role === 'admin' && (
-                  <button className="btn-secondary flex-1 !py-2" onClick={() => toggleActivo(nivel)}>
+                  <button className="btn-secondary flex-1 !py-2" onClick={() => handleToggleClick(nivel)}>
                     {nivel.activo ? 'Desactivar' : 'Activar'}
                   </button>
                 )}
@@ -213,6 +248,20 @@ export default function Clases() {
           </button>
         </form>
       </Modal>
+
+      <ConfirmModal
+        open={!!confirmDesactivar}
+        onClose={() => setConfirmDesactivar(null)}
+        onConfirm={confirmarDesactivar}
+        busy={confirmBusy}
+        title="¿Desactivar esta clase?"
+        confirmLabel="Sí, desactivar"
+        message={
+          confirmDesactivar
+            ? `"${confirmDesactivar.nombre}" dejará de aparecer como clase activa. Puedes reactivarla cuando quieras.`
+            : ''
+        }
+      />
     </div>
   )
 }
