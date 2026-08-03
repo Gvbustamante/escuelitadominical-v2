@@ -7,6 +7,7 @@ import ConfirmModal from '../../components/ConfirmModal'
 import DetalleNinoModal from '../../components/DetalleNinoModal'
 import VistaToggle from '../../components/VistaToggle'
 import { BADGE_CLASSES } from '../../lib/colors'
+import { whatsappLink } from '../../lib/whatsapp'
 
 function generarCodigoFacil(nombreNino) {
   const base = (nombreNino || 'familia').trim().split(' ')[0].toLowerCase().normalize('NFD').replace(/[^a-z]/g, '')
@@ -57,7 +58,7 @@ export default function Ninos() {
     const [{ data: n }, { data: niv }, { data: np }] = await Promise.all([
       supabase.from('ninos').select('*').order('nombre_completo'),
       supabase.from('niveles').select('*').eq('activo', true),
-      supabase.from('ninos_padres').select('nino_id, parentesco, padre:profiles(nombre_completo)'),
+      supabase.from('ninos_padres').select('nino_id, parentesco, padre:profiles(id, nombre_completo, telefono)'),
     ])
     setNinos(n || [])
     setNiveles(niv || [])
@@ -287,8 +288,15 @@ export default function Ninos() {
                 ) : (
                   <ul className="text-sm">
                     {padres.map((p, i) => (
-                      <li key={i}>
-                        {p.padre?.nombre_completo} {p.parentesco && `(${p.parentesco})`}
+                      <li key={i} className="flex items-center gap-2">
+                        <span>
+                          {p.padre?.nombre_completo} {p.parentesco && `(${p.parentesco})`}
+                        </span>
+                        {whatsappLink(p.padre?.telefono) && (
+                          <a href={whatsappLink(p.padre.telefono)} target="_blank" rel="noreferrer" title="Abrir WhatsApp">
+                            💬
+                          </a>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -345,9 +353,23 @@ export default function Ninos() {
                       {nino.alergias ? <span className="font-bold text-coral-600">⚠️ {nino.alergias}</span> : '—'}
                     </td>
                     <td className="px-4 py-3 text-ink/60">
-                      {padres.length === 0
-                        ? 'Sin vincular'
-                        : padres.map((p) => p.padre?.nombre_completo).filter(Boolean).join(', ')}
+                      {padres.length === 0 ? (
+                        'Sin vincular'
+                      ) : (
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          {padres.map((p, i) => (
+                            <span key={i} className="inline-flex items-center gap-1">
+                              {p.padre?.nombre_completo}
+                              {whatsappLink(p.padre?.telefono) && (
+                                <a href={whatsappLink(p.padre.telefono)} target="_blank" rel="noreferrer" title="Abrir WhatsApp">
+                                  💬
+                                </a>
+                              )}
+                              {i < padres.length - 1 && ','}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span className={`badge ${nino.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
@@ -595,6 +617,7 @@ export default function Ninos() {
         padres={detalleNino ? padresPorNino[detalleNino.id] || [] : []}
         open={!!detalleNino}
         onClose={() => setDetalleNino(null)}
+        onSaved={load}
       />
 
       <ConfirmModal

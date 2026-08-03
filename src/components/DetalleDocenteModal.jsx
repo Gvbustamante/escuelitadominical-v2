@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabaseClient'
+import { whatsappLink } from '../lib/whatsapp'
 import Modal from './Modal'
 
 const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente' }
@@ -7,8 +10,29 @@ const ROLE_BADGE = {
   docente: 'bg-sky-100 text-sky-700',
 }
 
-export default function DetalleDocenteModal({ persona, clases = [], open, onClose }) {
+export default function DetalleDocenteModal({ persona, clases = [], open, onClose, onSaved }) {
+  const [telefono, setTelefono] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [ok, setOk] = useState(false)
+
+  useEffect(() => {
+    if (open && persona) {
+      setTelefono(persona.telefono || '')
+      setOk(false)
+    }
+  }, [open, persona])
+
   if (!persona) return null
+
+  async function guardarTelefono() {
+    setBusy(true)
+    await supabase.from('profiles').update({ telefono: telefono || null }).eq('id', persona.id)
+    setBusy(false)
+    setOk(true)
+    onSaved?.()
+  }
+
+  const link = whatsappLink(persona.telefono)
 
   return (
     <Modal open={open} onClose={onClose} title={`Detalle — ${persona.nombre_completo}`}>
@@ -20,15 +44,25 @@ export default function DetalleDocenteModal({ persona, clases = [], open, onClos
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div>
-            <p className="text-xs font-extrabold uppercase text-ink/40">Cédula</p>
-            <p className="font-bold">{persona.cedula || '—'}</p>
+        <div>
+          <p className="text-xs font-extrabold uppercase text-ink/40">Cédula</p>
+          <p className="font-bold">{persona.cedula || '—'}</p>
+        </div>
+
+        <div>
+          <label className="label">WhatsApp (con código de país, ej. 18091234567)</label>
+          <div className="flex gap-2">
+            <input className="input" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej. 18091234567" />
+            <button type="button" onClick={guardarTelefono} disabled={busy} className="btn-secondary shrink-0 !px-4 !text-sm">
+              {busy ? '...' : 'Guardar'}
+            </button>
           </div>
-          <div>
-            <p className="text-xs font-extrabold uppercase text-ink/40">Teléfono</p>
-            <p className="font-bold">{persona.telefono || '—'}</p>
-          </div>
+          {ok && <p className="mt-1 text-xs font-bold text-grass-600">Guardado ✔️</p>}
+          {link && (
+            <a href={link} target="_blank" rel="noreferrer" className="btn-success mt-3 w-full justify-center !py-2 !text-sm">
+              💬 Abrir chat de WhatsApp
+            </a>
+          )}
         </div>
 
         {persona.role === 'docente' && (

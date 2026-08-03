@@ -20,12 +20,15 @@ import ActividadesAdmin from './pages/admin/ActividadesAdmin'
 import AgendaAdmin from './pages/admin/AgendaAdmin'
 import CitasBiblicasAdmin from './pages/admin/CitasBiblicasAdmin'
 import Ajustes from './pages/admin/Ajustes'
+import BitacoraAdmin from './pages/admin/BitacoraAdmin'
+import Materiales from './pages/admin/Materiales'
 
 import DocenteHome from './pages/docente/DocenteHome'
 import Asistencia from './pages/docente/Asistencia'
 import Actividades from './pages/docente/Actividades'
 import Agenda from './pages/docente/Agenda'
 import Progreso from './pages/docente/Progreso'
+import BitacoraDocente from './pages/docente/Bitacora'
 
 import PadreHome from './pages/padre/PadreHome'
 import PadreActividades from './pages/padre/PadreActividades'
@@ -113,6 +116,22 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/materiales"
+          element={
+            <ProtectedRoute roles={STAFF}>
+              <Materiales />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bitacora"
+          element={
+            <ProtectedRoute roles={[...STAFF, 'docente']}>
+              <RoleSwitchBitacora />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Docente */}
         <Route
@@ -154,6 +173,11 @@ function RoleSwitchHome() {
 function RoleSwitchAsistencia() {
   const { profile } = useAuth()
   return profile.role === 'docente' ? <Asistencia /> : <AsistenciaAdmin />
+}
+
+function RoleSwitchBitacora() {
+  const { profile } = useAuth()
+  return STAFF.includes(profile.role) ? <BitacoraAdmin /> : <BitacoraDocente />
 }
 
 function RoleSwitchActividades() {

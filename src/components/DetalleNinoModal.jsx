@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { badgeActual } from '../lib/gamification'
 import { BADGE_CLASSES } from '../lib/colors'
+import { whatsappLink } from '../lib/whatsapp'
 import Modal from './Modal'
 
 function calcularEdad(fecha) {
@@ -14,7 +15,53 @@ function calcularEdad(fecha) {
   return edad
 }
 
-export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClose }) {
+function PadreRow({ padre, parentesco, onSaved }) {
+  const [telefono, setTelefono] = useState(padre?.telefono || '')
+  const [busy, setBusy] = useState(false)
+  const [ok, setOk] = useState(false)
+
+  useEffect(() => {
+    setTelefono(padre?.telefono || '')
+    setOk(false)
+  }, [padre?.id])
+
+  async function guardar() {
+    setBusy(true)
+    await supabase.from('profiles').update({ telefono: telefono || null }).eq('id', padre.id)
+    setBusy(false)
+    setOk(true)
+    onSaved?.()
+  }
+
+  const link = whatsappLink(padre?.telefono)
+
+  return (
+    <div className="rounded-xl bg-ink/5 p-3">
+      <p className="font-bold">
+        {padre?.nombre_completo} {parentesco && `(${parentesco})`}
+      </p>
+      <div className="mt-2 flex gap-2">
+        <input
+          className="input !py-2 !text-sm"
+          placeholder="WhatsApp, ej. 18091234567"
+          value={telefono}
+          onChange={(e) => setTelefono(e.target.value)}
+        />
+        <button type="button" onClick={guardar} disabled={busy} className="btn-secondary shrink-0 !px-3 !text-sm">
+          {busy ? '...' : 'Guardar'}
+        </button>
+      </div>
+      {ok && <p className="mt-1 text-xs font-bold text-grass-600">Guardado ✔️</p>}
+      {link && (
+        <a href={link} target="_blank" rel="noreferrer" className="btn-success mt-2 w-full justify-center !py-2 !text-sm">
+          💬 Abrir chat de WhatsApp
+        </a>
+      )}
+    </div>
+  )
+}
+
+export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClose, onSaved }) {
   const [historial, setHistorial] = useState(null)
 
   useEffect(() => {
@@ -54,17 +101,15 @@ export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClo
         {nino.notas && <p className="text-sm text-ink/60">📝 {nino.notas}</p>}
 
         <div>
-          <p className="text-xs font-extrabold uppercase text-ink/40">Padres/encargados</p>
+          <p className="mb-2 text-xs font-extrabold uppercase text-ink/40">Padres/encargados</p>
           {padres.length === 0 ? (
             <p className="text-sm text-ink/40">Sin vincular</p>
           ) : (
-            <ul className="text-sm">
+            <div className="flex flex-col gap-2">
               {padres.map((p, i) => (
-                <li key={i}>
-                  {p.padre?.nombre_completo} {p.parentesco && `(${p.parentesco})`}
-                </li>
+                <PadreRow key={i} padre={p.padre} parentesco={p.parentesco} onSaved={onSaved} />
               ))}
-            </ul>
+            </div>
           )}
         </div>
 

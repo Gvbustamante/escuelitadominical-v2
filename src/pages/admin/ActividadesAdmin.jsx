@@ -4,6 +4,13 @@ import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ActivityFiles from '../../components/ActivityFiles'
+import CalendarioAgenda from '../../components/CalendarioAgenda'
+import VistaToggle from '../../components/VistaToggle'
+
+const VISTA_OPTIONS = [
+  { value: 'lista', label: '☰ Lista' },
+  { value: 'calendario', label: '🗓️ Plan del mes' },
+]
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -22,6 +29,8 @@ export default function ActividadesAdmin() {
   const [busy, setBusy] = useState(false)
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
+  const [vista, setVista] = useState('lista')
+  const [selectedDay, setSelectedDay] = useState(null)
 
   useEffect(() => {
     supabase
@@ -51,7 +60,7 @@ export default function ActividadesAdmin() {
 
   function openNew() {
     setEditing(null)
-    setForm({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '' })
+    setForm({ titulo: '', descripcion: '', fecha: selectedDay || hoyISO(), versiculo_clave: '', historia_biblica: '' })
     setArchivos([])
     setPreviews([])
     setError('')
@@ -150,12 +159,22 @@ export default function ActividadesAdmin() {
           <h1 className="text-3xl font-bold">Actividades 🎨</h1>
           <p className="text-ink/50">Lo que se hace en cada clase — fotos, versículo e historia bíblica</p>
         </div>
-        <button className="btn-primary" onClick={openNew}>
-          + Nueva actividad
-        </button>
+        <div className="flex items-center gap-3">
+          <VistaToggle vista={vista} onChange={setVista} options={VISTA_OPTIONS} />
+          <button className="btn-primary" onClick={openNew}>
+            + Nueva actividad
+          </button>
+        </div>
       </div>
 
-      <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
+      <select
+        className="input max-w-xs"
+        value={nivelId}
+        onChange={(e) => {
+          setNivelId(e.target.value)
+          setSelectedDay(null)
+        }}
+      >
         {niveles.map((c) => (
           <option key={c.id} value={c.id}>
             {c.nombre}
@@ -165,36 +184,27 @@ export default function ActividadesAdmin() {
 
       {!actividades ? (
         <Spinner />
+      ) : vista === 'calendario' ? (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <CalendarioAgenda eventos={actividades} selectedDay={selectedDay} onSelectDay={setSelectedDay} />
+          <div className="flex flex-col gap-4">
+            {selectedDay && (
+              <button onClick={() => setSelectedDay(null)} className="self-start text-sm font-bold text-sky-500 hover:underline">
+                ← Ver todas las actividades
+              </button>
+            )}
+            {(selectedDay ? actividades.filter((a) => a.fecha === selectedDay) : actividades).map((a, i) => (
+              <ActividadCard key={a.id} a={a} i={i} onEdit={openEdit} onDelete={eliminar} />
+            ))}
+            {(selectedDay ? actividades.filter((a) => a.fecha === selectedDay) : actividades).length === 0 && (
+              <p className="card text-ink/50">{selectedDay ? 'Nada planeado este día.' : 'Aún no hay actividades para esta clase.'}</p>
+            )}
+          </div>
+        </div>
       ) : (
         <div className="flex flex-col gap-4">
           {actividades.map((a, i) => (
-            <div
-              key={a.id}
-              className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
-              style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
-            >
-              <div className="flex items-start justify-between">
-                <h3 className="text-lg font-bold">{a.titulo}</h3>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-ink/40">{a.fecha}</span>
-                  <button onClick={() => openEdit(a)} className="text-lg text-ink/30 hover:text-sky-500">
-                    ✏️
-                  </button>
-                  <button onClick={() => eliminar(a.id)} className="text-lg text-ink/30 hover:text-coral-500">
-                    🗑️
-                  </button>
-                </div>
-              </div>
-              {a.descripcion && <p className="mt-1 text-ink/70">{a.descripcion}</p>}
-              {(a.versiculo_clave || a.historia_biblica) && (
-                <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
-                  {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
-                  {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
-                </div>
-              )}
-              <ActivityFiles archivos={a.actividad_archivos} />
-              <p className="mt-3 text-sm font-bold text-coral-500">{a.actividad_reacciones?.length || 0} reacciones ❤️</p>
-            </div>
+            <ActividadCard key={a.id} a={a} i={i} onEdit={openEdit} onDelete={eliminar} />
           ))}
           {actividades.length === 0 && <p className="card text-ink/50">Aún no hay actividades para esta clase.</p>}
         </div>
@@ -257,6 +267,37 @@ export default function ActividadesAdmin() {
           </button>
         </form>
       </Modal>
+    </div>
+  )
+}
+
+function ActividadCard({ a, i, onEdit, onDelete }) {
+  return (
+    <div
+      className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
+      style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
+    >
+      <div className="flex items-start justify-between">
+        <h3 className="text-lg font-bold">{a.titulo}</h3>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-ink/40">{a.fecha}</span>
+          <button onClick={() => onEdit(a)} className="text-lg text-ink/30 hover:text-sky-500">
+            ✏️
+          </button>
+          <button onClick={() => onDelete(a.id)} className="text-lg text-ink/30 hover:text-coral-500">
+            🗑️
+          </button>
+        </div>
+      </div>
+      {a.descripcion && <p className="mt-1 text-ink/70">{a.descripcion}</p>}
+      {(a.versiculo_clave || a.historia_biblica) && (
+        <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
+          {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
+          {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
+        </div>
+      )}
+      <ActivityFiles archivos={a.actividad_archivos} />
+      <p className="mt-3 text-sm font-bold text-coral-500">{a.actividad_reacciones?.length || 0} reacciones ❤️</p>
     </div>
   )
 }
