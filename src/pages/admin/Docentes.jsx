@@ -7,6 +7,7 @@ import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleDocenteModal from '../../components/DetalleDocenteModal'
 import VistaToggle from '../../components/VistaToggle'
+import { whatsappLink } from '../../lib/whatsapp'
 
 const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente' }
 const ROLE_BADGE = {
@@ -141,6 +142,17 @@ export default function Docentes() {
                 </p>
               )}
               <div className="mt-4 flex gap-2">
+                {whatsappLink(p.telefono) && (
+                  <a
+                    href={whatsappLink(p.telefono)}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Abrir WhatsApp"
+                    className="btn-success !px-3 !py-2 !text-sm"
+                  >
+                    💬
+                  </a>
+                )}
                 <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => setDetallePersona(p)}>
                   Ver detalle
                 </button>
@@ -184,6 +196,17 @@ export default function Docentes() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-2">
+                      {whatsappLink(p.telefono) && (
+                        <a
+                          href={whatsappLink(p.telefono)}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Abrir WhatsApp"
+                          className="btn-success !px-2 !py-1 !text-xs"
+                        >
+                          💬
+                        </a>
+                      )}
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetallePersona(p)}>
                         Ver detalle
                       </button>
@@ -271,6 +294,7 @@ export default function Docentes() {
         clases={detallePersona ? clasesPorDocente[detallePersona.id] || [] : []}
         open={!!detallePersona}
         onClose={() => setDetallePersona(null)}
+        onSaved={load}
       />
 
       <ConfirmModal

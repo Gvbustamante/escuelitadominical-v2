@@ -27,6 +27,8 @@ export default function Devocionales() {
   const [verTodos, setVerTodos] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '' })
+  const [imagen, setImagen] = useState(null)
+  const [preview, setPreview] = useState(null)
   const [busy, setBusy] = useState(false)
 
   const load = useCallback(async () => {
@@ -47,20 +49,43 @@ export default function Devocionales() {
 
   function openNew() {
     setForm({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '' })
+    setImagen(null)
+    setPreview(null)
     setModalOpen(true)
+  }
+
+  function handleImagen(e) {
+    const f = e.target.files?.[0]
+    if (!f) return
+    setImagen(f)
+    setPreview(URL.createObjectURL(f))
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setBusy(true)
-    await supabase.from('devocionales_ninos').insert({
-      titulo: form.titulo,
-      versiculo: form.versiculo || null,
-      contenido: form.contenido,
-      fecha: form.fecha,
-      nivel_id: form.nivel_id || null,
-      creado_por: user.id,
-    })
+    const { data: devocional, error } = await supabase
+      .from('devocionales_ninos')
+      .insert({
+        titulo: form.titulo,
+        versiculo: form.versiculo || null,
+        contenido: form.contenido,
+        fecha: form.fecha,
+        nivel_id: form.nivel_id || null,
+        creado_por: user.id,
+      })
+      .select()
+      .single()
+
+    if (!error && imagen) {
+      const path = `devocionales/${devocional.id}/${Date.now()}-${imagen.name}`
+      const { error: upError } = await supabase.storage.from('actividades').upload(path, imagen)
+      if (!upError) {
+        const imagen_url = supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
+        await supabase.from('devocionales_ninos').update({ imagen_url }).eq('id', devocional.id)
+      }
+    }
+
     setBusy(false)
     setModalOpen(false)
     load()
@@ -97,6 +122,9 @@ export default function Devocionales() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {devocionales.map((d) => (
           <div key={d.id} className="card">
+            {d.imagen_url && (
+              <img src={d.imagen_url} alt={d.titulo} className="mb-3 h-40 w-full rounded-2xl object-cover" />
+            )}
             <div className="flex items-start justify-between">
               <h3 className="text-lg font-bold">{d.titulo}</h3>
               <span className="text-sm text-ink/40">{d.fecha}</span>
@@ -155,6 +183,11 @@ export default function Devocionales() {
                 ))}
               </select>
             </div>
+          </div>
+          <div>
+            <label className="label">Imagen (opcional)</label>
+            <input type="file" accept="image/*" className="input" onChange={handleImagen} />
+            {preview && <img src={preview} alt="" className="mt-2 h-32 w-full rounded-2xl object-cover" />}
           </div>
           <button disabled={busy} className="btn-primary justify-center">
             {busy ? 'Publicando...' : 'Publicar devocional'}

@@ -1,0 +1,234 @@
+import { useEffect, useState, useCallback } from 'react'
+import { supabase } from '../../lib/supabaseClient'
+import Skeleton from '../../components/Skeleton'
+import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
+
+const CATEGORIA_LABEL = { general: 'General', ninos: 'Para niños', clase: 'Para una clase' }
+
+export default function Materiales() {
+  const [materiales, setMateriales] = useState(null)
+  const [niveles, setNiveles] = useState([])
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState({ nombre: '', categoria: 'general', nivel_id: '', cantidad: 0, notas: '' })
+  const [foto, setFoto] = useState(null)
+  const [preview, setPreview] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [confirmEliminar, setConfirmEliminar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
+
+  const load = useCallback(async () => {
+    const { data } = await supabase.from('materiales').select('*, nivel:niveles(nombre)').order('nombre')
+    setMateriales(data || [])
+  }, [])
+
+  useEffect(() => {
+    load()
+    supabase.from('niveles').select('*').eq('activo', true).order('nombre').then(({ data }) => setNiveles(data || []))
+  }, [load])
+
+  function openNew() {
+    setEditing(null)
+    setForm({ nombre: '', categoria: 'general', nivel_id: '', cantidad: 0, notas: '' })
+    setFoto(null)
+    setPreview(null)
+    setError('')
+    setModalOpen(true)
+  }
+
+  function openEdit(m) {
+    setEditing(m)
+    setForm({ nombre: m.nombre, categoria: m.categoria, nivel_id: m.nivel_id || '', cantidad: m.cantidad, notas: m.notas || '' })
+    setFoto(null)
+    setPreview(null)
+    setError('')
+    setModalOpen(true)
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setBusy(true)
+    setError('')
+
+    let foto_url = editing?.foto_url || null
+    if (foto) {
+      const path = `materiales/${Date.now()}-${foto.name}`
+      const { error: upError } = await supabase.storage.from('actividades').upload(path, foto)
+      if (!upError) foto_url = supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
+    }
+
+    const payload = {
+      nombre: form.nombre,
+      categoria: form.categoria,
+      nivel_id: form.categoria === 'clase' ? form.nivel_id || null : null,
+      cantidad: Number(form.cantidad) || 0,
+      notas: form.notas || null,
+      foto_url,
+    }
+
+    const { error: saveError } = editing
+      ? await supabase.from('materiales').update(payload).eq('id', editing.id)
+      : await supabase.from('materiales').insert(payload)
+
+    setBusy(false)
+    if (saveError) {
+      setError(saveError.message)
+      return
+    }
+    setModalOpen(false)
+    load()
+  }
+
+  async function eliminar() {
+    setConfirmBusy(true)
+    await supabase.from('materiales').delete().eq('id', confirmEliminar.id)
+    setConfirmBusy(false)
+    setConfirmEliminar(null)
+    load()
+  }
+
+  async function toggleActivo(m) {
+    await supabase.from('materiales').update({ activo: !m.activo }).eq('id', m.id)
+    load()
+  }
+
+  if (!materiales) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div>
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="mt-2 h-4 w-64" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Materiales 🧰</h1>
+          <p className="text-ink/50">Qué hay disponible para los niños y para cada clase</p>
+        </div>
+        <button className="btn-primary" onClick={openNew}>
+          + Agregar material
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {materiales.map((m) => (
+          <div key={m.id} className={`card ${!m.activo ? 'opacity-50' : ''}`}>
+            {m.foto_url && <img src={m.foto_url} alt={m.nombre} className="mb-3 h-32 w-full rounded-2xl object-cover" />}
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="text-lg font-bold">{m.nombre}</h3>
+              <span className={`badge ${m.cantidad <= 2 ? 'bg-coral-100 text-coral-700' : 'bg-sky-100 text-sky-700'}`}>
+                {m.cantidad}
+              </span>
+            </div>
+            <p className="text-sm text-ink/50">
+              {m.categoria === 'clase' ? m.nivel?.nombre || 'Para una clase' : CATEGORIA_LABEL[m.categoria]}
+            </p>
+            {m.cantidad <= 2 && <p className="mt-1 text-xs font-bold text-coral-600">⚠️ Queda poco</p>}
+            {m.notas && <p className="mt-2 text-sm text-ink/60">{m.notas}</p>}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openEdit(m)}>
+                Editar
+              </button>
+              <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => toggleActivo(m)}>
+                {m.activo ? 'Desactivar' : 'Activar'}
+              </button>
+              <button className="btn-secondary !py-2 !text-sm !text-coral-600" onClick={() => setConfirmEliminar(m)}>
+                🗑️
+              </button>
+            </div>
+          </div>
+        ))}
+        {materiales.length === 0 && <p className="card text-ink/50">Aún no hay materiales registrados.</p>}
+      </div>
+
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar material' : 'Agregar material'}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div>
+            <label className="label">Nombre</label>
+            <input required className="input" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="label">Categoría</label>
+              <select className="input" value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })}>
+                <option value="general">General</option>
+                <option value="ninos">Para niños</option>
+                <option value="clase">Para una clase</option>
+              </select>
+            </div>
+            <div>
+              <label className="label">Cantidad</label>
+              <input
+                type="number"
+                min="0"
+                className="input"
+                value={form.cantidad}
+                onChange={(e) => setForm({ ...form, cantidad: e.target.value })}
+              />
+            </div>
+          </div>
+          {form.categoria === 'clase' && (
+            <div>
+              <label className="label">Clase</label>
+              <select className="input" value={form.nivel_id} onChange={(e) => setForm({ ...form, nivel_id: e.target.value })}>
+                <option value="">Elige una clase</option>
+                {niveles.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <div>
+            <label className="label">Notas (opcional)</label>
+            <textarea className="input" rows={2} value={form.notas} onChange={(e) => setForm({ ...form, notas: e.target.value })} />
+          </div>
+          <div>
+            <label className="label">Foto (opcional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              className="input"
+              onChange={(e) => {
+                const f = e.target.files?.[0]
+                if (!f) return
+                setFoto(f)
+                setPreview(URL.createObjectURL(f))
+              }}
+            />
+            {(preview || editing?.foto_url) && (
+              <img src={preview || editing.foto_url} alt="" className="mt-2 h-32 w-full rounded-2xl object-cover" />
+            )}
+          </div>
+          {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
+          <button disabled={busy} className="btn-primary justify-center">
+            {busy ? 'Guardando...' : editing ? 'Guardar cambios' : 'Agregar'}
+          </button>
+        </form>
+      </Modal>
+
+      <ConfirmModal
+        open={!!confirmEliminar}
+        onClose={() => setConfirmEliminar(null)}
+        onConfirm={eliminar}
+        busy={confirmBusy}
+        title="¿Eliminar este material?"
+        confirmLabel="Sí, eliminar"
+        message="Esta acción no se puede deshacer."
+      />
+    </div>
+  )
+}
