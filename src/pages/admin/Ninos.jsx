@@ -6,6 +6,7 @@ import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleNinoModal from '../../components/DetalleNinoModal'
 import VistaToggle from '../../components/VistaToggle'
+import PadreContacto from '../../components/PadreContacto'
 import { BADGE_CLASSES } from '../../lib/colors'
 import { whatsappLink } from '../../lib/whatsapp'
 
@@ -286,20 +287,11 @@ export default function Ninos() {
                 {padres.length === 0 ? (
                   <p className="text-sm text-ink/40">Sin vincular</p>
                 ) : (
-                  <ul className="text-sm">
+                  <div className="mt-2 flex flex-col gap-2">
                     {padres.map((p, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <span>
-                          {p.padre?.nombre_completo} {p.parentesco && `(${p.parentesco})`}
-                        </span>
-                        {whatsappLink(p.padre?.telefono) && (
-                          <a href={whatsappLink(p.padre.telefono)} target="_blank" rel="noreferrer" title="Abrir WhatsApp">
-                            💬
-                          </a>
-                        )}
-                      </li>
+                      <PadreContacto key={i} padre={p.padre} parentesco={p.parentesco} onSaved={load} />
                     ))}
-                  </ul>
+                  </div>
                 )}
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => setDetalleNino(nino)}>
