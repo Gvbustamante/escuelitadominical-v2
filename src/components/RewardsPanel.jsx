@@ -1,9 +1,25 @@
-import { badgeActual, siguienteBadge, progresoHaciaSiguiente } from '../lib/gamification'
+import { useState } from 'react'
+import { useNivelesEstrella, badgeActual, siguienteBadge, progresoHaciaSiguiente } from '../lib/nivelesEstrella'
+import { useMotivosReconocimiento } from '../lib/motivosReconocimiento'
 
 export default function RewardsPanel({ estrellas, recientes = [], onAward, busy }) {
-  const badge = badgeActual(estrellas)
-  const siguiente = siguienteBadge(estrellas)
-  const pct = progresoHaciaSiguiente(estrellas)
+  const niveles = useNivelesEstrella()
+  const motivos = useMotivosReconocimiento()
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [motivoElegido, setMotivoElegido] = useState('')
+  const [motivoLibre, setMotivoLibre] = useState('')
+
+  const badge = badgeActual(niveles, estrellas)
+  const siguiente = siguienteBadge(niveles, estrellas)
+  const pct = progresoHaciaSiguiente(niveles, estrellas)
+
+  function confirmarEstrella() {
+    const motivo = motivoLibre.trim() || motivoElegido || null
+    onAward(motivo)
+    setPickerOpen(false)
+    setMotivoElegido('')
+    setMotivoLibre('')
+  }
 
   return (
     <div className="rw-card relative overflow-hidden rounded-blob border-4 border-sunshine-200 bg-sunshine-50 p-5">
@@ -30,15 +46,66 @@ export default function RewardsPanel({ estrellas, recientes = [], onAward, busy 
           </div>
           <p className="mt-1 text-xs font-bold text-ink/50">
             {estrellas} ⭐
-            {siguiente ? ` · faltan ${siguiente.min - estrellas} para ${siguiente.emoji} ${siguiente.nombre}` : ' · ¡insignia máxima desbloqueada!'}
+            {siguiente
+              ? ` · faltan ${siguiente.min_estrellas - estrellas} para ${siguiente.emoji} ${siguiente.nombre}`
+              : ' · ¡insignia máxima desbloqueada!'}
           </p>
         </div>
       </div>
 
-      {onAward && (
-        <button disabled={busy} onClick={onAward} className="btn-primary mt-4 w-full justify-center !bg-sunshine-500 hover:!bg-sunshine-600">
-          {busy ? 'Guardando...' : '⭐ Dar una estrella'}
+      {onAward && !pickerOpen && (
+        <button onClick={() => setPickerOpen(true)} className="btn-primary mt-4 w-full justify-center !bg-sunshine-500 hover:!bg-sunshine-600">
+          ⭐ Dar una estrella
         </button>
+      )}
+
+      {onAward && pickerOpen && (
+        <div className="mt-4 flex flex-col gap-3 rounded-2xl bg-white p-3">
+          <p className="text-xs font-extrabold uppercase tracking-wide text-ink/40">¿Por qué se la ganó?</p>
+          <div className="flex flex-wrap gap-2">
+            {motivos.map((m) => (
+              <button
+                type="button"
+                key={m.id}
+                onClick={() => {
+                  setMotivoElegido(m.texto)
+                  setMotivoLibre('')
+                }}
+                className={`rounded-full px-3 py-2 text-sm font-bold ${
+                  motivoElegido === m.texto ? 'bg-sunshine-400 text-white' : 'bg-ink/5'
+                }`}
+              >
+                {m.emoji} {m.texto}
+              </button>
+            ))}
+          </div>
+          <input
+            type="text"
+            className="input"
+            placeholder="O escribe tu propio motivo (opcional)"
+            value={motivoLibre}
+            onChange={(e) => {
+              setMotivoLibre(e.target.value)
+              setMotivoElegido('')
+            }}
+          />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="btn-secondary flex-1 !py-2 !text-sm"
+              onClick={() => {
+                setPickerOpen(false)
+                setMotivoElegido('')
+                setMotivoLibre('')
+              }}
+            >
+              Cancelar
+            </button>
+            <button disabled={busy} onClick={confirmarEstrella} className="btn-primary flex-1 !py-2 !text-sm justify-center !bg-sunshine-500 hover:!bg-sunshine-600">
+              {busy ? 'Guardando...' : '⭐ Confirmar'}
+            </button>
+          </div>
+        </div>
       )}
 
       {recientes.length > 0 && (

@@ -130,6 +130,11 @@ export default function Ninos() {
     load()
   }
 
+  async function togglePausado(nino) {
+    await supabase.from('ninos').update({ pausado: !nino.pausado }).eq('id', nino.id)
+    load()
+  }
+
   function handleToggleClick(nino) {
     if (nino.activo) {
       setConfirmDesactivar(nino)
@@ -270,13 +275,16 @@ export default function Ninos() {
             const nivel = nivelesById[nino.nivel_id]
             const padres = padresPorNino[nino.id] || []
             return (
-              <div key={nino.id} className={`card ${!nino.activo ? 'opacity-50' : ''}`}>
+              <div key={nino.id} className={`card ${!nino.activo || nino.pausado ? 'opacity-50 grayscale' : ''}`}>
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h3 className="text-lg font-bold">{nino.nombre_completo}</h3>
                     <p className="text-sm text-ink/50">{calcularEdad(nino.fecha_nacimiento)} años</p>
                   </div>
-                  {nivel && <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>}
+                  <div className="flex flex-col items-end gap-1">
+                    {nivel && <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>}
+                    {nino.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado</span>}
+                  </div>
                 </div>
                 {nino.alergias && (
                   <p className="mt-2 rounded-xl bg-coral-50 px-3 py-1 text-xs font-bold text-coral-600">
@@ -302,6 +310,9 @@ export default function Ninos() {
                   </button>
                   <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openInvite(nino)}>
                     + Padre
+                  </button>
+                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => togglePausado(nino)}>
+                    {nino.pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
                   </button>
                   <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => handleToggleClick(nino)}>
                     {nino.activo ? 'Desactivar' : 'Activar'}
@@ -331,7 +342,7 @@ export default function Ninos() {
                 const nivel = nivelesById[nino.nivel_id]
                 const padres = padresPorNino[nino.id] || []
                 return (
-                  <tr key={nino.id} className={`border-t border-ink/5 ${!nino.activo ? 'opacity-50' : ''}`}>
+                  <tr key={nino.id} className={`border-t border-ink/5 ${!nino.activo || nino.pausado ? 'opacity-50 grayscale' : ''}`}>
                     <td className="px-4 py-3 font-bold">{nino.nombre_completo}</td>
                     <td className="px-4 py-3 text-ink/60">{calcularEdad(nino.fecha_nacimiento)}</td>
                     <td className="px-4 py-3">
@@ -364,9 +375,12 @@ export default function Ninos() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`badge ${nino.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
-                        {nino.activo ? 'Activo' : 'Inactivo'}
-                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        <span className={`badge ${nino.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
+                          {nino.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                        {nino.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado</span>}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-2">
@@ -378,6 +392,9 @@ export default function Ninos() {
                         </button>
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openInvite(nino)}>
                           + Padre
+                        </button>
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => togglePausado(nino)}>
+                          {nino.pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
                         </button>
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(nino)}>
                           {nino.activo ? 'Desactivar' : 'Activar'}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { badgeActual } from '../lib/gamification'
+import { useNivelesEstrella, badgeActual } from '../lib/nivelesEstrella'
 import { BADGE_CLASSES } from '../lib/colors'
 import Modal from './Modal'
 import PadreContacto from './PadreContacto'
@@ -16,6 +16,7 @@ function calcularEdad(fecha) {
 }
 
 export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClose, onSaved }) {
+  const niveles = useNivelesEstrella()
   const [historial, setHistorial] = useState(null)
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClo
 
   if (!nino) return null
 
-  const badge = historial ? badgeActual(historial.estrellas.length) : null
+  const badge = historial ? badgeActual(niveles, historial.estrellas.length) : null
 
   return (
     <Modal open={open} onClose={onClose} title={`Detalle — ${nino.nombre_completo}`}>
@@ -47,6 +48,7 @@ export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClo
           <span className={`badge ${nino.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
             {nino.activo ? 'Activo' : 'Inactivo'}
           </span>
+          {nino.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado</span>}
         </div>
 
         {nino.alergias && (

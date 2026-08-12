@@ -174,7 +174,13 @@ No existe un endpoint de "sign up" público. El alta de `docente`/`padre`/`coord
 El admin/coordinador le comparte a mano la cédula (usuario) y la contraseña temporal generada a la persona invitada.
 
 ### 5.5 Gamificación
-`src/lib/gamification.js` define localmente 6 niveles de medalla (`🐣` a `👑`) según cantidad de "estrellas" (tabla `reconocimientos`, otorgadas por docente/admin a un niño), con mensajes motivacionales aleatorios. Es solo lógica de presentación — no hay tablas de "nivel" en la base de datos, se calcula todo a partir del conteo de `reconocimientos`.
+Las estrellas (tabla `reconocimientos`, otorgadas por docente/admin a un niño) y sus insignias son **configurables por el admin**, no hardcodeadas:
+- `motivos_reconocimiento`: catálogo de motivos rápidos (emoji + texto) que el docente puede tocar al dar una estrella, en vez de escribir siempre texto libre (aunque también puede escribir uno propio). Editable desde `/estrellas` (`ConfigEstrellas.jsx`).
+- `niveles_estrella`: las insignias (`🐣` a `👑` por defecto) y a partir de cuántas estrellas se alcanza cada una. También editable desde `/estrellas` — se puede agregar, renombrar o borrar un nivel sin tocar código.
+- `src/lib/nivelesEstrella.js` (hook `useNivelesEstrella`, con caché como `configIglesia.js`) reemplaza la lógica que antes vivía hardcodeada en `gamification.js`; `src/lib/motivosReconocimiento.js` hace lo mismo para el catálogo de motivos. `gamification.js` ahora solo guarda los mensajes motivacionales aleatorios.
+- El picker de motivo vive dentro de `RewardsPanel.jsx` (botón "⭐ Dar una estrella" → abre el catálogo + un campo de texto libre), reutilizado en `Progreso.jsx`, `ProgresoNinoModal.jsx` y la vista de solo lectura del padre.
+
+`Progreso.jsx` (docente) también tiene `VistaToggle` tarjetas/lista — la lista muestra de un vistazo la insignia y el total de estrellas de cada niño de la clase.
 
 ### 5.6 Asistencia: tabla mensual + modal para tomarla
 Tanto el admin (`AsistenciaAdmin.jsx`) como el docente (`docente/Asistencia.jsx`) muestran como vista principal una **tabla mensual** (`ResumenAsistenciaMensual.jsx`: niños en filas, días con asistencia tomada en columnas) para una clase y mes elegidos. El botón **"+ Tomar asistencia"** abre `TomarAsistenciaModal.jsx`: se elige la fecha, se marca presente/ausente por niño (con confeti si todos están presentes) y se guarda con un `upsert` sobre `asistencia` (única por `nino_id`+`fecha`). El admin puede tomar asistencia de cualquier clase — útil cuando falta el docente titular.
@@ -194,6 +200,19 @@ No hay columna `whatsapp` dedicada: se reutiliza `profiles.telefono` (existía d
 
 Ambas son tablas que **no existían** en el `schema.sql` original — ver sección 6.6 sobre cómo se agregaron a un proyecto ya desplegado.
 
+### 5.11 Tareas dentro de actividades
+Una actividad puede marcarse como **tarea** (`actividades.es_tarea`), con un **enlace externo** opcional (`actividades.enlace_externo`, ej. un video o formulario fuera de la plataforma). Cuando es tarea, cada niño del nivel tiene su propia fila en `tarea_entregas` con tres estados:
+- **Pendiente**: no ha pasado nada todavía (no hace falta insertar una fila hasta que alguien actúe).
+- **Pausada**: el docente la puso en espera desde el checklist (`TareaEntregas.jsx`) — no es un error ni un "pendiente" olvidado, es una decisión explícita del docente.
+- **Entregada**: el padre subió un archivo (foto, PDF...) desde `PadreActividades.jsx`, con comentario opcional. El docente puede responder con una nota corta (`nota_docente`) que el padre ve.
+
+El checklist `TareaEntregas.jsx` (usado tanto por `docente/Actividades.jsx` como por `admin/ActividadesAdmin.jsx` vía el botón "📋 Ver entregas") lista a cada niño del nivel por nombre, para que quede claro quién entregó qué.
+
+Los archivos de evidencia se guardan en el mismo bucket `actividades` de Storage, bajo el prefijo `tareas/{actividad_id}/{nino_id}/...`.
+
+### 5.12 Niños pausados
+`ninos.pausado` es un estado aparte de `activo` (que sigue siendo "¿está inscrito?"): un niño pausado se muestra en gris/desactivado en `Ninos.jsx` y `Progreso.jsx`, y en el checklist de tareas aparece directamente como "⏸️ Pausado (niño)" en vez de "Pendiente" — así no genera una falsa alarma de tarea atrasada mientras el niño no está asistiendo. Se activa/desactiva con un botón, sin perder ningún historial.
+
 ## 6. Modelo de datos (Supabase / Postgres)
 
 Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado para copiar/pegar una sola vez en el SQL Editor de un proyecto Supabase nuevo.
@@ -205,17 +224,20 @@ Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado 
 | `profiles` | Un registro por usuario autenticado (espejo de `auth.users`), con `role`, `nombre_completo`, `cedula`, `telefono` (reutilizado como WhatsApp de contacto, ver 5.9), `activo` | `id` = `auth.users.id` |
 | `niveles` | Clases/niveles (por edad), con nombre, rango de edad, color | — |
 | `docentes_niveles` | Tabla puente: qué docente da clase en qué nivel (M:N) | `profiles` ↔ `niveles` |
-| `ninos` | Niños inscritos | `nivel_id` → `niveles` |
+| `ninos` | Niños inscritos, con `activo` (¿inscrito?) y `pausado` (temporalmente inactivo, ver 5.12) | `nivel_id` → `niveles` |
 | `ninos_padres` | Vínculo niño ↔ padre/madre (M:N, con `parentesco`) | `ninos` ↔ `profiles` |
 | `asistencia` | Un registro por niño/fecha (único por `nino_id`+`fecha`) | `ninos`, `niveles`, `tomada_por` → `profiles` |
-| `actividades` | Actividad de clase: título, descripción, versículo clave, historia bíblica, `visible_padres` (si se oculta de padres/niños) | `niveles`, `docente_id` → `profiles` |
+| `actividades` | Actividad de clase: título, descripción, versículo clave, historia bíblica, `visible_padres`, `es_tarea` + `enlace_externo` (ver 5.11) | `niveles`, `docente_id` → `profiles` |
 | `actividad_archivos` | Archivos adjuntos de una actividad (fotos/videos en Storage) | `actividades` |
 | `actividad_reacciones` | Reacciones (emoji) de un padre a una actividad, única por padre+actividad | `actividades`, `profiles` |
+| `tarea_entregas` | Una fila por niño por actividad-tarea: `estado` (pendiente/pausada/entregada), `archivo_url`, `comentario_padre`, `nota_docente` (única por `actividad_id`+`nino_id`) | `actividades`, `ninos`, `entregado_por` → `profiles` |
 | `agenda` | Eventos calendario, opcionalmente ligados a un nivel | `niveles`, `creado_por` → `profiles` |
 | `progreso_notas` | Notas de progreso de un niño (comportamiento, emoción, logros) | `ninos`, `niveles`, `docente_id` |
 | `devocionales_ninos` | Devocionales para niños (título, versículo, contenido, `imagen_url` opcional) | `niveles`, `creado_por` |
 | `citas_biblicas` | Pool de versículos + `fecha_mostrar` para la "cita del día" | — |
 | `reconocimientos` | Estrellas otorgadas a un niño (capa de gamificación) | `ninos`, `niveles`, `otorgado_por` |
+| `motivos_reconocimiento` | Catálogo editable de motivos rápidos de estrella (ver 5.5) | — |
+| `niveles_estrella` | Insignias configurables y su umbral de estrellas (ver 5.5) | — |
 | `foros` / `foro_mensajes` | Foro de comunidad, general o ligado a un evento de agenda; `foros.privado` = solo staff (admin/coordinador/docente) y el creador | `foros` ↔ `agenda`, `profiles` |
 | `peticiones_oracion` | Peticiones de oración, públicas o privadas (solo staff + autor) | `profiles` |
 | `config_iglesia` | Fila única con nombre y logo personalizados de la iglesia | — |
@@ -229,7 +251,7 @@ Todas las tablas tienen RLS habilitado. El patrón general:
 - Cada política se apoya en subconsultas `exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in (...))` para saber el rol del usuario actual.
 
 ### 6.3 Storage (buckets)
-- `actividades`: archivos adjuntos a actividades (fotos/videos), **reutilizado también** para las fotos de devocionales (`devocionales/...`), bitácora (`bitacora/...`) y materiales (`materiales/...`) — no se crearon buckets nuevos para estas features, solo prefijos de ruta distintos dentro del mismo bucket público. Lectura pública, escritura solo staff (`admin`/`coordinador`/`docente`).
+- `actividades`: archivos adjuntos a actividades (fotos/videos), **reutilizado también** para las fotos de devocionales (`devocionales/...`), bitácora (`bitacora/...`), materiales (`materiales/...`) y evidencias de tareas (`tareas/...`) — no se crearon buckets nuevos para estas features, solo prefijos de ruta distintos dentro del mismo bucket público. Lectura pública; escritura de staff sin restricción de carpeta, y los padres solo pueden escribir dentro de `tareas/...` (política aparte, ver `schema.sql`).
 - `logos`: logo personalizado de la iglesia. Lectura pública, escritura solo staff.
 
 ### 6.4 Funciones de base de datos
@@ -239,7 +261,7 @@ Todas las tablas tienen RLS habilitado. El patrón general:
 `schema.sql` inserta 15 versículos bíblicos iniciales en `citas_biblicas` para que la app tenga contenido desde el día uno.
 
 ### 6.6 Actualizaciones incrementales a un proyecto ya desplegado
-`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql), [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql) y [`supabase/actualizacion_actividades_visibilidad.sql`](./supabase/actualizacion_actividades_visibilidad.sql). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
+`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql), [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql), [`supabase/actualizacion_actividades_visibilidad.sql`](./supabase/actualizacion_actividades_visibilidad.sql) y [`supabase/actualizacion_tareas_estrellas.sql`](./supabase/actualizacion_tareas_estrellas.sql) (tareas, estrellas configurables y niños pausados). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
 
 ## 7. Variables de entorno
 

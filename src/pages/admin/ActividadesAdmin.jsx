@@ -6,6 +6,7 @@ import Modal from '../../components/Modal'
 import ActivityFiles from '../../components/ActivityFiles'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
 import VistaToggle from '../../components/VistaToggle'
+import TareaEntregas from '../../components/TareaEntregas'
 
 const VISTA_OPTIONS = [
   { value: 'lista', label: '☰ Lista' },
@@ -23,7 +24,16 @@ export default function ActividadesAdmin() {
   const [actividades, setActividades] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '', visible_padres: true })
+  const [form, setForm] = useState({
+    titulo: '',
+    descripcion: '',
+    fecha: hoyISO(),
+    versiculo_clave: '',
+    historia_biblica: '',
+    visible_padres: true,
+    es_tarea: false,
+    enlace_externo: '',
+  })
   const [archivos, setArchivos] = useState([])
   const [previews, setPreviews] = useState([])
   const [busy, setBusy] = useState(false)
@@ -31,6 +41,7 @@ export default function ActividadesAdmin() {
   const [error, setError] = useState('')
   const [vista, setVista] = useState('lista')
   const [selectedDay, setSelectedDay] = useState(null)
+  const [tareaActividad, setTareaActividad] = useState(null)
 
   useEffect(() => {
     supabase
@@ -60,7 +71,16 @@ export default function ActividadesAdmin() {
 
   function openNew() {
     setEditing(null)
-    setForm({ titulo: '', descripcion: '', fecha: selectedDay || hoyISO(), versiculo_clave: '', historia_biblica: '', visible_padres: true })
+    setForm({
+      titulo: '',
+      descripcion: '',
+      fecha: selectedDay || hoyISO(),
+      versiculo_clave: '',
+      historia_biblica: '',
+      visible_padres: true,
+      es_tarea: false,
+      enlace_externo: '',
+    })
     setArchivos([])
     setPreviews([])
     setError('')
@@ -76,6 +96,8 @@ export default function ActividadesAdmin() {
       versiculo_clave: actividad.versiculo_clave || '',
       historia_biblica: actividad.historia_biblica || '',
       visible_padres: actividad.visible_padres ?? true,
+      es_tarea: actividad.es_tarea ?? false,
+      enlace_externo: actividad.enlace_externo || '',
     })
     setArchivos([])
     setPreviews([])
@@ -101,6 +123,8 @@ export default function ActividadesAdmin() {
       versiculo_clave: form.versiculo_clave || null,
       historia_biblica: form.historia_biblica || null,
       visible_padres: form.visible_padres,
+      es_tarea: form.es_tarea,
+      enlace_externo: form.enlace_externo || null,
     }
 
     let actividadId = editing?.id
@@ -196,7 +220,7 @@ export default function ActividadesAdmin() {
               </button>
             )}
             {(selectedDay ? actividades.filter((a) => a.fecha === selectedDay) : actividades).map((a, i) => (
-              <ActividadCard key={a.id} a={a} i={i} onEdit={openEdit} onDelete={eliminar} />
+              <ActividadCard key={a.id} a={a} i={i} onEdit={openEdit} onDelete={eliminar} onVerEntregas={setTareaActividad} />
             ))}
             {(selectedDay ? actividades.filter((a) => a.fecha === selectedDay) : actividades).length === 0 && (
               <p className="card text-ink/50">{selectedDay ? 'Nada planeado este día.' : 'Aún no hay actividades para esta clase.'}</p>
@@ -206,7 +230,7 @@ export default function ActividadesAdmin() {
       ) : (
         <div className="flex flex-col gap-4">
           {actividades.map((a, i) => (
-            <ActividadCard key={a.id} a={a} i={i} onEdit={openEdit} onDelete={eliminar} />
+            <ActividadCard key={a.id} a={a} i={i} onEdit={openEdit} onDelete={eliminar} onVerEntregas={setTareaActividad} />
           ))}
           {actividades.length === 0 && <p className="card text-ink/50">Aún no hay actividades para esta clase.</p>}
         </div>
@@ -269,6 +293,42 @@ export default function ActividadesAdmin() {
             </div>
           </div>
           <div>
+            <label className="label">¿Pide una tarea?</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, es_tarea: false })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.es_tarea ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                Solo informativa
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, es_tarea: true })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.es_tarea ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                📝 Es una tarea
+              </button>
+            </div>
+            {form.es_tarea && (
+              <p className="mt-1 text-xs text-ink/40">
+                Cada niño del nivel podrá entregar su evidencia desde la cuenta de su padre/madre.
+              </p>
+            )}
+          </div>
+          {form.es_tarea && (
+            <div>
+              <label className="label">Enlace externo (opcional)</label>
+              <input
+                type="url"
+                className="input"
+                placeholder="https://... (video, formulario, etc.)"
+                value={form.enlace_externo}
+                onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
+              />
+            </div>
+          )}
+          <div>
             <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
             <input type="file" multiple className="input" onChange={(e) => handleArchivos(e.target.files)} />
             {previews.length > 0 && (
@@ -288,11 +348,13 @@ export default function ActividadesAdmin() {
           </button>
         </form>
       </Modal>
+
+      <TareaEntregas actividad={tareaActividad} open={!!tareaActividad} onClose={() => setTareaActividad(null)} />
     </div>
   )
 }
 
-function ActividadCard({ a, i, onEdit, onDelete }) {
+function ActividadCard({ a, i, onEdit, onDelete, onVerEntregas }) {
   return (
     <div
       className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
@@ -302,6 +364,7 @@ function ActividadCard({ a, i, onEdit, onDelete }) {
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-bold">{a.titulo}</h3>
           {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
+          {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-ink/40">{a.fecha}</span>
@@ -321,7 +384,14 @@ function ActividadCard({ a, i, onEdit, onDelete }) {
         </div>
       )}
       <ActivityFiles archivos={a.actividad_archivos} />
-      <p className="mt-3 text-sm font-bold text-coral-500">{a.actividad_reacciones?.length || 0} reacciones ❤️</p>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-bold text-coral-500">{a.actividad_reacciones?.length || 0} reacciones ❤️</p>
+        {a.es_tarea && (
+          <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => onVerEntregas(a)}>
+            📋 Ver entregas
+          </button>
+        )}
+      </div>
     </div>
   )
 }

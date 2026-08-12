@@ -1,28 +1,5 @@
-export const BADGES = [
-  { min: 0, emoji: '🐣', nombre: 'Explorador nuevo' },
-  { min: 3, emoji: '🦊', nombre: 'Curioso' },
-  { min: 6, emoji: '🦁', nombre: 'Valiente' },
-  { min: 10, emoji: '🦋', nombre: 'Brillante' },
-  { min: 15, emoji: '🌟', nombre: 'Estrella de la Biblia' },
-  { min: 20, emoji: '👑', nombre: 'Campeón de fe' },
-]
-
-export function badgeActual(estrellas) {
-  return [...BADGES].reverse().find((b) => estrellas >= b.min) || BADGES[0]
-}
-
-export function siguienteBadge(estrellas) {
-  return BADGES.find((b) => estrellas < b.min) || null
-}
-
-export function progresoHaciaSiguiente(estrellas) {
-  const actual = badgeActual(estrellas)
-  const siguiente = siguienteBadge(estrellas)
-  if (!siguiente) return 100
-  const rango = siguiente.min - actual.min
-  const avance = estrellas - actual.min
-  return Math.min(100, Math.round((avance / rango) * 100))
-}
+// Insignias/niveles de estrella ahora son configurables por el admin —
+// ver src/lib/nivelesEstrella.js (badgeActual, siguienteBadge, etc.)
 
 export const MENSAJES_MOTIVACION = [
   '¡Lo hiciste increíble!',
