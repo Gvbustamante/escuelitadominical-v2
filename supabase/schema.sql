@@ -445,9 +445,11 @@ create table public.foros (
   titulo text not null,
   categoria text not null default 'general' check (categoria in ('general','evento')),
   evento_id uuid references public.agenda(id) on delete set null,
+  privado boolean not null default false,
   creado_por uuid references public.profiles(id),
   created_at timestamptz not null default now()
 );
+comment on column public.foros.privado is 'true = solo lo ve staff (admin/coordinador/docente) y quien lo creó. false = toda la comunidad, incluidos padres.';
 
 create table public.foro_mensajes (
   id uuid primary key default gen_random_uuid(),
@@ -460,18 +462,54 @@ create table public.foro_mensajes (
 alter table public.foros enable row level security;
 alter table public.foro_mensajes enable row level security;
 
-create policy "leer foros" on public.foros for select to authenticated using (true);
+create policy "leer foros" on public.foros for select to authenticated
+  using (
+    privado = false
+    or creado_por = auth.uid()
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+  );
 create policy "crear foro" on public.foros for insert to authenticated
   with check (creado_por = auth.uid());
+create policy "cambiar privacidad propio o staff" on public.foros for update to authenticated
+  using (
+    creado_por = auth.uid()
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+  )
+  with check (
+    creado_por = auth.uid()
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+  );
 create policy "borrar foro propio o staff" on public.foros for delete to authenticated
   using (
     creado_por = auth.uid()
     or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
   );
 
-create policy "leer mensajes" on public.foro_mensajes for select to authenticated using (true);
+create policy "leer mensajes" on public.foro_mensajes for select to authenticated
+  using (
+    exists (
+      select 1 from public.foros f
+      where f.id = foro_mensajes.foro_id
+      and (
+        f.privado = false
+        or f.creado_por = auth.uid()
+        or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+      )
+    )
+  );
 create policy "crear mensaje" on public.foro_mensajes for insert to authenticated
-  with check (autor_id = auth.uid());
+  with check (
+    autor_id = auth.uid()
+    and exists (
+      select 1 from public.foros f
+      where f.id = foro_mensajes.foro_id
+      and (
+        f.privado = false
+        or f.creado_por = auth.uid()
+        or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+      )
+    )
+  );
 create policy "borrar mensaje propio o staff" on public.foro_mensajes for delete to authenticated
   using (
     autor_id = auth.uid()
