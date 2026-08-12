@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import Skeleton from '../../components/Skeleton'
-import { exportCSV } from '../../lib/exportCsv'
+import { exportExcel } from '../../lib/exportExcel'
 
 function hoyYYYYMM() {
   return new Date().toISOString().slice(0, 7)
@@ -57,7 +57,7 @@ export default function BitacoraAdmin() {
       r.refrigerio_detalle || '',
       r.notas || '',
     ])
-    exportCSV('bitacora', ['Fecha', 'Docente', 'Salón', 'Refrigerio', 'Notas'], filas)
+    exportExcel('bitacora', ['Fecha', 'Docente', 'Salón', 'Refrigerio', 'Notas'], filas)
   }
 
   if (!niveles) {

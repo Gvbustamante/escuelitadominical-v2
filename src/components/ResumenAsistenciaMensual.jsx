@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import Spinner from './Spinner'
-import { exportCSV } from '../lib/exportCsv'
+import { exportExcel } from '../lib/exportExcel'
 
 function hoyYYYYMM() {
   return new Date().toISOString().slice(0, 7)
@@ -47,7 +47,7 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
       const total = fechas.filter((f) => fila[f]).length
       return [n.nombre_completo, ...fechas.map((f) => (fila[f] === true ? 'Presente' : fila[f] === false ? 'Ausente' : '')), `${total}/${fechas.length}`]
     })
-    exportCSV(`asistencia-${mes}`, ['Niño/a', ...fechas, 'Total'], filas)
+    exportExcel(`asistencia-${mes}`, ['Niño/a', ...fechas, 'Total'], filas)
   }
 
   return (

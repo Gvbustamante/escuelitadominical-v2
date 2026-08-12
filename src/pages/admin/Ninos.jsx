@@ -7,7 +7,7 @@ import ConfirmModal from '../../components/ConfirmModal'
 import DetalleNinoModal from '../../components/DetalleNinoModal'
 import { BADGE_CLASSES } from '../../lib/colors'
 import { whatsappLink } from '../../lib/whatsapp'
-import { exportCSV } from '../../lib/exportCsv'
+import { exportExcel } from '../../lib/exportExcel'
 
 function generarCodigoFacil(nombreNino) {
   const base = (nombreNino || 'familia').trim().split(' ')[0].toLowerCase().normalize('NFD').replace(/[^a-z]/g, '')
@@ -147,7 +147,7 @@ export default function Ninos() {
         nino.pausado ? 'Sí' : 'No',
       ]
     })
-    exportCSV('ninos', ['Nombre', 'Edad', 'Clase', 'Alergias', 'Padres/encargados', 'Estado', 'Pausado'], filas)
+    exportExcel('ninos', ['Nombre', 'Edad', 'Clase', 'Alergias', 'Padres/encargados', 'Estado', 'Pausado'], filas)
   }
 
   function handleToggleClick(nino) {

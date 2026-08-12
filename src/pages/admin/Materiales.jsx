@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabaseClient'
 import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
-import { exportCSV } from '../../lib/exportCsv'
+import { exportExcel } from '../../lib/exportExcel'
 
 const CATEGORIA_LABEL = { general: 'General', ninos: 'Para niños', clase: 'Para una clase' }
 
@@ -103,7 +103,7 @@ export default function Materiales() {
       m.notas || '',
       m.activo ? 'Activo' : 'Inactivo',
     ])
-    exportCSV('materiales', ['Nombre', 'Categoría/Clase', 'Cantidad', 'Notas', 'Estado'], filas)
+    exportExcel('materiales', ['Nombre', 'Categoría/Clase', 'Cantidad', 'Notas', 'Estado'], filas)
   }
 
   if (!materiales) {
