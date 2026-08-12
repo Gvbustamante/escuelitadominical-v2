@@ -893,19 +893,59 @@ create policy "gestionar dias_clase" on public.dias_clase for all to authenticat
 insert into public.dias_clase (dia_semana, activo) values
 (0, true), (1, false), (2, false), (3, false), (4, false), (5, false), (6, false);
 
--- ---------- COBERTURA_DIA (quién cubre cada clase en una fecha puntual) ----------
+-- ---------- HORARIOS (servicios el mismo día — ej. 9am, 11am) ----------
+
+create table public.horarios (
+  id uuid primary key default gen_random_uuid(),
+  nombre text not null,
+  hora time,
+  activo boolean not null default true,
+  orden int not null default 0,
+  created_at timestamptz not null default now()
+);
+comment on table public.horarios is 'Horarios/servicios del mismo día de clase (ej. "9:00 am", "11:00 am"). Toda iglesia arranca con uno solo ("Servicio único"); el admin agrega más si tiene varios servicios.';
+
+alter table public.horarios enable row level security;
+
+create policy "leer horarios" on public.horarios for select to authenticated using (true);
+create policy "gestionar horarios" on public.horarios for all to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+
+insert into public.horarios (nombre, orden) values ('Servicio único', 1);
+
+-- ---------- ASIGNACION_HORARIO (docente fijo por clase + horario) ----------
+
+create table public.asignacion_horario (
+  id uuid primary key default gen_random_uuid(),
+  nivel_id uuid not null references public.niveles(id) on delete cascade,
+  horario_id uuid not null references public.horarios(id) on delete cascade,
+  docente_id uuid references public.profiles(id) on delete set null,
+  unique (nivel_id, horario_id)
+);
+comment on table public.asignacion_horario is 'Docente fijo que cubre cada clase en cada horario, para cuando hay más de un servicio el mismo día. Al asignarlo, la app también lo vincula en docentes_niveles si no lo estaba ya.';
+
+alter table public.asignacion_horario enable row level security;
+
+create policy "leer asignacion_horario" on public.asignacion_horario for select to authenticated using (true);
+create policy "gestionar asignacion_horario" on public.asignacion_horario for all to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+
+-- ---------- COBERTURA_DIA (quién cubre cada clase, en una fecha y horario puntual) ----------
 
 create table public.cobertura_dia (
   id uuid primary key default gen_random_uuid(),
   nivel_id uuid not null references public.niveles(id) on delete cascade,
+  horario_id uuid not null references public.horarios(id) on delete cascade,
   fecha date not null,
   docente_id uuid references public.profiles(id) on delete set null,
   notas text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (nivel_id, fecha)
+  unique (nivel_id, horario_id, fecha)
 );
-comment on table public.cobertura_dia is 'Quién cubre de verdad cada clase en una fecha puntual (ej. un suplente). Si no hay fila para ese nivel+fecha, se asume el/los docente(s) fijo(s) de docentes_niveles.';
+comment on table public.cobertura_dia is 'Quién cubre de verdad cada clase, en un horario y fecha puntual (ej. un suplente). Si no hay fila para ese nivel+horario+fecha, se asume el docente fijo de asignacion_horario.';
 
 alter table public.cobertura_dia enable row level security;
 

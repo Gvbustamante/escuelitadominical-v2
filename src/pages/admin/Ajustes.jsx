@@ -28,6 +28,11 @@ export default function Ajustes() {
   const [resultadoRevision, setResultadoRevision] = useState('')
 
   const [diasClase, setDiasClase] = useState(null)
+  const [horarios, setHorarios] = useState(null)
+  const [nuevoHorario, setNuevoHorario] = useState('')
+  const [busyHorario, setBusyHorario] = useState(false)
+
+  const loadHorarios = () => supabase.from('horarios').select('*').order('orden').then(({ data }) => setHorarios(data || []))
 
   useEffect(() => {
     supabase
@@ -35,6 +40,7 @@ export default function Ajustes() {
       .select('*')
       .order('dia_semana')
       .then(({ data }) => setDiasClase(data || []))
+    loadHorarios()
   }, [])
 
   async function toggleDiaClase(dia_semana) {
@@ -42,6 +48,28 @@ export default function Ajustes() {
     const nuevoActivo = !actual?.activo
     setDiasClase((prev) => prev.map((d) => (d.dia_semana === dia_semana ? { ...d, activo: nuevoActivo } : d)))
     await supabase.from('dias_clase').upsert({ dia_semana, activo: nuevoActivo }, { onConflict: 'dia_semana' })
+  }
+
+  async function agregarHorario(e) {
+    e.preventDefault()
+    if (!nuevoHorario.trim()) return
+    setBusyHorario(true)
+    const orden = (horarios.reduce((max, h) => Math.max(max, h.orden), 0) || 0) + 1
+    await supabase.from('horarios').insert({ nombre: nuevoHorario.trim(), orden })
+    setNuevoHorario('')
+    setBusyHorario(false)
+    loadHorarios()
+  }
+
+  async function toggleHorarioActivo(h) {
+    await supabase.from('horarios').update({ activo: !h.activo }).eq('id', h.id)
+    loadHorarios()
+  }
+
+  async function renombrarHorario(h, nombre) {
+    if (!nombre.trim() || nombre === h.nombre) return
+    await supabase.from('horarios').update({ nombre: nombre.trim() }).eq('id', h.id)
+    loadHorarios()
   }
 
   async function handleRevisarInactividad() {
@@ -230,6 +258,48 @@ export default function Ajustes() {
             })}
           </div>
         )}
+      </div>
+
+      <div className="card max-w-xl">
+        <p className="label mb-1">Horarios</p>
+        <p className="mb-4 text-sm text-ink/50">
+          Si el mismo día de clase hay más de un servicio (ej. 9:00 am y 11:00 am), agrégalos aquí. Con uno solo no
+          necesitas tocar nada — ya viene creado por defecto.
+        </p>
+        {!horarios ? (
+          <p className="text-sm text-ink/40">Cargando...</p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {horarios.map((h) => (
+              <div key={h.id} className="flex items-center gap-2 rounded-xl bg-ink/5 px-3 py-2">
+                <input
+                  defaultValue={h.nombre}
+                  onBlur={(e) => renombrarHorario(h, e.target.value)}
+                  className="input !w-auto flex-1 !py-1.5 !text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => toggleHorarioActivo(h)}
+                  className={`badge shrink-0 ${h.activo ? 'bg-grass-100 text-grass-700' : 'bg-ink/10 text-ink/40'}`}
+                >
+                  {h.activo ? 'Activo' : 'Inactivo'}
+                </button>
+              </div>
+            ))}
+            {horarios.length === 0 && <p className="text-sm text-ink/40">Aún no hay horarios.</p>}
+          </div>
+        )}
+        <form onSubmit={agregarHorario} className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <input
+            className="input flex-1"
+            value={nuevoHorario}
+            onChange={(e) => setNuevoHorario(e.target.value)}
+            placeholder="Ej. 11:00 am"
+          />
+          <button disabled={busyHorario} className="btn-secondary shrink-0">
+            {busyHorario ? 'Agregando...' : '+ Agregar horario'}
+          </button>
+        </form>
       </div>
     </div>
   )
