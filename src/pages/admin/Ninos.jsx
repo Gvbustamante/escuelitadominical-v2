@@ -52,6 +52,7 @@ export default function Ninos() {
   const [detalleNino, setDetalleNino] = useState(null)
   const [confirmDesactivar, setConfirmDesactivar] = useState(null)
   const [confirmBusy, setConfirmBusy] = useState(false)
+  const [confirmDesvincular, setConfirmDesvincular] = useState(null) // { nino, padre }
 
   const load = useCallback(async () => {
     const [{ data: n }, { data: niv }, { data: np }] = await Promise.all([
@@ -163,6 +164,23 @@ export default function Ninos() {
     await toggleActivo(confirmDesactivar)
     setConfirmBusy(false)
     setConfirmDesactivar(null)
+  }
+
+  function pedirDesvincular(nino, padre) {
+    setConfirmDesvincular({ nino, padre })
+  }
+
+  async function confirmarDesvincular() {
+    if (!confirmDesvincular) return
+    setConfirmBusy(true)
+    await supabase
+      .from('ninos_padres')
+      .delete()
+      .eq('nino_id', confirmDesvincular.nino.id)
+      .eq('padre_id', confirmDesvincular.padre.id)
+    setConfirmBusy(false)
+    setConfirmDesvincular(null)
+    load()
   }
 
   function openInvite(nino) {
@@ -586,6 +604,7 @@ export default function Ninos() {
         open={!!detalleNino}
         onClose={() => setDetalleNino(null)}
         onSaved={load}
+        onDesvincular={(padre) => pedirDesvincular(detalleNino, padre)}
       />
 
       <ConfirmModal
@@ -598,6 +617,20 @@ export default function Ninos() {
         message={
           confirmDesactivar
             ? `${confirmDesactivar.nombre_completo} dejará de aparecer en las listas activas. Puedes reactivarlo/a cuando quieras.`
+            : ''
+        }
+      />
+
+      <ConfirmModal
+        open={!!confirmDesvincular}
+        onClose={() => setConfirmDesvincular(null)}
+        onConfirm={confirmarDesvincular}
+        busy={confirmBusy}
+        title="¿Desvincular a este padre/madre?"
+        confirmLabel="Sí, desvincular"
+        message={
+          confirmDesvincular
+            ? `${confirmDesvincular.padre?.nombre_completo} ya no podrá ver ni gestionar la información de ${confirmDesvincular.nino?.nombre_completo}. Su cuenta sigue existiendo — puedes volver a vincularlo/a cuando quieras con "+ Padre".`
             : ''
         }
       />

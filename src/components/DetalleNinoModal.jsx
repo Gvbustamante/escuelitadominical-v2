@@ -15,7 +15,7 @@ function calcularEdad(fecha) {
   return edad
 }
 
-export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClose, onSaved }) {
+export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClose, onSaved, onDesvincular }) {
   const niveles = useNivelesEstrella()
   const [historial, setHistorial] = useState(null)
 
@@ -63,7 +63,13 @@ export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClo
           ) : (
             <div className="flex flex-col gap-2">
               {padres.map((p, i) => (
-                <PadreContacto key={i} padre={p.padre} parentesco={p.parentesco} onSaved={onSaved} />
+                <PadreContacto
+                  key={i}
+                  padre={p.padre}
+                  parentesco={p.parentesco}
+                  onSaved={onSaved}
+                  onDesvincular={onDesvincular ? () => onDesvincular(p.padre) : undefined}
+                />
               ))}
             </div>
           )}

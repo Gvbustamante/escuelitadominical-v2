@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { whatsappLink } from '../lib/whatsapp'
 
-export default function PadreContacto({ padre, parentesco, onSaved }) {
+export default function PadreContacto({ padre, parentesco, onSaved, onDesvincular }) {
   const [telefono, setTelefono] = useState(padre?.telefono || '')
   const [busy, setBusy] = useState(false)
   const [ok, setOk] = useState(false)
@@ -24,9 +24,20 @@ export default function PadreContacto({ padre, parentesco, onSaved }) {
 
   return (
     <div className="rounded-xl bg-ink/5 p-3">
-      <p className="flex flex-wrap items-center gap-2 font-bold">
-        {padre?.nombre_completo} {parentesco && `(${parentesco})`}
-        {padre?.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Sin entrar hace tiempo</span>}
+      <p className="flex flex-wrap items-center justify-between gap-2 font-bold">
+        <span className="flex flex-wrap items-center gap-2">
+          {padre?.nombre_completo} {parentesco && `(${parentesco})`}
+          {padre?.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Sin entrar hace tiempo</span>}
+        </span>
+        {onDesvincular && (
+          <button
+            type="button"
+            onClick={onDesvincular}
+            className="shrink-0 text-xs font-bold text-coral-500 hover:underline"
+          >
+            ✕ Desvincular
+          </button>
+        )}
       </p>
       <div className="mt-2 flex gap-2">
         <input
