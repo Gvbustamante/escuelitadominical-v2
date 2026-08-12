@@ -154,11 +154,11 @@ export default function Clases() {
         <table className="w-full text-left">
           <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
             <tr>
-              <th className="px-4 py-3">Nombre</th>
-              <th className="px-4 py-3">Edades</th>
-              <th className="px-4 py-3">Docentes</th>
-              <th className="px-4 py-3">Estado</th>
-              <th className="px-4 py-3">Acciones</th>
+              <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
+              <th className="px-3 py-2 sm:px-4 sm:py-3">Edades</th>
+              <th className="px-3 py-2 sm:px-4 sm:py-3">Docentes</th>
+              <th className="px-3 py-2 sm:px-4 sm:py-3">Estado</th>
+              <th className="px-3 py-2 sm:px-4 sm:py-3">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -166,19 +166,19 @@ export default function Clases() {
               const docs = asignaciones.filter((a) => a.nivel_id === nivel.id)
               return (
                 <tr key={nivel.id} className={`border-t border-ink/5 ${!nivel.activo ? 'opacity-50' : ''}`}>
-                  <td className="px-4 py-3 font-bold">{nivel.nombre}</td>
-                  <td className="px-4 py-3 text-ink/60">
+                  <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">{nivel.nombre}</td>
+                  <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
                     {nivel.edad_min ?? '?'} - {nivel.edad_max ?? '?'} años
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2 sm:px-4 sm:py-3">
                     <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{docs.length} docente(s)</span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2 sm:px-4 sm:py-3">
                     <span className={`badge ${nivel.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
                       {nivel.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2 sm:px-4 sm:py-3">
                     <div className="flex flex-wrap gap-2">
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nivel)}>
                         Editar

@@ -288,13 +288,13 @@ export default function Ninos() {
           <table className="w-full text-left">
             <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
               <tr>
-                <th className="px-4 py-3">Nombre</th>
-                <th className="px-4 py-3">Edad</th>
-                <th className="px-4 py-3">Clase</th>
-                <th className="px-4 py-3">Alergias</th>
-                <th className="px-4 py-3">Padres/encargados</th>
-                <th className="px-4 py-3">Estado</th>
-                <th className="px-4 py-3">Acciones</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Edad</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Clase</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Alergias</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Padres/encargados</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Estado</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -303,19 +303,19 @@ export default function Ninos() {
                 const padres = padresPorNino[nino.id] || []
                 return (
                   <tr key={nino.id} className={`border-t border-ink/5 ${!nino.activo || nino.pausado ? 'opacity-50 grayscale' : ''}`}>
-                    <td className="px-4 py-3 font-bold">{nino.nombre_completo}</td>
-                    <td className="px-4 py-3 text-ink/60">{calcularEdad(nino.fecha_nacimiento)}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">{nino.nombre_completo}</td>
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">{calcularEdad(nino.fecha_nacimiento)}</td>
+                    <td className="px-3 py-2 sm:px-4 sm:py-3">
                       {nivel ? (
                         <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>
                       ) : (
                         <span className="text-ink/40">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-ink/60">
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
                       {nino.alergias ? <span className="font-bold text-coral-600">⚠️ {nino.alergias}</span> : '—'}
                     </td>
-                    <td className="px-4 py-3 text-ink/60">
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
                       {padres.length === 0 ? (
                         'Sin vincular'
                       ) : (
@@ -334,7 +334,7 @@ export default function Ninos() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2 sm:px-4 sm:py-3">
                       <div className="flex flex-wrap gap-1">
                         <span className={`badge ${nino.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
                           {nino.activo ? 'Activo' : 'Inactivo'}
@@ -342,7 +342,7 @@ export default function Ninos() {
                         {nino.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado</span>}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2 sm:px-4 sm:py-3">
                       <div className="flex flex-wrap gap-2">
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetalleNino(nino)}>
                           Ver detalle

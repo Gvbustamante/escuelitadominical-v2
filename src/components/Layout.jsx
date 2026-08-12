@@ -111,44 +111,44 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen bg-cream">
-      <aside className="flex w-24 flex-col items-center gap-2 border-r-4 border-sky-100 bg-white py-6 md:w-64 md:items-stretch md:px-4">
-        <div className="mb-6 flex flex-col items-center gap-1 px-2 text-center">
-          <AppLogo emojiClassName="text-4xl" imgClassName="h-11 w-11 object-contain" />
+      <aside className="flex w-16 flex-col items-center gap-1 border-r-4 border-sky-100 bg-white py-4 sm:w-20 sm:gap-2 sm:py-6 md:w-64 md:items-stretch md:px-4">
+        <div className="mb-3 flex flex-col items-center gap-1 px-1 text-center sm:mb-6">
+          <AppLogo emojiClassName="text-3xl sm:text-4xl" imgClassName="h-9 w-9 object-contain sm:h-11 sm:w-11" />
           <span className="hidden font-display text-lg font-extrabold uppercase leading-tight tracking-wide text-sky-500 md:block">
             <AppName />
           </span>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-2 overflow-y-auto">
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto sm:gap-2">
           {items.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex items-center justify-center gap-3 rounded-2xl px-3 py-3 text-lg font-bold transition-colors md:justify-start ${
+                `flex items-center justify-center gap-3 rounded-2xl px-2 py-2 text-base font-bold transition-colors sm:px-3 sm:py-3 sm:text-lg md:justify-start ${
                   isActive
                     ? 'bg-sky-400 text-white shadow-pop'
                     : 'text-ink/60 hover:bg-sky-50'
                 }`
               }
             >
-              <span className="text-2xl">{item.icon}</span>
+              <span className="text-xl sm:text-2xl">{item.icon}</span>
               <span className="hidden md:block">{item.label}</span>
             </NavLink>
           ))}
         </nav>
 
-        <div className="mt-4 flex flex-col items-center gap-2 border-t-2 border-ink/5 pt-4 md:items-stretch">
+        <div className="mt-2 flex flex-col items-center gap-2 border-t-2 border-ink/5 pt-3 sm:mt-4 sm:pt-4 md:items-stretch">
           <div className="hidden text-center md:block">
             <p className="truncate text-sm font-bold">{profile?.nombre_completo}</p>
             <p className="text-xs text-ink/50">{ROLE_LABEL[profile?.role]}</p>
           </div>
-          <button onClick={() => setPwOpen(true)} className="btn-secondary w-full !py-2 !text-base">
+          <button onClick={() => setPwOpen(true)} className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
             <span>🔑</span>
             <span className="hidden md:block">Contraseña</span>
           </button>
-          <button onClick={signOut} className="btn-secondary w-full !py-2 !text-base">
+          <button onClick={signOut} className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
             <span>🚪</span>
             <span className="hidden md:block">Salir</span>
           </button>
@@ -163,23 +163,25 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main ref={mainRef} className="flex-1 overflow-y-auto p-4 md:p-8">
-        {bienvenidaDeVuelta && (
-          <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50 px-4 py-3">
-            <p className="text-sm font-bold text-sky-700">
-              👋 ¡Bienvenido/a de vuelta! Habíamos marcado tu cuenta como inactiva porque llevaba un tiempo sin
-              entrar — ya quedó activa de nuevo.
-            </p>
-            <button
-              onClick={() => setBienvenidaDeVuelta(false)}
-              className="shrink-0 text-lg font-bold text-sky-400 hover:text-sky-600"
-              aria-label="Cerrar aviso"
-            >
-              ×
-            </button>
-          </div>
-        )}
-        <Outlet />
+      <main ref={mainRef} className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-8">
+        <div className="mx-auto w-full max-w-screen-2xl">
+          {bienvenidaDeVuelta && (
+            <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50 px-4 py-3">
+              <p className="text-sm font-bold text-sky-700">
+                👋 ¡Bienvenido/a de vuelta! Habíamos marcado tu cuenta como inactiva porque llevaba un tiempo sin
+                entrar — ya quedó activa de nuevo.
+              </p>
+              <button
+                onClick={() => setBienvenidaDeVuelta(false)}
+                className="shrink-0 text-lg font-bold text-sky-400 hover:text-sky-600"
+                aria-label="Cerrar aviso"
+              >
+                ×
+              </button>
+            </div>
+          )}
+          <Outlet />
+        </div>
       </main>
 
       <CambiarPasswordModal open={pwOpen} onClose={() => setPwOpen(false)} />
