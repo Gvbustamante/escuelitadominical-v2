@@ -19,7 +19,8 @@ function hoyISO() {
 }
 
 export default function Planeacion() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
+  const esDocente = profile?.role === 'docente'
   const [cursor, setCursor] = useState(() => {
     const h = new Date()
     return { year: h.getFullYear(), month: h.getMonth() }
@@ -83,6 +84,13 @@ export default function Planeacion() {
   }, [loadMes])
 
   const diasClaseSet = useMemo(() => new Set((diasClase || []).filter((d) => d.activo).map((d) => d.dia_semana)), [diasClase])
+
+  // El docente solo planea sus propias clases; admin/coordinador ven todas.
+  const nivelesVisibles = useMemo(() => {
+    if (!esDocente) return niveles
+    const misNivelIds = new Set(asignaciones.filter((a) => a.docente_id === user?.id).map((a) => a.nivel_id))
+    return niveles.filter((n) => misNivelIds.has(n.id))
+  }, [niveles, asignaciones, esDocente, user?.id])
 
   const primerDia = new Date(year, month, 1).getDay()
   const diasEnMes = new Date(year, month + 1, 0).getDate()
@@ -237,7 +245,7 @@ export default function Planeacion() {
               <p className="font-bold">
                 {new Date(selectedDay + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}
               </p>
-              {niveles.map((nivel) => {
+              {nivelesVisibles.map((nivel) => {
                 const fijosGenerales = asignaciones
                   .filter((a) => a.nivel_id === nivel.id)
                   .map((a) => a.docente?.nombre_completo)
@@ -270,21 +278,23 @@ export default function Planeacion() {
                                 <span className="badge bg-coral-100 text-coral-700">Sin docente</span>
                               )}
                             </div>
-                            <div className="mt-1 flex items-center gap-2">
-                              <label className="text-xs font-bold text-ink/40">Cubre este día:</label>
-                              <select
-                                className="input !w-auto !py-1 !text-sm"
-                                value={override?.docente_id || ''}
-                                onChange={(e) => asignarCobertura(nivel.id, horario.id, e.target.value || null)}
-                              >
-                                <option value="">{nombreFijo ? `Fijo (${nombreFijo})` : respaldoGeneral ? `Fijo (${respaldoGeneral})` : 'Sin asignar'}</option>
-                                {docentes.map((d) => (
-                                  <option key={d.id} value={d.id}>
-                                    {d.nombre_completo}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
+                            {!esDocente && (
+                              <div className="mt-1 flex items-center gap-2">
+                                <label className="text-xs font-bold text-ink/40">Cubre este día:</label>
+                                <select
+                                  className="input !w-auto !py-1 !text-sm"
+                                  value={override?.docente_id || ''}
+                                  onChange={(e) => asignarCobertura(nivel.id, horario.id, e.target.value || null)}
+                                >
+                                  <option value="">{nombreFijo ? `Fijo (${nombreFijo})` : respaldoGeneral ? `Fijo (${respaldoGeneral})` : 'Sin asignar'}</option>
+                                  {docentes.map((d) => (
+                                    <option key={d.id} value={d.id}>
+                                      {d.nombre_completo}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
                           </div>
                         )
                       })}
@@ -307,7 +317,11 @@ export default function Planeacion() {
                   </div>
                 )
               })}
-              {niveles.length === 0 && <p className="card text-ink/50">Todavía no hay clases creadas.</p>}
+              {nivelesVisibles.length === 0 && (
+                <p className="card text-ink/50">
+                  {esDocente ? 'Todavía no tienes clases asignadas.' : 'Todavía no hay clases creadas.'}
+                </p>
+              )}
             </>
           )}
         </div>
