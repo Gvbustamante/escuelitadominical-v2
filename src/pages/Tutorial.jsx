@@ -37,26 +37,64 @@ function AdminGuide() {
         Ve a <strong>Clases</strong> → <em>+ Nueva clase</em>. Ponle nombre y el rango de edad (ej. "Exploradores", 3 a 5 años).
         Puedes crear todas las que necesite tu escuelita.
       </Step>
-      <Step number="2" icon="🍎" title="Agrega a tus docentes" color="sunshine">
+      <Step number="2" icon="📆" title="Configura tus días de clase y horarios" color="sky">
+        En <strong>Ajustes</strong>, activa qué días de la semana hay escuelita (por defecto solo domingo). Si tienes más de
+        un servicio el mismo día (ej. 9:00 am y 11:00 am), agrégalos ahí mismo en <em>Horarios</em> — con uno solo no hace
+        falta tocar nada.
+      </Step>
+      <Step number="3" icon="🍎" title="Agrega a tus docentes" color="sunshine">
         Ve a <strong>Docentes</strong> → <em>+ Agregar</em>. Escribe su nombre y cédula — te va a mostrar la contraseña que le
         toca, para que se la des tú directamente (por WhatsApp, en persona, como prefieras).
       </Step>
-      <Step number="3" icon="🔗" title="Asigna cada docente a su clase" color="sky">
-        En <strong>Clases</strong>, edita una clase y marca qué docente(s) la llevan. Así ella solo verá su propia clase.
+      <Step number="4" icon="🔗" title="Asigna cada docente a su clase" color="sky">
+        En <strong>Clases</strong>, edita una clase y marca qué docente(s) la llevan. Si configuraste más de un horario,
+        también puedes fijar qué docente cubre cada uno — queda vinculado a la clase automáticamente, sin pasos extra.
       </Step>
-      <Step number="4" icon="🧒" title="Registra a los niños" color="coral">
+      <Step number="5" icon="🧒" title="Registra a los niños" color="coral">
         Ve a <strong>Niños</strong> → <em>+ Nuevo niño/a</em>. Escribe su nombre, fecha de nacimiento, clase y alergias si
         tiene. Desde aquí también puedes desactivar a un niño si ya no asiste, sin borrar su historial.
       </Step>
-      <Step number="5" icon="👪" title="Vincula a los padres" color="grape">
+      <Step number="6" icon="👪" title="Vincula a los padres" color="grape">
         En la tarjeta de cada niño, botón <em>+ Padre</em>. Si es alguien nuevo, crea su cuenta con su cédula. Si ya tiene
-        cuenta (por ejemplo, es docente y también es su papá/mamá), usa "Ya tiene cuenta" para vincularlo sin duplicar.
+        cuenta (por ejemplo, es docente y también es su papá/mamá), usa "Ya tiene cuenta" para vincularlo sin duplicar. Si
+        alguna vez necesitas quitarle el acceso a un niño en particular, entra a <em>Ver detalle</em> del niño y toca
+        "✕ Desvincular" — su cuenta sigue existiendo, solo pierde ese vínculo.
       </Step>
-      <Step number="6" icon="✅" title="Supervisa la asistencia" color="grass">
-        En <strong>Asistencia</strong> puedes ver, por fecha y por clase, quién vino cada domingo.
+      <Step number="7" icon="✅" title="Supervisa la asistencia" color="grass">
+        En <strong>Asistencia</strong> puedes ver, por fecha y por clase, quién vino cada domingo. En el inicio, la tarjeta
+        "Cobertura de hoy" te avisa si falta un docente o si aún no se ha tomado asistencia — solo los días que de verdad
+        hay clase.
       </Step>
-      <Step number="7" icon="🙏" title="Publica devocionales para niños" color="sunshine">
-        En <strong>Devocionales</strong> puedes escribir reflexiones cortas pensadas para niños, con su versículo.
+      <Step number="8" icon="📋" title="Planea cada clase con anticipación" color="sunshine">
+        En <strong>Planeación</strong> ves el mes marcado con tus días de clase. Elige un día y, por cada clase (y cada
+        horario, si tienes varios), puedes ver quién la cubre, asignar un suplente puntual, y planear ahí mismo la
+        actividad de ese día.
+      </Step>
+      <Step number="9" icon="🎨" title="Revisa las actividades y tareas" color="coral">
+        En <strong>Actividades</strong> ves lo que publica cada docente. Una actividad puede marcarse como <em>tarea</em>
+        (con un enlace externo opcional) — ahí mismo puedes abrir "Ver entregas" para revisar qué niño ya entregó, cuál
+        está pendiente y cuál el docente puso en pausa.
+      </Step>
+      <Step number="10" icon="⭐" title="Configura las estrellas e insignias" color="sunshine">
+        En <strong>Estrellas</strong> puedes editar los motivos rápidos que usan los docentes al reconocer a un niño (ej.
+        "🙌 Buen compañerismo"), y las insignias que se van desbloqueando según cuántas estrellas junta cada niño.
+      </Step>
+      <Step number="11" icon="🙏" title="Publica devocionales para niños" color="grass">
+        En <strong>Devocionales</strong> puedes escribir reflexiones cortas pensadas para niños, con su versículo. Marca uno
+        como "⭐ Activo" para que aparezca destacado en los 3 dashboards.
+      </Step>
+      <Step number="12" icon="🧰" title="Lleva el control de materiales y bitácora" color="grape">
+        En <strong>Materiales</strong> llevas el inventario (con aviso cuando queda poco), y en <strong>Bitácora</strong>
+        ves, por clase y fecha, cómo quedó el salón y qué refrigerio se dio.
+      </Step>
+      <Step number="13" icon="🔍" title="Revisa la inactividad de vez en cuando" color="sky">
+        En <strong>Ajustes</strong>, el botón "Revisar inactividad" pausa (de forma reversible) a los niños sin asistencia
+        hace más de 3 meses y a los padres que no han entrado hace más de 2. Tócalo cuando quieras, por ejemplo cada
+        domingo.
+      </Step>
+      <Step number="14" icon="📊" title="Exporta tus listas a Excel" color="coral">
+        Niños, Materiales, Bitácora y el resumen mensual de Asistencia tienen un botón "Exportar" que descarga un archivo
+        .xlsx listo para abrir.
       </Step>
     </>
   )
@@ -66,28 +104,41 @@ function DocenteGuide() {
   return (
     <>
       <Step number="1" icon="🏠" title="Revisa tus clases" color="sky">
-        En el inicio ves las clases que el admin te asignó, con cuántos niños activos tiene cada una.
+        En el inicio ves las clases que el admin te asignó, con cuántos niños activos tiene cada una, y el widget
+        "Agenda y tareas" con lo próximo que te toca.
       </Step>
       <Step number="2" icon="✅" title="Toma la asistencia" color="grass">
         Ve a <strong>Asistencia</strong>, elige la clase y la fecha. Toca a cada niño para marcarlo presente — se pone
-        verde. Al final, toca <em>Guardar asistencia</em>.
+        verde. Al final, toca <em>Guardar asistencia</em>. Si tu clase tiene más de un horario y otro docente ya tomó
+        parte, sus marcas ya van a estar cargadas — solo agrega las tuyas.
       </Step>
-      <Step number="3" icon="🎨" title="Publica una actividad" color="sunshine">
-        Ve a <strong>Actividades</strong> → <em>+ Nueva actividad</em>. Puedes subir varias fotos a la vez.
+      <Step number="3" icon="🎨" title="Publica una actividad (o pide una tarea)" color="sunshine">
+        Ve a <strong>Actividades</strong> → <em>+ Nueva actividad</em>. Puedes subir varias fotos a la vez. Si además
+        quieres que los niños hagan algo en casa, márcala como <em>tarea</em> (puedes agregar un enlace externo, ej. un
+        video). Desde ahí mismo, "Ver entregas" te muestra quién ya entregó, quién falta, y te deja poner una tarea en
+        pausa si hace falta.
       </Step>
       <Step number="4" icon="📅" title="Agenda un evento" color="grape">
         Ve a <strong>Agenda</strong> → <em>+ Nuevo evento</em> para avisar de un paseo o actividad especial próxima.
       </Step>
-      <Step number="5" icon="🌱" title="Registra el progreso de cada niño" color="coral">
-        Ve a <strong>Progreso</strong>, elige un niño y anota cómo se comportó, cómo se sintió y qué logró ese día. Ahí
-        mismo puedes darle una <strong>estrella ⭐</strong> como reconocimiento por algo que hizo bien. Cada niño va
-        desbloqueando insignias a medida que junta estrellas (🐣 → 🦊 → 🦁 → 🦋 → 🌟 → 👑), y tanto tú como sus padres
-        pueden ver su insignia actual y cuánto le falta para la siguiente.
+      <Step number="5" icon="📋" title="Planea tu clase con anticipación" color="coral">
+        En <strong>Planeación</strong> ves el calendario del mes con tus días de clase. Elige un día para ver quién cubre
+        tu clase (o planear tú la actividad de ese día) — solo ves tus propias clases, no las de todo el equipo.
       </Step>
-      <Step number="6" icon="🙏" title="Publica un devocional" color="sunshine">
+      <Step number="6" icon="🌱" title="Registra el progreso de cada niño" color="grass">
+        Ve a <strong>Progreso</strong>, elige un niño y anota cómo se comportó, cómo se sintió y qué logró ese día. Ahí
+        mismo puedes darle una <strong>estrella ⭐</strong> (elige un motivo rápido o escribe el tuyo) como reconocimiento
+        por algo que hizo bien. Cada niño va desbloqueando insignias a medida que junta estrellas, y tanto tú como sus
+        padres pueden ver su insignia actual y cuánto le falta para la siguiente.
+      </Step>
+      <Step number="7" icon="📋" title="Lleva la bitácora de tu clase" color="sunshine">
+        En <strong>Bitácora</strong> deja constancia, por fecha, de cómo quedó el salón (con foto) y qué refrigerio se
+        dio (con foto).
+      </Step>
+      <Step number="8" icon="🙏" title="Publica un devocional" color="sky">
         Ve a <strong>Devocionales</strong> → <em>+ Nuevo devocional</em>.
       </Step>
-      <Step number="7" icon="👪" title="¿Tienes un hijo/a en la escuelita?" color="grape">
+      <Step number="9" icon="👪" title="¿Tienes un hijo/a en la escuelita?" color="grape">
         Pídele al admin que te vincule también como padre/madre de tu hijo/a (opción "Ya tiene cuenta") — así, con la misma
         cuenta, puedes cambiar entre tu vista de docente y ver el progreso de tu hijo/a.
       </Step>
@@ -105,17 +156,19 @@ function PadreGuide() {
       <Step number="2" icon="🏠" title="Mira la información de tu hijo/a" color="grass">
         En el inicio ves su nombre, edad, clase y alergias registradas. Si tienes varios hijos, puedes cambiar entre ellos.
       </Step>
-      <Step number="3" icon="🎨" title="Reacciona a sus actividades" color="coral">
+      <Step number="3" icon="🎨" title="Reacciona a sus actividades y entrega sus tareas" color="coral">
         En <strong>Actividades</strong> ves fotos y lo que hicieron en clase. Toca un emoji (❤️ 👏 🙌 😍) para reaccionar.
+        Si una actividad viene marcada como <em>tarea</em>, ahí mismo puedes subir la evidencia (una foto, por ejemplo) y
+        dejar un comentario — la docente puede responderte con una nota corta.
       </Step>
-      <Step number="4" icon="📅" title="Entérate de los próximos eventos" color="grape">
-        En <strong>Agenda</strong> ves paseos, presentaciones y fechas importantes de la clase de tu hijo/a.
+      <Step number="4" icon="📅" title="Entérate de los próximos eventos y tareas pendientes" color="grape">
+        En el inicio y en <strong>Agenda</strong> ves el widget "Agenda y tareas": los próximos eventos de la clase de tu
+        hijo/a, y las tareas que todavía le faltan entregar.
       </Step>
       <Step number="5" icon="🌱" title="Mira su progreso" color="coral">
         En <strong>Progreso</strong> ves cómo se comportó, cómo se sintió y qué logró tu hijo/a en cada clase. También
-        aparece su <strong>insignia actual</strong> (🐣 → 🦊 → 🦁 → 🦋 → 🌟 → 👑) y sus <strong>estrellas ⭐</strong>: la
-        docente se las va dando como reconocimiento, y ahí puedes ver cuántas lleva y qué le falta para la siguiente
-        insignia.
+        aparece su <strong>insignia actual</strong> y sus <strong>estrellas ⭐</strong>: la docente se las va dando como
+        reconocimiento, y ahí puedes ver cuántas lleva y qué le falta para la siguiente insignia.
       </Step>
       <Step number="6" icon="🙏" title="Lean juntos un devocional" color="sunshine">
         En <strong>Devocionales</strong> hay reflexiones cortas pensadas para niños que pueden leer juntos en casa.
