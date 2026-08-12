@@ -80,6 +80,10 @@ export default function Layout() {
   const mainRef = useRef(null)
 
   useEffect(() => {
+    // El scroll real pasa en la ventana (el <main> no queda con altura
+    // fija porque el contenedor de afuera usa min-h-screen, no h-screen),
+    // así que hay que resetear window, no solo el <main>.
+    window.scrollTo({ top: 0 })
     mainRef.current?.scrollTo({ top: 0 })
   }, [pathname])
 
