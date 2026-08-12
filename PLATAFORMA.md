@@ -251,7 +251,10 @@ Algunas iglesias tienen más de un servicio el mismo día de clase (ej. 9:00 am 
 - **No hay "sedes"**: cada iglesia usa su propio proyecto de Supabase (ver sección 8), así que horarios solo resuelve "varios servicios el mismo lugar", no multi-sede.
 
 ### 5.16 Devocional activo
-`devocionales_ninos.activo`: el admin/coordinador/docente puede marcar un devocional como el destacado del momento (botón "⭐ Marcar activo" en Devocionales, que se ve ahora como lista compacta). La app se encarga de que solo haya uno activo a la vez, desmarcando el anterior. `DevocionalActivo.jsx` lo muestra como tarjeta en los 3 dashboards. `CitaDelDia.jsx` también lo usa: si nadie fijó manualmente una cita bíblica para hoy (`citas_biblicas.fecha_mostrar`), pero hay un devocional activo con versículo, el "Versículo del día" toma ese versículo en vez de la rotación automática.
+`devocionales_ninos.activo`: el admin/coordinador/docente puede marcar un devocional como el destacado del momento (botón "⭐ Marcar activo" en Devocionales, que se ve ahora como lista compacta). La app se encarga de que solo haya uno activo a la vez, desmarcando el anterior. Se muestra dentro de `ResumenHoy.jsx` (ver 5.19) en los 3 dashboards. `CitaDelDia.jsx` también lo usa: si nadie fijó manualmente una cita bíblica para hoy (`citas_biblicas.fecha_mostrar`), pero hay un devocional activo con versículo, el "Versículo del día" toma ese versículo en vez de la rotación automática.
+
+### 5.19 Resumen de hoy (dashboard)
+`ResumenHoy.jsx` es una sola tarjeta que junta todo lo del día: el devocional activo, los eventos de `agenda` con `fecha = hoy`, y las `actividades` (incluyendo tareas) con `fecha = hoy` — filtrado por `nivelIds` igual que `ProximaAgenda.jsx` (undefined = sin filtrar para admin/coordinador; un array para docente/padre). Si no hay nada de nada ese día, no se muestra (igual que `ProximaAgenda`). Reemplazó al antiguo `DevocionalActivo.jsx` (ahora eliminado), que solo mostraba el devocional por separado; `ProximaAgenda.jsx` se mantiene aparte para el vistazo de "qué viene" más adelante (no solo hoy).
 
 Materiales, Docentes y Clases quedaron solo en vista de lista/tabla — ver 5.14. Versículos (`CitasBiblicasAdmin.jsx`) también se convirtió de tarjetas a tabla. Actividades (docente y admin) ahora abre por defecto en la vista "📃 Compacta" en vez de la de tarjetas/lista completa.
 

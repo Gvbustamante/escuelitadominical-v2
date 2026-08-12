@@ -6,7 +6,7 @@ import Spinner from '../../components/Spinner'
 import { BADGE_CLASSES } from '../../lib/colors'
 import CitaDelDia from '../../components/CitaDelDia'
 import ProximaAgenda from '../../components/ProximaAgenda'
-import DevocionalActivo from '../../components/DevocionalActivo'
+import ResumenHoy from '../../components/ResumenHoy'
 
 export default function DocenteHome() {
   const { profile, user } = useAuth()
@@ -45,7 +45,7 @@ export default function DocenteHome() {
 
       <CitaDelDia />
 
-      <DevocionalActivo />
+      <ResumenHoy nivelIds={clases.map((c) => c.id)} />
 
       {clases.length === 0 && (
         <p className="card text-ink/50">
