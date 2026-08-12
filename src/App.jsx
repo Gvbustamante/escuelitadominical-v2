@@ -24,6 +24,7 @@ import BitacoraAdmin from './pages/admin/BitacoraAdmin'
 import Materiales from './pages/admin/Materiales'
 import ConfigEstrellas from './pages/admin/ConfigEstrellas'
 import Planeacion from './pages/admin/Planeacion'
+import Usuarios from './pages/admin/Usuarios'
 
 import DocenteHome from './pages/docente/DocenteHome'
 import Asistencia from './pages/docente/Asistencia'
@@ -73,8 +74,16 @@ export default function App() {
         <Route
           path="/ninos"
           element={
-            <ProtectedRoute roles={STAFF}>
+            <ProtectedRoute roles={[...STAFF, 'docente']}>
               <Ninos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/usuarios"
+          element={
+            <ProtectedRoute roles={STAFF}>
+              <Usuarios />
             </ProtectedRoute>
           }
         />

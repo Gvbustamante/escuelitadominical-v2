@@ -44,7 +44,11 @@ function AdminGuide() {
       </Step>
       <Step number="3" icon="🍎" title="Agrega a tus docentes" color="sunshine">
         Ve a <strong>Docentes</strong> → <em>+ Agregar</em>. Escribe su nombre y cédula — te va a mostrar la contraseña que le
-        toca, para que se la des tú directamente (por WhatsApp, en persona, como prefieras).
+        toca, para que se la des tú directamente (por WhatsApp, en persona, como prefieras). También puedes usar{' '}
+        <strong>Usuarios</strong>, que reúne cualquier tipo de cuenta (admin, coordinador, docente, padre) en un solo
+        lugar, con edición de datos y restablecer contraseña. Ahí mismo, en la pestaña <em>Roles y permisos</em>, puedes
+        prender o apagar cosas como que un docente edite/registre niños o vincule padres — vienen algunas activadas por
+        defecto y otras no.
       </Step>
       <Step number="4" icon="🔗" title="Asigna cada docente a su clase" color="sky">
         En <strong>Clases</strong>, edita una clase y marca qué docente(s) la llevan. Si configuraste más de un horario,

@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { crearUsuario } from '../../lib/invite'
+import { useAuth } from '../../contexts/AuthContext'
+import { usePermisosRol } from '../../lib/permisosRol'
 import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
@@ -8,12 +10,9 @@ import DetalleNinoModal from '../../components/DetalleNinoModal'
 import { BADGE_CLASSES } from '../../lib/colors'
 import { whatsappLink } from '../../lib/whatsapp'
 import { exportExcel } from '../../lib/exportExcel'
+import { generarCodigoFacil } from '../../lib/codigoFacil'
 
-function generarCodigoFacil(nombreNino) {
-  const base = (nombreNino || 'familia').trim().split(' ')[0].toLowerCase().normalize('NFD').replace(/[^a-z]/g, '')
-  const numero = Math.floor(100 + Math.random() * 900)
-  return `${base || 'familia'}${numero}`
-}
+const STAFF = ['admin', 'coordinador']
 
 function calcularEdad(fecha) {
   if (!fecha) return '—'
@@ -26,9 +25,18 @@ function calcularEdad(fecha) {
 }
 
 export default function Ninos() {
+  const { profile, user } = useAuth()
+  const esStaff = STAFF.includes(profile.role)
+  const esDocente = profile.role === 'docente'
+  const { tiene } = usePermisosRol()
+  const puedeEditar = esStaff || (esDocente && tiene('docente', 'editar_ninos'))
+  const puedeAgregar = esStaff || (esDocente && tiene('docente', 'agregar_ninos'))
+  const puedeVincularPadre = esStaff || (esDocente && tiene('docente', 'vincular_padres'))
+
   const [ninos, setNinos] = useState(null)
   const [niveles, setNiveles] = useState([])
   const [padresPorNino, setPadresPorNino] = useState({})
+  const [misNivelIds, setMisNivelIds] = useState(null)
   const [filtro, setFiltro] = useState('activos')
   const [busqueda, setBusqueda] = useState('')
 
@@ -55,11 +63,13 @@ export default function Ninos() {
   const [confirmDesvincular, setConfirmDesvincular] = useState(null) // { nino, padre }
 
   const load = useCallback(async () => {
-    const [{ data: n }, { data: niv }, { data: np }] = await Promise.all([
+    const queries = [
       supabase.from('ninos').select('*').order('nombre_completo'),
       supabase.from('niveles').select('*').eq('activo', true),
       supabase.from('ninos_padres').select('nino_id, parentesco, padre:profiles(id, nombre_completo, telefono, pausado)'),
-    ])
+    ]
+    if (esDocente) queries.push(supabase.from('docentes_niveles').select('nivel_id').eq('docente_id', user.id))
+    const [{ data: n }, { data: niv }, { data: np }, misAsig] = await Promise.all(queries)
     setNinos(n || [])
     setNiveles(niv || [])
     const grouped = {}
@@ -68,7 +78,8 @@ export default function Ninos() {
       grouped[row.nino_id].push(row)
     })
     setPadresPorNino(grouped)
-  }, [])
+    if (esDocente) setMisNivelIds(new Set((misAsig?.data || []).map((a) => a.nivel_id)))
+  }, [esDocente, user.id])
 
   useEffect(() => {
     load()
@@ -76,12 +87,16 @@ export default function Ninos() {
 
   const nivelesById = useMemo(() => Object.fromEntries(niveles.map((n) => [n.id, n])), [niveles])
 
-  const filtrados = useMemo(() => {
+  const ninosVisibles = useMemo(() => {
     if (!ninos) return []
-    return ninos
+    return esDocente ? ninos.filter((n) => misNivelIds?.has(n.nivel_id)) : ninos
+  }, [ninos, esDocente, misNivelIds])
+
+  const filtrados = useMemo(() => {
+    return ninosVisibles
       .filter((n) => (filtro === 'activos' ? n.activo : filtro === 'inactivos' ? !n.activo : true))
       .filter((n) => n.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()))
-  }, [ninos, filtro, busqueda])
+  }, [ninosVisibles, filtro, busqueda])
 
   function openNew() {
     setEditing(null)
@@ -268,14 +283,18 @@ export default function Ninos() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Niños 🧒</h1>
-          <p className="text-ink/50">{filtrados.length} de {ninos.length} en total</p>
+          <p className="text-ink/50">{filtrados.length} de {ninosVisibles.length} en total</p>
         </div>
-        <button className="btn-secondary" onClick={exportar}>
-          📊 Exportar
-        </button>
-        <button className="btn-primary" onClick={openNew}>
-          + Nuevo niño/a
-        </button>
+        {esStaff && (
+          <button className="btn-secondary" onClick={exportar}>
+            📊 Exportar
+          </button>
+        )}
+        {puedeAgregar && (
+          <button className="btn-primary" onClick={openNew}>
+            + Nuevo niño/a
+          </button>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -365,18 +384,26 @@ export default function Ninos() {
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetalleNino(nino)}>
                           Ver detalle
                         </button>
-                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nino)}>
-                          Editar
-                        </button>
-                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openInvite(nino)}>
-                          + Padre
-                        </button>
-                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => togglePausado(nino)}>
-                          {nino.pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
-                        </button>
-                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(nino)}>
-                          {nino.activo ? 'Desactivar' : 'Activar'}
-                        </button>
+                        {puedeEditar && (
+                          <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nino)}>
+                            Editar
+                          </button>
+                        )}
+                        {puedeVincularPadre && (
+                          <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openInvite(nino)}>
+                            + Padre
+                          </button>
+                        )}
+                        {esStaff && (
+                          <>
+                            <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => togglePausado(nino)}>
+                              {nino.pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
+                            </button>
+                            <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(nino)}>
+                              {nino.activo ? 'Desactivar' : 'Activar'}
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -604,7 +631,7 @@ export default function Ninos() {
         open={!!detalleNino}
         onClose={() => setDetalleNino(null)}
         onSaved={load}
-        onDesvincular={(padre) => pedirDesvincular(detalleNino, padre)}
+        onDesvincular={esStaff ? (padre) => pedirDesvincular(detalleNino, padre) : undefined}
       />
 
       <ConfirmModal
