@@ -50,6 +50,18 @@ export default function CitaDelDia() {
       setStatus('listo')
       return
     }
+
+    const { data: devocionalActivo } = await supabase
+      .from('devocionales_ninos')
+      .select('titulo, versiculo')
+      .eq('activo', true)
+      .maybeSingle()
+    if (devocionalActivo?.versiculo) {
+      setCita({ texto: devocionalActivo.versiculo, referencia: devocionalActivo.titulo })
+      setStatus('listo')
+      return
+    }
+
     if (esStaff) {
       const { data: todas } = await supabase.from('citas_biblicas').select('id, texto, referencia').order('referencia')
       setPool(todas || [])

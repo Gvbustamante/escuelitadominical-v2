@@ -3,19 +3,13 @@ import { supabase } from '../../lib/supabaseClient'
 import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
-import VistaToggle from '../../components/VistaToggle'
 import { exportCSV } from '../../lib/exportCsv'
 
 const CATEGORIA_LABEL = { general: 'General', ninos: 'Para niños', clase: 'Para una clase' }
-const VISTA_OPTIONS = [
-  { value: 'tarjetas', label: '🔲 Tarjetas' },
-  { value: 'lista', label: '☰ Lista compacta' },
-]
 
 export default function Materiales() {
   const [materiales, setMateriales] = useState(null)
   const [niveles, setNiveles] = useState([])
-  const [vista, setVista] = useState('tarjetas')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ nombre: '', categoria: 'general', nivel_id: '', cantidad: 0, notas: '' })
@@ -143,43 +137,7 @@ export default function Materiales() {
         </button>
       </div>
 
-      <div className="flex justify-end">
-        <VistaToggle vista={vista} onChange={setVista} options={VISTA_OPTIONS} />
-      </div>
-
-      {vista === 'tarjetas' ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {materiales.map((m) => (
-            <div key={m.id} className={`card ${!m.activo ? 'opacity-50' : ''}`}>
-              {m.foto_url && <img src={m.foto_url} alt={m.nombre} className="mb-3 h-32 w-full rounded-2xl object-cover" />}
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="text-lg font-bold">{m.nombre}</h3>
-                <span className={`badge ${m.cantidad <= 2 ? 'bg-coral-100 text-coral-700' : 'bg-sky-100 text-sky-700'}`}>
-                  {m.cantidad}
-                </span>
-              </div>
-              <p className="text-sm text-ink/50">
-                {m.categoria === 'clase' ? m.nivel?.nombre || 'Para una clase' : CATEGORIA_LABEL[m.categoria]}
-              </p>
-              {m.cantidad <= 2 && <p className="mt-1 text-xs font-bold text-coral-600">⚠️ Queda poco</p>}
-              {m.notas && <p className="mt-2 text-sm text-ink/60">{m.notas}</p>}
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openEdit(m)}>
-                  Editar
-                </button>
-                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => toggleActivo(m)}>
-                  {m.activo ? 'Desactivar' : 'Activar'}
-                </button>
-                <button className="btn-secondary !py-2 !text-sm !text-coral-600" onClick={() => setConfirmEliminar(m)}>
-                  🗑️
-                </button>
-              </div>
-            </div>
-          ))}
-          {materiales.length === 0 && <p className="card text-ink/50">Aún no hay materiales registrados.</p>}
-        </div>
-      ) : (
-        <div className="card overflow-x-auto p-0">
+      <div className="card overflow-x-auto p-0">
           <table className="w-full text-left text-sm">
             <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/50">
               <tr>
@@ -232,7 +190,6 @@ export default function Materiales() {
             </tbody>
           </table>
         </div>
-      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar material' : 'Agregar material'}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

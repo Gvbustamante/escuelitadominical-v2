@@ -4,6 +4,7 @@ import Spinner from '../../components/Spinner'
 import { BADGE_CLASSES } from '../../lib/colors'
 import CitaDelDia from '../../components/CitaDelDia'
 import ProximaAgenda from '../../components/ProximaAgenda'
+import DevocionalActivo from '../../components/DevocionalActivo'
 
 function calcularEdad(fecha) {
   if (!fecha) return '—'
@@ -32,6 +33,8 @@ export default function PadreHome() {
       </div>
 
       <CitaDelDia />
+
+      <DevocionalActivo />
 
       {hijos.length === 0 && (
         <p className="card text-ink/50">Aún no tienes niños vinculados. Habla con la docente de tu hijo/a.</p>

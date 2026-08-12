@@ -133,9 +133,11 @@ create table public.devocionales_ninos (
   contenido text not null,
   imagen_url text,
   fecha date not null default current_date,
+  activo boolean not null default false,
   creado_por uuid references public.profiles(id),
   created_at timestamptz not null default now()
 );
+comment on column public.devocionales_ninos.activo is 'true = es el devocional destacado del momento (del día/semana). Solo debería haber uno activo a la vez; la app se encarga de desmarcar los demás al activar uno nuevo.';
 
 create table public.citas_biblicas (
   id uuid primary key default gen_random_uuid(),
