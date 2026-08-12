@@ -5,6 +5,7 @@ import { useMisClases } from '../../lib/useMisClases'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ActivityFiles from '../../components/ActivityFiles'
+import TareaEntregas from '../../components/TareaEntregas'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -15,11 +16,21 @@ export default function Actividades() {
   const { clases, nivelId, setNivelId } = useMisClases()
   const [actividades, setActividades] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
-  const [form, setForm] = useState({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '', visible_padres: true })
+  const [form, setForm] = useState({
+    titulo: '',
+    descripcion: '',
+    fecha: hoyISO(),
+    versiculo_clave: '',
+    historia_biblica: '',
+    visible_padres: true,
+    es_tarea: false,
+    enlace_externo: '',
+  })
   const [archivos, setArchivos] = useState([])
   const [busy, setBusy] = useState(false)
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
+  const [tareaActividad, setTareaActividad] = useState(null)
 
   const load = useCallback(async () => {
     if (!nivelId) return
@@ -36,7 +47,16 @@ export default function Actividades() {
   }, [load])
 
   function openNew() {
-    setForm({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '', visible_padres: true })
+    setForm({
+      titulo: '',
+      descripcion: '',
+      fecha: hoyISO(),
+      versiculo_clave: '',
+      historia_biblica: '',
+      visible_padres: true,
+      es_tarea: false,
+      enlace_externo: '',
+    })
     setArchivos([])
     setError('')
     setModalOpen(true)
@@ -58,6 +78,8 @@ export default function Actividades() {
         versiculo_clave: form.versiculo_clave || null,
         historia_biblica: form.historia_biblica || null,
         visible_padres: form.visible_padres,
+        es_tarea: form.es_tarea,
+        enlace_externo: form.enlace_externo || null,
       })
       .select()
       .single()
@@ -126,6 +148,7 @@ export default function Actividades() {
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-bold">{a.titulo}</h3>
                   {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
+                  {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
                 </div>
                 <span className="text-sm text-ink/40">{a.fecha}</span>
               </div>
@@ -137,9 +160,14 @@ export default function Actividades() {
                 </div>
               )}
               <ActivityFiles archivos={a.actividad_archivos} />
-              <p className="mt-3 text-sm font-bold text-coral-500">
-                {a.actividad_reacciones?.length || 0} reacciones ❤️
-              </p>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-bold text-coral-500">{a.actividad_reacciones?.length || 0} reacciones ❤️</p>
+                {a.es_tarea && (
+                  <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setTareaActividad(a)}>
+                    📋 Ver entregas
+                  </button>
+                )}
+              </div>
             </div>
           ))}
           {actividades.length === 0 && <p className="card text-ink/50">Aún no hay actividades para esta clase.</p>}
@@ -203,6 +231,42 @@ export default function Actividades() {
             </div>
           </div>
           <div>
+            <label className="label">¿Pide una tarea?</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, es_tarea: false })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.es_tarea ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                Solo informativa
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, es_tarea: true })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.es_tarea ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                📝 Es una tarea
+              </button>
+            </div>
+            {form.es_tarea && (
+              <p className="mt-1 text-xs text-ink/40">
+                Cada niño del nivel podrá entregar su evidencia desde la cuenta de su padre/madre.
+              </p>
+            )}
+          </div>
+          {form.es_tarea && (
+            <div>
+              <label className="label">Enlace externo (opcional)</label>
+              <input
+                type="url"
+                className="input"
+                placeholder="https://... (video, formulario, etc.)"
+                value={form.enlace_externo}
+                onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
+              />
+            </div>
+          )}
+          <div>
             <label className="label">Archivos (fotos, PDFs, etc.)</label>
             <input
               type="file"
@@ -219,6 +283,8 @@ export default function Actividades() {
           </button>
         </form>
       </Modal>
+
+      <TareaEntregas actividad={tareaActividad} open={!!tareaActividad} onClose={() => setTareaActividad(null)} />
     </div>
   )
 }

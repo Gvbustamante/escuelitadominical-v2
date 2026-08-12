@@ -14,6 +14,24 @@ export default function Ajustes() {
   const [ok, setOk] = useState('')
   const inputRef = useRef(null)
 
+  const [revisando, setRevisando] = useState(false)
+  const [resultadoRevision, setResultadoRevision] = useState('')
+
+  async function handleRevisarInactividad() {
+    setRevisando(true)
+    setResultadoRevision('')
+    const { data, error: rpcError } = await supabase.rpc('revisar_inactividad')
+    setRevisando(false)
+    if (rpcError) {
+      setResultadoRevision('❌ ' + rpcError.message)
+      return
+    }
+    const fila = Array.isArray(data) ? data[0] : data
+    setResultadoRevision(
+      `✅ Se pausaron ${fila?.ninos_pausados ?? 0} niño(s) y ${fila?.padres_pausados ?? 0} cuenta(s) de padre/madre por inactividad.`,
+    )
+  }
+
   useEffect(() => {
     setNombreIglesia(config?.nombre_iglesia || '')
   }, [config])
@@ -143,6 +161,19 @@ export default function Ajustes() {
         <button type="button" onClick={handleGuardar} disabled={busy} className="btn-primary mt-5 justify-center">
           {busy ? 'Guardando...' : 'Guardar cambios'}
         </button>
+      </div>
+
+      <div className="card max-w-xl">
+        <p className="label mb-1">Revisar inactividad</p>
+        <p className="mb-4 text-sm text-ink/50">
+          Pausa automáticamente a los niños sin asistencia hace más de 3 meses, y a los padres/madres que no han
+          entrado en más de 2 meses. No borra nada — es reversible, y un padre se reactiva solo la próxima vez que
+          entra. Tócalo cuando quieras (ej. cada domingo).
+        </p>
+        <button type="button" onClick={handleRevisarInactividad} disabled={revisando} className="btn-secondary">
+          {revisando ? 'Revisando...' : '🔍 Revisar inactividad'}
+        </button>
+        {resultadoRevision && <p className="mt-3 text-sm font-bold text-ink/70">{resultadoRevision}</p>}
       </div>
     </div>
   )

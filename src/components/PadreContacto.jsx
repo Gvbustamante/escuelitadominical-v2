@@ -24,8 +24,9 @@ export default function PadreContacto({ padre, parentesco, onSaved }) {
 
   return (
     <div className="rounded-xl bg-ink/5 p-3">
-      <p className="font-bold">
+      <p className="flex flex-wrap items-center gap-2 font-bold">
         {padre?.nombre_completo} {parentesco && `(${parentesco})`}
+        {padre?.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Sin entrar hace tiempo</span>}
       </p>
       <div className="mt-2 flex gap-2">
         <input

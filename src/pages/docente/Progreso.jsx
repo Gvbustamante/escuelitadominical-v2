@@ -6,7 +6,9 @@ import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import RewardsPanel from '../../components/RewardsPanel'
 import RewardBurst from '../../components/RewardBurst'
-import { badgeActual, mensajeAleatorio, playSound } from '../../lib/gamification'
+import VistaToggle from '../../components/VistaToggle'
+import { useNivelesEstrella, badgeActual } from '../../lib/nivelesEstrella'
+import { mensajeAleatorio, playSound } from '../../lib/gamification'
 
 const COMPORTAMIENTOS = ['Excelente', 'Bueno', 'Regular', 'Necesita apoyo']
 const EMOCIONES = ['😊 Feliz', '🤩 Emocionado', '😐 Tranquilo', '😢 Triste', '😡 Molesto', '😴 Cansado']
@@ -18,7 +20,9 @@ function hoyISO() {
 export default function Progreso() {
   const { user } = useAuth()
   const { clases, nivelId, setNivelId } = useMisClases()
+  const niveles = useNivelesEstrella()
   const [ninos, setNinos] = useState(null)
+  const [vista, setVista] = useState('tarjetas')
   const [notasPorNino, setNotasPorNino] = useState({})
   const [estrellasPorNino, setEstrellasPorNino] = useState({})
   const [modalNino, setModalNino] = useState(null)
@@ -102,9 +106,12 @@ export default function Progreso() {
     <div className="flex flex-col gap-6">
       <RewardBurst toast={toast} />
 
-      <div>
-        <h1 className="text-3xl font-bold">Progreso 🌱</h1>
-        <p className="text-ink/50">Comportamiento, emociones y logros de cada niño/a</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Progreso 🌱</h1>
+          <p className="text-ink/50">Comportamiento, emociones y logros de cada niño/a</p>
+        </div>
+        <VistaToggle vista={vista} onChange={setVista} />
       </div>
 
       <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
@@ -117,16 +124,66 @@ export default function Progreso() {
 
       {!ninos ? (
         <Spinner />
+      ) : vista === 'lista' ? (
+        <div className="card overflow-x-auto !p-0">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b-2 border-ink/5 text-left text-xs font-extrabold uppercase text-ink/40">
+                <th className="px-4 py-3">Niño/a</th>
+                <th className="px-4 py-3">Insignia</th>
+                <th className="px-4 py-3">Estrellas</th>
+                <th className="px-4 py-3">Última nota</th>
+                <th className="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {ninos.map((n) => {
+                const estrellas = estrellasPorNino[n.id] || []
+                const notas = notasPorNino[n.id] || []
+                const ultima = notas[0]
+                const badge = badgeActual(niveles, estrellas.length)
+                return (
+                  <tr key={n.id} className={`border-b border-ink/5 ${n.pausado ? 'opacity-50 grayscale' : ''}`}>
+                    <td className="px-4 py-3 font-bold">
+                      {n.nombre_completo}
+                      {n.pausado && <span className="badge ml-2 bg-ink/10 text-ink/50">⏸️ Pausado</span>}
+                    </td>
+                    <td className="px-4 py-3">
+                      {badge.emoji} <span className="text-ink/50">{badge.nombre}</span>
+                    </td>
+                    <td className="px-4 py-3 font-bold text-sunshine-700">{estrellas.length} ⭐</td>
+                    <td className="px-4 py-3 text-ink/50">{ultima ? ultima.fecha : 'Sin notas'}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setHistorialNino(n)}>
+                        Ver / dar estrella
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+              {ninos.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-6 text-center text-ink/40">
+                    No hay niños activos en esta clase.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ninos.map((n) => {
             const notas = notasPorNino[n.id] || []
             const estrellas = estrellasPorNino[n.id] || []
             const ultima = notas[0]
-            const badge = badgeActual(estrellas.length)
+            const badge = badgeActual(niveles, estrellas.length)
             return (
-              <div key={n.id} className="card">
-                <h3 className="text-lg font-bold">{n.nombre_completo}</h3>
+              <div key={n.id} className={`card ${n.pausado ? 'opacity-50 grayscale' : ''}`}>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold">{n.nombre_completo}</h3>
+                  {n.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado</span>}
+                </div>
                 {ultima ? (
                   <div className="mt-2 text-sm text-ink/60">
                     <p>Última nota: {ultima.fecha}</p>
@@ -142,11 +199,10 @@ export default function Progreso() {
                     {badge.emoji} {estrellas.length} ⭐
                   </span>
                   <button
-                    disabled={busyEstrella === n.id}
-                    onClick={() => darEstrella(n)}
-                    className="shrink-0 rounded-full bg-sunshine-400 px-3 py-1 text-xs font-extrabold text-white transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+                    onClick={() => setHistorialNino(n)}
+                    className="shrink-0 rounded-full bg-sunshine-400 px-3 py-1 text-xs font-extrabold text-white transition-transform hover:scale-105 active:scale-95"
                   >
-                    +1 ⭐
+                    ⭐ Dar
                   </button>
                 </div>
 
@@ -224,7 +280,7 @@ export default function Progreso() {
               estrellas={(estrellasPorNino[historialNino.id] || []).length}
               recientes={estrellasPorNino[historialNino.id] || []}
               busy={busyEstrella === historialNino.id}
-              onAward={() => darEstrella(historialNino)}
+              onAward={(motivo) => darEstrella(historialNino, motivo)}
             />
           )}
           {(notasPorNino[historialNino?.id] || []).map((nota) => (

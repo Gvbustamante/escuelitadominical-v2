@@ -40,11 +40,12 @@ export default function ProgresoNinoModal({ nino, nivelId, open, onClose }) {
     }
   }, [open, nino, cargarEstrellas])
 
-  async function darEstrella() {
+  async function darEstrella(motivo) {
     setBusyEstrella(true)
     const { error } = await supabase.from('reconocimientos').insert({
       nino_id: nino.id,
       nivel_id: nivelId,
+      motivo: motivo || null,
       otorgado_por: user.id,
     })
     setBusyEstrella(false)
