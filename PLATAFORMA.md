@@ -1,4 +1,4 @@
-# Access Kids — Documentación maestra de la plataforma 📖
+# KidsMin — Documentación maestra de la plataforma 📖
 
 Este documento describe **todo** lo que compone la plataforma: qué es, cómo está construida, cómo se relacionan sus piezas, el modelo de datos completo y cómo se despliega. Es el punto de referencia único para entender el proyecto sin tener que leer todo el código.
 
@@ -8,7 +8,7 @@ Este documento describe **todo** lo que compone la plataforma: qué es, cómo es
 
 ## 1. Qué es
 
-**Access Kids** es un sistema de gestión para escuelas dominicales cristianas (ministerio infantil de una iglesia). Cubre el ciclo completo de un domingo y de la semana:
+**KidsMin** es un sistema de gestión para escuelas dominicales cristianas (ministerio infantil de una iglesia). Cubre el ciclo completo de un domingo y de la semana:
 
 - Registro de niños y organización por clases/niveles.
 - Control de asistencia, con vista de tabla mensual (nombres × días) y un modal para tomarla/editarla por clase y fecha.
@@ -21,7 +21,7 @@ Este documento describe **todo** lo que compone la plataforma: qué es, cómo es
 - **Bitácora de clase**: constancia con foto de que el salón quedó en buen estado y de qué refrigerio se dio a los niños, por clase y fecha.
 - **Inventario de materiales**: qué hay disponible (general, para niños o para una clase), con foto, cantidad y aviso cuando queda poco.
 - **WhatsApp de contacto**: cada docente y cada padre puede tener un número guardado, con un botón que abre directo el chat (`wa.me`) — editable desde "Ver detalle".
-- Nombre y logo de la iglesia personalizables (Ajustes), que reemplazan el branding "Access Kids" en el menú y la pantalla de ingreso.
+- Nombre y logo de la iglesia personalizables (Ajustes), que reemplazan el branding "KidsMin" en el menú y la pantalla de ingreso.
 - Un portal para padres, donde ven todo lo relacionado a sus hijos.
 - Comunidad: foro (con temas públicos o privados —solo staff—), versículo del día, peticiones de oración.
 - Multi-tenant "por fork": cada iglesia tiene su propio proyecto de Supabase y su propio despliegue, sin compartir datos con otras iglesias (ver sección 8).

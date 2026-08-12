@@ -7,7 +7,7 @@ export default function AppName({ acentoClassName = 'text-coral-500' }) {
   if (!nombre) {
     return (
       <>
-        Access <span className={acentoClassName}>Kids</span>
+        Kids<span className={acentoClassName}>Min</span>
       </>
     )
   }
