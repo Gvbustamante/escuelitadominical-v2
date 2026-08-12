@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabaseClient'
@@ -71,9 +71,11 @@ const ROLE_LABEL = {
 }
 
 export default function Layout() {
-  const { profile, user, signOut } = useAuth()
+  const { profile, user, signOut, refreshProfile } = useAuth()
   const [pwOpen, setPwOpen] = useState(false)
   const [tieneHijos, setTieneHijos] = useState(false)
+  const [bienvenidaDeVuelta, setBienvenidaDeVuelta] = useState(false)
+  const yaRevisadoPausado = useRef(null)
 
   useEffect(() => {
     if (!user || profile?.role === 'padre') return
@@ -83,6 +85,18 @@ export default function Layout() {
       .eq('padre_id', user.id)
       .then(({ count }) => setTieneHijos((count || 0) > 0))
   }, [user, profile?.role])
+
+  useEffect(() => {
+    if (!profile || profile.role !== 'padre' || !profile.pausado) return
+    if (yaRevisadoPausado.current === profile.id) return
+    yaRevisadoPausado.current = profile.id
+    setBienvenidaDeVuelta(true)
+    supabase
+      .from('profiles')
+      .update({ pausado: false })
+      .eq('id', profile.id)
+      .then(() => refreshProfile())
+  }, [profile, refreshProfile])
 
   const items = [...(NAV[profile?.role] || [])]
   if (tieneHijos && ['admin', 'coordinador', 'docente'].includes(profile?.role)) {
@@ -144,6 +158,21 @@ export default function Layout() {
       </aside>
 
       <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        {bienvenidaDeVuelta && (
+          <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50 px-4 py-3">
+            <p className="text-sm font-bold text-sky-700">
+              👋 ¡Bienvenido/a de vuelta! Habíamos marcado tu cuenta como inactiva porque llevaba un tiempo sin
+              entrar — ya quedó activa de nuevo.
+            </p>
+            <button
+              onClick={() => setBienvenidaDeVuelta(false)}
+              className="shrink-0 text-lg font-bold text-sky-400 hover:text-sky-600"
+              aria-label="Cerrar aviso"
+            >
+              ×
+            </button>
+          </div>
+        )}
         <Outlet />
       </main>
 

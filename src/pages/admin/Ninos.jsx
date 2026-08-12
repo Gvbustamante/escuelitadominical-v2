@@ -59,7 +59,7 @@ export default function Ninos() {
     const [{ data: n }, { data: niv }, { data: np }] = await Promise.all([
       supabase.from('ninos').select('*').order('nombre_completo'),
       supabase.from('niveles').select('*').eq('activo', true),
-      supabase.from('ninos_padres').select('nino_id, parentesco, padre:profiles(id, nombre_completo, telefono)'),
+      supabase.from('ninos_padres').select('nino_id, parentesco, padre:profiles(id, nombre_completo, telefono, pausado)'),
     ])
     setNinos(n || [])
     setNiveles(niv || [])

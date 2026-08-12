@@ -213,6 +213,13 @@ Los archivos de evidencia se guardan en el mismo bucket `actividades` de Storage
 ### 5.12 Niños pausados
 `ninos.pausado` es un estado aparte de `activo` (que sigue siendo "¿está inscrito?"): un niño pausado se muestra en gris/desactivado en `Ninos.jsx` y `Progreso.jsx`, y en el checklist de tareas aparece directamente como "⏸️ Pausado (niño)" en vez de "Pendiente" — así no genera una falsa alarma de tarea atrasada mientras el niño no está asistiendo. Se activa/desactiva con un botón, sin perder ningún historial.
 
+### 5.13 Revisar inactividad (niños y padres)
+Botón "🔍 Revisar inactividad" en Ajustes (solo admin/coordinador) que llama a la función `revisar_inactividad()` (RPC, security definer):
+- **Niños**: se pausan (`ninos.pausado = true`) los que tuvieron alguna asistencia presente alguna vez pero ninguna en los últimos 3 meses. Un niño que nunca ha tenido asistencia registrada **nunca** se pausa automáticamente (podría ser un recién inscrito).
+- **Padres**: se pausan (`profiles.pausado = true`) los que no han entrado (`auth.users.last_sign_in_at`, o `created_at` si nunca entraron) en más de 2 meses.
+- Es **solo una marca visual** — nunca bloquea el login. Un padre pausado se reactiva solo (`Layout.jsx`) la próxima vez que entra, y ve un aviso de bienvenida explicándole que estuvo marcado como inactivo.
+- Se ejecuta manualmente (no hay cron) para que funcione igual en cualquier proyecto de Supabase sin configuración extra; el admin lo toca cuando quiera (ej. cada domingo).
+
 ## 6. Modelo de datos (Supabase / Postgres)
 
 Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado para copiar/pegar una sola vez en el SQL Editor de un proyecto Supabase nuevo.
@@ -256,12 +263,13 @@ Todas las tablas tienen RLS habilitado. El patrón general:
 
 ### 6.4 Funciones de base de datos
 - `admin_create_invited_user(...)`: ver sección 5.4. Es la única forma de crear usuarios nuevos (no hay sign-up público).
+- `revisar_inactividad()`: ver sección 5.13. Pausa niños y padres inactivos; solo admin/coordinador pueden llamarla.
 
 ### 6.5 Datos semilla
 `schema.sql` inserta 15 versículos bíblicos iniciales en `citas_biblicas` para que la app tenga contenido desde el día uno.
 
 ### 6.6 Actualizaciones incrementales a un proyecto ya desplegado
-`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql), [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql), [`supabase/actualizacion_actividades_visibilidad.sql`](./supabase/actualizacion_actividades_visibilidad.sql) y [`supabase/actualizacion_tareas_estrellas.sql`](./supabase/actualizacion_tareas_estrellas.sql) (tareas, estrellas configurables y niños pausados). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
+`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql), [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql), [`supabase/actualizacion_actividades_visibilidad.sql`](./supabase/actualizacion_actividades_visibilidad.sql), [`supabase/actualizacion_tareas_estrellas.sql`](./supabase/actualizacion_tareas_estrellas.sql) (tareas, estrellas configurables y niños pausados) y [`supabase/actualizacion_inactividad.sql`](./supabase/actualizacion_inactividad.sql) (revisar inactividad — requiere haber corrido antes el de tareas/estrellas). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
 
 ## 7. Variables de entorno
 
