@@ -72,8 +72,10 @@ create table public.actividades (
   fecha date not null default current_date,
   versiculo_clave text,
   historia_biblica text,
+  visible_padres boolean not null default true,
   created_at timestamptz not null default now()
 );
+comment on column public.actividades.visible_padres is 'false = solo la ve staff (admin/coordinador/docente); los padres/niños no la ven aunque sea de su clase y ya haya pasado.';
 
 create table public.actividad_archivos (
   id uuid primary key default gen_random_uuid(),
@@ -223,9 +225,12 @@ create policy "gestionar asistencia" on public.asistencia for all to authenticat
 create policy "leer actividades" on public.actividades for select to authenticated
   using (
     exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
-    or exists (
-      select 1 from public.ninos_padres np join public.ninos n on n.id = np.nino_id
-      where np.padre_id = auth.uid() and n.nivel_id = actividades.nivel_id
+    or (
+      actividades.visible_padres
+      and exists (
+        select 1 from public.ninos_padres np join public.ninos n on n.id = np.nino_id
+        where np.padre_id = auth.uid() and n.nivel_id = actividades.nivel_id
+      )
     )
   );
 create policy "gestionar actividades" on public.actividades for all to authenticated

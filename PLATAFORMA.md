@@ -12,7 +12,7 @@ Este documento describe **todo** lo que compone la plataforma: qué es, cómo es
 
 - Registro de niños y organización por clases/niveles.
 - Control de asistencia, con vista de tabla mensual (nombres × días) y un modal para tomarla/editarla por clase y fecha.
-- Actividades con archivos multimedia (miniaturas), versículo clave e historia bíblica, editables, con vista de lista o de **calendario mensual** ("plan del mes") — los padres solo ven las actividades ya dadas, no las futuras.
+- Actividades con archivos multimedia (miniaturas), versículo clave e historia bíblica, editables, con vista de lista o de **calendario mensual** ("plan del mes") — los padres solo ven las actividades ya dadas y visibles (no las futuras, y el equipo puede marcar una como "solo equipo" para ocultarla de padres/niños).
 - Agenda de eventos, con vista de calendario.
 - Devocionales para niños, con imagen opcional, editables y filtrables por mes.
 - Progreso individual del niño (comportamiento, emoción, logros) con notas del docente.
@@ -208,7 +208,7 @@ Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado 
 | `ninos` | Niños inscritos | `nivel_id` → `niveles` |
 | `ninos_padres` | Vínculo niño ↔ padre/madre (M:N, con `parentesco`) | `ninos` ↔ `profiles` |
 | `asistencia` | Un registro por niño/fecha (único por `nino_id`+`fecha`) | `ninos`, `niveles`, `tomada_por` → `profiles` |
-| `actividades` | Actividad de clase: título, descripción, versículo clave, historia bíblica | `niveles`, `docente_id` → `profiles` |
+| `actividades` | Actividad de clase: título, descripción, versículo clave, historia bíblica, `visible_padres` (si se oculta de padres/niños) | `niveles`, `docente_id` → `profiles` |
 | `actividad_archivos` | Archivos adjuntos de una actividad (fotos/videos en Storage) | `actividades` |
 | `actividad_reacciones` | Reacciones (emoji) de un padre a una actividad, única por padre+actividad | `actividades`, `profiles` |
 | `agenda` | Eventos calendario, opcionalmente ligados a un nivel | `niveles`, `creado_por` → `profiles` |
@@ -239,7 +239,7 @@ Todas las tablas tienen RLS habilitado. El patrón general:
 `schema.sql` inserta 15 versículos bíblicos iniciales en `citas_biblicas` para que la app tenga contenido desde el día uno.
 
 ### 6.6 Actualizaciones incrementales a un proyecto ya desplegado
-`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql) y [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
+`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql), [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql) y [`supabase/actualizacion_actividades_visibilidad.sql`](./supabase/actualizacion_actividades_visibilidad.sql). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
 
 ## 7. Variables de entorno
 
