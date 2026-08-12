@@ -30,8 +30,6 @@ const INTROS = [
   (n) => (n ? `Para ti, ${n}, con todo su amor` : 'Para ti, con todo su amor'),
 ]
 
-const GREETINGS = ['Hola', '¿Qué tal', 'Hola de nuevo']
-
 export default function CitaDelDia() {
   const { profile } = useAuth()
   const esStaff = STAFF.includes(profile?.role)
@@ -130,7 +128,6 @@ export default function CitaDelDia() {
   const theme = THEMES[diaDelAnio() % THEMES.length]
   const intro = INTROS[diaDelAnio() % INTROS.length]
   const primerNombre = profile?.nombre_completo?.trim().split(/\s+/)[0] || ''
-  const greeting = GREETINGS[diaDelAnio() % GREETINGS.length]
 
   return (
     <div
@@ -138,16 +135,14 @@ export default function CitaDelDia() {
       style={{ borderLeft: `6px solid ${theme.accent}` }}
     >
       <style>{`
-        @keyframes cd-greet { 0% { transform: scale(2.2); opacity: 0; } 55% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes cd-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes cd-sparkle { 0%, 100% { opacity: 0.25; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.05); } }
         @keyframes cd-glow { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.65; } }
-        .cd-greet { animation: cd-greet 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; transform-origin: left center; }
         .cd-body { animation: cd-in 0.5s ease-out 0.1s both; }
         .cd-sparkle { animation: cd-sparkle 2.6s ease-in-out infinite; }
         .cd-glow { animation: cd-glow 3.2s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) {
-          .cd-greet, .cd-body, .cd-sparkle, .cd-glow { animation: none !important; }
+          .cd-body, .cd-sparkle, .cd-glow { animation: none !important; }
         }
       `}</style>
 
@@ -162,12 +157,6 @@ export default function CitaDelDia() {
       <div className="relative flex items-start gap-4">
         <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl ${theme.chip}`}>📖</div>
         <div className="min-w-0 flex-1">
-          {primerNombre && (
-            <span className="cd-greet mb-2 inline-flex items-center gap-1 rounded-full bg-ink/5 px-3 py-1 text-xs font-extrabold text-ink/60">
-              👋 {greeting}, {primerNombre}
-            </span>
-          )}
-
           <div className="cd-body">
             <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: theme.label }}>
               Versículo del día
