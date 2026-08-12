@@ -23,7 +23,7 @@ export default function ActividadesAdmin() {
   const [actividades, setActividades] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '' })
+  const [form, setForm] = useState({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '', visible_padres: true })
   const [archivos, setArchivos] = useState([])
   const [previews, setPreviews] = useState([])
   const [busy, setBusy] = useState(false)
@@ -60,7 +60,7 @@ export default function ActividadesAdmin() {
 
   function openNew() {
     setEditing(null)
-    setForm({ titulo: '', descripcion: '', fecha: selectedDay || hoyISO(), versiculo_clave: '', historia_biblica: '' })
+    setForm({ titulo: '', descripcion: '', fecha: selectedDay || hoyISO(), versiculo_clave: '', historia_biblica: '', visible_padres: true })
     setArchivos([])
     setPreviews([])
     setError('')
@@ -75,6 +75,7 @@ export default function ActividadesAdmin() {
       fecha: actividad.fecha,
       versiculo_clave: actividad.versiculo_clave || '',
       historia_biblica: actividad.historia_biblica || '',
+      visible_padres: actividad.visible_padres ?? true,
     })
     setArchivos([])
     setPreviews([])
@@ -99,6 +100,7 @@ export default function ActividadesAdmin() {
       fecha: form.fecha,
       versiculo_clave: form.versiculo_clave || null,
       historia_biblica: form.historia_biblica || null,
+      visible_padres: form.visible_padres,
     }
 
     let actividadId = editing?.id
@@ -248,6 +250,25 @@ export default function ActividadesAdmin() {
             />
           </div>
           <div>
+            <label className="label">Quién la puede ver</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, visible_padres: true })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                👀 Visible para padres
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, visible_padres: false })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                🙈 Solo el equipo
+              </button>
+            </div>
+          </div>
+          <div>
             <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
             <input type="file" multiple className="input" onChange={(e) => handleArchivos(e.target.files)} />
             {previews.length > 0 && (
@@ -278,7 +299,10 @@ function ActividadCard({ a, i, onEdit, onDelete }) {
       style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
     >
       <div className="flex items-start justify-between">
-        <h3 className="text-lg font-bold">{a.titulo}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-bold">{a.titulo}</h3>
+          {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-ink/40">{a.fecha}</span>
           <button onClick={() => onEdit(a)} className="text-lg text-ink/30 hover:text-sky-500">

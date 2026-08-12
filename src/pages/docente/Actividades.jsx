@@ -15,7 +15,7 @@ export default function Actividades() {
   const { clases, nivelId, setNivelId } = useMisClases()
   const [actividades, setActividades] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
-  const [form, setForm] = useState({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '' })
+  const [form, setForm] = useState({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '', visible_padres: true })
   const [archivos, setArchivos] = useState([])
   const [busy, setBusy] = useState(false)
   const [progreso, setProgreso] = useState('')
@@ -36,7 +36,7 @@ export default function Actividades() {
   }, [load])
 
   function openNew() {
-    setForm({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '' })
+    setForm({ titulo: '', descripcion: '', fecha: hoyISO(), versiculo_clave: '', historia_biblica: '', visible_padres: true })
     setArchivos([])
     setError('')
     setModalOpen(true)
@@ -57,6 +57,7 @@ export default function Actividades() {
         fecha: form.fecha,
         versiculo_clave: form.versiculo_clave || null,
         historia_biblica: form.historia_biblica || null,
+        visible_padres: form.visible_padres,
       })
       .select()
       .single()
@@ -122,7 +123,10 @@ export default function Actividades() {
               style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
             >
               <div className="flex items-start justify-between">
-                <h3 className="text-lg font-bold">{a.titulo}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold">{a.titulo}</h3>
+                  {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
+                </div>
                 <span className="text-sm text-ink/40">{a.fecha}</span>
               </div>
               {a.descripcion && <p className="mt-1 text-ink/70">{a.descripcion}</p>}
@@ -178,6 +182,25 @@ export default function Actividades() {
               value={form.historia_biblica}
               onChange={(e) => setForm({ ...form, historia_biblica: e.target.value })}
             />
+          </div>
+          <div>
+            <label className="label">Quién la puede ver</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, visible_padres: true })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                👀 Visible para padres
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, visible_padres: false })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                🙈 Solo el equipo
+              </button>
+            </div>
           </div>
           <div>
             <label className="label">Archivos (fotos, PDFs, etc.)</label>
