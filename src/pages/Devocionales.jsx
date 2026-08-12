@@ -80,6 +80,17 @@ export default function Devocionales() {
     setPreview(URL.createObjectURL(f))
   }
 
+  async function marcarActivo(d) {
+    await supabase.from('devocionales_ninos').update({ activo: false }).eq('activo', true)
+    await supabase.from('devocionales_ninos').update({ activo: true }).eq('id', d.id)
+    load()
+  }
+
+  async function quitarActivo(d) {
+    await supabase.from('devocionales_ninos').update({ activo: false }).eq('id', d.id)
+    load()
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setBusy(true)
@@ -157,30 +168,40 @@ export default function Devocionales() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="card divide-y divide-ink/5 !p-0">
         {devocionales.map((d) => (
-          <div key={d.id} className="card">
+          <div key={d.id} className={`flex flex-wrap items-start gap-3 px-4 py-3 ${d.activo ? 'bg-sunshine-50' : ''}`}>
             {d.imagen_url && (
-              <img src={d.imagen_url} alt={d.titulo} className="mb-3 h-40 w-full rounded-2xl object-cover" />
+              <img src={d.imagen_url} alt={d.titulo} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
             )}
-            <div className="flex items-start justify-between">
-              <h3 className="text-lg font-bold">{d.titulo}</h3>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-ink/40">{d.fecha}</span>
-                {puedeCrear && (
-                  <button onClick={() => openEdit(d)} className="text-lg text-ink/30 hover:text-sky-500">
-                    ✏️
-                  </button>
-                )}
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-bold">{d.titulo}</p>
+                {d.activo && <span className="badge bg-sunshine-200 text-sunshine-800">🟢 Activo</span>}
+                {d.nivel?.nombre && <span className="badge bg-sky-100 text-sky-700">{d.nivel.nombre}</span>}
+                <span className="text-xs text-ink/40">{d.fecha}</span>
               </div>
+              {d.versiculo && <p className="mt-1 truncate italic text-ink/60">📖 "{d.versiculo}"</p>}
             </div>
-            {d.nivel?.nombre && <p className="text-xs font-bold uppercase text-sky-500">{d.nivel.nombre}</p>}
-            {d.versiculo && <p className="mt-2 italic text-ink/70">📖 "{d.versiculo}"</p>}
-            <p className="mt-2 whitespace-pre-line text-ink/70">{d.contenido}</p>
+            <div className="flex shrink-0 items-center gap-2">
+              {puedeCrear && (
+                <button
+                  className="btn-secondary !py-1 !px-3 !text-xs"
+                  onClick={() => (d.activo ? quitarActivo(d) : marcarActivo(d))}
+                >
+                  {d.activo ? 'Quitar activo' : '⭐ Marcar activo'}
+                </button>
+              )}
+              {puedeCrear && (
+                <button onClick={() => openEdit(d)} className="text-lg text-ink/30 hover:text-sky-500" title="Editar">
+                  ✏️
+                </button>
+              )}
+            </div>
           </div>
         ))}
         {devocionales.length === 0 && (
-          <p className="card text-ink/50">
+          <p className="p-6 text-center text-ink/50">
             {verTodos ? 'Todavía no hay devocionales publicados.' : 'No hay devocionales publicados este mes.'}
           </p>
         )}

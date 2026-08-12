@@ -156,12 +156,23 @@ export default function CitasBiblicasAdmin() {
         </button>
       </div>
 
-      <div className="flex flex-col gap-3">
-        {citas.map((c) => (
-          <div key={c.id} className={`card ${!c.activo ? 'opacity-50' : ''}`}>
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="mb-1 flex flex-wrap items-center gap-2">
+      <div className="card overflow-x-auto p-0">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/50">
+            <tr>
+              <th className="px-4 py-2">Texto</th>
+              <th className="px-4 py-2">Referencia</th>
+              <th className="px-4 py-2">Fecha</th>
+              <th className="px-4 py-2">Estado</th>
+              <th className="px-4 py-2">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {citas.map((c) => (
+              <tr key={c.id} className={`border-t border-ink/5 ${!c.activo ? 'opacity-50' : ''}`}>
+                <td className="max-w-xs truncate px-4 py-2 italic text-ink/80">"{c.texto}"</td>
+                <td className="px-4 py-2 font-bold text-ink/60">{c.referencia}</td>
+                <td className="px-4 py-2">
                   {c.fecha_mostrar === hoy && <span className="badge bg-grass-100 text-grass-700">Hoy</span>}
                   {c.fecha_mostrar && c.fecha_mostrar !== hoy && (
                     <span className="badge bg-sky-100 text-sky-700">
@@ -169,36 +180,46 @@ export default function CitasBiblicasAdmin() {
                     </span>
                   )}
                   {!c.fecha_mostrar && <span className="badge bg-ink/5 text-ink/40">Sin fecha</span>}
-                  {!c.activo && <span className="badge bg-coral-100 text-coral-600">Inactiva</span>}
-                </div>
-                <p className="italic text-ink/80">"{c.texto}"</p>
-                <p className="mt-1 text-sm font-bold text-ink/50">— {c.referencia}</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {c.fecha_mostrar !== hoy && (
-                  <button className="btn-secondary !py-2 !text-sm" onClick={() => usarHoy(c)}>
-                    Usar hoy
-                  </button>
-                )}
-                {c.fecha_mostrar && (
-                  <button className="btn-secondary !py-2 !text-sm" onClick={() => quitarFecha(c)}>
-                    Quitar fecha
-                  </button>
-                )}
-                <button className="btn-secondary !py-2 !text-sm" onClick={() => handleToggleClick(c)}>
-                  {c.activo ? 'Desactivar' : 'Activar'}
-                </button>
-                <button className="btn-secondary !py-2 !text-sm" onClick={() => openEdit(c)}>
-                  Editar
-                </button>
-                <button className="btn-secondary !py-2 !text-sm !text-coral-600" onClick={() => setConfirmEliminar(c)}>
-                  🗑️
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-        {citas.length === 0 && <p className="text-ink/40">Aún no hay citas. ¡Agrega la primera!</p>}
+                </td>
+                <td className="px-4 py-2">
+                  <span className={`badge ${c.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-600'}`}>
+                    {c.activo ? 'Activa' : 'Inactiva'}
+                  </span>
+                </td>
+                <td className="px-4 py-2">
+                  <div className="flex flex-wrap gap-2">
+                    {c.fecha_mostrar !== hoy && (
+                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => usarHoy(c)}>
+                        Usar hoy
+                      </button>
+                    )}
+                    {c.fecha_mostrar && (
+                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => quitarFecha(c)}>
+                        Quitar fecha
+                      </button>
+                    )}
+                    <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(c)}>
+                      {c.activo ? 'Desactivar' : 'Activar'}
+                    </button>
+                    <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(c)}>
+                      Editar
+                    </button>
+                    <button className="btn-secondary !py-1 !px-3 !text-xs !text-coral-600" onClick={() => setConfirmEliminar(c)}>
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {citas.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-6 text-center text-ink/40">
+                  Aún no hay citas. ¡Agrega la primera!
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar cita' : 'Nueva cita'}>

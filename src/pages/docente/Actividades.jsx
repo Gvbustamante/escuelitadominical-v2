@@ -10,8 +10,8 @@ import ActividadFila from '../../components/ActividadFila'
 import VistaToggle from '../../components/VistaToggle'
 
 const VISTA_OPTIONS = [
-  { value: 'tarjetas', label: '🔲 Tarjetas' },
   { value: 'compacta', label: '📃 Compacta' },
+  { value: 'tarjetas', label: '🔲 Tarjetas' },
 ]
 
 function hoyISO() {
@@ -38,7 +38,7 @@ export default function Actividades() {
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
   const [tareaActividad, setTareaActividad] = useState(null)
-  const [vista, setVista] = useState('tarjetas')
+  const [vista, setVista] = useState('compacta')
 
   const load = useCallback(async () => {
     if (!nivelId) return

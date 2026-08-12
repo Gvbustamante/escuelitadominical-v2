@@ -10,9 +10,9 @@ import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
 
 const VISTA_OPTIONS = [
-  { value: 'lista', label: '☰ Lista' },
   { value: 'compacta', label: '📃 Compacta' },
   { value: 'calendario', label: '🗓️ Plan del mes' },
+  { value: 'lista', label: '☰ Lista' },
 ]
 
 function hoyISO() {
@@ -41,7 +41,7 @@ export default function ActividadesAdmin() {
   const [busy, setBusy] = useState(false)
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
-  const [vista, setVista] = useState('lista')
+  const [vista, setVista] = useState('compacta')
   const [selectedDay, setSelectedDay] = useState(null)
   const [tareaActividad, setTareaActividad] = useState(null)
 

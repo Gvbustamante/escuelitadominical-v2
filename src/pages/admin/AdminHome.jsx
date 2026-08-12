@@ -7,6 +7,7 @@ import Skeleton from '../../components/Skeleton'
 import CitaDelDia from '../../components/CitaDelDia'
 import CoberturaHoy from '../../components/CoberturaHoy'
 import ProximaAgenda from '../../components/ProximaAgenda'
+import DevocionalActivo from '../../components/DevocionalActivo'
 
 export default function AdminHome() {
   const { profile } = useAuth()
@@ -70,6 +71,8 @@ export default function AdminHome() {
       </div>
 
       <CitaDelDia />
+
+      <DevocionalActivo />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard icon="🧒" label="Niños activos" value={stats.ninos} color="sky" delay={0} />

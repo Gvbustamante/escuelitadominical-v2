@@ -6,6 +6,7 @@ import Spinner from '../../components/Spinner'
 import { BADGE_CLASSES } from '../../lib/colors'
 import CitaDelDia from '../../components/CitaDelDia'
 import ProximaAgenda from '../../components/ProximaAgenda'
+import DevocionalActivo from '../../components/DevocionalActivo'
 
 export default function DocenteHome() {
   const { profile, user } = useAuth()
@@ -43,6 +44,8 @@ export default function DocenteHome() {
       </div>
 
       <CitaDelDia />
+
+      <DevocionalActivo />
 
       {clases.length === 0 && (
         <p className="card text-ink/50">

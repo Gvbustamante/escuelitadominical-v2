@@ -232,6 +232,11 @@ Botón "🔍 Revisar inactividad" en Ajustes (solo admin/coordinador) que llama 
 - **Docente**: filtrado a sus propios niveles asignados (+ eventos generales sin nivel).
 - **Padre**: filtrado a los niveles de sus hijos, y en vez de listar todas las tareas del nivel, solo muestra las que **sus propios hijos** todavía no han entregado (`soloTareasPendientes`).
 
+### 5.16 Devocional activo
+`devocionales_ninos.activo`: el admin/coordinador/docente puede marcar un devocional como el destacado del momento (botón "⭐ Marcar activo" en Devocionales, que se ve ahora como lista compacta). La app se encarga de que solo haya uno activo a la vez, desmarcando el anterior. `DevocionalActivo.jsx` lo muestra como tarjeta en los 3 dashboards. `CitaDelDia.jsx` también lo usa: si nadie fijó manualmente una cita bíblica para hoy (`citas_biblicas.fecha_mostrar`), pero hay un devocional activo con versículo, el "Versículo del día" toma ese versículo en vez de la rotación automática.
+
+Materiales, Docentes y Clases quedaron solo en vista de lista/tabla — ver 5.14. Versículos (`CitasBiblicasAdmin.jsx`) también se convirtió de tarjetas a tabla. Actividades (docente y admin) ahora abre por defecto en la vista "📃 Compacta" en vez de la de tarjetas/lista completa.
+
 ## 6. Modelo de datos (Supabase / Postgres)
 
 Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado para copiar/pegar una sola vez en el SQL Editor de un proyecto Supabase nuevo.
@@ -252,7 +257,7 @@ Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado 
 | `tarea_entregas` | Una fila por niño por actividad-tarea: `estado` (pendiente/pausada/entregada), `archivo_url`, `comentario_padre`, `nota_docente` (única por `actividad_id`+`nino_id`) | `actividades`, `ninos`, `entregado_por` → `profiles` |
 | `agenda` | Eventos calendario, opcionalmente ligados a un nivel | `niveles`, `creado_por` → `profiles` |
 | `progreso_notas` | Notas de progreso de un niño (comportamiento, emoción, logros) | `ninos`, `niveles`, `docente_id` |
-| `devocionales_ninos` | Devocionales para niños (título, versículo, contenido, `imagen_url` opcional) | `niveles`, `creado_por` |
+| `devocionales_ninos` | Devocionales para niños (título, versículo, contenido, `imagen_url` opcional, `activo` — ver 5.16) | `niveles`, `creado_por` |
 | `citas_biblicas` | Pool de versículos + `fecha_mostrar` para la "cita del día" | — |
 | `reconocimientos` | Estrellas otorgadas a un niño (capa de gamificación) | `ninos`, `niveles`, `otorgado_por` |
 | `motivos_reconocimiento` | Catálogo editable de motivos rápidos de estrella (ver 5.5) | — |
@@ -281,7 +286,7 @@ Todas las tablas tienen RLS habilitado. El patrón general:
 `schema.sql` inserta 15 versículos bíblicos iniciales en `citas_biblicas` para que la app tenga contenido desde el día uno.
 
 ### 6.6 Actualizaciones incrementales a un proyecto ya desplegado
-`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql), [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql), [`supabase/actualizacion_actividades_visibilidad.sql`](./supabase/actualizacion_actividades_visibilidad.sql), [`supabase/actualizacion_tareas_estrellas.sql`](./supabase/actualizacion_tareas_estrellas.sql) (tareas, estrellas configurables y niños pausados) y [`supabase/actualizacion_inactividad.sql`](./supabase/actualizacion_inactividad.sql) (revisar inactividad — requiere haber corrido antes el de tareas/estrellas). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
+`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql), [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql), [`supabase/actualizacion_actividades_visibilidad.sql`](./supabase/actualizacion_actividades_visibilidad.sql), [`supabase/actualizacion_tareas_estrellas.sql`](./supabase/actualizacion_tareas_estrellas.sql) (tareas, estrellas configurables y niños pausados), [`supabase/actualizacion_inactividad.sql`](./supabase/actualizacion_inactividad.sql) (revisar inactividad — requiere haber corrido antes el de tareas/estrellas) y [`supabase/actualizacion_devocional_activo.sql`](./supabase/actualizacion_devocional_activo.sql). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
 
 ## 7. Variables de entorno
 
