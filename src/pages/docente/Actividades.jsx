@@ -6,6 +6,13 @@ import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ActivityFiles from '../../components/ActivityFiles'
 import TareaEntregas from '../../components/TareaEntregas'
+import ActividadFila from '../../components/ActividadFila'
+import VistaToggle from '../../components/VistaToggle'
+
+const VISTA_OPTIONS = [
+  { value: 'tarjetas', label: '🔲 Tarjetas' },
+  { value: 'compacta', label: '📃 Compacta' },
+]
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -31,6 +38,7 @@ export default function Actividades() {
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
   const [tareaActividad, setTareaActividad] = useState(null)
+  const [vista, setVista] = useState('tarjetas')
 
   const load = useCallback(async () => {
     if (!nivelId) return
@@ -121,9 +129,12 @@ export default function Actividades() {
           <h1 className="text-3xl font-bold">Actividades 🎨</h1>
           <p className="text-ink/50">Comparte lo que hicieron en clase</p>
         </div>
-        <button className="btn-primary" onClick={openNew}>
-          + Nueva actividad
-        </button>
+        <div className="flex items-center gap-3">
+          <VistaToggle vista={vista} onChange={setVista} options={VISTA_OPTIONS} />
+          <button className="btn-primary" onClick={openNew}>
+            + Nueva actividad
+          </button>
+        </div>
       </div>
 
       <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
@@ -136,6 +147,13 @@ export default function Actividades() {
 
       {!actividades ? (
         <Spinner />
+      ) : vista === 'compacta' ? (
+        <div className="card divide-y divide-ink/5 !p-0">
+          {actividades.map((a) => (
+            <ActividadFila key={a.id} a={a} onVerEntregas={setTareaActividad} />
+          ))}
+          {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
+        </div>
       ) : (
         <div className="flex flex-col gap-4">
           {actividades.map((a, i) => (

@@ -7,9 +7,11 @@ import ActivityFiles from '../../components/ActivityFiles'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
 import VistaToggle from '../../components/VistaToggle'
 import TareaEntregas from '../../components/TareaEntregas'
+import ActividadFila from '../../components/ActividadFila'
 
 const VISTA_OPTIONS = [
   { value: 'lista', label: '☰ Lista' },
+  { value: 'compacta', label: '📃 Compacta' },
   { value: 'calendario', label: '🗓️ Plan del mes' },
 ]
 
@@ -226,6 +228,13 @@ export default function ActividadesAdmin() {
               <p className="card text-ink/50">{selectedDay ? 'Nada planeado este día.' : 'Aún no hay actividades para esta clase.'}</p>
             )}
           </div>
+        </div>
+      ) : vista === 'compacta' ? (
+        <div className="card divide-y divide-ink/5 !p-0">
+          {actividades.map((a) => (
+            <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={eliminar} onVerEntregas={setTareaActividad} />
+          ))}
+          {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
         </div>
       ) : (
         <div className="flex flex-col gap-4">

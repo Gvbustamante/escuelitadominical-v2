@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import Skeleton from '../../components/Skeleton'
+import { exportCSV } from '../../lib/exportCsv'
 
 function hoyYYYYMM() {
   return new Date().toISOString().slice(0, 7)
@@ -48,6 +49,17 @@ export default function BitacoraAdmin() {
     load()
   }, [load])
 
+  function exportar() {
+    const filas = (registros || []).map((r) => [
+      r.fecha,
+      r.docente?.nombre_completo || '',
+      r.salon_ok ? 'En buen estado' : 'Hubo daños',
+      r.refrigerio_detalle || '',
+      r.notas || '',
+    ])
+    exportCSV('bitacora', ['Fecha', 'Docente', 'Salón', 'Refrigerio', 'Notas'], filas)
+  }
+
   if (!niveles) {
     return (
       <div className="flex flex-col gap-6">
@@ -64,9 +76,14 @@ export default function BitacoraAdmin() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl font-bold">Bitácora 📋</h1>
-        <p className="text-ink/50">Constancia de salón y refrigerio por clase</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Bitácora 📋</h1>
+          <p className="text-ink/50">Constancia de salón y refrigerio por clase</p>
+        </div>
+        <button className="btn-secondary" onClick={exportar} disabled={!registros || registros.length === 0}>
+          📊 Exportar
+        </button>
       </div>
 
       <div className="flex flex-wrap gap-3">

@@ -5,10 +5,9 @@ import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleNinoModal from '../../components/DetalleNinoModal'
-import VistaToggle from '../../components/VistaToggle'
-import PadreContacto from '../../components/PadreContacto'
 import { BADGE_CLASSES } from '../../lib/colors'
 import { whatsappLink } from '../../lib/whatsapp'
+import { exportCSV } from '../../lib/exportCsv'
 
 function generarCodigoFacil(nombreNino) {
   const base = (nombreNino || 'familia').trim().split(' ')[0].toLowerCase().normalize('NFD').replace(/[^a-z]/g, '')
@@ -32,7 +31,6 @@ export default function Ninos() {
   const [padresPorNino, setPadresPorNino] = useState({})
   const [filtro, setFiltro] = useState('activos')
   const [busqueda, setBusqueda] = useState('')
-  const [vista, setVista] = useState('tarjetas')
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
@@ -133,6 +131,23 @@ export default function Ninos() {
   async function togglePausado(nino) {
     await supabase.from('ninos').update({ pausado: !nino.pausado }).eq('id', nino.id)
     load()
+  }
+
+  function exportar() {
+    const filas = filtrados.map((nino) => {
+      const nivel = nivelesById[nino.nivel_id]
+      const padres = padresPorNino[nino.id] || []
+      return [
+        nino.nombre_completo,
+        calcularEdad(nino.fecha_nacimiento),
+        nivel?.nombre || '',
+        nino.alergias || '',
+        padres.map((p) => p.padre?.nombre_completo).filter(Boolean).join(' / '),
+        nino.activo ? 'Activo' : 'Inactivo',
+        nino.pausado ? 'Sí' : 'No',
+      ]
+    })
+    exportCSV('ninos', ['Nombre', 'Edad', 'Clase', 'Alergias', 'Padres/encargados', 'Estado', 'Pausado'], filas)
   }
 
   function handleToggleClick(nino) {
@@ -237,94 +252,39 @@ export default function Ninos() {
           <h1 className="text-3xl font-bold">Niños 🧒</h1>
           <p className="text-ink/50">{filtrados.length} de {ninos.length} en total</p>
         </div>
+        <button className="btn-secondary" onClick={exportar}>
+          📊 Exportar
+        </button>
         <button className="btn-primary" onClick={openNew}>
           + Nuevo niño/a
         </button>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <input
-            className="input max-w-xs"
-            placeholder="Buscar por nombre..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-          <div className="flex gap-2">
-            {[
-              ['activos', 'Activos'],
-              ['inactivos', 'Inactivos'],
-              ['todos', 'Todos'],
-            ].map(([v, label]) => (
-              <button
-                key={v}
-                onClick={() => setFiltro(v)}
-                className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <input
+          className="input max-w-xs"
+          placeholder="Buscar por nombre..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
+        <div className="flex gap-2">
+          {[
+            ['activos', 'Activos'],
+            ['inactivos', 'Inactivos'],
+            ['todos', 'Todos'],
+          ].map(([v, label]) => (
+            <button
+              key={v}
+              onClick={() => setFiltro(v)}
+              className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-        <VistaToggle vista={vista} onChange={setVista} />
       </div>
 
-      {vista === 'tarjetas' ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtrados.map((nino) => {
-            const nivel = nivelesById[nino.nivel_id]
-            const padres = padresPorNino[nino.id] || []
-            return (
-              <div key={nino.id} className={`card ${!nino.activo || nino.pausado ? 'opacity-50 grayscale' : ''}`}>
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className="text-lg font-bold">{nino.nombre_completo}</h3>
-                    <p className="text-sm text-ink/50">{calcularEdad(nino.fecha_nacimiento)} años</p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    {nivel && <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>}
-                    {nino.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado</span>}
-                  </div>
-                </div>
-                {nino.alergias && (
-                  <p className="mt-2 rounded-xl bg-coral-50 px-3 py-1 text-xs font-bold text-coral-600">
-                    ⚠️ Alergias: {nino.alergias}
-                  </p>
-                )}
-                <p className="mt-2 text-xs font-bold uppercase text-ink/40">Padres/encargados</p>
-                {padres.length === 0 ? (
-                  <p className="text-sm text-ink/40">Sin vincular</p>
-                ) : (
-                  <div className="mt-2 flex flex-col gap-2">
-                    {padres.map((p, i) => (
-                      <PadreContacto key={i} padre={p.padre} parentesco={p.parentesco} onSaved={load} />
-                    ))}
-                  </div>
-                )}
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => setDetalleNino(nino)}>
-                    Ver detalle
-                  </button>
-                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openEdit(nino)}>
-                    Editar
-                  </button>
-                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => openInvite(nino)}>
-                    + Padre
-                  </button>
-                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => togglePausado(nino)}>
-                    {nino.pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
-                  </button>
-                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => handleToggleClick(nino)}>
-                    {nino.activo ? 'Desactivar' : 'Activar'}
-                  </button>
-                </div>
-              </div>
-            )
-          })}
-          {filtrados.length === 0 && <p className="text-ink/40">No hay niños que coincidan.</p>}
-        </div>
-      ) : (
-        <div className="card overflow-x-auto p-0">
+      <div className="card overflow-x-auto p-0">
           <table className="w-full text-left">
             <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
               <tr>
@@ -414,7 +374,6 @@ export default function Ninos() {
             </tbody>
           </table>
         </div>
-      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar niño/a' : 'Nuevo niño/a'}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

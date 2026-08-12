@@ -150,34 +150,58 @@ export default function Clases() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {niveles.map((nivel) => {
-          const docs = asignaciones.filter((a) => a.nivel_id === nivel.id)
-          return (
-            <div key={nivel.id} className={`card ${!nivel.activo ? 'opacity-50' : ''}`}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-xl font-bold">{nivel.nombre}</h3>
-                  <p className="text-sm text-ink/50">
+      <div className="card overflow-x-auto p-0">
+        <table className="w-full text-left">
+          <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
+            <tr>
+              <th className="px-4 py-3">Nombre</th>
+              <th className="px-4 py-3">Edades</th>
+              <th className="px-4 py-3">Docentes</th>
+              <th className="px-4 py-3">Estado</th>
+              <th className="px-4 py-3">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {niveles.map((nivel) => {
+              const docs = asignaciones.filter((a) => a.nivel_id === nivel.id)
+              return (
+                <tr key={nivel.id} className={`border-t border-ink/5 ${!nivel.activo ? 'opacity-50' : ''}`}>
+                  <td className="px-4 py-3 font-bold">{nivel.nombre}</td>
+                  <td className="px-4 py-3 text-ink/60">
                     {nivel.edad_min ?? '?'} - {nivel.edad_max ?? '?'} años
-                  </p>
-                </div>
-                <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{docs.length} docente(s)</span>
-              </div>
-              <div className="mt-4 flex gap-2">
-                <button className="btn-secondary flex-1 !py-2" onClick={() => openEdit(nivel)}>
-                  Editar
-                </button>
-                {profile.role === 'admin' && (
-                  <button className="btn-secondary flex-1 !py-2" onClick={() => handleToggleClick(nivel)}>
-                    {nivel.activo ? 'Desactivar' : 'Activar'}
-                  </button>
-                )}
-              </div>
-            </div>
-          )
-        })}
-        {niveles.length === 0 && <p className="text-ink/40">Aún no hay clases. ¡Crea la primera!</p>}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{docs.length} docente(s)</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`badge ${nivel.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
+                      {nivel.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-2">
+                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nivel)}>
+                        Editar
+                      </button>
+                      {profile.role === 'admin' && (
+                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(nivel)}>
+                          {nivel.activo ? 'Desactivar' : 'Activar'}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+            {niveles.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-6 text-center text-ink/40">
+                  Aún no hay clases. ¡Crea la primera!
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar clase' : 'Nueva clase'}>

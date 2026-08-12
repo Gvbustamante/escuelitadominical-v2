@@ -220,6 +220,18 @@ Botón "🔍 Revisar inactividad" en Ajustes (solo admin/coordinador) que llama 
 - Es **solo una marca visual** — nunca bloquea el login. Un padre pausado se reactiva solo (`Layout.jsx`) la próxima vez que entra, y ve un aviso de bienvenida explicándole que estuvo marcado como inactivo.
 - Se ejecuta manualmente (no hay cron) para que funcione igual en cualquier proyecto de Supabase sin configuración extra; el admin lo toca cuando quiera (ej. cada domingo).
 
+### 5.14 Exportar a Excel y vistas de lista
+- `src/lib/exportCsv.js`: genera un `.csv` (con BOM, para que Excel muestre bien los acentos) en el navegador, sin ninguna librería nueva. Botón "📊 Exportar" en Niños, Materiales, Bitácora y el resumen mensual de Asistencia.
+- **Niños, Equipo (Docentes) y Clases** ahora son de **solo lista/tabla** — se quitó el toggle de tarjetas para que la información quede más compacta y fácil de escanear.
+- **Materiales** ganó una vista "📃 Lista compacta" además de las tarjetas.
+- **Actividades** (docente y admin) ganó una vista "📃 Compacta" (una fila por actividad) además de tarjetas/calendario, usando el componente compartido `ActividadFila.jsx`.
+
+### 5.15 Agenda y tareas en los 3 dashboards
+`ProximaAgenda.jsx`: widget que combina los próximos eventos de `agenda` con las tareas recientes (`actividades.es_tarea`), ordenados por fecha. Aparece en `AdminHome`, `DocenteHome` y `PadreHome`, cada uno con su propio alcance:
+- **Admin/coordinador**: sin filtrar, ve de todas las clases.
+- **Docente**: filtrado a sus propios niveles asignados (+ eventos generales sin nivel).
+- **Padre**: filtrado a los niveles de sus hijos, y en vez de listar todas las tareas del nivel, solo muestra las que **sus propios hijos** todavía no han entregado (`soloTareasPendientes`).
+
 ## 6. Modelo de datos (Supabase / Postgres)
 
 Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado para copiar/pegar una sola vez en el SQL Editor de un proyecto Supabase nuevo.

@@ -6,7 +6,6 @@ import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleDocenteModal from '../../components/DetalleDocenteModal'
-import VistaToggle from '../../components/VistaToggle'
 import { whatsappLink } from '../../lib/whatsapp'
 
 const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente' }
@@ -20,7 +19,6 @@ export default function Docentes() {
   const { profile } = useAuth()
   const [staff, setStaff] = useState(null)
   const [clasesPorDocente, setClasesPorDocente] = useState({})
-  const [vista, setVista] = useState('tarjetas')
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState({ cedula: '', nombre_completo: '', role: 'docente' })
   const [error, setError] = useState('')
@@ -124,54 +122,12 @@ export default function Docentes() {
           <h1 className="text-3xl font-bold">Equipo 🍎</h1>
           <p className="text-ink/50">Docentes, coordinadores y administradores</p>
         </div>
-        <div className="flex items-center gap-3">
-          <VistaToggle vista={vista} onChange={setVista} />
-          <button className="btn-primary" onClick={openInvite}>
-            + Agregar
-          </button>
-        </div>
+        <button className="btn-primary" onClick={openInvite}>
+          + Agregar
+        </button>
       </div>
 
-      {vista === 'tarjetas' ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {staff.map((p) => (
-            <div key={p.id} className={`card ${!p.activo ? 'opacity-50' : ''}`}>
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="text-lg font-bold">{p.nombre_completo}</h3>
-                <span className={`badge ${ROLE_BADGE[p.role]}`}>{ROLE_LABEL[p.role]}</span>
-              </div>
-              {p.cedula && <p className="text-sm text-ink/50">Cédula: {p.cedula}</p>}
-              {p.role === 'docente' && (
-                <p className="mt-2 text-sm text-ink/50">
-                  Clases: {clasesPorDocente[p.id]?.join(', ') || 'Sin asignar'}
-                </p>
-              )}
-              <div className="mt-4 flex gap-2">
-                {whatsappLink(p.telefono) && (
-                  <a
-                    href={whatsappLink(p.telefono)}
-                    target="_blank"
-                    rel="noreferrer"
-                    title="Abrir WhatsApp"
-                    className="btn-success !px-3 !py-2 !text-sm"
-                  >
-                    💬
-                  </a>
-                )}
-                <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => setDetallePersona(p)}>
-                  Ver detalle
-                </button>
-                {profile.role === 'admin' && p.id !== profile.id && (
-                  <button className="btn-secondary flex-1 !py-2 !text-sm" onClick={() => handleToggleClick(p)}>
-                    {p.activo ? 'Desactivar' : 'Activar'}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="card overflow-x-auto p-0">
+      <div className="card overflow-x-auto p-0">
           <table className="w-full text-left">
             <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
               <tr>
@@ -234,7 +190,6 @@ export default function Docentes() {
             </tbody>
           </table>
         </div>
-      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Agregar al equipo">
         {creado ? (
