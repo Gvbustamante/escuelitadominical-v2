@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabaseClient'
 import CambiarPasswordModal from './CambiarPasswordModal'
@@ -72,10 +72,16 @@ const ROLE_LABEL = {
 
 export default function Layout() {
   const { profile, user, signOut, refreshProfile } = useAuth()
+  const { pathname } = useLocation()
   const [pwOpen, setPwOpen] = useState(false)
   const [tieneHijos, setTieneHijos] = useState(false)
   const [bienvenidaDeVuelta, setBienvenidaDeVuelta] = useState(false)
   const yaRevisadoPausado = useRef(null)
+  const mainRef = useRef(null)
+
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 })
+  }, [pathname])
 
   useEffect(() => {
     if (!user || profile?.role === 'padre') return
@@ -157,7 +163,7 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-4 md:p-8">
+      <main ref={mainRef} className="flex-1 overflow-y-auto p-4 md:p-8">
         {bienvenidaDeVuelta && (
           <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50 px-4 py-3">
             <p className="text-sm font-bold text-sky-700">
