@@ -120,14 +120,14 @@ export default function Bitacora() {
             <button
               type="button"
               onClick={() => setSalonOk(true)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${salonOk ? 'bg-grass-400 text-white' : 'bg-ink/5'}`}
+              className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${salonOk ? 'bg-grass-400 text-white' : 'bg-ink/5'}`}
             >
               ✅ En buen estado
             </button>
             <button
               type="button"
               onClick={() => setSalonOk(false)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${!salonOk ? 'bg-coral-400 text-white' : 'bg-ink/5'}`}
+              className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${!salonOk ? 'bg-coral-400 text-white' : 'bg-ink/5'}`}
             >
               ⚠️ Hubo daños
             </button>

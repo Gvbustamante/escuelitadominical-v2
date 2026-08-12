@@ -170,20 +170,22 @@ export default function Devocionales() {
 
       <div className="card divide-y divide-ink/5 !p-0">
         {devocionales.map((d) => (
-          <div key={d.id} className={`flex flex-wrap items-start gap-3 px-4 py-3 ${d.activo ? 'bg-sunshine-50' : ''}`}>
-            {d.imagen_url && (
-              <img src={d.imagen_url} alt={d.titulo} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
-            )}
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-bold">{d.titulo}</p>
-                {d.activo && <span className="badge bg-sunshine-200 text-sunshine-800">🟢 Activo</span>}
-                {d.nivel?.nombre && <span className="badge bg-sky-100 text-sky-700">{d.nivel.nombre}</span>}
-                <span className="text-xs text-ink/40">{d.fecha}</span>
+          <div key={d.id} className={`flex flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-start sm:gap-3 sm:px-4 sm:py-3 ${d.activo ? 'bg-sunshine-50' : ''}`}>
+            <div className="flex items-start gap-3">
+              {d.imagen_url && (
+                <img src={d.imagen_url} alt={d.titulo} className="h-12 w-12 shrink-0 rounded-xl object-cover sm:h-14 sm:w-14" />
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <p className="text-sm font-bold sm:text-base">{d.titulo}</p>
+                  {d.activo && <span className="badge bg-sunshine-200 text-sunshine-800">🟢 Activo</span>}
+                  {d.nivel?.nombre && <span className="badge bg-sky-100 text-sky-700">{d.nivel.nombre}</span>}
+                  <span className="text-xs text-ink/40">{d.fecha}</span>
+                </div>
+                {d.versiculo && <p className="mt-1 truncate italic text-ink/60">📖 "{d.versiculo}"</p>}
               </div>
-              {d.versiculo && <p className="mt-1 truncate italic text-ink/60">📖 "{d.versiculo}"</p>}
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center justify-end gap-2">
               {puedeCrear && (
                 <button
                   className="btn-secondary !py-1 !px-3 !text-xs"

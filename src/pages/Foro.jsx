@@ -211,16 +211,16 @@ export default function Foro() {
         <p className="text-ink/50">Conversemos y oremos los unos por los otros</p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setTabPrincipal('foro')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tabPrincipal === 'foro' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'foro' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
         >
           💬 Foro
         </button>
         <button
           onClick={() => setTabPrincipal('oracion')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tabPrincipal === 'oracion' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'oracion' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
         >
           🙏 Peticiones de oración
         </button>
@@ -268,21 +268,21 @@ export default function Foro() {
               value={formPeticion.texto}
               onChange={(e) => setFormPeticion({ ...formPeticion, texto: e.target.value })}
             />
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setFormPeticion({ ...formPeticion, privado: true })}
-                  className={`rounded-full px-4 py-2 text-sm font-bold ${formPeticion.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                  className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:flex-none sm:px-4 sm:text-sm ${formPeticion.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
                 >
-                  🔒 Privado (solo el equipo)
+                  🔒 Privado (equipo)
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormPeticion({ ...formPeticion, privado: false })}
-                  className={`rounded-full px-4 py-2 text-sm font-bold ${!formPeticion.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                  className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:flex-none sm:px-4 sm:text-sm ${!formPeticion.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
                 >
-                  🌍 Público (toda la comunidad)
+                  🌍 Público (comunidad)
                 </button>
               </div>
               <button disabled={busyPeticion} className="btn-primary">
