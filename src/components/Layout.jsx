@@ -48,6 +48,7 @@ const NAV = {
     { to: '/asistencia', label: 'Asistencia', icon: '✅' },
     { to: '/actividades', label: 'Actividades', icon: '🎨' },
     { to: '/bitacora', label: 'Bitácora', icon: '📋' },
+    { to: '/planeacion', label: 'Planeación', icon: '📆' },
     { to: '/progreso', label: 'Progreso', icon: '🌱' },
     { to: '/agenda', label: 'Agenda', icon: '📅' },
     { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
