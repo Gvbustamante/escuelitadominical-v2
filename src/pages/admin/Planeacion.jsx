@@ -28,6 +28,8 @@ export default function Planeacion() {
   const [niveles, setNiveles] = useState([])
   const [docentes, setDocentes] = useState([])
   const [asignaciones, setAsignaciones] = useState([])
+  const [horarios, setHorarios] = useState([])
+  const [asignacionesHorario, setAsignacionesHorario] = useState([])
   const [actividadesMes, setActividadesMes] = useState([])
   const [coberturaMes, setCoberturaMes] = useState([])
   const [selectedDay, setSelectedDay] = useState(null)
@@ -52,6 +54,11 @@ export default function Planeacion() {
       .order('nombre_completo')
       .then(({ data }) => setDocentes(data || []))
     supabase.from('docentes_niveles').select('docente_id, nivel_id, docente:profiles(nombre_completo)').then(({ data }) => setAsignaciones(data || []))
+    supabase.from('horarios').select('*').eq('activo', true).order('orden').then(({ data }) => setHorarios(data || []))
+    supabase
+      .from('asignacion_horario')
+      .select('nivel_id, horario_id, docente_id, docente:profiles(nombre_completo)')
+      .then(({ data }) => setAsignacionesHorario(data || []))
   }, [])
 
   const { year, month } = cursor
@@ -61,7 +68,11 @@ export default function Planeacion() {
   const loadMes = useCallback(async () => {
     const [{ data: acts }, { data: cob }] = await Promise.all([
       supabase.from('actividades').select('id, nivel_id, fecha, titulo').gte('fecha', inicioMes).lte('fecha', finMes),
-      supabase.from('cobertura_dia').select('*, docente:profiles(nombre_completo)').gte('fecha', inicioMes).lte('fecha', finMes),
+      supabase
+        .from('cobertura_dia')
+        .select('*, docente:profiles(nombre_completo)')
+        .gte('fecha', inicioMes)
+        .lte('fecha', finMes),
     ])
     setActividadesMes(acts || [])
     setCoberturaMes(cob || [])
@@ -130,15 +141,15 @@ export default function Planeacion() {
     loadMes()
   }
 
-  async function asignarCobertura(nivelId, docenteId) {
+  async function asignarCobertura(nivelId, horarioId, docenteId) {
     if (!docenteId) {
-      await supabase.from('cobertura_dia').delete().eq('nivel_id', nivelId).eq('fecha', selectedDay)
+      await supabase.from('cobertura_dia').delete().eq('nivel_id', nivelId).eq('horario_id', horarioId).eq('fecha', selectedDay)
     } else {
       await supabase
         .from('cobertura_dia')
         .upsert(
-          { nivel_id: nivelId, fecha: selectedDay, docente_id: docenteId, updated_at: new Date().toISOString() },
-          { onConflict: 'nivel_id,fecha' },
+          { nivel_id: nivelId, horario_id: horarioId, fecha: selectedDay, docente_id: docenteId, updated_at: new Date().toISOString() },
+          { onConflict: 'nivel_id,horario_id,fecha' },
         )
     }
     loadMes()
@@ -227,38 +238,57 @@ export default function Planeacion() {
                 {new Date(selectedDay + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}
               </p>
               {niveles.map((nivel) => {
-                const fijos = asignaciones.filter((a) => a.nivel_id === nivel.id).map((a) => a.docente?.nombre_completo).filter(Boolean)
-                const override = coberturaDelDia.find((c) => c.nivel_id === nivel.id)
+                const fijosGenerales = asignaciones
+                  .filter((a) => a.nivel_id === nivel.id)
+                  .map((a) => a.docente?.nombre_completo)
+                  .filter(Boolean)
                 const actividad = actividadesDelDia.find((a) => a.nivel_id === nivel.id)
+                const soloUnHorario = horarios.length <= 1
                 return (
                   <div key={nivel.id} className="card">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="font-bold">{nivel.nombre}</h3>
-                      {override ? (
-                        <span className="badge bg-grape-100 text-grape-700">🔁 {override.docente?.nombre_completo || 'Sin asignar'}</span>
-                      ) : fijos.length > 0 ? (
-                        <span className="badge bg-sky-100 text-sky-700">{fijos.join(', ')}</span>
-                      ) : (
-                        <span className="badge bg-coral-100 text-coral-700">Sin docente</span>
-                      )}
-                    </div>
+                    <h3 className="font-bold">{nivel.nombre}</h3>
 
-                    <div className="mt-2 flex items-center gap-2">
-                      <label className="text-xs font-bold text-ink/40">Cubre este día:</label>
-                      <select
-                        className="input !w-auto !py-1 !text-sm"
-                        value={override?.docente_id || ''}
-                        onChange={(e) => asignarCobertura(nivel.id, e.target.value || null)}
-                      >
-                        <option value="">
-                          {fijos.length > 0 ? `Fijo (${fijos.join(', ')})` : 'Sin asignar'}
-                        </option>
-                        {docentes.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            {d.nombre_completo}
-                          </option>
-                        ))}
-                      </select>
+                    <div className="mt-2 flex flex-col gap-2">
+                      {horarios.map((horario) => {
+                        const fijo = asignacionesHorario.find((a) => a.nivel_id === nivel.id && a.horario_id === horario.id)
+                        const override = coberturaDelDia.find((c) => c.nivel_id === nivel.id && c.horario_id === horario.id)
+                        const nombreFijo = fijo?.docente?.nombre_completo
+                        // Si aún no hay nada configurado por horario (iglesia con un solo servicio,
+                        // usando la lista general de la clase), la mostramos como respaldo.
+                        const respaldoGeneral = !nombreFijo && fijosGenerales.length > 0 ? fijosGenerales.join(', ') : null
+                        return (
+                          <div key={horario.id} className="rounded-xl bg-ink/5 px-3 py-2">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              {!soloUnHorario && <span className="text-xs font-bold uppercase text-ink/40">{horario.nombre}</span>}
+                              {override ? (
+                                <span className="badge bg-grape-100 text-grape-700">🔁 {override.docente?.nombre_completo || 'Sin asignar'}</span>
+                              ) : nombreFijo ? (
+                                <span className="badge bg-sky-100 text-sky-700">{nombreFijo}</span>
+                              ) : respaldoGeneral ? (
+                                <span className="badge bg-sky-100 text-sky-700">{respaldoGeneral}</span>
+                              ) : (
+                                <span className="badge bg-coral-100 text-coral-700">Sin docente</span>
+                              )}
+                            </div>
+                            <div className="mt-1 flex items-center gap-2">
+                              <label className="text-xs font-bold text-ink/40">Cubre este día:</label>
+                              <select
+                                className="input !w-auto !py-1 !text-sm"
+                                value={override?.docente_id || ''}
+                                onChange={(e) => asignarCobertura(nivel.id, horario.id, e.target.value || null)}
+                              >
+                                <option value="">{nombreFijo ? `Fijo (${nombreFijo})` : respaldoGeneral ? `Fijo (${respaldoGeneral})` : 'Sin asignar'}</option>
+                                {docentes.map((d) => (
+                                  <option key={d.id} value={d.id}>
+                                    {d.nombre_completo}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        )
+                      })}
+                      {horarios.length === 0 && <p className="text-sm text-ink/40">No hay horarios activos configurados.</p>}
                     </div>
 
                     <div className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-ink/5 px-3 py-2">

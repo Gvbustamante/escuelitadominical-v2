@@ -7,24 +7,46 @@ function hoyISO() {
   return new Date().toISOString().slice(0, 10)
 }
 
+function horaActualHHMM() {
+  const d = new Date()
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
 export default function CoberturaHoy() {
-  const [filas, setFilas] = useState(null)
+  const [estado, setEstado] = useState(null) // undefined mientras carga; luego { esDiaClase, filas }
 
   useEffect(() => {
     async function load() {
       const hoy = hoyISO()
-      const [{ data: niveles }, { data: asignaciones }, { data: ninos }, { data: asistenciaHoy }] = await Promise.all([
-        supabase.from('niveles').select('id, nombre').eq('activo', true).order('edad_min', { ascending: true, nullsFirst: true }),
-        supabase.from('docentes_niveles').select('nivel_id, docente:profiles(nombre_completo)'),
-        supabase.from('ninos').select('nivel_id').eq('activo', true),
-        supabase.from('asistencia').select('nivel_id, tomada_por:profiles(nombre_completo)').eq('fecha', hoy),
-      ])
+      const diaSemana = new Date().getDay()
 
-      const docentesPorNivel = {}
-      ;(asignaciones || []).forEach((a) => {
+      const { data: diasClase } = await supabase.from('dias_clase').select('dia_semana, activo')
+      const esDiaClase = (diasClase || []).some((d) => d.dia_semana === diaSemana && d.activo)
+
+      if (!esDiaClase) {
+        setEstado({ esDiaClase: false, filas: [] })
+        return
+      }
+
+      const [{ data: niveles }, { data: horarios }, { data: docentesNiveles }, { data: asigHorario }, { data: coberturaHoy }, { data: ninos }, { data: asistenciaHoy }] =
+        await Promise.all([
+          supabase.from('niveles').select('id, nombre').eq('activo', true).order('edad_min', { ascending: true, nullsFirst: true }),
+          supabase.from('horarios').select('*').eq('activo', true).order('orden'),
+          supabase.from('docentes_niveles').select('nivel_id, docente:profiles(nombre_completo)'),
+          supabase.from('asignacion_horario').select('nivel_id, horario_id, docente:profiles(nombre_completo)'),
+          supabase.from('cobertura_dia').select('nivel_id, horario_id, docente:profiles(nombre_completo)').eq('fecha', hoy),
+          supabase.from('ninos').select('nivel_id').eq('activo', true),
+          supabase.from('asistencia').select('nivel_id, tomada_por:profiles(nombre_completo)').eq('fecha', hoy),
+        ])
+
+      const horaAhora = horaActualHHMM()
+      const yaPaso = (h) => !h.hora || h.hora.slice(0, 5) <= horaAhora
+
+      const docentesGeneralPorNivel = {}
+      ;(docentesNiveles || []).forEach((a) => {
         if (!a.docente?.nombre_completo) return
-        docentesPorNivel[a.nivel_id] = docentesPorNivel[a.nivel_id] || []
-        docentesPorNivel[a.nivel_id].push(a.docente.nombre_completo)
+        docentesGeneralPorNivel[a.nivel_id] = docentesGeneralPorNivel[a.nivel_id] || []
+        docentesGeneralPorNivel[a.nivel_id].push(a.docente.nombre_completo)
       })
 
       const ninosPorNivel = {}
@@ -38,20 +60,51 @@ export default function CoberturaHoy() {
         if (!tomadaPorNivel[r.nivel_id]) tomadaPorNivel[r.nivel_id] = r.tomada_por?.nombre_completo || 'el equipo'
       })
 
-      setFilas(
-        (niveles || []).map((n) => ({
+      const horariosActivos = horarios || []
+      const soloUnHorario = horariosActivos.length <= 1
+
+      const filas = (niveles || []).map((n) => {
+        const generalNombres = docentesGeneralPorNivel[n.id] || []
+        const tieneAsigPorHorario =
+          (asigHorario || []).some((a) => a.nivel_id === n.id) || (coberturaHoy || []).some((c) => c.nivel_id === n.id)
+
+        const porHorario = horariosActivos.map((h) => {
+          const override = (coberturaHoy || []).find((c) => c.nivel_id === n.id && c.horario_id === h.id)
+          const fijo = (asigHorario || []).find((a) => a.nivel_id === n.id && a.horario_id === h.id)
+          let docente = override?.docente?.nombre_completo || fijo?.docente?.nombre_completo || null
+          // Respaldo: si esta clase todavía no tiene nada configurado por
+          // horario (caso típico: un solo servicio con la lista general de
+          // Clases), usamos esa lista para no generar una alarma falsa.
+          if (!docente && !tieneAsigPorHorario && generalNombres.length > 0) docente = generalNombres.join(', ')
+          return { horario: h, docente, pasado: yaPaso(h) }
+        })
+
+        const ninosCount = ninosPorNivel[n.id] || 0
+        const algunoPaso = porHorario.some((p) => p.pasado)
+        const pasadosSinDocente = porHorario.filter((p) => p.pasado)
+        const sinDocente = algunoPaso && pasadosSinDocente.length > 0 && pasadosSinDocente.every((p) => !p.docente)
+        const asistenciaTomada = tomadaPorNivel[n.id] || null
+        const pendiente = algunoPaso && !sinDocente && ninosCount > 0 && !asistenciaTomada
+
+        return {
           id: n.id,
           nombre: n.nombre,
-          docentes: docentesPorNivel[n.id] || [],
-          ninosCount: ninosPorNivel[n.id] || 0,
-          tomadaPor: tomadaPorNivel[n.id] || null,
-        })),
-      )
+          porHorario,
+          soloUnHorario,
+          ninosCount,
+          asistenciaTomada,
+          algunoPaso,
+          sinDocente,
+          pendiente,
+        }
+      })
+
+      setEstado({ esDiaClase: true, filas })
     }
     load()
   }, [])
 
-  if (!filas) {
+  if (estado === null) {
     return (
       <div className="card">
         <Skeleton className="h-6 w-48" />
@@ -65,9 +118,24 @@ export default function CoberturaHoy() {
     )
   }
 
-  const sinDocente = filas.filter((f) => f.docentes.length === 0)
-  const pendientes = filas.filter((f) => f.docentes.length > 0 && f.ninosCount > 0 && !f.tomadaPor)
-  const alertas = sinDocente.length + pendientes.length
+  if (!estado.esDiaClase) {
+    return (
+      <div className="card">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-xl font-bold">Cobertura de hoy 🗓️</h2>
+            <p className="text-sm text-ink/50">Hoy no es un día de clase configurado — no hay nada que cubrir.</p>
+          </div>
+        </div>
+        <Link to="/ajustes" className="mt-4 inline-block text-sm font-bold text-sky-600 hover:underline">
+          Configurar días de clase en Ajustes →
+        </Link>
+      </div>
+    )
+  }
+
+  const { filas } = estado
+  const alertas = filas.filter((f) => f.sinDocente || f.pendiente).length
 
   return (
     <div className="card">
@@ -96,29 +164,43 @@ export default function CoberturaHoy() {
             </tr>
           </thead>
           <tbody>
-            {filas.map((f) => {
-              const sinDoc = f.docentes.length === 0
-              return (
-                <tr key={f.id} className="border-t border-ink/5">
-                  <td className="px-2 py-3 font-bold">{f.nombre}</td>
-                  <td className="px-2 py-3 text-sm">
-                    {sinDoc ? <span className="font-bold text-coral-600">Sin docente asignado</span> : f.docentes.join(', ')}
-                  </td>
-                  <td className="px-2 py-3 text-sm text-ink/50">{f.ninosCount}</td>
-                  <td className="px-2 py-3">
-                    {f.tomadaPor ? (
-                      <span className="badge bg-grass-100 text-grass-700">✅ Tomada por {f.tomadaPor}</span>
-                    ) : sinDoc ? (
-                      <span className="badge bg-coral-100 text-coral-700">🔴 Sin docente</span>
-                    ) : f.ninosCount === 0 ? (
-                      <span className="badge bg-ink/5 text-ink/40">— Sin niños</span>
+            {filas.map((f) => (
+              <tr key={f.id} className="border-t border-ink/5">
+                <td className="px-2 py-3 font-bold">{f.nombre}</td>
+                <td className="px-2 py-3 text-sm">
+                  {f.soloUnHorario ? (
+                    f.porHorario[0]?.docente ? (
+                      f.porHorario[0].docente
                     ) : (
-                      <span className="badge bg-sunshine-100 text-sunshine-700">⏳ Pendiente</span>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
+                      <span className="font-bold text-coral-600">Sin docente asignado</span>
+                    )
+                  ) : (
+                    <div className="flex flex-col gap-0.5">
+                      {f.porHorario.map((p) => (
+                        <span key={p.horario.id}>
+                          <span className="text-ink/40">{p.horario.nombre}:</span>{' '}
+                          {p.docente || <span className="font-bold text-coral-600">sin docente</span>}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </td>
+                <td className="px-2 py-3 text-sm text-ink/50">{f.ninosCount}</td>
+                <td className="px-2 py-3">
+                  {f.asistenciaTomada ? (
+                    <span className="badge bg-grass-100 text-grass-700">✅ Tomada por {f.asistenciaTomada}</span>
+                  ) : f.sinDocente ? (
+                    <span className="badge bg-coral-100 text-coral-700">🔴 Sin docente</span>
+                  ) : f.ninosCount === 0 ? (
+                    <span className="badge bg-ink/5 text-ink/40">— Sin niños</span>
+                  ) : !f.algunoPaso ? (
+                    <span className="badge bg-ink/5 text-ink/40">⏳ Aún no empieza</span>
+                  ) : (
+                    <span className="badge bg-sunshine-100 text-sunshine-700">⏳ Pendiente</span>
+                  )}
+                </td>
+              </tr>
+            ))}
             {filas.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-2 py-6 text-center text-ink/40">

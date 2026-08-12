@@ -13,24 +13,31 @@ export default function Clases() {
   const [niveles, setNiveles] = useState(null)
   const [docentes, setDocentes] = useState([])
   const [asignaciones, setAsignaciones] = useState([])
+  const [horarios, setHorarios] = useState([])
+  const [asignacionesHorario, setAsignacionesHorario] = useState([])
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ nombre: '', edad_min: '', edad_max: '', color: 'sky' })
   const [selectedDocentes, setSelectedDocentes] = useState([])
+  const [horarioDocentes, setHorarioDocentes] = useState({}) // { [horario_id]: docente_id }
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [confirmDesactivar, setConfirmDesactivar] = useState(null)
   const [confirmBusy, setConfirmBusy] = useState(false)
 
   const load = useCallback(async () => {
-    const [{ data: n }, { data: d }, { data: a }] = await Promise.all([
+    const [{ data: n }, { data: d }, { data: a }, { data: h }, { data: ah }] = await Promise.all([
       supabase.from('niveles').select('*').order('edad_min', { ascending: true, nullsFirst: true }),
       supabase.from('profiles').select('id, nombre_completo').eq('role', 'docente').eq('activo', true),
       supabase.from('docentes_niveles').select('*'),
+      supabase.from('horarios').select('*').eq('activo', true).order('orden'),
+      supabase.from('asignacion_horario').select('*'),
     ])
     setNiveles(n || [])
     setDocentes(d || [])
     setAsignaciones(a || [])
+    setHorarios(h || [])
+    setAsignacionesHorario(ah || [])
   }, [])
 
   useEffect(() => {
@@ -41,6 +48,7 @@ export default function Clases() {
     setEditing(null)
     setForm({ nombre: '', edad_min: '', edad_max: '', color: 'sky' })
     setSelectedDocentes([])
+    setHorarioDocentes({})
     setError('')
     setModalOpen(true)
   }
@@ -54,8 +62,19 @@ export default function Clases() {
       color: nivel.color || 'sky',
     })
     setSelectedDocentes(asignaciones.filter((a) => a.nivel_id === nivel.id).map((a) => a.docente_id))
+    const hd = {}
+    asignacionesHorario
+      .filter((a) => a.nivel_id === nivel.id)
+      .forEach((a) => {
+        hd[a.horario_id] = a.docente_id
+      })
+    setHorarioDocentes(hd)
     setError('')
     setModalOpen(true)
+  }
+
+  function setHorarioDocente(horarioId, docenteId) {
+    setHorarioDocentes((prev) => ({ ...prev, [horarioId]: docenteId || undefined }))
   }
 
   function toggleDocente(id) {
@@ -84,9 +103,22 @@ export default function Clases() {
       nivelId = data.id
     }
 
+    // Un docente fijo por horario auto-vincula (docentes_niveles) aunque no
+    // se haya marcado a mano en la lista general de arriba.
+    const docentesPorHorario = Object.values(horarioDocentes).filter(Boolean)
+    const docentesFinal = Array.from(new Set([...selectedDocentes, ...docentesPorHorario]))
+
     await supabase.from('docentes_niveles').delete().eq('nivel_id', nivelId)
-    if (selectedDocentes.length) {
-      await supabase.from('docentes_niveles').insert(selectedDocentes.map((docente_id) => ({ docente_id, nivel_id: nivelId })))
+    if (docentesFinal.length) {
+      await supabase.from('docentes_niveles').insert(docentesFinal.map((docente_id) => ({ docente_id, nivel_id: nivelId })))
+    }
+
+    await supabase.from('asignacion_horario').delete().eq('nivel_id', nivelId)
+    const filasHorario = horarios
+      .filter((h) => horarioDocentes[h.id])
+      .map((h) => ({ nivel_id: nivelId, horario_id: h.id, docente_id: horarioDocentes[h.id] }))
+    if (filasHorario.length) {
+      await supabase.from('asignacion_horario').insert(filasHorario)
     }
 
     setBusy(false)
@@ -266,6 +298,33 @@ export default function Clases() {
               ))}
             </div>
           </div>
+          {horarios.length > 1 && (
+            <div>
+              <label className="label">Docente fijo por horario (opcional)</label>
+              <p className="mb-2 text-xs text-ink/40">
+                Si hay más de un servicio el mismo día, di quién cubre cada uno. Se vincula automáticamente arriba.
+              </p>
+              <div className="flex flex-col gap-2">
+                {horarios.map((h) => (
+                  <div key={h.id} className="flex items-center gap-2">
+                    <span className="w-24 shrink-0 text-sm font-bold text-ink/60">{h.nombre}</span>
+                    <select
+                      className="input !w-auto flex-1 !py-1.5 !text-sm"
+                      value={horarioDocentes[h.id] || ''}
+                      onChange={(e) => setHorarioDocente(h.id, e.target.value)}
+                    >
+                      <option value="">Sin asignar</option>
+                      {docentes.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.nombre_completo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
           <button disabled={busy} className="btn-primary justify-center">
             {busy ? 'Guardando...' : 'Guardar'}

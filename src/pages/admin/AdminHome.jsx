@@ -17,19 +17,23 @@ export default function AdminHome() {
     async function load() {
       const today = new Date().toISOString().slice(0, 10)
       const hace7dias = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-      const [ninos, clases, docentes, asistenciaHoy, eventosProximos, peticionesRecientes] = await Promise.all([
+      const diaSemana = new Date().getDay()
+      const [ninos, clases, docentes, asistenciaHoy, eventosProximos, peticionesRecientes, diasClase] = await Promise.all([
         supabase.from('ninos').select('id', { count: 'exact', head: true }).eq('activo', true),
         supabase.from('niveles').select('id', { count: 'exact', head: true }).eq('activo', true),
         supabase.from('profiles').select('id', { count: 'exact', head: true }).in('role', ['docente', 'coordinador']).eq('activo', true),
         supabase.from('asistencia').select('id', { count: 'exact', head: true }).eq('fecha', today).eq('presente', true),
         supabase.from('agenda').select('id', { count: 'exact', head: true }).gte('fecha', today),
         supabase.from('peticiones_oracion').select('id', { count: 'exact', head: true }).gte('created_at', hace7dias),
+        supabase.from('dias_clase').select('dia_semana, activo'),
       ])
+      const esDiaClase = (diasClase.data || []).some((d) => d.dia_semana === diaSemana && d.activo)
       setStats({
         ninos: ninos.count ?? 0,
         clases: clases.count ?? 0,
         docentes: docentes.count ?? 0,
         asistenciaHoy: asistenciaHoy.count ?? 0,
+        esDiaClase,
         eventosProximos: eventosProximos.count ?? 0,
         peticionesRecientes: peticionesRecientes.count ?? 0,
       })
@@ -78,7 +82,19 @@ export default function AdminHome() {
         <StatCard icon="🧒" label="Niños activos" value={stats.ninos} color="sky" delay={0} />
         <StatCard icon="🎒" label="Clases activas" value={stats.clases} color="grass" delay={80} />
         <StatCard icon="🍎" label="Equipo" value={stats.docentes} color="sunshine" delay={160} />
-        <StatCard icon="✅" label="Asistencia hoy" value={stats.asistenciaHoy} color="grape" delay={240} />
+        {stats.esDiaClase ? (
+          <StatCard icon="✅" label="Asistencia hoy" value={stats.asistenciaHoy} color="grape" delay={240} />
+        ) : (
+          <div className="card animate-pop-in flex items-center gap-3 !p-4 sm:gap-4 sm:!p-6" style={{ animationDelay: '240ms' }}>
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ink/5 text-xl text-ink/30 ring-4 ring-ink/5 sm:h-16 sm:w-16 sm:text-3xl">
+              💤
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-lg font-bold leading-none text-ink/40 sm:text-xl">Sin clase</p>
+              <p className="mt-1 text-xs font-bold leading-tight text-ink/50 sm:text-sm">Hoy no toca escuelita</p>
+            </div>
+          </div>
+        )}
         <StatCard icon="📅" label="Eventos próximos" value={stats.eventosProximos} color="coral" delay={320} />
         <StatCard icon="🙏" label="Peticiones (7 días)" value={stats.peticionesRecientes} color="sky" delay={400} />
       </div>
