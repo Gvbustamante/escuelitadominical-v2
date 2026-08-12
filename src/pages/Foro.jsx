@@ -18,7 +18,7 @@ export default function Foro() {
   const [nuevoMensaje, setNuevoMensaje] = useState('')
 
   const [modalOpen, setModalOpen] = useState(false)
-  const [form, setForm] = useState({ titulo: '', categoria: 'general', evento_id: '' })
+  const [form, setForm] = useState({ titulo: '', categoria: 'general', evento_id: '', privado: false })
   const [busy, setBusy] = useState(false)
 
   const [peticiones, setPeticiones] = useState(null)
@@ -59,7 +59,7 @@ export default function Foro() {
   }
 
   function openNew() {
-    setForm({ titulo: '', categoria: 'general', evento_id: '' })
+    setForm({ titulo: '', categoria: 'general', evento_id: '', privado: false })
     setModalOpen(true)
   }
 
@@ -70,10 +70,16 @@ export default function Foro() {
       titulo: form.titulo,
       categoria: form.categoria,
       evento_id: form.categoria === 'evento' ? form.evento_id || null : null,
+      privado: form.privado,
       creado_por: user.id,
     })
     setBusy(false)
     setModalOpen(false)
+    load()
+  }
+
+  async function cambiarPrivacidadForo(foro) {
+    await supabase.from('foros').update({ privado: !foro.privado }).eq('id', foro.id)
     load()
   }
 
@@ -131,9 +137,25 @@ export default function Foro() {
               ← Volver a Nuestra comunidad
             </button>
             <h1 className="text-2xl font-bold">{seleccionado.titulo}</h1>
-            {seleccionado.evento?.titulo && (
-              <span className="badge mt-1 bg-sunshine-100 text-sunshine-700">📅 {seleccionado.evento.titulo}</span>
-            )}
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {seleccionado.evento?.titulo && (
+                <span className="badge bg-sunshine-100 text-sunshine-700">📅 {seleccionado.evento.titulo}</span>
+              )}
+              <span className={`badge ${seleccionado.privado ? 'bg-grape-100 text-grape-700' : 'bg-grass-100 text-grass-700'}`}>
+                {seleccionado.privado ? '🔒 Privado' : '🌍 Público'}
+              </span>
+              {(esStaff || seleccionado.creado_por === user.id) && (
+                <button
+                  onClick={async () => {
+                    await cambiarPrivacidadForo(seleccionado)
+                    setSeleccionado({ ...seleccionado, privado: !seleccionado.privado })
+                  }}
+                  className="text-xs font-bold text-sky-500 hover:underline"
+                >
+                  cambiar
+                </button>
+              )}
+            </div>
           </div>
           {(esStaff || seleccionado.creado_por === user.id) && (
             <button onClick={() => borrarForo(seleccionado.id)} className="text-2xl text-ink/30 hover:text-coral-500">
@@ -219,6 +241,7 @@ export default function Foro() {
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-bold">{f.titulo}</h3>
                     {f.categoria === 'evento' && <span className="badge bg-sunshine-100 text-sunshine-700">📅 Evento</span>}
+                    {f.privado && <span className="badge bg-grape-100 text-grape-700">🔒 Privado</span>}
                   </div>
                   <p className="text-sm text-ink/50">
                     {f.creador?.nombre_completo} {f.evento?.titulo && `· ${f.evento.titulo}`}
@@ -227,7 +250,11 @@ export default function Foro() {
                 <span className="badge bg-sky-100 text-sky-700">{f.mensajes?.[0]?.count ?? 0} 💬</span>
               </button>
             ))}
-            {foros.length === 0 && <p className="card text-ink/50">Todavía no hay temas. ¡Crea el primero!</p>}
+            {foros.length === 0 && (
+              <p className="card text-ink/50">
+                {esStaffAmplio ? 'Todavía no hay temas. ¡Crea el primero!' : 'Todavía no hay temas visibles para ti.'}
+              </p>
+            )}
           </div>
         </>
       ) : (
@@ -338,6 +365,25 @@ export default function Foro() {
               </select>
             </div>
           )}
+          <div>
+            <label className="label">Quién lo puede ver</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, privado: false })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                🌍 Público (toda la comunidad)
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, privado: true })}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+              >
+                🔒 Privado (solo el equipo)
+              </button>
+            </div>
+          </div>
           <button disabled={busy} className="btn-primary justify-center">
             {busy ? 'Creando...' : 'Crear tema'}
           </button>

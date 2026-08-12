@@ -23,7 +23,7 @@ Este documento describe **todo** lo que compone la plataforma: qué es, cómo es
 - **WhatsApp de contacto**: cada docente y cada padre puede tener un número guardado, con un botón que abre directo el chat (`wa.me`) — editable desde "Ver detalle".
 - Nombre y logo de la iglesia personalizables (Ajustes), que reemplazan el branding "Access Kids" en el menú y la pantalla de ingreso.
 - Un portal para padres, donde ven todo lo relacionado a sus hijos.
-- Comunidad: foro, versículo del día, peticiones de oración.
+- Comunidad: foro (con temas públicos o privados —solo staff—), versículo del día, peticiones de oración.
 - Multi-tenant "por fork": cada iglesia tiene su propio proyecto de Supabase y su propio despliegue, sin compartir datos con otras iglesias (ver sección 8).
 
 ## 2. Roles
@@ -216,7 +216,7 @@ Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado 
 | `devocionales_ninos` | Devocionales para niños (título, versículo, contenido, `imagen_url` opcional) | `niveles`, `creado_por` |
 | `citas_biblicas` | Pool de versículos + `fecha_mostrar` para la "cita del día" | — |
 | `reconocimientos` | Estrellas otorgadas a un niño (capa de gamificación) | `ninos`, `niveles`, `otorgado_por` |
-| `foros` / `foro_mensajes` | Foro de comunidad, general o ligado a un evento de agenda | `foros` ↔ `agenda`, `profiles` |
+| `foros` / `foro_mensajes` | Foro de comunidad, general o ligado a un evento de agenda; `foros.privado` = solo staff (admin/coordinador/docente) y el creador | `foros` ↔ `agenda`, `profiles` |
 | `peticiones_oracion` | Peticiones de oración, públicas o privadas (solo staff + autor) | `profiles` |
 | `config_iglesia` | Fila única con nombre y logo personalizados de la iglesia | — |
 | `bitacora_clase` | Constancia por clase y fecha: `salon_ok` + `salon_foto_url`, `refrigerio_detalle` + `refrigerio_foto_url` (única por `nivel_id`+`fecha`) | `niveles`, `docente_id` → `profiles` |
@@ -239,7 +239,7 @@ Todas las tablas tienen RLS habilitado. El patrón general:
 `schema.sql` inserta 15 versículos bíblicos iniciales en `citas_biblicas` para que la app tenga contenido desde el día uno.
 
 ### 6.6 Actualizaciones incrementales a un proyecto ya desplegado
-`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplo real: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
+`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql) y [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
 
 ## 7. Variables de entorno
 
