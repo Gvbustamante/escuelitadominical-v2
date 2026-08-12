@@ -52,7 +52,7 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
 
   return (
     <div className="card animate-pop-in overflow-hidden p-0">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink/5 p-4">
+      <div className="flex flex-col gap-3 border-b-2 border-ink/5 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
         <div>
           <p className="font-bold">Asistencia del mes</p>
           <p className="text-xs text-ink/40">Solo se muestran los días en que se tomó asistencia</p>
@@ -75,20 +75,20 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
         <p className="p-6 text-center text-ink/40">Todavía no se ha tomado asistencia este mes.</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/50">
+          <table className="w-full text-left text-xs sm:text-sm">
+            <thead className="bg-sky-50 text-[0.65rem] font-bold uppercase text-ink/50 sm:text-xs">
               <tr>
-                <th className="sticky left-0 z-10 bg-sky-50 px-4 py-3">Niño/a</th>
+                <th className="sticky left-0 z-10 min-w-[6rem] bg-sky-50 px-2 py-2 sm:min-w-0 sm:px-4 sm:py-3">Niño/a</th>
                 {fechas.map((f) => {
                   const d = new Date(f + 'T00:00:00')
                   return (
-                    <th key={f} className="px-3 py-3 text-center">
-                      <div className="text-sm">{d.getDate()}</div>
+                    <th key={f} className="px-1.5 py-2 text-center sm:px-3 sm:py-3">
+                      <div className="text-xs sm:text-sm">{d.getDate()}</div>
                       <div className="font-normal normal-case text-ink/35">{DIAS_SEMANA[d.getDay()]}</div>
                     </th>
                   )
                 })}
-                <th className="px-3 py-3 text-center">Total</th>
+                <th className="px-1.5 py-2 text-center sm:px-3 sm:py-3">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -97,16 +97,18 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
                 const total = fechas.filter((f) => fila[f]).length
                 return (
                   <tr key={n.id} className="border-t border-ink/5">
-                    <td className="sticky left-0 z-10 bg-white px-4 py-3 font-bold">{n.nombre_completo}</td>
+                    <td className="sticky left-0 z-10 min-w-[6rem] truncate bg-white px-2 py-2 font-bold sm:min-w-0 sm:px-4 sm:py-3">
+                      {n.nombre_completo}
+                    </td>
                     {fechas.map((f) => {
                       const v = fila[f]
                       return (
-                        <td key={f} className="px-3 py-3 text-center text-lg">
-                          {v === true ? '✅' : v === false ? '❌' : <span className="text-sm text-ink/20">—</span>}
+                        <td key={f} className="px-1.5 py-2 text-center text-base sm:px-3 sm:py-3 sm:text-lg">
+                          {v === true ? '✅' : v === false ? '❌' : <span className="text-xs text-ink/20 sm:text-sm">—</span>}
                         </td>
                       )
                     })}
-                    <td className="px-3 py-3 text-center font-bold text-grass-600">
+                    <td className="px-1.5 py-2 text-center font-bold text-grass-600 sm:px-3 sm:py-3">
                       {total}/{fechas.length}
                     </td>
                   </tr>
@@ -115,13 +117,13 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-ink/10 bg-ink/5 font-bold text-ink/60">
-                <td className="sticky left-0 z-10 bg-ink/5 px-4 py-3">Presentes</td>
+                <td className="sticky left-0 z-10 min-w-[6rem] bg-ink/5 px-2 py-2 sm:min-w-0 sm:px-4 sm:py-3">Presentes</td>
                 {fechas.map((f) => (
-                  <td key={f} className="px-3 py-3 text-center">
+                  <td key={f} className="px-1.5 py-2 text-center sm:px-3 sm:py-3">
                     {ninos.filter((n) => mapa[n.id]?.[f]).length}
                   </td>
                 ))}
-                <td className="px-3 py-3" />
+                <td className="px-1.5 py-2 sm:px-3 sm:py-3" />
               </tr>
             </tfoot>
           </table>

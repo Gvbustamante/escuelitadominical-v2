@@ -187,7 +187,7 @@ export default function ActividadesAdmin() {
           <h1 className="text-3xl font-bold">Actividades 🎨</h1>
           <p className="text-ink/50">Lo que se hace en cada clase — fotos, versículo e historia bíblica</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <VistaToggle vista={vista} onChange={setVista} options={VISTA_OPTIONS} />
           <button className="btn-primary" onClick={openNew}>
             + Nueva actividad
