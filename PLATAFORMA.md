@@ -84,6 +84,9 @@ Cada ruta de la app está protegida por rol vía `<ProtectedRoute roles={[...]}>
 6. Actualizar la copia duplicada de `STAFF` en `CitaDelDia.jsx` (y revisar si hay más copias sueltas antes de dar por cerrado el cambio — conviene buscar `role in (` y `profile.role` en todo el repo).
 7. Ajustar las pantallas y textos de invitación (`src/lib/invite.js` y las páginas que la usan) para el nuevo set de roles.
 
+### 2.1.1 Responsive: celular, tablet y PC
+Las clases base compartidas (`.btn`, `.card`, `.input`, `.badge` en `src/index.css`) son más compactas por defecto (pensadas para celular) y se agrandan a partir de `sm:` (tablet en adelante) — así toda la plataforma se ajusta de una vez, sin tener que retocar cada pantalla por separado. El menú lateral (`Layout.jsx`) también es más angosto e ícono-solo en celular, y se expande con etiquetas de texto a partir de `md:`. El contenido dentro de `<main>` tiene un ancho máximo centrado (`max-w-screen-2xl`) para que no se vea demasiado estirado en monitores muy anchos, sin afectar tablets ni celulares (que ya son más angostos que ese límite).
+
 ## 3. Stack tecnológico
 
 | Capa | Tecnología | Versión (package.json) |

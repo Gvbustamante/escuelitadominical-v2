@@ -141,31 +141,31 @@ export default function Materiales() {
           <table className="w-full text-left text-sm">
             <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/50">
               <tr>
-                <th className="px-4 py-2">Nombre</th>
-                <th className="px-4 py-2">Categoría/Clase</th>
-                <th className="px-4 py-2">Cantidad</th>
-                <th className="px-4 py-2">Estado</th>
-                <th className="px-4 py-2">Acciones</th>
+                <th className="px-3 py-1.5 sm:px-4 sm:py-2">Nombre</th>
+                <th className="px-3 py-1.5 sm:px-4 sm:py-2">Categoría/Clase</th>
+                <th className="px-3 py-1.5 sm:px-4 sm:py-2">Cantidad</th>
+                <th className="px-3 py-1.5 sm:px-4 sm:py-2">Estado</th>
+                <th className="px-3 py-1.5 sm:px-4 sm:py-2">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {materiales.map((m) => (
                 <tr key={m.id} className={`border-t border-ink/5 ${!m.activo ? 'opacity-50' : ''}`}>
-                  <td className="px-4 py-2 font-bold">{m.nombre}</td>
-                  <td className="px-4 py-2 text-ink/60">
+                  <td className="px-3 py-1.5 sm:px-4 sm:py-2 font-bold">{m.nombre}</td>
+                  <td className="px-3 py-1.5 sm:px-4 sm:py-2 text-ink/60">
                     {m.categoria === 'clase' ? m.nivel?.nombre || 'Para una clase' : CATEGORIA_LABEL[m.categoria]}
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-3 py-1.5 sm:px-4 sm:py-2">
                     <span className={`badge ${m.cantidad <= 2 ? 'bg-coral-100 text-coral-700' : 'bg-sky-100 text-sky-700'}`}>
                       {m.cantidad} {m.cantidad <= 2 && '⚠️'}
                     </span>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-3 py-1.5 sm:px-4 sm:py-2">
                     <span className={`badge ${m.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
                       {m.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-3 py-1.5 sm:px-4 sm:py-2">
                     <div className="flex flex-wrap gap-2">
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(m)}>
                         Editar
