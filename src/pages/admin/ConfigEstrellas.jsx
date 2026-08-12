@@ -121,18 +121,18 @@ export default function ConfigEstrellas() {
 
         <form onSubmit={agregarMotivo} className="mt-4 flex gap-2">
           <input
-            className="input w-20 text-center"
+            className="input w-14 shrink-0 text-center sm:w-20"
             value={nuevoMotivo.emoji}
             onChange={(e) => setNuevoMotivo({ ...nuevoMotivo, emoji: e.target.value })}
             placeholder="🌟"
           />
           <input
-            className="input flex-1"
+            className="input min-w-0 flex-1"
             value={nuevoMotivo.texto}
             onChange={(e) => setNuevoMotivo({ ...nuevoMotivo, texto: e.target.value })}
             placeholder="Ej. Compartió con sus compañeros"
           />
-          <button disabled={busy} className="btn-primary shrink-0 !px-4">
+          <button disabled={busy} className="btn-primary shrink-0 !px-3 sm:!px-4">
             + Agregar
           </button>
         </form>
@@ -144,70 +144,78 @@ export default function ConfigEstrellas() {
 
         <div className="flex flex-col gap-2">
           {niveles.map((n) => (
-            <div key={n.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-ink/5 px-3 py-2">
-              <input
-                className="input !w-14 !py-1 text-center"
-                defaultValue={n.emoji}
-                onBlur={(e) => e.target.value !== n.emoji && actualizarNivel(n, { emoji: e.target.value })}
-              />
-              <input
-                className="input !flex-1 !py-1"
-                defaultValue={n.nombre}
-                onBlur={(e) => e.target.value !== n.nombre && actualizarNivel(n, { nombre: e.target.value })}
-              />
-              <div className="flex items-center gap-1 text-sm text-ink/50">
-                <span>desde</span>
+            <div key={n.id} className="flex flex-col gap-2 rounded-xl bg-ink/5 px-3 py-2 sm:flex-row sm:items-center">
+              <div className="flex flex-1 items-center gap-2">
                 <input
-                  type="number"
-                  min={0}
-                  className="input !w-20 !py-1 text-center"
-                  defaultValue={n.min_estrellas}
-                  onBlur={(e) =>
-                    Number(e.target.value) !== n.min_estrellas &&
-                    actualizarNivel(n, { min_estrellas: Number(e.target.value), orden: Number(e.target.value) })
-                  }
+                  className="input !w-14 !py-1 shrink-0 text-center"
+                  defaultValue={n.emoji}
+                  onBlur={(e) => e.target.value !== n.emoji && actualizarNivel(n, { emoji: e.target.value })}
                 />
-                <span>⭐</span>
+                <input
+                  className="input !flex-1 !py-1"
+                  defaultValue={n.nombre}
+                  onBlur={(e) => e.target.value !== n.nombre && actualizarNivel(n, { nombre: e.target.value })}
+                />
               </div>
-              <button
-                className="ml-auto text-xs font-bold text-coral-500 hover:underline"
-                onClick={() => setConfirmBorrar({ tipo: 'nivel', item: n })}
-              >
-                Borrar
-              </button>
+              <div className="flex items-center justify-between gap-2 sm:justify-end">
+                <div className="flex items-center gap-1 text-sm text-ink/50">
+                  <span>desde</span>
+                  <input
+                    type="number"
+                    min={0}
+                    className="input !w-20 !py-1 text-center"
+                    defaultValue={n.min_estrellas}
+                    onBlur={(e) =>
+                      Number(e.target.value) !== n.min_estrellas &&
+                      actualizarNivel(n, { min_estrellas: Number(e.target.value), orden: Number(e.target.value) })
+                    }
+                  />
+                  <span>⭐</span>
+                </div>
+                <button
+                  className="shrink-0 text-xs font-bold text-coral-500 hover:underline"
+                  onClick={() => setConfirmBorrar({ tipo: 'nivel', item: n })}
+                >
+                  Borrar
+                </button>
+              </div>
             </div>
           ))}
           {niveles.length === 0 && <p className="text-sm text-ink/40">Sin niveles todavía.</p>}
         </div>
 
-        <form onSubmit={agregarNivel} className="mt-4 flex flex-wrap items-center gap-2">
-          <input
-            className="input w-20 text-center"
-            value={nuevoNivel.emoji}
-            onChange={(e) => setNuevoNivel({ ...nuevoNivel, emoji: e.target.value })}
-            placeholder="🏅"
-          />
-          <input
-            className="input flex-1"
-            value={nuevoNivel.nombre}
-            onChange={(e) => setNuevoNivel({ ...nuevoNivel, nombre: e.target.value })}
-            placeholder="Ej. Guerrero de fe"
-          />
-          <div className="flex items-center gap-1 text-sm text-ink/50">
-            <span>desde</span>
+        <form onSubmit={agregarNivel} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex flex-1 items-center gap-2">
             <input
-              type="number"
-              min={0}
-              className="input w-20 text-center"
-              value={nuevoNivel.min_estrellas}
-              onChange={(e) => setNuevoNivel({ ...nuevoNivel, min_estrellas: e.target.value })}
-              placeholder="25"
+              className="input w-20 shrink-0 text-center"
+              value={nuevoNivel.emoji}
+              onChange={(e) => setNuevoNivel({ ...nuevoNivel, emoji: e.target.value })}
+              placeholder="🏅"
             />
-            <span>⭐</span>
+            <input
+              className="input flex-1"
+              value={nuevoNivel.nombre}
+              onChange={(e) => setNuevoNivel({ ...nuevoNivel, nombre: e.target.value })}
+              placeholder="Ej. Guerrero de fe"
+            />
           </div>
-          <button disabled={busy} className="btn-primary shrink-0 !px-4">
-            + Agregar
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="flex flex-1 items-center gap-1 text-sm text-ink/50 sm:flex-none">
+              <span>desde</span>
+              <input
+                type="number"
+                min={0}
+                className="input w-20 text-center"
+                value={nuevoNivel.min_estrellas}
+                onChange={(e) => setNuevoNivel({ ...nuevoNivel, min_estrellas: e.target.value })}
+                placeholder="25"
+              />
+              <span>⭐</span>
+            </div>
+            <button disabled={busy} className="btn-primary shrink-0 !px-4">
+              + Agregar
+            </button>
+          </div>
         </form>
       </div>
 
