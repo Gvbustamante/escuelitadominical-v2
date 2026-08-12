@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import Spinner from './Spinner'
+import { exportCSV } from '../lib/exportCsv'
 
 function hoyYYYYMM() {
   return new Date().toISOString().slice(0, 7)
@@ -40,6 +41,15 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
     mapa[r.nino_id][r.fecha] = r.presente
   })
 
+  function exportar() {
+    const filas = ninos.map((n) => {
+      const fila = mapa[n.id] || {}
+      const total = fechas.filter((f) => fila[f]).length
+      return [n.nombre_completo, ...fechas.map((f) => (fila[f] === true ? 'Presente' : fila[f] === false ? 'Ausente' : '')), `${total}/${fechas.length}`]
+    })
+    exportCSV(`asistencia-${mes}`, ['Niño/a', ...fechas, 'Total'], filas)
+  }
+
   return (
     <div className="card animate-pop-in overflow-hidden p-0">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink/5 p-4">
@@ -47,7 +57,12 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
           <p className="font-bold">Asistencia del mes</p>
           <p className="text-xs text-ink/40">Solo se muestran los días en que se tomó asistencia</p>
         </div>
-        <input type="month" className="input !w-auto !py-2" value={mes} onChange={(e) => setMes(e.target.value)} />
+        <div className="flex items-center gap-2">
+          <input type="month" className="input !w-auto !py-2" value={mes} onChange={(e) => setMes(e.target.value)} />
+          <button className="btn-secondary !py-2 !text-sm" onClick={exportar} disabled={fechas.length === 0}>
+            📊 Exportar
+          </button>
+        </div>
       </div>
 
       {!registros ? (

@@ -6,6 +6,7 @@ import StatCard from '../../components/StatCard'
 import Skeleton from '../../components/Skeleton'
 import CitaDelDia from '../../components/CitaDelDia'
 import CoberturaHoy from '../../components/CoberturaHoy'
+import ProximaAgenda from '../../components/ProximaAgenda'
 
 export default function AdminHome() {
   const { profile } = useAuth()
@@ -80,6 +81,8 @@ export default function AdminHome() {
       </div>
 
       <CoberturaHoy />
+
+      <ProximaAgenda />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Link to="/ninos" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '80ms' }}>

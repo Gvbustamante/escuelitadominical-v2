@@ -3,6 +3,7 @@ import { useMisHijos } from '../../lib/useMisHijos'
 import Spinner from '../../components/Spinner'
 import { BADGE_CLASSES } from '../../lib/colors'
 import CitaDelDia from '../../components/CitaDelDia'
+import ProximaAgenda from '../../components/ProximaAgenda'
 
 function calcularEdad(fecha) {
   if (!fecha) return '—'
@@ -34,6 +35,14 @@ export default function PadreHome() {
 
       {hijos.length === 0 && (
         <p className="card text-ink/50">Aún no tienes niños vinculados. Habla con la docente de tu hijo/a.</p>
+      )}
+
+      {hijos.length > 0 && (
+        <ProximaAgenda
+          nivelIds={[...new Set(hijos.map((h) => h.nivel_id).filter(Boolean))]}
+          soloTareasPendientes
+          hijoIds={hijos.map((h) => h.id)}
+        />
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

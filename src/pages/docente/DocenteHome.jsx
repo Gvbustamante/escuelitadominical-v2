@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
 import { BADGE_CLASSES } from '../../lib/colors'
 import CitaDelDia from '../../components/CitaDelDia'
+import ProximaAgenda from '../../components/ProximaAgenda'
 
 export default function DocenteHome() {
   const { profile, user } = useAuth()
@@ -48,6 +49,8 @@ export default function DocenteHome() {
           Aún no tienes clases asignadas. Pide al administrador que te asigne una en la sección de Clases.
         </p>
       )}
+
+      <ProximaAgenda nivelIds={clases.map((c) => c.id)} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {clases.map((c, i) => (
