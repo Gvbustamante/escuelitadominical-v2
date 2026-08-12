@@ -1,5 +1,5 @@
 -- ============================================================
--- Access Kids — esquema completo de base de datos
+-- KidsMin — esquema completo de base de datos
 -- Copia y pega TODO este archivo en Supabase → SQL Editor → Run
 -- Se ejecuta UNA sola vez, en un proyecto de Supabase nuevo/vacío.
 -- ============================================================

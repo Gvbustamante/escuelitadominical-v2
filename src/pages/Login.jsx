@@ -70,7 +70,7 @@ export default function Login() {
           ¿No tienes cuenta? Pide al administrador de tu escuelita que te invite.
         </p>
         <Link to="/bienvenida" className="mt-2 block text-center text-sm font-bold text-sky-500 hover:underline">
-          ← Conoce Access Kids
+          ← Conoce KidsMin
         </Link>
       </div>
     </div>

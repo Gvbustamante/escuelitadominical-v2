@@ -1,4 +1,4 @@
-# Access Kids 📖
+# KidsMin 📖
 
 Sistema de gestión para escuelas dominicales cristianas: niños, clases, docentes, asistencia, actividades, devocionales y agenda — con un portal para padres.
 

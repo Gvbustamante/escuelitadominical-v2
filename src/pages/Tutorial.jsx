@@ -240,7 +240,7 @@ export default function Tutorial() {
       )}
 
       <div className="card max-w-2xl">
-        <p className="label mb-3">Acerca de Access Kids</p>
+        <p className="label mb-3">Acerca de KidsMin</p>
         <div className="flex flex-wrap items-center gap-4">
           <a href="https://gobeapp.com" target="_blank" rel="noreferrer" className="shrink-0">
             <GobeLogo className="h-8 w-auto" />

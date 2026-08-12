@@ -91,7 +91,7 @@ export default function Landing() {
         <div className="lp-in relative mx-auto max-w-2xl px-6 text-center">
           <AppLogo emojiClassName="text-6xl" imgClassName="mx-auto h-20 w-20 object-contain" />
           <h1 className="mt-3 text-4xl uppercase tracking-tight text-sky-600 sm:text-6xl">
-            Access <span className="text-coral-500">Kids</span>
+            Kids<span className="text-coral-500">Min</span>
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-lg font-bold text-ink/70 sm:text-xl">
             Un espacio donde los niños descubren a Dios entre risas y colores,
@@ -148,7 +148,7 @@ export default function Landing() {
           encontrar espacio en mi agenda, y esta vez la empecé desde cero.
         </p>
         <p className="mt-4 text-lg leading-relaxed text-ink/70">
-          Access Kids es un trabajo hecho con cariño, entregado como ofrenda al Señor. Para que la Palabra
+          KidsMin es un trabajo hecho con cariño, entregado como ofrenda al Señor. Para que la Palabra
           se enseñe de una forma bonita, y para que cada niño y niña disfrute más su tiempo en la iglesia.
         </p>
         <div className="mt-5 flex flex-col items-center gap-1">
@@ -166,7 +166,7 @@ export default function Landing() {
             rel="noreferrer"
             className="text-sm font-extrabold uppercase tracking-wide text-coral-500 hover:underline"
           >
-            Gisella Bustamante, creadora de Access Kids
+            Gisella Bustamante, creadora de KidsMin
           </a>
         </div>
       </section>
@@ -177,7 +177,7 @@ export default function Landing() {
           <span className="text-4xl">💛</span>
           <h2 className="mt-2 text-2xl uppercase text-sunshine-700">¿Quieres bendecir este proyecto?</h2>
           <p className="mx-auto mt-3 max-w-lg text-ink/70">
-            Access Kids se entrega como ofrenda, de corazón. No es un pago obligatorio. Pero si esta
+            KidsMin se entrega como ofrenda, de corazón. No es un pago obligatorio. Pero si esta
             herramienta ha sido de bendición para tu iglesia y quieres sembrar para que llegue a más
             escuelitas, hazlo con la libertad que Dios ponga en tu corazón.
           </p>
@@ -195,7 +195,7 @@ export default function Landing() {
           <span className="badge bg-sky-100 text-sky-700">Hablemos</span>
           <h2 className="mt-3 text-3xl uppercase text-sky-600">¿Quieres tenerla en tu iglesia?</h2>
           <p className="mx-auto mt-3 max-w-lg text-ink/60">
-            Escríbeme si quieres Access Kids para tu escuelita, si tienes una sugerencia, si necesitas
+            Escríbeme si quieres KidsMin para tu escuelita, si tienes una sugerencia, si necesitas
             soporte o si quieres apoyar el proyecto de otra forma. Leo todos los mensajes.
           </p>
         </div>
@@ -211,7 +211,7 @@ export default function Landing() {
         <Link to="/login" className="btn-primary mt-6 inline-flex">
           Ingresar
         </Link>
-        <p className="mt-8 text-xs text-white/30">Access Kids, hecho con fe, como ofrenda para la gloria de Dios.</p>
+        <p className="mt-8 text-xs text-white/30">KidsMin, hecho con fe, como ofrenda para la gloria de Dios.</p>
       </footer>
     </div>
   )
