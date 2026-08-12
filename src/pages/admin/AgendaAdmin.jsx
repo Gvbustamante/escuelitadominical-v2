@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
 
 function hoyISO() {
@@ -17,6 +18,8 @@ export default function AgendaAdmin() {
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState({ titulo: '', descripcion: '', fecha: hoyISO(), nivel_id: '' })
   const [busy, setBusy] = useState(false)
+  const [confirmEliminar, setConfirmEliminar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
 
   const load = useCallback(async () => {
     const { data } = await supabase.from('agenda').select('*, nivel:niveles(nombre)').order('fecha')
@@ -48,8 +51,12 @@ export default function AgendaAdmin() {
     load()
   }
 
-  async function eliminar(id) {
-    await supabase.from('agenda').delete().eq('id', id)
+  async function confirmarEliminar() {
+    if (!confirmEliminar) return
+    setConfirmBusy(true)
+    await supabase.from('agenda').delete().eq('id', confirmEliminar)
+    setConfirmBusy(false)
+    setConfirmEliminar(null)
     load()
   }
 
@@ -87,7 +94,7 @@ export default function AgendaAdmin() {
                 <p className="text-sm text-ink/50">{ev.fecha}</p>
                 {ev.descripcion && <p className="mt-1 text-sm text-ink/60">{ev.descripcion}</p>}
               </div>
-              <button onClick={() => eliminar(ev.id)} className="text-2xl text-ink/30 hover:text-coral-500">
+              <button onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/30 hover:text-coral-500">
                 🗑️
               </button>
             </div>
@@ -133,6 +140,16 @@ export default function AgendaAdmin() {
           </button>
         </form>
       </Modal>
+
+      <ConfirmModal
+        open={!!confirmEliminar}
+        onClose={() => setConfirmEliminar(null)}
+        onConfirm={confirmarEliminar}
+        busy={confirmBusy}
+        title="¿Eliminar este evento?"
+        confirmLabel="Sí, eliminar"
+        message="No se puede deshacer."
+      />
     </div>
   )
 }

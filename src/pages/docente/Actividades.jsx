@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useMisClases } from '../../lib/useMisClases'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
+import ConfirmModal from '../../components/ConfirmModal'
 import ActivityFiles from '../../components/ActivityFiles'
 import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
@@ -23,6 +24,9 @@ export default function Actividades() {
   const { clases, nivelId, setNivelId } = useMisClases()
   const [actividades, setActividades] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [confirmEliminar, setConfirmEliminar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
   const [form, setForm] = useState({
     titulo: '',
     descripcion: '',
@@ -55,6 +59,7 @@ export default function Actividades() {
   }, [load])
 
   function openNew() {
+    setEditing(null)
     setForm({
       titulo: '',
       descripcion: '',
@@ -70,42 +75,69 @@ export default function Actividades() {
     setModalOpen(true)
   }
 
+  function openEdit(actividad) {
+    setEditing(actividad)
+    setForm({
+      titulo: actividad.titulo,
+      descripcion: actividad.descripcion || '',
+      fecha: actividad.fecha,
+      versiculo_clave: actividad.versiculo_clave || '',
+      historia_biblica: actividad.historia_biblica || '',
+      visible_padres: actividad.visible_padres ?? true,
+      es_tarea: actividad.es_tarea ?? false,
+      enlace_externo: actividad.enlace_externo || '',
+    })
+    setArchivos([])
+    setError('')
+    setModalOpen(true)
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setBusy(true)
     setError('')
 
-    const { data: actividad, error: actError } = await supabase
-      .from('actividades')
-      .insert({
-        nivel_id: nivelId,
-        docente_id: user.id,
-        titulo: form.titulo,
-        descripcion: form.descripcion,
-        fecha: form.fecha,
-        versiculo_clave: form.versiculo_clave || null,
-        historia_biblica: form.historia_biblica || null,
-        visible_padres: form.visible_padres,
-        es_tarea: form.es_tarea,
-        enlace_externo: form.enlace_externo || null,
-      })
-      .select()
-      .single()
+    const payload = {
+      titulo: form.titulo,
+      descripcion: form.descripcion,
+      fecha: form.fecha,
+      versiculo_clave: form.versiculo_clave || null,
+      historia_biblica: form.historia_biblica || null,
+      visible_padres: form.visible_padres,
+      es_tarea: form.es_tarea,
+      enlace_externo: form.enlace_externo || null,
+    }
 
-    if (actError) {
-      setError(actError.message)
-      setBusy(false)
-      return
+    let actividadId = editing?.id
+    if (editing) {
+      const { error: updError } = await supabase.from('actividades').update(payload).eq('id', editing.id)
+      if (updError) {
+        setError(updError.message)
+        setBusy(false)
+        return
+      }
+    } else {
+      const { data: actividad, error: actError } = await supabase
+        .from('actividades')
+        .insert({ ...payload, nivel_id: nivelId, docente_id: user.id })
+        .select()
+        .single()
+      if (actError) {
+        setError(actError.message)
+        setBusy(false)
+        return
+      }
+      actividadId = actividad.id
     }
 
     for (let i = 0; i < archivos.length; i++) {
       const file = archivos[i]
       setProgreso(`Subiendo ${i + 1} de ${archivos.length}...`)
-      const path = `${nivelId}/${actividad.id}/${Date.now()}-${file.name}`
+      const path = `${nivelId}/${actividadId}/${Date.now()}-${file.name}`
       const { error: upError } = await supabase.storage.from('actividades').upload(path, file)
       if (!upError) {
         await supabase.from('actividad_archivos').insert({
-          actividad_id: actividad.id,
+          actividad_id: actividadId,
           storage_path: path,
           nombre_archivo: file.name,
           tipo: file.type,
@@ -116,6 +148,19 @@ export default function Actividades() {
     setProgreso('')
     setBusy(false)
     setModalOpen(false)
+    load()
+  }
+
+  function pedirEliminar(id) {
+    setConfirmEliminar(id)
+  }
+
+  async function confirmarEliminar() {
+    if (!confirmEliminar) return
+    setConfirmBusy(true)
+    await supabase.from('actividades').delete().eq('id', confirmEliminar)
+    setConfirmBusy(false)
+    setConfirmEliminar(null)
     load()
   }
 
@@ -150,7 +195,7 @@ export default function Actividades() {
       ) : vista === 'compacta' ? (
         <div className="card divide-y divide-ink/5 !p-0">
           {actividades.map((a) => (
-            <ActividadFila key={a.id} a={a} onVerEntregas={setTareaActividad} />
+            <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} />
           ))}
           {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
         </div>
@@ -162,13 +207,21 @@ export default function Actividades() {
               className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
               style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
             >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-lg font-bold">{a.titulo}</h3>
                   {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
                   {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
                 </div>
-                <span className="text-sm text-ink/40">{a.fecha}</span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-sm text-ink/40">{a.fecha}</span>
+                  <button onClick={() => openEdit(a)} className="text-lg text-ink/30 hover:text-sky-500" title="Editar">
+                    ✏️
+                  </button>
+                  <button onClick={() => pedirEliminar(a.id)} className="text-lg text-ink/30 hover:text-coral-500" title="Eliminar">
+                    🗑️
+                  </button>
+                </div>
               </div>
               {a.descripcion && <p className="mt-1 text-ink/70">{a.descripcion}</p>}
               {(a.versiculo_clave || a.historia_biblica) && (
@@ -192,7 +245,7 @@ export default function Actividades() {
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nueva actividad">
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar actividad' : 'Nueva actividad'}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="label">Título</label>
@@ -285,7 +338,7 @@ export default function Actividades() {
             </div>
           )}
           <div>
-            <label className="label">Archivos (fotos, PDFs, etc.)</label>
+            <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
             <input
               type="file"
               multiple
@@ -293,16 +346,27 @@ export default function Actividades() {
               onChange={(e) => setArchivos(Array.from(e.target.files))}
             />
             {archivos.length > 0 && <p className="mt-1 text-sm text-ink/50">{archivos.length} archivo(s) seleccionado(s)</p>}
+            {editing && <ActivityFiles archivos={editing.actividad_archivos} />}
           </div>
           {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
           <button disabled={busy} className="btn-primary justify-center">
-            {busy ? 'Guardando...' : 'Publicar actividad'}
+            {busy ? 'Guardando...' : editing ? 'Guardar cambios' : 'Publicar actividad'}
           </button>
         </form>
       </Modal>
 
       <TareaEntregas actividad={tareaActividad} open={!!tareaActividad} onClose={() => setTareaActividad(null)} />
+
+      <ConfirmModal
+        open={!!confirmEliminar}
+        onClose={() => setConfirmEliminar(null)}
+        onConfirm={confirmarEliminar}
+        busy={confirmBusy}
+        title="¿Eliminar esta actividad?"
+        confirmLabel="Sí, eliminar"
+        message="Se borra junto con sus fotos/archivos y las entregas de tarea, si tenía. No se puede deshacer."
+      />
     </div>
   )
 }
