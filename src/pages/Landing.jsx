@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppLogo from '../components/AppLogo'
+import heroImg from '../assets/hero-ninos-cruz.jpg'
 
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xdaqpawn'
 
@@ -98,113 +99,13 @@ export default function Landing() {
           </p>
         </div>
 
-        {/* escena: colinas, arboles, sendero, niños caminando hacia la Biblia */}
-        <div className="lp-in relative mt-8 h-72 sm:h-96" style={{ animationDelay: '0.15s' }}>
-          <svg viewBox="0 0 800 320" preserveAspectRatio="xMidYMax slice" className="absolute inset-0 h-full w-full">
-            {/* colina trasera */}
-            <path d="M0 220 Q200 150 400 200 T800 190 V320 H0 Z" fill="#a4efc3" />
-            {/* colina frontal */}
-            <path d="M0 260 Q220 190 420 240 T800 230 V320 H0 Z" fill="#6fe0a3" />
-
-            {/* arboles */}
-            {[[80, 210], [140, 232], [660, 200], [724, 224]].map(([x, y], i) => (
-              <g key={i} transform={`translate(${x} ${y})`}>
-                <rect x="-5" y="24" width="10" height="30" rx="3" fill="#a6742f" />
-                <circle cx="0" cy="10" r="26" fill="#2fc46f" />
-                <circle cx="-17" cy="20" r="18" fill="#2fc46f" />
-                <circle cx="17" cy="20" r="18" fill="#2fc46f" />
-              </g>
-            ))}
-
-            {/* sendero de huellitas serpenteando hacia la Biblia */}
-            {[
-              [430, 312], [392, 296], [436, 278], [398, 260], [432, 240],
-              [400, 220], [428, 198], [404, 178],
-            ].map(([x, y], i) => (
-              <ellipse key={i} cx={x} cy={y} rx="8" ry="11" fill="#ffffff" opacity="0.8" transform={`rotate(${i % 2 ? -18 : 18} ${x} ${y})`} />
-            ))}
-
-            {/* flores a los lados del sendero, bien separadas */}
-            {[
-              [230, 300], [560, 292], [190, 250], [600, 244],
-              [260, 210], [540, 202], [300, 165], [500, 158],
-            ].map(([x, y], i) => (
-              <g key={i} className="lp-sway" transform={`translate(${x} ${y})`} style={{ animationDelay: `${i * 0.3}s` }}>
-                <line x1="0" y1="0" x2="0" y2="18" stroke="#188546" strokeWidth="2.5" />
-                {[0, 72, 144, 216, 288].map((a) => (
-                  <circle key={a} cx={Math.cos((a * Math.PI) / 180) * 6.5} cy={Math.sin((a * Math.PI) / 180) * 6.5} r="4.4" fill={i % 2 ? '#ff9163' : '#ffd54d'} />
-                ))}
-                <circle cx="0" cy="0" r="3.4" fill="#f04e1d" />
-              </g>
-            ))}
-
-            {/* niños tomados de la mano subiendo el sendero */}
-            <line x1="356" y1="284" x2="404" y2="270" stroke="#ffcf9e" strokeWidth="4" strokeLinecap="round" />
-            <line x1="404" y1="270" x2="452" y2="282" stroke="#ffcf9e" strokeWidth="4" strokeLinecap="round" />
-
-            <g transform="translate(356 268)">
-              <rect x="-6" y="18" width="6" height="16" rx="3" fill="#ff6a35" />
-              <rect x="4" y="18" width="6" height="16" rx="3" fill="#ff6a35" />
-              <rect x="-11" y="0" width="22" height="26" rx="9" fill="#ff6a35" />
-              <circle cx="0" cy="-13" r="13" fill="#5a3a22" />
-              <circle cx="0" cy="-10" r="10" fill="#ffcf9e" />
-              <circle cx="-3.5" cy="-10" r="1.4" fill="#2b2b2b" />
-              <circle cx="3.5" cy="-10" r="1.4" fill="#2b2b2b" />
-              <path d="M-3 -5 Q0 -3 3 -5" stroke="#c96b3f" strokeWidth="1.4" strokeLinecap="round" fill="none" />
-            </g>
-            <g transform="translate(404 254)">
-              <rect x="-7" y="20" width="7" height="18" rx="3.5" fill="#1cade4" />
-              <rect x="4" y="20" width="7" height="18" rx="3.5" fill="#1cade4" />
-              <rect x="-13" y="0" width="26" height="30" rx="10" fill="#1cade4" />
-              <circle cx="-14" cy="-8" r="4.4" fill="#2b2b2b" />
-              <circle cx="14" cy="-8" r="4.4" fill="#2b2b2b" />
-              <circle cx="0" cy="-15" r="15" fill="#2b2b2b" />
-              <circle cx="0" cy="-11" r="11" fill="#ffcf9e" />
-              <circle cx="-4" cy="-11" r="1.5" fill="#2b2b2b" />
-              <circle cx="4" cy="-11" r="1.5" fill="#2b2b2b" />
-              <path d="M-3.5 -5 Q0 -2.5 3.5 -5" stroke="#c96b3f" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-            </g>
-            <g transform="translate(452 266)">
-              <rect x="-6" y="17" width="6" height="15" rx="3" fill="#8339d6" />
-              <rect x="4" y="17" width="6" height="15" rx="3" fill="#8339d6" />
-              <rect x="-10" y="0" width="20" height="24" rx="8" fill="#8339d6" />
-              {[-150, -115, -80, -45, -10].map((a) => (
-                <circle
-                  key={a}
-                  cx={Math.cos((a * Math.PI) / 180) * 12}
-                  cy={-12 + Math.sin((a * Math.PI) / 180) * 12}
-                  r="4.2"
-                  fill="#7a4a1e"
-                />
-              ))}
-              <circle cx="0" cy="-12" r="12" fill="#7a4a1e" />
-              <circle cx="0" cy="-9" r="9" fill="#ffcf9e" />
-              <circle cx="-3" cy="-9" r="1.3" fill="#2b2b2b" />
-              <circle cx="3" cy="-9" r="1.3" fill="#2b2b2b" />
-              <path d="M-3 -4 Q0 -2 3 -4" stroke="#c96b3f" strokeWidth="1.3" strokeLinecap="round" fill="none" />
-            </g>
-
-            {/* biblia radiante en la cima */}
-            <g transform="translate(400 140)">
-              {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
-                <line
-                  key={a}
-                  x1={Math.cos((a * Math.PI) / 180) * 42}
-                  y1={Math.sin((a * Math.PI) / 180) * 42}
-                  x2={Math.cos((a * Math.PI) / 180) * 58}
-                  y2={Math.sin((a * Math.PI) / 180) * 58}
-                  stroke="#ffd76b"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  opacity="0.7"
-                />
-              ))}
-              <circle cx="0" cy="0" r="46" fill="#ffe685" opacity="0.55" />
-              <circle cx="0" cy="0" r="32" fill="#fff3c4" opacity="0.9" />
-              <path d="M-24 7 Q0 -8 24 7 V18 Q0 7 -24 18 Z" fill="#ffffff" stroke="#f0ad00" strokeWidth="2" />
-              <path d="M0 7 V18" stroke="#f0ad00" strokeWidth="2" />
-            </g>
-          </svg>
+        {/* escena: foto real de niños compartiendo la Palabra */}
+        <div className="lp-in relative mx-auto mt-8 h-72 w-full max-w-4xl px-4 sm:h-96" style={{ animationDelay: '0.15s' }}>
+          <img
+            src={heroImg}
+            alt="Niños sonriendo mientras leen la Biblia juntos, con una cruz de madera en la colina"
+            className="h-full w-full rounded-blob object-cover shadow-soft"
+          />
         </div>
 
         <div className="relative mx-auto -mt-2 flex max-w-2xl justify-center px-6 pb-10">
