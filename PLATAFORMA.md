@@ -224,7 +224,7 @@ Botón "🔍 Revisar inactividad" en Ajustes (solo admin/coordinador) que llama 
 - Se ejecuta manualmente (no hay cron) para que funcione igual en cualquier proyecto de Supabase sin configuración extra; el admin lo toca cuando quiera (ej. cada domingo).
 
 ### 5.14 Exportar a Excel y vistas de lista
-- `src/lib/exportCsv.js`: genera un `.csv` (con BOM, para que Excel muestre bien los acentos) en el navegador, sin ninguna librería nueva. Botón "📊 Exportar" en Niños, Materiales, Bitácora y el resumen mensual de Asistencia.
+- `src/lib/exportExcel.js`: genera un `.xlsx` real (librería `xlsx`/SheetJS, cargada con `import()` dinámico solo al exportar) — cada dato en su propia celda, sin depender del separador CSV que espera el Excel de cada quien (coma vs. punto y coma según el idioma). Botón "📊 Exportar" en Niños, Materiales, Bitácora y el resumen mensual de Asistencia.
 - **Niños, Equipo (Docentes) y Clases** ahora son de **solo lista/tabla** — se quitó el toggle de tarjetas para que la información quede más compacta y fácil de escanear.
 - **Materiales** ganó una vista "📃 Lista compacta" además de las tarjetas.
 - **Actividades** (docente y admin) ganó una vista "📃 Compacta" (una fila por actividad) además de tarjetas/calendario, usando el componente compartido `ActividadFila.jsx`.
@@ -234,6 +234,13 @@ Botón "🔍 Revisar inactividad" en Ajustes (solo admin/coordinador) que llama 
 - **Admin/coordinador**: sin filtrar, ve de todas las clases.
 - **Docente**: filtrado a sus propios niveles asignados (+ eventos generales sin nivel).
 - **Padre**: filtrado a los niveles de sus hijos, y en vez de listar todas las tareas del nivel, solo muestra las que **sus propios hijos** todavía no han entregado (`soloTareasPendientes`).
+
+### 5.17 Días de clase y Planeación
+- `dias_clase`: qué días de la semana (0=domingo … 6=sábado) hay escuelita — un patrón recurrente, no fechas sueltas. Se configura en **Ajustes → Días de clase** (solo admin/coordinador), con los 7 días como toggles; por defecto solo domingo viene activo.
+- **Planeación** (`/planeacion`, solo admin/coordinador): calendario del mes que marca en azul los días de clase configurados. Al elegir un día, por cada clase activa se ve:
+  - Quién la cubre — el/los docente(s) fijo(s) de `docentes_niveles`, o un **suplente** para esa fecha puntual si hay uno asignado.
+  - `cobertura_dia`: tabla de overrides puntuales (única por `nivel_id`+`fecha`). Si no hay fila ahí, se asume el docente fijo. Se asigna/quita desde un selector en la misma pantalla — solo admin/coordinador.
+  - Si ya hay una actividad planeada ese día para esa clase (`actividades` con esa `fecha`+`nivel_id`), su título con botón "Editar"; si no, "+ Planear" abre un formulario corto (sin archivos — esos se agregan después desde Actividades) que crea la actividad ahí mismo.
 
 ### 5.16 Devocional activo
 `devocionales_ninos.activo`: el admin/coordinador/docente puede marcar un devocional como el destacado del momento (botón "⭐ Marcar activo" en Devocionales, que se ve ahora como lista compacta). La app se encarga de que solo haya uno activo a la vez, desmarcando el anterior. `DevocionalActivo.jsx` lo muestra como tarjeta en los 3 dashboards. `CitaDelDia.jsx` también lo usa: si nadie fijó manualmente una cita bíblica para hoy (`citas_biblicas.fecha_mostrar`), pero hay un devocional activo con versículo, el "Versículo del día" toma ese versículo en vez de la rotación automática.
@@ -270,6 +277,8 @@ Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado 
 | `config_iglesia` | Fila única con nombre y logo personalizados de la iglesia | — |
 | `bitacora_clase` | Constancia por clase y fecha: `salon_ok` + `salon_foto_url`, `refrigerio_detalle` + `refrigerio_foto_url` (única por `nivel_id`+`fecha`) | `niveles`, `docente_id` → `profiles` |
 | `materiales` | Inventario: `nombre`, `categoria` (general/niños/clase), `cantidad`, `foto_url` | `nivel_id` → `niveles` (opcional) |
+| `dias_clase` | Qué días de la semana (0-6) son día de clase (ver 5.17) | — |
+| `cobertura_dia` | Suplente puntual por clase y fecha (única por `nivel_id`+`fecha`, ver 5.17) | `niveles`, `docente_id` → `profiles` |
 
 ### 6.2 Seguridad (Row Level Security)
 Todas las tablas tienen RLS habilitado. El patrón general:
@@ -289,7 +298,7 @@ Todas las tablas tienen RLS habilitado. El patrón general:
 `schema.sql` inserta 15 versículos bíblicos iniciales en `citas_biblicas` para que la app tenga contenido desde el día uno.
 
 ### 6.6 Actualizaciones incrementales a un proyecto ya desplegado
-`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql), [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql), [`supabase/actualizacion_actividades_visibilidad.sql`](./supabase/actualizacion_actividades_visibilidad.sql), [`supabase/actualizacion_tareas_estrellas.sql`](./supabase/actualizacion_tareas_estrellas.sql) (tareas, estrellas configurables y niños pausados), [`supabase/actualizacion_inactividad.sql`](./supabase/actualizacion_inactividad.sql) (revisar inactividad — requiere haber corrido antes el de tareas/estrellas) y [`supabase/actualizacion_devocional_activo.sql`](./supabase/actualizacion_devocional_activo.sql). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
+`schema.sql` solo se corre una vez, al crear el proyecto. Cuando se agregan tablas/columnas nuevas después (como `bitacora_clase`, `materiales` o `devocionales_ninos.imagen_url`), se comparten como un archivo de SQL suelto, idempotente (`create table if not exists`, `add column if not exists`, `drop policy if exists` antes de recrearla) para poder pegarlo en el SQL Editor de cualquier proyecto ya en uso sin romper nada. Ejemplos reales: [`supabase/actualizacion_evidencias_materiales.sql`](./supabase/actualizacion_evidencias_materiales.sql), [`supabase/actualizacion_foros_privados.sql`](./supabase/actualizacion_foros_privados.sql), [`supabase/actualizacion_actividades_visibilidad.sql`](./supabase/actualizacion_actividades_visibilidad.sql), [`supabase/actualizacion_tareas_estrellas.sql`](./supabase/actualizacion_tareas_estrellas.sql) (tareas, estrellas configurables y niños pausados), [`supabase/actualizacion_inactividad.sql`](./supabase/actualizacion_inactividad.sql) (revisar inactividad — requiere haber corrido antes el de tareas/estrellas) y [`supabase/actualizacion_devocional_activo.sql`](./supabase/actualizacion_devocional_activo.sql) y [`supabase/actualizacion_dias_clase.sql`](./supabase/actualizacion_dias_clase.sql) (días de clase + cobertura puntual). Los mismos cambios también se agregan a `schema.sql` para que las iglesias *nuevas* los tengan desde el inicio (ver también sección 8).
 
 ## 7. Variables de entorno
 

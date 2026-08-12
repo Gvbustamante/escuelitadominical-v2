@@ -23,6 +23,7 @@ import Ajustes from './pages/admin/Ajustes'
 import BitacoraAdmin from './pages/admin/BitacoraAdmin'
 import Materiales from './pages/admin/Materiales'
 import ConfigEstrellas from './pages/admin/ConfigEstrellas'
+import Planeacion from './pages/admin/Planeacion'
 
 import DocenteHome from './pages/docente/DocenteHome'
 import Asistencia from './pages/docente/Asistencia'
@@ -130,6 +131,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={STAFF}>
               <ConfigEstrellas />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/planeacion"
+          element={
+            <ProtectedRoute roles={STAFF}>
+              <Planeacion />
             </ProtectedRoute>
           }
         />

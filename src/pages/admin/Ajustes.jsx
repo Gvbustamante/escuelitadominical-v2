@@ -4,6 +4,16 @@ import Spinner from '../../components/Spinner'
 import AppLogo from '../../components/AppLogo'
 import { useConfigIglesia, refreshConfigIglesia } from '../../lib/configIglesia'
 
+const DIAS_SEMANA = [
+  { dia_semana: 0, label: 'Domingo' },
+  { dia_semana: 1, label: 'Lunes' },
+  { dia_semana: 2, label: 'Martes' },
+  { dia_semana: 3, label: 'Miércoles' },
+  { dia_semana: 4, label: 'Jueves' },
+  { dia_semana: 5, label: 'Viernes' },
+  { dia_semana: 6, label: 'Sábado' },
+]
+
 export default function Ajustes() {
   const config = useConfigIglesia()
   const [nombreIglesia, setNombreIglesia] = useState('')
@@ -16,6 +26,23 @@ export default function Ajustes() {
 
   const [revisando, setRevisando] = useState(false)
   const [resultadoRevision, setResultadoRevision] = useState('')
+
+  const [diasClase, setDiasClase] = useState(null)
+
+  useEffect(() => {
+    supabase
+      .from('dias_clase')
+      .select('*')
+      .order('dia_semana')
+      .then(({ data }) => setDiasClase(data || []))
+  }, [])
+
+  async function toggleDiaClase(dia_semana) {
+    const actual = diasClase.find((d) => d.dia_semana === dia_semana)
+    const nuevoActivo = !actual?.activo
+    setDiasClase((prev) => prev.map((d) => (d.dia_semana === dia_semana ? { ...d, activo: nuevoActivo } : d)))
+    await supabase.from('dias_clase').upsert({ dia_semana, activo: nuevoActivo }, { onConflict: 'dia_semana' })
+  }
 
   async function handleRevisarInactividad() {
     setRevisando(true)
@@ -174,6 +201,35 @@ export default function Ajustes() {
           {revisando ? 'Revisando...' : '🔍 Revisar inactividad'}
         </button>
         {resultadoRevision && <p className="mt-3 text-sm font-bold text-ink/70">{resultadoRevision}</p>}
+      </div>
+
+      <div className="card max-w-xl">
+        <p className="label mb-1">Días de clase</p>
+        <p className="mb-4 text-sm text-ink/50">
+          Qué días de la semana hay escuelita. Se usa en <strong>Planeación</strong> para saber qué días marcar en
+          el calendario y pedirte cubrir cada clase.
+        </p>
+        {!diasClase ? (
+          <p className="text-sm text-ink/40">Cargando...</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {DIAS_SEMANA.map((d) => {
+              const activo = diasClase.find((x) => x.dia_semana === d.dia_semana)?.activo
+              return (
+                <button
+                  key={d.dia_semana}
+                  type="button"
+                  onClick={() => toggleDiaClase(d.dia_semana)}
+                  className={`rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${
+                    activo ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/50'
+                  }`}
+                >
+                  {d.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )
