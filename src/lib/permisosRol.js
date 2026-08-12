@@ -29,6 +29,7 @@ export const PERMISOS_DISPONIBLES = [
 ]
 
 let cache = null
+let cacheError = null
 let inFlight = null
 const listeners = new Set()
 
@@ -37,9 +38,10 @@ function fetchPermisos() {
     inFlight = supabase
       .from('permisos_rol')
       .select('*')
-      .then(({ data }) => {
+      .then(({ data, error }) => {
         cache = data || []
-        listeners.forEach((fn) => fn(cache))
+        cacheError = error ? error.message : null
+        listeners.forEach((fn) => fn(cache, cacheError))
         inFlight = null
         return cache
       })
@@ -53,20 +55,29 @@ export function refreshPermisosRol() {
 
 export function usePermisosRol() {
   const [permisos, setPermisos] = useState(cache)
+  const [error, setError] = useState(cacheError)
 
   useEffect(() => {
     if (!cache) fetchPermisos()
-    const fn = (p) => setPermisos(p)
+    const fn = (p, err) => {
+      setPermisos(p)
+      setError(err)
+    }
     listeners.add(fn)
     return () => listeners.delete(fn)
   }, [])
 
   // true/false una vez cargado; false mientras carga (nunca se abre un
   // botón sensible antes de confirmar que el permiso existe de verdad).
+  // Si la fila no existe en la base todavía (ej. antes de correr el SQL
+  // de la actualización, o un permiso agregado después), usa el valor
+  // por defecto del catálogo en vez de bloquear todo de golpe.
   function tiene(rol, permiso) {
     if (!permisos) return false
-    return !!permisos.find((p) => p.rol === rol && p.permiso === permiso)?.activo
+    const fila = permisos.find((p) => p.rol === rol && p.permiso === permiso)
+    if (fila) return !!fila.activo
+    return !!PERMISOS_DISPONIBLES.find((p) => p.rol === rol && p.permiso === permiso)?.porDefecto
   }
 
-  return { permisos, tiene, cargando: permisos === null }
+  return { permisos, tiene, cargando: permisos === null, error }
 }

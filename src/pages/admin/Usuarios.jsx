@@ -453,14 +453,23 @@ function UsuariosTab({
 }
 
 function PermisosTab() {
-  const { permisos, cargando } = usePermisosRol()
+  const { permisos, cargando, error: errorCarga } = usePermisosRol()
   const [busyKey, setBusyKey] = useState('')
+  const [error, setError] = useState('')
 
   async function toggle(rol, permiso) {
     const key = `${rol}_${permiso}`
     setBusyKey(key)
+    setError('')
     const actual = permisos?.find((p) => p.rol === rol && p.permiso === permiso)
-    await supabase.from('permisos_rol').upsert({ rol, permiso, activo: !actual?.activo }, { onConflict: 'rol,permiso' })
+    const { error: upsertError } = await supabase
+      .from('permisos_rol')
+      .upsert({ rol, permiso, activo: !actual?.activo }, { onConflict: 'rol,permiso' })
+    if (upsertError) {
+      setError(upsertError.message)
+      setBusyKey('')
+      return
+    }
     await refreshPermisosRol()
     setBusyKey('')
   }
@@ -481,6 +490,17 @@ function PermisosTab() {
         Interruptores extra para lo que un rol puede hacer, además de lo normal de la plataforma. Se aplican al
         instante — no hace falta guardar.
       </p>
+      {errorCarga && (
+        <p className="max-w-2xl rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">
+          No pude cargar los permisos: {errorCarga}. ¿Ya corriste <code>actualizacion_permisos.sql</code> en tu
+          proyecto de Supabase?
+        </p>
+      )}
+      {error && (
+        <p className="max-w-2xl rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">
+          No se pudo guardar: {error}
+        </p>
+      )}
       {PERMISOS_DISPONIBLES.map((p) => {
         const activo = !!permisos?.find((row) => row.rol === p.rol && row.permiso === p.permiso)?.activo
         const key = `${p.rol}_${p.permiso}`
