@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 const AuthContext = createContext(null)
@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [passwordRecovery, setPasswordRecovery] = useState(false)
+  const userIdRef = useRef(null)
 
   const loadProfile = useCallback(async (userId) => {
     if (!userId) {
@@ -20,18 +21,31 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
+      userIdRef.current = session?.user?.id ?? null
       setSession(session)
       loadProfile(session?.user?.id).finally(() => setLoading(false))
     })
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true)
+
+      const nuevoUserId = session?.user?.id ?? null
+      const esMismoUsuario = nuevoUserId === userIdRef.current
+      userIdRef.current = nuevoUserId
+
       setSession(session)
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+
+      // Supabase vuelve a disparar SIGNED_IN con la misma sesión cada vez
+      // que la pestaña recupera el foco (no es un login real) — si ahí
+      // ponemos loading=true, App.jsx desmonta toda la app (incluyendo
+      // cualquier modal abierto o texto sin guardar) para mostrar el
+      // spinner de pantalla completa. Solo lo hacemos si de verdad cambió
+      // de usuario o cerró sesión.
+      if (event === 'SIGNED_OUT' || (event === 'SIGNED_IN' && !esMismoUsuario)) {
         setLoading(true)
-        loadProfile(session?.user?.id).finally(() => setLoading(false))
+        loadProfile(nuevoUserId).finally(() => setLoading(false))
       } else {
-        loadProfile(session?.user?.id)
+        loadProfile(nuevoUserId)
       }
     })
 
