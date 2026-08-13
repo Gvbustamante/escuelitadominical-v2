@@ -8,6 +8,8 @@ import CalendarioAgenda from '../../components/CalendarioAgenda'
 import VistaToggle from '../../components/VistaToggle'
 import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
+import RichTextEditor from '../../components/RichTextEditor'
+import RichTextView from '../../components/RichTextView'
 
 const VISTA_OPTIONS = [
   { value: 'compacta', label: '📃 Compacta' },
@@ -19,23 +21,28 @@ function hoyISO() {
   return new Date().toISOString().slice(0, 10)
 }
 
-export default function ActividadesAdmin() {
-  const { user } = useAuth()
-  const [niveles, setNiveles] = useState(null)
-  const [nivelId, setNivelId] = useState('')
-  const [actividades, setActividades] = useState(null)
-  const [modalOpen, setModalOpen] = useState(false)
-  const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({
+function formVacio(fecha) {
+  return {
     titulo: '',
     descripcion: '',
-    fecha: hoyISO(),
+    fecha: fecha || hoyISO(),
     versiculo_clave: '',
     historia_biblica: '',
     visible_padres: true,
     es_tarea: false,
     enlace_externo: '',
-  })
+  }
+}
+
+export default function ActividadesAdmin() {
+  const { user } = useAuth()
+  const [niveles, setNiveles] = useState(null)
+  const [nivelId, setNivelId] = useState('')
+  const [audiencia, setAudiencia] = useState('ninos')
+  const [actividades, setActividades] = useState(null)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState(formVacio())
   const [archivos, setArchivos] = useState([])
   const [previews, setPreviews] = useState([])
   const [busy, setBusy] = useState(false)
@@ -58,31 +65,38 @@ export default function ActividadesAdmin() {
   }, [])
 
   const load = useCallback(async () => {
+    if (audiencia === 'docentes') {
+      const { data } = await supabase
+        .from('actividades')
+        .select('*, actividad_archivos(*), actividad_reacciones(*)')
+        .eq('audiencia', 'docentes')
+        .order('fecha', { ascending: false })
+      setActividades(data || [])
+      return
+    }
     if (!nivelId) return
     const { data } = await supabase
       .from('actividades')
       .select('*, actividad_archivos(*), actividad_reacciones(*)')
       .eq('nivel_id', nivelId)
+      .eq('audiencia', 'ninos')
       .order('fecha', { ascending: false })
     setActividades(data || [])
-  }, [nivelId])
+  }, [nivelId, audiencia])
 
   useEffect(() => {
     load()
   }, [load])
 
+  function cambiarAudiencia(nueva) {
+    setAudiencia(nueva)
+    setSelectedDay(null)
+    setActividades(null)
+  }
+
   function openNew() {
     setEditing(null)
-    setForm({
-      titulo: '',
-      descripcion: '',
-      fecha: selectedDay || hoyISO(),
-      versiculo_clave: '',
-      historia_biblica: '',
-      visible_padres: true,
-      es_tarea: false,
-      enlace_externo: '',
-    })
+    setForm(formVacio(selectedDay))
     setArchivos([])
     setPreviews([])
     setError('')
@@ -124,7 +138,7 @@ export default function ActividadesAdmin() {
       fecha: form.fecha,
       versiculo_clave: form.versiculo_clave || null,
       historia_biblica: form.historia_biblica || null,
-      visible_padres: form.visible_padres,
+      visible_padres: audiencia === 'docentes' ? false : form.visible_padres,
       es_tarea: form.es_tarea,
       enlace_externo: form.enlace_externo || null,
     }
@@ -140,7 +154,12 @@ export default function ActividadesAdmin() {
     } else {
       const { data: actividad, error: actError } = await supabase
         .from('actividades')
-        .insert({ ...payload, nivel_id: nivelId, docente_id: user.id })
+        .insert({
+          ...payload,
+          nivel_id: audiencia === 'docentes' ? null : nivelId,
+          audiencia,
+          docente_id: user.id,
+        })
         .select()
         .single()
       if (actError) {
@@ -154,7 +173,7 @@ export default function ActividadesAdmin() {
     for (let i = 0; i < archivos.length; i++) {
       const file = archivos[i]
       setProgreso(`Subiendo ${i + 1} de ${archivos.length}...`)
-      const path = `${nivelId}/${actividadId}/${Date.now()}-${file.name}`
+      const path = `${nivelId || 'equipo-docente'}/${actividadId}/${Date.now()}-${file.name}`
       const { error: upError } = await supabase.storage.from('actividades').upload(path, file)
       if (!upError) {
         await supabase.from('actividad_archivos').insert({
@@ -195,20 +214,43 @@ export default function ActividadesAdmin() {
         </div>
       </div>
 
-      <select
-        className="input max-w-xs"
-        value={nivelId}
-        onChange={(e) => {
-          setNivelId(e.target.value)
-          setSelectedDay(null)
-        }}
-      >
-        {niveles.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.nombre}
-          </option>
-        ))}
-      </select>
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => cambiarAudiencia('ninos')}
+            className={`rounded-full px-4 py-2 text-sm font-bold ${audiencia === 'ninos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50 border-2 border-ink/10'}`}
+          >
+            🧒 Niños
+          </button>
+          <button
+            type="button"
+            onClick={() => cambiarAudiencia('docentes')}
+            className={`rounded-full px-4 py-2 text-sm font-bold ${audiencia === 'docentes' ? 'bg-grape-400 text-white' : 'bg-white text-ink/50 border-2 border-ink/10'}`}
+          >
+            🍎 Equipo docente
+          </button>
+        </div>
+        {audiencia === 'ninos' && (
+          <select
+            className="input max-w-xs"
+            value={nivelId}
+            onChange={(e) => {
+              setNivelId(e.target.value)
+              setSelectedDay(null)
+            }}
+          >
+            {niveles.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nombre}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+      {audiencia === 'docentes' && (
+        <p className="-mt-3 text-sm text-ink/50">Comunicados, capacitaciones o tareas dirigidas a todo el equipo docente, no a una clase en particular.</p>
+      )}
 
       {!actividades ? (
         <Spinner />
@@ -245,7 +287,11 @@ export default function ActividadesAdmin() {
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar actividad' : 'Nueva actividad'}>
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={editing ? 'Editar actividad' : audiencia === 'docentes' ? 'Nuevo comunicado para el equipo' : 'Nueva actividad'}
+      >
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="label">Título</label>
@@ -253,12 +299,7 @@ export default function ActividadesAdmin() {
           </div>
           <div>
             <label className="label">Descripción</label>
-            <textarea
-              className="input"
-              rows={3}
-              value={form.descripcion}
-              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-            />
+            <RichTextEditor value={form.descripcion} onChange={(html) => setForm({ ...form, descripcion: html })} />
           </div>
           <div>
             <label className="label">Fecha</label>
@@ -282,25 +323,27 @@ export default function ActividadesAdmin() {
               onChange={(e) => setForm({ ...form, historia_biblica: e.target.value })}
             />
           </div>
-          <div>
-            <label className="label">Quién la puede ver</label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, visible_padres: true })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
-              >
-                👀 Visible para padres
-              </button>
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, visible_padres: false })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
-              >
-                🙈 Solo el equipo
-              </button>
+          {audiencia === 'ninos' && (
+            <div>
+              <label className="label">Quién la puede ver</label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, visible_padres: true })}
+                  className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                >
+                  👀 Visible para padres
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, visible_padres: false })}
+                  className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                >
+                  🙈 Solo el equipo
+                </button>
+              </div>
             </div>
-          </div>
+          )}
           <div>
             <label className="label">¿Pide una tarea?</label>
             <div className="flex gap-2">
@@ -321,7 +364,9 @@ export default function ActividadesAdmin() {
             </div>
             {form.es_tarea && (
               <p className="mt-1 text-xs text-ink/40">
-                Cada niño del nivel podrá entregar su evidencia desde la cuenta de su padre/madre.
+                {audiencia === 'docentes'
+                  ? 'Cada docente podrá marcarla como hecha desde su cuenta.'
+                  : 'Cada niño del nivel podrá entregar su evidencia desde la cuenta de su padre/madre.'}
               </p>
             )}
           </div>
@@ -372,7 +417,8 @@ function ActividadCard({ a, i, onEdit, onDelete, onVerEntregas }) {
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-bold">{a.titulo}</h3>
-          {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
+          {a.audiencia === 'docentes' && <span className="badge bg-grape-100 text-grape-700">🍎 Equipo docente</span>}
+          {a.visible_padres === false && a.audiencia !== 'docentes' && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
           {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
         </div>
         <div className="flex items-center gap-2">
@@ -385,7 +431,7 @@ function ActividadCard({ a, i, onEdit, onDelete, onVerEntregas }) {
           </button>
         </div>
       </div>
-      {a.descripcion && <p className="mt-1 text-ink/70">{a.descripcion}</p>}
+      <RichTextView html={a.descripcion} className="mt-1" />
       {(a.versiculo_clave || a.historia_biblica) && (
         <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
           {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}

@@ -9,6 +9,8 @@ import ActivityFiles from '../../components/ActivityFiles'
 import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
 import VistaToggle from '../../components/VistaToggle'
+import RichTextEditor from '../../components/RichTextEditor'
+import RichTextView from '../../components/RichTextView'
 
 const VISTA_OPTIONS = [
   { value: 'compacta', label: '📃 Compacta' },
@@ -19,15 +21,8 @@ function hoyISO() {
   return new Date().toISOString().slice(0, 10)
 }
 
-export default function Actividades() {
-  const { user } = useAuth()
-  const { clases, nivelId, setNivelId } = useMisClases()
-  const [actividades, setActividades] = useState(null)
-  const [modalOpen, setModalOpen] = useState(false)
-  const [editing, setEditing] = useState(null)
-  const [confirmEliminar, setConfirmEliminar] = useState(null)
-  const [confirmBusy, setConfirmBusy] = useState(false)
-  const [form, setForm] = useState({
+function formVacio() {
+  return {
     titulo: '',
     descripcion: '',
     fecha: hoyISO(),
@@ -36,7 +31,21 @@ export default function Actividades() {
     visible_padres: true,
     es_tarea: false,
     enlace_externo: '',
-  })
+  }
+}
+
+export default function Actividades() {
+  const { user } = useAuth()
+  const { clases, nivelId, setNivelId } = useMisClases()
+  const [seccion, setSeccion] = useState('clase')
+  const [actividades, setActividades] = useState(null)
+  const [paraEquipo, setParaEquipo] = useState(null)
+  const [misEntregas, setMisEntregas] = useState({})
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [confirmEliminar, setConfirmEliminar] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
+  const [form, setForm] = useState(formVacio())
   const [archivos, setArchivos] = useState([])
   const [busy, setBusy] = useState(false)
   const [progreso, setProgreso] = useState('')
@@ -50,26 +59,43 @@ export default function Actividades() {
       .from('actividades')
       .select('*, actividad_archivos(*), actividad_reacciones(*)')
       .eq('nivel_id', nivelId)
+      .eq('audiencia', 'ninos')
       .order('fecha', { ascending: false })
     setActividades(data || [])
   }, [nivelId])
+
+  const loadEquipo = useCallback(async () => {
+    const { data } = await supabase
+      .from('actividades')
+      .select('*, actividad_archivos(*)')
+      .eq('audiencia', 'docentes')
+      .order('fecha', { ascending: false })
+    setParaEquipo(data || [])
+
+    const tareaIds = (data || []).filter((a) => a.es_tarea).map((a) => a.id)
+    if (tareaIds.length > 0) {
+      const { data: e } = await supabase.from('tarea_entregas').select('*').in('actividad_id', tareaIds).eq('docente_id', user.id)
+      const byActividad = {}
+      ;(e || []).forEach((row) => {
+        byActividad[row.actividad_id] = row
+      })
+      setMisEntregas(byActividad)
+    } else {
+      setMisEntregas({})
+    }
+  }, [user.id])
 
   useEffect(() => {
     load()
   }, [load])
 
+  useEffect(() => {
+    loadEquipo()
+  }, [loadEquipo])
+
   function openNew() {
     setEditing(null)
-    setForm({
-      titulo: '',
-      descripcion: '',
-      fecha: hoyISO(),
-      versiculo_clave: '',
-      historia_biblica: '',
-      visible_padres: true,
-      es_tarea: false,
-      enlace_externo: '',
-    })
+    setForm(formVacio())
     setArchivos([])
     setError('')
     setModalOpen(true)
@@ -174,74 +200,145 @@ export default function Actividades() {
           <h1 className="text-3xl font-bold">Actividades 🎨</h1>
           <p className="text-ink/50">Comparte lo que hicieron en clase</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <VistaToggle vista={vista} onChange={setVista} options={VISTA_OPTIONS} />
-          <button className="btn-primary" onClick={openNew}>
-            + Nueva actividad
-          </button>
-        </div>
+        {seccion === 'clase' && (
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <VistaToggle vista={vista} onChange={setVista} options={VISTA_OPTIONS} />
+            <button className="btn-primary" onClick={openNew}>
+              + Nueva actividad
+            </button>
+          </div>
+        )}
       </div>
 
-      <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
-        {clases.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.nombre}
-          </option>
-        ))}
-      </select>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setSeccion('clase')}
+          className={`rounded-full px-4 py-2 text-sm font-bold ${seccion === 'clase' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50 border-2 border-ink/10'}`}
+        >
+          🧒 Mi clase
+        </button>
+        <button
+          type="button"
+          onClick={() => setSeccion('equipo')}
+          className={`relative rounded-full px-4 py-2 text-sm font-bold ${seccion === 'equipo' ? 'bg-grape-400 text-white' : 'bg-white text-ink/50 border-2 border-ink/10'}`}
+        >
+          🍎 Para el equipo
+          {paraEquipo && paraEquipo.some((a) => a.es_tarea && (misEntregas[a.id]?.estado || 'pendiente') !== 'entregada') && (
+            <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-coral-400" />
+          )}
+        </button>
+      </div>
 
-      {!actividades ? (
-        <Spinner />
-      ) : vista === 'compacta' ? (
-        <div className="card divide-y divide-ink/5 !p-0">
-          {actividades.map((a) => (
-            <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} />
-          ))}
-          {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
-        </div>
+      {seccion === 'clase' ? (
+        <>
+          <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
+            {clases.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nombre}
+              </option>
+            ))}
+          </select>
+
+          {!actividades ? (
+            <Spinner />
+          ) : vista === 'compacta' ? (
+            <div className="card divide-y divide-ink/5 !p-0">
+              {actividades.map((a) => (
+                <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} />
+              ))}
+              {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {actividades.map((a, i) => (
+                <div
+                  key={a.id}
+                  className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
+                  style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-lg font-bold">{a.titulo}</h3>
+                      {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
+                      {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="text-sm text-ink/40">{a.fecha}</span>
+                      <button onClick={() => openEdit(a)} className="text-lg text-ink/30 hover:text-sky-500" title="Editar">
+                        ✏️
+                      </button>
+                      <button onClick={() => pedirEliminar(a.id)} className="text-lg text-ink/30 hover:text-coral-500" title="Eliminar">
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                  <RichTextView html={a.descripcion} className="mt-1" />
+                  {(a.versiculo_clave || a.historia_biblica) && (
+                    <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
+                      {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
+                      {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
+                    </div>
+                  )}
+                  <ActivityFiles archivos={a.actividad_archivos} />
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-bold text-coral-500">{a.actividad_reacciones?.length || 0} reacciones ❤️</p>
+                    {a.es_tarea && (
+                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setTareaActividad(a)}>
+                        📋 Ver entregas
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {actividades.length === 0 && <p className="card text-ink/50">Aún no hay actividades para esta clase.</p>}
+            </div>
+          )}
+        </>
       ) : (
         <div className="flex flex-col gap-4">
-          {actividades.map((a, i) => (
-            <div
-              key={a.id}
-              className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
-              style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-lg font-bold">{a.titulo}</h3>
-                  {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
-                  {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
+          {!paraEquipo ? (
+            <Spinner />
+          ) : paraEquipo.length === 0 ? (
+            <p className="card text-ink/50">Todavía no hay comunicados para el equipo docente.</p>
+          ) : (
+            paraEquipo.map((a, i) => (
+              <div
+                key={a.id}
+                className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
+                style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-lg font-bold">{a.titulo}</h3>
+                    {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
+                  </div>
+                  <span className="shrink-0 text-sm text-ink/40">{a.fecha}</span>
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="text-sm text-ink/40">{a.fecha}</span>
-                  <button onClick={() => openEdit(a)} className="text-lg text-ink/30 hover:text-sky-500" title="Editar">
-                    ✏️
-                  </button>
-                  <button onClick={() => pedirEliminar(a.id)} className="text-lg text-ink/30 hover:text-coral-500" title="Eliminar">
-                    🗑️
-                  </button>
-                </div>
-              </div>
-              {a.descripcion && <p className="mt-1 text-ink/70">{a.descripcion}</p>}
-              {(a.versiculo_clave || a.historia_biblica) && (
-                <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
-                  {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
-                  {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
-                </div>
-              )}
-              <ActivityFiles archivos={a.actividad_archivos} />
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-bold text-coral-500">{a.actividad_reacciones?.length || 0} reacciones ❤️</p>
+                <RichTextView html={a.descripcion} className="mt-1" />
+                {(a.versiculo_clave || a.historia_biblica) && (
+                  <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
+                    {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
+                    {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
+                  </div>
+                )}
+                {a.enlace_externo && (
+                  <a
+                    href={a.enlace_externo}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-block w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
+                  >
+                    🔗 Abrir enlace
+                  </a>
+                )}
+                <ActivityFiles archivos={a.actividad_archivos} />
                 {a.es_tarea && (
-                  <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setTareaActividad(a)}>
-                    📋 Ver entregas
-                  </button>
+                  <MiEntregaEquipo actividad={a} entrega={misEntregas[a.id]} onSaved={loadEquipo} />
                 )}
               </div>
-            </div>
-          ))}
-          {actividades.length === 0 && <p className="card text-ink/50">Aún no hay actividades para esta clase.</p>}
+            ))
+          )}
         </div>
       )}
 
@@ -253,12 +350,7 @@ export default function Actividades() {
           </div>
           <div>
             <label className="label">Descripción</label>
-            <textarea
-              className="input"
-              rows={3}
-              value={form.descripcion}
-              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-            />
+            <RichTextEditor value={form.descripcion} onChange={(html) => setForm({ ...form, descripcion: html })} />
           </div>
           <div>
             <label className="label">Fecha</label>
@@ -367,6 +459,45 @@ export default function Actividades() {
         confirmLabel="Sí, eliminar"
         message="Se borra junto con sus fotos/archivos y las entregas de tarea, si tenía. No se puede deshacer."
       />
+    </div>
+  )
+}
+
+function MiEntregaEquipo({ actividad, entrega, onSaved }) {
+  const { user } = useAuth()
+  const [busy, setBusy] = useState(false)
+  const estado = entrega?.estado || 'pendiente'
+
+  async function marcar(hecha) {
+    setBusy(true)
+    await supabase.from('tarea_entregas').upsert(
+      {
+        actividad_id: actividad.id,
+        docente_id: user.id,
+        estado: hecha ? 'entregada' : 'pendiente',
+        entregado_por: user.id,
+        entregado_at: hecha ? new Date().toISOString() : null,
+      },
+      { onConflict: 'actividad_id,docente_id' },
+    )
+    setBusy(false)
+    onSaved()
+  }
+
+  return (
+    <div className="mt-4 flex items-center justify-between gap-2 rounded-2xl border-2 border-dashed border-grape-200 bg-grape-50/50 p-3">
+      {estado === 'entregada' ? (
+        <p className="text-sm font-bold text-grass-700">✅ Ya la marcaste como hecha</p>
+      ) : (
+        <p className="text-sm font-bold text-grape-700">⏳ Pendiente por hacer</p>
+      )}
+      <button
+        disabled={busy}
+        onClick={() => marcar(estado !== 'entregada')}
+        className={estado === 'entregada' ? 'btn-secondary !py-1 !px-3 !text-xs' : 'btn-primary !py-1 !px-3 !text-xs'}
+      >
+        {busy ? '...' : estado === 'entregada' ? 'Deshacer' : '✅ Marcar como hecha'}
+      </button>
     </div>
   )
 }
