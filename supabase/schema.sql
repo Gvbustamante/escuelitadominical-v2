@@ -1042,7 +1042,8 @@ comment on function public.tiene_permiso is 'Helper usado dentro de políticas R
 insert into public.permisos_rol (rol, permiso, activo) values
   ('docente', 'editar_ninos', true),
   ('docente', 'agregar_ninos', false),
-  ('docente', 'vincular_padres', false)
+  ('docente', 'vincular_padres', false),
+  ('docente', 'elegir_clase', false)
 on conflict (rol, permiso) do nothing;
 
 create policy "docente actualiza ninos de su nivel" on public.ninos for update to authenticated
@@ -1069,3 +1070,9 @@ create policy "docente vincula padres si tiene permiso" on public.ninos_padres f
       where n.id = ninos_padres.nino_id and dn.docente_id = auth.uid()
     )
   );
+
+create policy "docente elige su clase si tiene permiso" on public.docentes_niveles for insert to authenticated
+  with check (docente_id = auth.uid() and public.tiene_permiso('docente', 'elegir_clase'));
+
+create policy "docente sale de su clase si tiene permiso" on public.docentes_niveles for delete to authenticated
+  using (docente_id = auth.uid() and public.tiene_permiso('docente', 'elegir_clase'));
