@@ -26,6 +26,13 @@ export const PERMISOS_DISPONIBLES = [
     detalle: 'Crear una cuenta nueva de padre/madre (o vincular una existente) para los niños de su propia clase.',
     porDefecto: false,
   },
+  {
+    rol: 'docente',
+    permiso: 'elegir_clase',
+    label: 'Elegir su propia clase/salón',
+    detalle: 'Desde su Inicio, puede unirse o salirse de cualquier clase sin que el admin tenga que asignarlo. Puede estar en más de una a la vez.',
+    porDefecto: false,
+  },
 ]
 
 let cache = null

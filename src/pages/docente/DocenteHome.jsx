@@ -1,35 +1,40 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePermisosRol } from '../../lib/permisosRol'
 import Spinner from '../../components/Spinner'
 import { BADGE_CLASSES } from '../../lib/colors'
 import CitaDelDia from '../../components/CitaDelDia'
 import ProximaAgenda from '../../components/ProximaAgenda'
 import ResumenHoy from '../../components/ResumenHoy'
+import MiClase from '../../components/MiClase'
 
 export default function DocenteHome() {
   const { profile, user } = useAuth()
+  const { tiene } = usePermisosRol()
+  const puedeElegirClase = tiene('docente', 'elegir_clase')
   const [clases, setClases] = useState(null)
 
-  useEffect(() => {
-    async function load() {
-      const { data: asign } = await supabase.from('docentes_niveles').select('nivel_id').eq('docente_id', user.id)
-      const nivelIds = (asign || []).map((a) => a.nivel_id)
-      if (nivelIds.length === 0) {
-        setClases([])
-        return
-      }
-      const { data: niveles } = await supabase.from('niveles').select('*').in('id', nivelIds)
-      const { data: ninos } = await supabase.from('ninos').select('id, nivel_id').eq('activo', true).in('nivel_id', nivelIds)
-      const withCounts = (niveles || []).map((n) => ({
-        ...n,
-        count: (ninos || []).filter((c) => c.nivel_id === n.id).length,
-      }))
-      setClases(withCounts)
+  const load = useCallback(async () => {
+    const { data: asign } = await supabase.from('docentes_niveles').select('nivel_id').eq('docente_id', user.id)
+    const nivelIds = (asign || []).map((a) => a.nivel_id)
+    if (nivelIds.length === 0) {
+      setClases([])
+      return
     }
-    load()
+    const { data: niveles } = await supabase.from('niveles').select('*').in('id', nivelIds)
+    const { data: ninos } = await supabase.from('ninos').select('id, nivel_id').eq('activo', true).in('nivel_id', nivelIds)
+    const withCounts = (niveles || []).map((n) => ({
+      ...n,
+      count: (ninos || []).filter((c) => c.nivel_id === n.id).length,
+    }))
+    setClases(withCounts)
   }, [user.id])
+
+  useEffect(() => {
+    load()
+  }, [load])
 
   if (!clases) return <Spinner />
 
@@ -47,10 +52,14 @@ export default function DocenteHome() {
 
       <ResumenHoy nivelIds={clases.map((c) => c.id)} />
 
-      {clases.length === 0 && (
-        <p className="card text-ink/50">
-          Aún no tienes clases asignadas. Pide al administrador que te asigne una en la sección de Clases.
-        </p>
+      {puedeElegirClase ? (
+        <MiClase onChange={load} />
+      ) : (
+        clases.length === 0 && (
+          <p className="card text-ink/50">
+            Aún no tienes clases asignadas. Pide al administrador que te asigne una en la sección de Clases.
+          </p>
+        )
       )}
 
       <ProximaAgenda nivelIds={clases.map((c) => c.id)} />
