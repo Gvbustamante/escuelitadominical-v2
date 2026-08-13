@@ -141,6 +141,25 @@ create table public.devocionales_ninos (
 );
 comment on column public.devocionales_ninos.activo is 'true = es el devocional destacado del momento (del día/semana). Solo debería haber uno activo a la vez; la app se encarga de desmarcar los demás al activar uno nuevo.';
 
+create table public.devocional_archivos (
+  id uuid primary key default gen_random_uuid(),
+  devocional_id uuid references public.devocionales_ninos(id) on delete cascade,
+  storage_path text not null,
+  nombre_archivo text,
+  tipo text,
+  created_at timestamptz not null default now()
+);
+comment on table public.devocional_archivos is 'Archivos descargables de un devocional (guías, hojas de actividad, etc.), aparte de la imagen principal (devocionales_ninos.imagen_url).';
+
+create table public.devocional_reacciones (
+  id uuid primary key default gen_random_uuid(),
+  devocional_id uuid references public.devocionales_ninos(id) on delete cascade,
+  usuario_id uuid references public.profiles(id) on delete cascade,
+  tipo text not null default '❤️',
+  created_at timestamptz not null default now(),
+  unique (devocional_id, usuario_id)
+);
+
 create table public.citas_biblicas (
   id uuid primary key default gen_random_uuid(),
   texto text not null,
@@ -165,6 +184,8 @@ alter table public.actividad_reacciones enable row level security;
 alter table public.agenda enable row level security;
 alter table public.progreso_notas enable row level security;
 alter table public.devocionales_ninos enable row level security;
+alter table public.devocional_archivos enable row level security;
+alter table public.devocional_reacciones enable row level security;
 alter table public.citas_biblicas enable row level security;
 
 -- PROFILES
@@ -320,6 +341,15 @@ create policy "leer devocionales ninos" on public.devocionales_ninos for select 
 create policy "gestionar devocionales ninos" on public.devocionales_ninos for all to authenticated
   using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')))
   with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+
+create policy "leer archivos de devocional" on public.devocional_archivos for select to authenticated using (true);
+create policy "gestionar archivos de devocional" on public.devocional_archivos for all to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+
+create policy "leer reacciones de devocional" on public.devocional_reacciones for select to authenticated using (true);
+create policy "gestionar propia reaccion de devocional" on public.devocional_reacciones for all to authenticated
+  using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
 
 -- CITAS_BIBLICAS
 create policy "leer citas biblicas" on public.citas_biblicas for select to authenticated using (true);

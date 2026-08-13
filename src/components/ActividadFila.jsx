@@ -1,9 +1,15 @@
+import { useNavigate } from 'react-router-dom'
+
 export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas }) {
+  const navigate = useNavigate()
   return (
     <div className="flex flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-center sm:gap-3 sm:px-4 sm:py-3">
-      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+      <div
+        className="flex min-w-0 flex-1 cursor-pointer flex-wrap items-center gap-2"
+        onClick={() => navigate(`/actividades/${a.id}`)}
+      >
         <span className="shrink-0 text-xs text-ink/40 sm:w-20 sm:text-sm">{a.fecha}</span>
-        <p className="min-w-0 truncate text-sm font-bold sm:text-base">{a.titulo}</p>
+        <p className="min-w-0 truncate text-sm font-bold hover:text-sky-600 sm:text-base">{a.titulo}</p>
         {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
         {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
       </div>
