@@ -18,6 +18,11 @@ function diasEnMes(yyyyMM) {
   return new Date(y, m, 0).getDate()
 }
 
+const MOMENTOS = [
+  { value: 'antes', label: '🚪 Antes de clase', pregunta: '¿Cómo se encontró el salón?' },
+  { value: 'despues', label: '🏁 Después de clase', pregunta: '¿Cómo se entrega el salón?' },
+]
+
 export default function BitacoraAdmin() {
   const [niveles, setNiveles] = useState(null)
   const [nivelId, setNivelId] = useState('')
@@ -59,12 +64,13 @@ export default function BitacoraAdmin() {
   function exportar() {
     const filas = (registros || []).map((r) => [
       r.fecha,
+      r.momento === 'antes' ? 'Antes de clase' : 'Después de clase',
       r.docente?.nombre_completo || '',
       r.salon_ok ? 'En buen estado' : 'Hubo daños',
       r.refrigerio_detalle || '',
       r.notas || '',
     ])
-    exportExcel('bitacora', ['Fecha', 'Docente', 'Salón', 'Refrigerio', 'Notas'], filas)
+    exportExcel('bitacora', ['Fecha', 'Momento', 'Docente', 'Salón', 'Refrigerio', 'Notas'], filas)
   }
 
   if (!niveles) {
@@ -81,12 +87,14 @@ export default function BitacoraAdmin() {
   }
   if (niveles.length === 0) return <p className="card text-ink/50">Todavía no hay clases creadas.</p>
 
+  const porFecha = agruparPorFecha(registros)
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Bitácora 📋</h1>
-          <p className="text-ink/50">Constancia de salón y refrigerio por clase</p>
+          <p className="text-ink/50">Constancia de salón antes/después de clase, y refrigerio</p>
         </div>
         <div className="flex gap-2">
           <button className="btn-primary" onClick={() => setModalOpen(true)}>
@@ -111,34 +119,58 @@ export default function BitacoraAdmin() {
 
       {!registros ? (
         <Skeleton className="h-64 w-full" />
-      ) : registros.length === 0 ? (
+      ) : porFecha.length === 0 ? (
         <p className="card text-ink/50">Sin registros este mes para esta clase.</p>
       ) : (
         <div className="flex flex-col gap-4">
-          {registros.map((r) => (
-            <div key={r.id} className="card">
+          {porFecha.map(({ fecha, antes, despues }) => (
+            <div key={fecha} className="card">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-bold">{r.fecha}</p>
-                <span className={`badge ${r.salon_ok ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
-                  {r.salon_ok ? '✅ Salón en buen estado' : '⚠️ Hubo daños'}
-                </span>
+                <p className="font-bold">{fecha}</p>
+                <div className="flex gap-2">
+                  <span className={`badge ${antes ? 'bg-grass-100 text-grass-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
+                    {antes ? '✅' : '⏳'} Antes de clase
+                  </span>
+                  <span className={`badge ${despues ? 'bg-grass-100 text-grass-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
+                    {despues ? '✅' : '⏳'} Después de clase
+                  </span>
+                </div>
               </div>
-              <p className="text-sm text-ink/50">Registrado por {r.docente?.nombre_completo || '—'}</p>
-              {r.refrigerio_detalle && <p className="mt-2 text-sm text-ink/70">🥤 Refrigerio: {r.refrigerio_detalle}</p>}
-              {r.notas && <p className="mt-1 text-sm text-ink/60">{r.notas}</p>}
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                {r.salon_foto_url && (
-                  <div>
-                    <p className="mb-1 text-xs font-bold uppercase text-ink/40">Salón</p>
-                    <img src={r.salon_foto_url} alt="Foto del salón" className="h-32 w-full rounded-2xl object-cover" />
-                  </div>
-                )}
-                {r.refrigerio_foto_url && (
-                  <div>
-                    <p className="mb-1 text-xs font-bold uppercase text-ink/40">Refrigerio</p>
-                    <img src={r.refrigerio_foto_url} alt="Foto del refrigerio" className="h-32 w-full rounded-2xl object-cover" />
-                  </div>
-                )}
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {MOMENTOS.map((m) => {
+                  const r = m.value === 'antes' ? antes : despues
+                  return (
+                    <div key={m.value} className="rounded-2xl border-2 border-ink/5 p-3">
+                      <p className="text-sm font-bold">{m.label}</p>
+                      {!r ? (
+                        <p className="mt-1 text-sm text-ink/40">Todavía no se ha registrado.</p>
+                      ) : (
+                        <>
+                          <span className={`badge mt-1 ${r.salon_ok ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
+                            {r.salon_ok ? '✅ Salón en buen estado' : '⚠️ Hubo daños'}
+                          </span>
+                          <p className="mt-1 text-xs text-ink/50">Registrado por {r.docente?.nombre_completo || '—'}</p>
+                          {r.refrigerio_detalle && <p className="mt-2 text-sm text-ink/70">🥤 Refrigerio: {r.refrigerio_detalle}</p>}
+                          {r.notas && <p className="mt-1 text-sm text-ink/60">{r.notas}</p>}
+                          <div className="mt-2 grid grid-cols-2 gap-2">
+                            {r.salon_foto_url && (
+                              <div>
+                                <p className="mb-1 text-xs font-bold uppercase text-ink/40">Salón</p>
+                                <img src={r.salon_foto_url} alt="Foto del salón" className="h-24 w-full rounded-xl object-cover" />
+                              </div>
+                            )}
+                            {r.refrigerio_foto_url && (
+                              <div>
+                                <p className="mb-1 text-xs font-bold uppercase text-ink/40">Refrigerio</p>
+                                <img src={r.refrigerio_foto_url} alt="Foto del refrigerio" className="h-24 w-full rounded-xl object-cover" />
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           ))}
@@ -159,10 +191,21 @@ export default function BitacoraAdmin() {
   )
 }
 
+function agruparPorFecha(registros) {
+  if (!registros) return []
+  const map = {}
+  registros.forEach((r) => {
+    if (!map[r.fecha]) map[r.fecha] = { fecha: r.fecha, antes: null, despues: null }
+    map[r.fecha][r.momento === 'antes' ? 'antes' : 'despues'] = r
+  })
+  return Object.values(map).sort((a, b) => (a.fecha < b.fecha ? 1 : -1))
+}
+
 function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
   const { user } = useAuth()
   const [nivelId, setNivelId] = useState(nivelIdInicial || niveles[0]?.id || '')
   const [fecha, setFecha] = useState(hoyISO())
+  const [momento, setMomento] = useState('antes')
   const [registro, setRegistro] = useState(null)
   const [salonOk, setSalonOk] = useState(true)
   const [salonFoto, setSalonFoto] = useState(null)
@@ -174,6 +217,9 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
+  const meta = MOMENTOS.find((m) => m.value === momento)
+  const esDespues = momento === 'despues'
+
   const load = useCallback(async () => {
     if (!nivelId) return
     const { data } = await supabase
@@ -181,6 +227,7 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
       .select('*')
       .eq('nivel_id', nivelId)
       .eq('fecha', fecha)
+      .eq('momento', momento)
       .maybeSingle()
     setRegistro(data)
     setSalonOk(data?.salon_ok ?? true)
@@ -190,14 +237,14 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
     setSalonPreview(null)
     setRefrigerioFoto(null)
     setRefrigerioPreview(null)
-  }, [nivelId, fecha])
+  }, [nivelId, fecha, momento])
 
   useEffect(() => {
     load()
   }, [load])
 
   async function subirFoto(file, tipo) {
-    const path = `bitacora/${nivelId}/${fecha}-${tipo}-${Date.now()}-${file.name}`
+    const path = `bitacora/${nivelId}/${fecha}-${momento}-${tipo}-${Date.now()}-${file.name}`
     const { error: upError } = await supabase.storage.from('actividades').upload(path, file)
     if (upError) return null
     return supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
@@ -214,7 +261,7 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
       if (url) salon_foto_url = url
     }
     let refrigerio_foto_url = registro?.refrigerio_foto_url || null
-    if (refrigerioFoto) {
+    if (esDespues && refrigerioFoto) {
       const url = await subirFoto(refrigerioFoto, 'refrigerio')
       if (url) refrigerio_foto_url = url
     }
@@ -222,15 +269,16 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
     const payload = {
       nivel_id: nivelId,
       fecha,
+      momento,
       docente_id: user.id,
       salon_ok: salonOk,
       salon_foto_url,
-      refrigerio_detalle: refrigerioDetalle || null,
-      refrigerio_foto_url,
+      refrigerio_detalle: esDespues ? refrigerioDetalle || null : null,
+      refrigerio_foto_url: esDespues ? refrigerio_foto_url : null,
       notas: notas || null,
       updated_at: new Date().toISOString(),
     }
-    const { error: saveError } = await supabase.from('bitacora_clase').upsert(payload, { onConflict: 'nivel_id,fecha' })
+    const { error: saveError } = await supabase.from('bitacora_clase').upsert(payload, { onConflict: 'nivel_id,fecha,momento' })
     setBusy(false)
     if (saveError) {
       setError(saveError.message)
@@ -257,10 +305,23 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
           <input type="date" className="input" value={fecha} onChange={(e) => setFecha(e.target.value)} />
         </div>
       </div>
-      {registro && <p className="text-xs font-bold text-sunshine-700">Ya hay una bitácora para esta clase y fecha — se va a actualizar.</p>}
+
+      <div className="flex gap-2">
+        {MOMENTOS.map((m) => (
+          <button
+            key={m.value}
+            type="button"
+            onClick={() => setMomento(m.value)}
+            className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${momento === m.value ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+      {registro && <p className="text-xs font-bold text-sunshine-700">Ya hay una bitácora de "{meta.label}" para esta clase y fecha — se va a actualizar.</p>}
 
       <div>
-        <label className="label">Salón</label>
+        <label className="label">{meta.pregunta}</label>
         <div className="flex gap-2">
           <button
             type="button"
@@ -293,42 +354,54 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
         )}
       </div>
 
-      <div>
-        <label className="label">Refrigerio dado</label>
-        <input
-          className="input"
-          placeholder="Ej. Galletas y jugo"
-          value={refrigerioDetalle}
-          onChange={(e) => setRefrigerioDetalle(e.target.value)}
-        />
-        <input
-          type="file"
-          accept="image/*"
-          className="input mt-2"
-          onChange={(e) => {
-            const f = e.target.files?.[0]
-            if (!f) return
-            setRefrigerioFoto(f)
-            setRefrigerioPreview(URL.createObjectURL(f))
-          }}
-        />
-        {(refrigerioPreview || registro?.refrigerio_foto_url) && (
-          <img
-            src={refrigerioPreview || registro.refrigerio_foto_url}
-            alt="Foto del refrigerio"
-            className="mt-2 h-32 w-full rounded-2xl object-cover"
+      {esDespues && (
+        <div>
+          <label className="label">Refrigerio dado</label>
+          <input
+            className="input"
+            placeholder="Ej. Galletas y jugo"
+            value={refrigerioDetalle}
+            onChange={(e) => setRefrigerioDetalle(e.target.value)}
           />
-        )}
-      </div>
+          <input
+            type="file"
+            accept="image/*"
+            className="input mt-2"
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              if (!f) return
+              setRefrigerioFoto(f)
+              setRefrigerioPreview(URL.createObjectURL(f))
+            }}
+          />
+          {(refrigerioPreview || registro?.refrigerio_foto_url) && (
+            <img
+              src={refrigerioPreview || registro.refrigerio_foto_url}
+              alt="Foto del refrigerio"
+              className="mt-2 h-32 w-full rounded-2xl object-cover"
+            />
+          )}
+        </div>
+      )}
 
       <div>
-        <label className="label">Notas (opcional)</label>
-        <textarea className="input" rows={3} value={notas} onChange={(e) => setNotas(e.target.value)} />
+        <label className="label">Descripción / notas (opcional)</label>
+        <textarea
+          className="input"
+          rows={3}
+          placeholder={
+            esDespues
+              ? 'Ej. Quedó todo recogido, se barrió y se acomodaron las sillas...'
+              : 'Ej. Encontramos las mesas desordenadas, faltaba jabón en el baño...'
+          }
+          value={notas}
+          onChange={(e) => setNotas(e.target.value)}
+        />
       </div>
 
       {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
       <button disabled={busy} className="btn-primary justify-center">
-        {busy ? 'Guardando...' : 'Guardar bitácora'}
+        {busy ? 'Guardando...' : `Guardar — ${meta.label}`}
       </button>
     </form>
   )

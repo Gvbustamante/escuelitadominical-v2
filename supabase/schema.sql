@@ -762,6 +762,7 @@ create table public.bitacora_clase (
   id uuid primary key default gen_random_uuid(),
   nivel_id uuid references public.niveles(id) on delete cascade,
   fecha date not null default current_date,
+  momento text not null default 'despues' check (momento in ('antes','despues')),
   docente_id uuid references public.profiles(id),
   salon_ok boolean,
   salon_foto_url text,
@@ -770,9 +771,10 @@ create table public.bitacora_clase (
   notas text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (nivel_id, fecha)
+  unique (nivel_id, fecha, momento)
 );
-comment on table public.bitacora_clase is 'Constancia por clase y fecha: estado del salón (con foto) y refrigerio dado (con foto).';
+comment on table public.bitacora_clase is 'Constancia por clase y fecha, una fila por momento (antes de clase / después de clase): estado del salón (con foto), refrigerio dado (con foto, solo aplica a "despues") y notas generales.';
+comment on column public.bitacora_clase.momento is '''antes'' = cómo se encontró el salón al llegar. ''despues'' = cómo se entrega el salón al terminar la clase (incluye refrigerio).';
 
 alter table public.bitacora_clase enable row level security;
 
