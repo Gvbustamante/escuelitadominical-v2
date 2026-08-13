@@ -168,6 +168,8 @@ Tipografías: `Baloo 2` (display, títulos) y `Nunito` (body), configuradas en `
 ### 5.3 Navegación (`Layout.jsx`)
 El menú lateral (`NAV`) está definido **por rol** (admin, coordinador, docente, padre), cada uno con su propio set de links e íconos. Si el usuario logueado (aunque sea staff) también tiene hijos vinculados, se le agrega dinámicamente el link "Mi familia".
 
+En pantallas **md y más grandes** (≥768px) el menú es la columna fija de siempre, siempre visible. Por debajo de `md` (celular y tablet en vertical) el `<aside>` pasa a ser un **drawer** (`fixed`, fuera del flujo, `-translate-x-full` cuando está cerrado) que no ocupa espacio en pantalla hasta que se abre: una barra superior (`md:hidden`) con un botón ☰ lo abre (`translate-x-0`, con transición), y se cierra tocando la ✕ del propio menú, tocando el fondo oscuro detrás (`onClick` en el overlay), o navegando a cualquier link (el `useEffect` que ya reseteaba el scroll al cambiar de `pathname` también cierra el menú).
+
 ### 5.4 Alta de usuarios (invitaciones)
 No existe un endpoint de "sign up" público. El alta de `docente`/`padre`/`coordinador` la hace un admin/coordinador desde la UI, que llama a `src/lib/invite.js` → RPC de Postgres `admin_create_invited_user(p_cedula, p_role, p_nombre_completo, p_nino_id, p_parentesco)` (definida en `schema.sql`). Esa función, ejecutando con privilegios elevados (`security definer`):
 1. Verifica que quien llama sea `admin`/`coordinador` (y que un coordinador no intente crear otro admin/coordinador).
