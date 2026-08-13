@@ -8,6 +8,8 @@ import Landing from './pages/Landing'
 import CompleteProfile from './pages/CompleteProfile'
 import Tutorial from './pages/Tutorial'
 import Devocionales from './pages/Devocionales'
+import DevocionalDetalle from './pages/DevocionalDetalle'
+import ActividadDetalle from './pages/ActividadDetalle'
 import MiFamilia from './pages/MiFamilia'
 import Foro from './pages/Foro'
 
@@ -60,6 +62,7 @@ export default function App() {
         <Route path="/" element={<RoleSwitchHome />} />
         <Route path="/ayuda" element={<Tutorial />} />
         <Route path="/devocionales" element={<Devocionales />} />
+        <Route path="/devocionales/:id" element={<DevocionalDetalle />} />
         <Route path="/foro" element={<Foro />} />
         <Route
           path="/mi-familia"
@@ -166,6 +169,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={[...STAFF, 'docente', 'padre']}>
               <RoleSwitchActividades />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/actividades/:id"
+          element={
+            <ProtectedRoute roles={[...STAFF, 'docente', 'padre']}>
+              <ActividadDetalle />
             </ProtectedRoute>
           }
         />

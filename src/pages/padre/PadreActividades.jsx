@@ -1,17 +1,19 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMisHijos } from '../../lib/useMisHijos'
 import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
 import ActivityFiles from '../../components/ActivityFiles'
-import RichTextEditor from '../../components/RichTextEditor'
 import RichTextView from '../../components/RichTextView'
+import TareaHijoWidget from '../../components/TareaHijoWidget'
 
 const REACCIONES = ['❤️', '👏', '🙌', '😍']
 
 export default function PadreActividades() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const hijos = useMisHijos()
   const [actividades, setActividades] = useState(null)
   const [entregas, setEntregas] = useState({})
@@ -91,10 +93,10 @@ export default function PadreActividades() {
               className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
               style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between cursor-pointer" onClick={() => navigate(`/actividades/${a.id}`)}>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold">{a.titulo}</h3>
+                    <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
                     {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
                   </div>
                   <p className="text-xs font-bold uppercase text-sky-500">{a.nivel?.nombre}</p>
@@ -123,13 +125,7 @@ export default function PadreActividades() {
               {a.es_tarea && (
                 <div className="mt-4 flex flex-col gap-2">
                   {hijosParaTarea(a.nivel_id).map((h) => (
-                    <TareaHijo
-                      key={h.id}
-                      actividad={a}
-                      hijo={h}
-                      entrega={entregas[`${a.id}_${h.id}`]}
-                      onSaved={load}
-                    />
+                    <TareaHijoWidget key={h.id} actividad={a} hijo={h} entrega={entregas[`${a.id}_${h.id}`]} onSaved={load} />
                   ))}
                 </div>
               )}
@@ -146,95 +142,18 @@ export default function PadreActividades() {
                     {r}
                   </button>
                 ))}
-                <span className="ml-auto text-sm font-bold text-ink/40">{a.actividad_reacciones.length} reacciones</span>
+                <button
+                  onClick={() => navigate(`/actividades/${a.id}`)}
+                  className="ml-auto text-sm font-bold text-ink/40 hover:text-sky-600 hover:underline"
+                >
+                  {a.actividad_reacciones.length} reacciones · Ver completa →
+                </button>
               </div>
             </div>
           )
         })}
         {actividades.length === 0 && <p className="card text-ink/50">Aún no hay actividades publicadas.</p>}
       </div>
-    </div>
-  )
-}
-
-function TareaHijo({ actividad, hijo, entrega, onSaved }) {
-  const { user } = useAuth()
-  const [archivo, setArchivo] = useState(null)
-  const [comentario, setComentario] = useState('')
-  const [busy, setBusy] = useState(false)
-
-  if (hijo.pausado) {
-    return (
-      <div className="rounded-2xl bg-ink/5 px-3 py-2 text-sm text-ink/40">
-        ⏸️ Esta tarea está en pausa para {hijo.nombre_completo.split(' ')[0]}.
-      </div>
-    )
-  }
-
-  const estado = entrega?.estado || 'pendiente'
-
-  if (estado === 'pausada') {
-    return (
-      <div className="rounded-2xl bg-sunshine-50 px-3 py-2 text-sm font-bold text-sunshine-700">
-        ⏸️ El docente puso esta tarea en pausa para {hijo.nombre_completo.split(' ')[0]}.
-      </div>
-    )
-  }
-
-  if (estado === 'entregada') {
-    return (
-      <div className="rounded-2xl bg-grass-50 px-3 py-3">
-        <p className="text-sm font-bold text-grass-700">✅ {hijo.nombre_completo.split(' ')[0]} ya entregó esta tarea</p>
-        {entrega.archivo_url && (
-          <a href={entrega.archivo_url} target="_blank" rel="noreferrer" className="text-sm font-bold text-sky-600 hover:underline">
-            📎 Ver lo que subiste
-          </a>
-        )}
-        {entrega.nota_docente && (
-          <p className="mt-1 text-sm text-ink/70">💬 Nota del docente: {entrega.nota_docente}</p>
-        )}
-      </div>
-    )
-  }
-
-  async function subir() {
-    if (!archivo) return
-    setBusy(true)
-    const path = `tareas/${actividad.id}/${hijo.id}/${Date.now()}-${archivo.name}`
-    const { error: upError } = await supabase.storage.from('actividades').upload(path, archivo)
-    if (upError) {
-      setBusy(false)
-      return
-    }
-    const archivo_url = supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
-    await supabase.from('tarea_entregas').upsert(
-      {
-        actividad_id: actividad.id,
-        nino_id: hijo.id,
-        estado: 'entregada',
-        archivo_url,
-        comentario_padre: comentario || null,
-        entregado_por: user.id,
-        entregado_at: new Date().toISOString(),
-      },
-      { onConflict: 'actividad_id,nino_id' },
-    )
-    setBusy(false)
-    setArchivo(null)
-    setComentario('')
-    onSaved()
-  }
-
-  return (
-    <div className="rounded-2xl border-2 border-dashed border-sky-200 p-3">
-      <p className="text-sm font-bold text-sky-700">📝 Sube la tarea de {hijo.nombre_completo.split(' ')[0]}</p>
-      <input type="file" className="input mt-2" onChange={(e) => setArchivo(e.target.files[0] || null)} />
-      <div className="mt-2">
-        <RichTextEditor value={comentario} onChange={setComentario} placeholder="Comentario (opcional)" compact />
-      </div>
-      <button disabled={!archivo || busy} onClick={subir} className="btn-primary mt-2 w-full justify-center !py-2 !text-sm">
-        {busy ? 'Subiendo...' : 'Subir tarea'}
-      </button>
     </div>
   )
 }

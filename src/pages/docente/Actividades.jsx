@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMisClases } from '../../lib/useMisClases'
@@ -11,6 +12,7 @@ import ActividadFila from '../../components/ActividadFila'
 import VistaToggle from '../../components/VistaToggle'
 import RichTextEditor from '../../components/RichTextEditor'
 import RichTextView from '../../components/RichTextView'
+import MiEntregaEquipoWidget from '../../components/MiEntregaEquipoWidget'
 
 const VISTA_OPTIONS = [
   { value: 'compacta', label: '📃 Compacta' },
@@ -36,6 +38,7 @@ function formVacio() {
 
 export default function Actividades() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const { clases, nivelId, setNivelId } = useMisClases()
   const [seccion, setSeccion] = useState('clase')
   const [actividades, setActividades] = useState(null)
@@ -258,8 +261,8 @@ export default function Actividades() {
                   style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-bold">{a.titulo}</h3>
+                    <div className="flex cursor-pointer flex-wrap items-center gap-2" onClick={() => navigate(`/actividades/${a.id}`)}>
+                      <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
                       {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
                       {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
                     </div>
@@ -309,8 +312,8 @@ export default function Actividades() {
                 style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-bold">{a.titulo}</h3>
+                  <div className="flex cursor-pointer flex-wrap items-center gap-2" onClick={() => navigate(`/actividades/${a.id}`)}>
+                    <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
                     {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
                   </div>
                   <span className="shrink-0 text-sm text-ink/40">{a.fecha}</span>
@@ -333,9 +336,7 @@ export default function Actividades() {
                   </a>
                 )}
                 <ActivityFiles archivos={a.actividad_archivos} />
-                {a.es_tarea && (
-                  <MiEntregaEquipo actividad={a} entrega={misEntregas[a.id]} onSaved={loadEquipo} />
-                )}
+                {a.es_tarea && <MiEntregaEquipoWidget actividad={a} entrega={misEntregas[a.id]} onSaved={loadEquipo} />}
               </div>
             ))
           )}
@@ -459,45 +460,6 @@ export default function Actividades() {
         confirmLabel="Sí, eliminar"
         message="Se borra junto con sus fotos/archivos y las entregas de tarea, si tenía. No se puede deshacer."
       />
-    </div>
-  )
-}
-
-function MiEntregaEquipo({ actividad, entrega, onSaved }) {
-  const { user } = useAuth()
-  const [busy, setBusy] = useState(false)
-  const estado = entrega?.estado || 'pendiente'
-
-  async function marcar(hecha) {
-    setBusy(true)
-    await supabase.from('tarea_entregas').upsert(
-      {
-        actividad_id: actividad.id,
-        docente_id: user.id,
-        estado: hecha ? 'entregada' : 'pendiente',
-        entregado_por: user.id,
-        entregado_at: hecha ? new Date().toISOString() : null,
-      },
-      { onConflict: 'actividad_id,docente_id' },
-    )
-    setBusy(false)
-    onSaved()
-  }
-
-  return (
-    <div className="mt-4 flex items-center justify-between gap-2 rounded-2xl border-2 border-dashed border-grape-200 bg-grape-50/50 p-3">
-      {estado === 'entregada' ? (
-        <p className="text-sm font-bold text-grass-700">✅ Ya la marcaste como hecha</p>
-      ) : (
-        <p className="text-sm font-bold text-grape-700">⏳ Pendiente por hacer</p>
-      )}
-      <button
-        disabled={busy}
-        onClick={() => marcar(estado !== 'entregada')}
-        className={estado === 'entregada' ? 'btn-secondary !py-1 !px-3 !text-xs' : 'btn-primary !py-1 !px-3 !text-xs'}
-      >
-        {busy ? '...' : estado === 'entregada' ? 'Deshacer' : '✅ Marcar como hecha'}
-      </button>
     </div>
   )
 }

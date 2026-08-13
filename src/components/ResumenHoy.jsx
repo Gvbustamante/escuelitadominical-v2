@@ -63,7 +63,7 @@ export default function ResumenHoy({ nivelIds }) {
 
       {devocional && (
         <Link
-          to="/devocionales"
+          to={`/devocionales/${devocional.id}`}
           className="mt-3 flex items-start gap-3 rounded-xl bg-sunshine-50 px-3 py-2.5 transition-colors hover:bg-sunshine-100"
         >
           {devocional.imagen_url ? (
@@ -98,11 +98,11 @@ export default function ResumenHoy({ nivelIds }) {
           <p className="text-xs font-extrabold uppercase tracking-wide text-sky-600">🎨 Actividades y tareas de hoy</p>
           <div className="mt-1.5 flex flex-col gap-1.5">
             {actividades.map((a) => (
-              <div key={a.id} className="rounded-xl bg-sky-50 px-3 py-2 text-sm">
+              <Link key={a.id} to={`/actividades/${a.id}`} className="block rounded-xl bg-sky-50 px-3 py-2 text-sm transition-colors hover:bg-sky-100">
                 <span aria-hidden="true">{a.es_tarea ? '📝' : '🎨'}</span> <span className="font-bold">{a.titulo}</span>
                 {a.nivel && <span className="text-ink/40"> · {a.nivel.nombre}</span>}
                 {a.es_tarea && <span className="badge ml-2 bg-coral-100 text-coral-700">Tarea</span>}
-              </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
@@ -409,14 +410,15 @@ export default function ActividadesAdmin() {
 }
 
 function ActividadCard({ a, i, onEdit, onDelete, onVerEntregas }) {
+  const navigate = useNavigate()
   return (
     <div
       className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
       style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
     >
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg font-bold">{a.titulo}</h3>
+        <div className="flex cursor-pointer items-center gap-2" onClick={() => navigate(`/actividades/${a.id}`)}>
+          <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
           {a.audiencia === 'docentes' && <span className="badge bg-grape-100 text-grape-700">🍎 Equipo docente</span>}
           {a.visible_padres === false && a.audiencia !== 'docentes' && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
           {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
