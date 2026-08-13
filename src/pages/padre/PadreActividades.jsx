@@ -5,6 +5,8 @@ import { useMisHijos } from '../../lib/useMisHijos'
 import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
 import ActivityFiles from '../../components/ActivityFiles'
+import RichTextEditor from '../../components/RichTextEditor'
+import RichTextView from '../../components/RichTextView'
 
 const REACCIONES = ['❤️', '👏', '🙌', '😍']
 
@@ -99,7 +101,7 @@ export default function PadreActividades() {
                 </div>
                 <span className="text-sm text-ink/40">{a.fecha}</span>
               </div>
-              {a.descripcion && <p className="mt-1 text-ink/70">{a.descripcion}</p>}
+              <RichTextView html={a.descripcion} className="mt-1" />
               {(a.versiculo_clave || a.historia_biblica) && (
                 <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
                   {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
@@ -227,13 +229,9 @@ function TareaHijo({ actividad, hijo, entrega, onSaved }) {
     <div className="rounded-2xl border-2 border-dashed border-sky-200 p-3">
       <p className="text-sm font-bold text-sky-700">📝 Sube la tarea de {hijo.nombre_completo.split(' ')[0]}</p>
       <input type="file" className="input mt-2" onChange={(e) => setArchivo(e.target.files[0] || null)} />
-      <input
-        type="text"
-        className="input mt-2"
-        placeholder="Comentario (opcional)"
-        value={comentario}
-        onChange={(e) => setComentario(e.target.value)}
-      />
+      <div className="mt-2">
+        <RichTextEditor value={comentario} onChange={setComentario} placeholder="Comentario (opcional)" compact />
+      </div>
       <button disabled={!archivo || busy} onClick={subir} className="btn-primary mt-2 w-full justify-center !py-2 !text-sm">
         {busy ? 'Subiendo...' : 'Subir tarea'}
       </button>

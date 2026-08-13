@@ -79,11 +79,13 @@ create table public.actividades (
   visible_padres boolean not null default true,
   es_tarea boolean not null default false,
   enlace_externo text,
+  audiencia text not null default 'ninos' check (audiencia in ('ninos','docentes')),
   created_at timestamptz not null default now()
 );
 comment on column public.actividades.visible_padres is 'false = solo la ve staff (admin/coordinador/docente); los padres/niños no la ven aunque sea de su clase y ya haya pasado.';
-comment on column public.actividades.es_tarea is 'true = además de informativa, pide una entrega de cada niño del nivel (ver tarea_entregas).';
+comment on column public.actividades.es_tarea is 'true = además de informativa, pide una entrega de cada niño del nivel (ver tarea_entregas). Si audiencia=docentes, cada docente marca su propia entrega en vez de cada niño.';
 comment on column public.actividades.enlace_externo is 'Link opcional si la tarea/actividad ocurre fuera de la plataforma (video, formulario, etc.).';
+comment on column public.actividades.audiencia is '''ninos'' = actividad normal de una clase (nivel_id obligatorio en la práctica). ''docentes'' = comunicado/tarea para el equipo docente, sin nivel_id, la crea admin/coordinador y la ve cualquier docente.';
 
 create table public.actividad_archivos (
   id uuid primary key default gen_random_uuid(),
@@ -817,7 +819,8 @@ create policy "gestionar materiales" on public.materiales for all to authenticat
 create table public.tarea_entregas (
   id uuid primary key default gen_random_uuid(),
   actividad_id uuid not null references public.actividades(id) on delete cascade,
-  nino_id uuid not null references public.ninos(id) on delete cascade,
+  nino_id uuid references public.ninos(id) on delete cascade,
+  docente_id uuid references public.profiles(id) on delete cascade,
   estado text not null default 'pendiente' check (estado in ('pendiente','pausada','entregada')),
   archivo_url text,
   comentario_padre text,
@@ -826,9 +829,13 @@ create table public.tarea_entregas (
   entregado_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (actividad_id, nino_id)
+  unique (actividad_id, nino_id),
+  unique (actividad_id, docente_id),
+  check (
+    (nino_id is not null and docente_id is null) or (nino_id is null and docente_id is not null)
+  )
 );
-comment on table public.tarea_entregas is 'Una fila por niño para cada actividad marcada como tarea (es_tarea=true). estado: pendiente (sin acción), pausada (el docente la puso en espera), entregada (el padre subió evidencia).';
+comment on table public.tarea_entregas is 'Una fila por niño (actividad audiencia=ninos) o por docente (audiencia=docentes) para cada actividad marcada como tarea (es_tarea=true). Exactamente uno de nino_id/docente_id va lleno. estado: pendiente (sin acción), pausada (el docente la puso en espera — solo aplica a niños), entregada (el padre subió evidencia, o el docente se marcó como hecho).';
 
 alter table public.tarea_entregas enable row level security;
 
@@ -840,6 +847,7 @@ create policy "leer tarea_entregas" on public.tarea_entregas for select to authe
       where a.id = tarea_entregas.actividad_id and dn.docente_id = auth.uid()
     )
     or exists (select 1 from public.ninos_padres np where np.nino_id = tarea_entregas.nino_id and np.padre_id = auth.uid())
+    or tarea_entregas.docente_id = auth.uid()
   );
 create policy "padre entrega su tarea" on public.tarea_entregas for insert to authenticated
   with check (
@@ -849,6 +857,7 @@ create policy "padre entrega su tarea" on public.tarea_entregas for insert to au
       select 1 from public.actividades a join public.docentes_niveles dn on dn.nivel_id = a.nivel_id
       where a.id = tarea_entregas.actividad_id and dn.docente_id = auth.uid()
     )
+    or tarea_entregas.docente_id = auth.uid()
   );
 create policy "actualizar tarea_entregas propia o staff" on public.tarea_entregas for update to authenticated
   using (
@@ -858,6 +867,7 @@ create policy "actualizar tarea_entregas propia o staff" on public.tarea_entrega
       select 1 from public.actividades a join public.docentes_niveles dn on dn.nivel_id = a.nivel_id
       where a.id = tarea_entregas.actividad_id and dn.docente_id = auth.uid()
     )
+    or tarea_entregas.docente_id = auth.uid()
   )
   with check (
     exists (select 1 from public.ninos_padres np where np.nino_id = tarea_entregas.nino_id and np.padre_id = auth.uid())
@@ -866,6 +876,7 @@ create policy "actualizar tarea_entregas propia o staff" on public.tarea_entrega
       select 1 from public.actividades a join public.docentes_niveles dn on dn.nivel_id = a.nivel_id
       where a.id = tarea_entregas.actividad_id and dn.docente_id = auth.uid()
     )
+    or tarea_entregas.docente_id = auth.uid()
   );
 
 -- ---------- MOTIVOS_RECONOCIMIENTO (catálogo configurable de motivos de estrella) ----------

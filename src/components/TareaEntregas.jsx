@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import Modal from './Modal'
+import RichTextView from './RichTextView'
 
 const ESTADO_BADGE = {
   pendiente: 'bg-ink/10 text-ink/50',
@@ -10,52 +11,71 @@ const ESTADO_BADGE = {
 const ESTADO_LABEL = { pendiente: '⏳ Pendiente', pausada: '⏸️ Pausada', entregada: '✅ Entregada' }
 
 export default function TareaEntregas({ actividad, open, onClose }) {
-  const [ninos, setNinos] = useState(null)
+  const esDocentes = actividad?.audiencia === 'docentes'
+  const [personas, setPersonas] = useState(null)
   const [entregas, setEntregas] = useState({})
   const [notaDraft, setNotaDraft] = useState({})
   const [busyId, setBusyId] = useState(null)
 
   const load = useCallback(async () => {
     if (!actividad) return
+    if (esDocentes) {
+      const [{ data: d }, { data: e }] = await Promise.all([
+        supabase.from('profiles').select('*').eq('role', 'docente').eq('activo', true).order('nombre_completo'),
+        supabase.from('tarea_entregas').select('*').eq('actividad_id', actividad.id),
+      ])
+      setPersonas(d || [])
+      const byDocente = {}
+      ;(e || []).forEach((row) => {
+        if (row.docente_id) byDocente[row.docente_id] = row
+      })
+      setEntregas(byDocente)
+      setNotaDraft({})
+      return
+    }
     const [{ data: n }, { data: e }] = await Promise.all([
       supabase.from('ninos').select('*').eq('nivel_id', actividad.nivel_id).eq('activo', true).order('nombre_completo'),
       supabase.from('tarea_entregas').select('*').eq('actividad_id', actividad.id),
     ])
-    setNinos(n || [])
+    setPersonas(n || [])
     const byNino = {}
     ;(e || []).forEach((row) => {
-      byNino[row.nino_id] = row
+      if (row.nino_id) byNino[row.nino_id] = row
     })
     setEntregas(byNino)
     setNotaDraft({})
-  }, [actividad])
+  }, [actividad, esDocentes])
 
   useEffect(() => {
     if (open) load()
   }, [open, load])
 
-  async function togglePausa(nino) {
-    setBusyId(nino.id)
-    const actual = entregas[nino.id]
+  function idField() {
+    return esDocentes ? 'docente_id' : 'nino_id'
+  }
+
+  async function togglePausa(persona) {
+    setBusyId(persona.id)
+    const actual = entregas[persona.id]
     const nuevoEstado = actual?.estado === 'pausada' ? 'pendiente' : 'pausada'
     await supabase
       .from('tarea_entregas')
       .upsert(
-        { actividad_id: actividad.id, nino_id: nino.id, estado: nuevoEstado, updated_at: new Date().toISOString() },
-        { onConflict: 'actividad_id,nino_id' },
+        { actividad_id: actividad.id, [idField()]: persona.id, estado: nuevoEstado, updated_at: new Date().toISOString() },
+        { onConflict: `actividad_id,${idField()}` },
       )
     setBusyId(null)
     load()
   }
 
-  async function guardarNota(nino) {
-    setBusyId(nino.id)
-    const nota = notaDraft[nino.id] ?? entregas[nino.id]?.nota_docente ?? ''
+  async function guardarNota(persona) {
+    setBusyId(persona.id)
+    const nota = notaDraft[persona.id] ?? entregas[persona.id]?.nota_docente ?? ''
     await supabase
       .from('tarea_entregas')
       .upsert(
-        { actividad_id: actividad.id, nino_id: nino.id, nota_docente: nota, updated_at: new Date().toISOString() },
-        { onConflict: 'actividad_id,nino_id' },
+        { actividad_id: actividad.id, [idField()]: persona.id, nota_docente: nota, updated_at: new Date().toISOString() },
+        { onConflict: `actividad_id,${idField()}` },
       )
     setBusyId(null)
     load()
@@ -63,15 +83,17 @@ export default function TareaEntregas({ actividad, open, onClose }) {
 
   if (!actividad) return null
 
-  const total = ninos?.filter((n) => !n.pausado).length || 0
-  const entregadas = ninos?.filter((n) => !n.pausado && entregas[n.id]?.estado === 'entregada').length || 0
+  const total = esDocentes ? personas?.length || 0 : personas?.filter((n) => !n.pausado).length || 0
+  const entregadas = esDocentes
+    ? personas?.filter((d) => entregas[d.id]?.estado === 'entregada').length || 0
+    : personas?.filter((n) => !n.pausado && entregas[n.id]?.estado === 'entregada').length || 0
 
   return (
     <Modal open={open} onClose={onClose} title={`Entregas — ${actividad.titulo}`}>
       <div className="flex flex-col gap-3">
-        {ninos && (
+        {personas && (
           <p className="text-sm font-bold text-ink/50">
-            {entregadas} de {total} entregaron
+            {entregadas} de {total} {esDocentes ? 'ya la marcaron como hecha' : 'entregaron'}
           </p>
         )}
         {actividad.enlace_externo && (
@@ -84,24 +106,25 @@ export default function TareaEntregas({ actividad, open, onClose }) {
             🔗 Abrir enlace de la tarea
           </a>
         )}
-        {!ninos ? (
+        {!personas ? (
           <p className="text-ink/40">Cargando...</p>
         ) : (
-          ninos.map((n) => {
-            const entrega = entregas[n.id]
+          personas.map((persona) => {
+            const entrega = entregas[persona.id]
             const estado = entrega?.estado || 'pendiente'
+            const pausadaPorNino = !esDocentes && persona.pausado
             return (
-              <div key={n.id} className={`rounded-2xl border-2 border-ink/5 p-3 ${n.pausado ? 'opacity-50 grayscale' : ''}`}>
+              <div key={persona.id} className={`rounded-2xl border-2 border-ink/5 p-3 ${pausadaPorNino ? 'opacity-50 grayscale' : ''}`}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-bold">{n.nombre_completo}</p>
-                  {n.pausado ? (
+                  <p className="font-bold">{persona.nombre_completo}</p>
+                  {pausadaPorNino ? (
                     <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado (niño)</span>
                   ) : (
                     <span className={`badge ${ESTADO_BADGE[estado]}`}>{ESTADO_LABEL[estado]}</span>
                   )}
                 </div>
 
-                {!n.pausado && entrega?.archivo_url && (
+                {!pausadaPorNino && entrega?.archivo_url && (
                   <a
                     href={entrega.archivo_url}
                     target="_blank"
@@ -111,31 +134,29 @@ export default function TareaEntregas({ actividad, open, onClose }) {
                     📎 Ver evidencia
                   </a>
                 )}
-                {!n.pausado && entrega?.comentario_padre && (
-                  <p className="mt-1 text-sm text-ink/60">💬 {entrega.comentario_padre}</p>
-                )}
+                {!pausadaPorNino && entrega?.comentario_padre && <RichTextView html={entrega.comentario_padre} className="mt-1 text-sm text-ink/60" />}
 
-                {!n.pausado && estado !== 'entregada' && (
+                {!pausadaPorNino && !esDocentes && estado !== 'entregada' && (
                   <button
-                    disabled={busyId === n.id}
-                    onClick={() => togglePausa(n)}
+                    disabled={busyId === persona.id}
+                    onClick={() => togglePausa(persona)}
                     className="btn-secondary mt-2 !py-1 !px-3 !text-xs"
                   >
                     {estado === 'pausada' ? '▶️ Reanudar' : '⏸️ Pausar'}
                   </button>
                 )}
 
-                {!n.pausado && estado === 'entregada' && (
+                {!pausadaPorNino && estado === 'entregada' && (
                   <div className="mt-2 flex gap-2">
                     <input
                       className="input !py-1 !text-sm"
                       placeholder="Escríbele una nota (ej. ¡Muy bien!)"
-                      value={notaDraft[n.id] ?? entrega?.nota_docente ?? ''}
-                      onChange={(e) => setNotaDraft({ ...notaDraft, [n.id]: e.target.value })}
+                      value={notaDraft[persona.id] ?? entrega?.nota_docente ?? ''}
+                      onChange={(e) => setNotaDraft({ ...notaDraft, [persona.id]: e.target.value })}
                     />
                     <button
-                      disabled={busyId === n.id}
-                      onClick={() => guardarNota(n)}
+                      disabled={busyId === persona.id}
+                      onClick={() => guardarNota(persona)}
                       className="btn-secondary shrink-0 !py-1 !px-3 !text-xs"
                     >
                       Guardar
@@ -146,7 +167,9 @@ export default function TareaEntregas({ actividad, open, onClose }) {
             )
           })
         )}
-        {ninos && ninos.length === 0 && <p className="text-ink/40">No hay niños activos en este nivel.</p>}
+        {personas && personas.length === 0 && (
+          <p className="text-ink/40">{esDocentes ? 'No hay docentes activos.' : 'No hay niños activos en este nivel.'}</p>
+        )}
       </div>
     </Modal>
   )

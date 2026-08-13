@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import Spinner from '../components/Spinner'
 import Modal from '../components/Modal'
+import RichTextEditor from '../components/RichTextEditor'
+import RichTextView from '../components/RichTextView'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -25,6 +27,7 @@ export default function Devocionales() {
   const [niveles, setNiveles] = useState([])
   const [mes, setMes] = useState(hoyYYYYMM())
   const [verTodos, setVerTodos] = useState(false)
+  const [expandidoId, setExpandidoId] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '' })
@@ -93,6 +96,10 @@ export default function Devocionales() {
 
   async function handleSubmit(e) {
     e.preventDefault()
+    if (!form.contenido) {
+      setError('Escribe la reflexión para el niño/a.')
+      return
+    }
     setBusy(true)
     setError('')
 
@@ -169,39 +176,63 @@ export default function Devocionales() {
       </div>
 
       <div className="card divide-y divide-ink/5 !p-0">
-        {devocionales.map((d) => (
-          <div key={d.id} className={`flex flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-start sm:gap-3 sm:px-4 sm:py-3 ${d.activo ? 'bg-sunshine-50' : ''}`}>
-            <div className="flex items-start gap-3">
-              {d.imagen_url && (
-                <img src={d.imagen_url} alt={d.titulo} className="h-12 w-12 shrink-0 rounded-xl object-cover sm:h-14 sm:w-14" />
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <p className="text-sm font-bold sm:text-base">{d.titulo}</p>
-                  {d.activo && <span className="badge bg-sunshine-200 text-sunshine-800">🟢 Activo</span>}
-                  {d.nivel?.nombre && <span className="badge bg-sky-100 text-sky-700">{d.nivel.nombre}</span>}
-                  <span className="text-xs text-ink/40">{d.fecha}</span>
+        {devocionales.map((d) => {
+          const abierto = expandidoId === d.id
+          return (
+            <div key={d.id} className={d.activo ? 'bg-sunshine-50' : ''}>
+              <div
+                className="flex cursor-pointer flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-start sm:gap-3 sm:px-4 sm:py-3"
+                onClick={() => setExpandidoId(abierto ? null : d.id)}
+              >
+                <div className="flex items-start gap-3">
+                  {d.imagen_url && (
+                    <img src={d.imagen_url} alt={d.titulo} className="h-12 w-12 shrink-0 rounded-xl object-cover sm:h-14 sm:w-14" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p className="text-sm font-bold sm:text-base">{d.titulo}</p>
+                      {d.activo && <span className="badge bg-sunshine-200 text-sunshine-800">🟢 Activo</span>}
+                      {d.nivel?.nombre && <span className="badge bg-sky-100 text-sky-700">{d.nivel.nombre}</span>}
+                      <span className="text-xs text-ink/40">{d.fecha}</span>
+                    </div>
+                    {d.versiculo && <p className="mt-1 truncate italic text-ink/60">📖 "{d.versiculo}"</p>}
+                  </div>
                 </div>
-                {d.versiculo && <p className="mt-1 truncate italic text-ink/60">📖 "{d.versiculo}"</p>}
+                <div className="flex shrink-0 items-center justify-end gap-2">
+                  <span className="text-sm text-ink/30">{abierto ? '▲' : '▼'}</span>
+                  {puedeCrear && (
+                    <button
+                      className="btn-secondary !py-1 !px-3 !text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        d.activo ? quitarActivo(d) : marcarActivo(d)
+                      }}
+                    >
+                      {d.activo ? 'Quitar activo' : '⭐ Marcar activo'}
+                    </button>
+                  )}
+                  {puedeCrear && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openEdit(d)
+                      }}
+                      className="text-lg text-ink/30 hover:text-sky-500"
+                      title="Editar"
+                    >
+                      ✏️
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="flex shrink-0 items-center justify-end gap-2">
-              {puedeCrear && (
-                <button
-                  className="btn-secondary !py-1 !px-3 !text-xs"
-                  onClick={() => (d.activo ? quitarActivo(d) : marcarActivo(d))}
-                >
-                  {d.activo ? 'Quitar activo' : '⭐ Marcar activo'}
-                </button>
-              )}
-              {puedeCrear && (
-                <button onClick={() => openEdit(d)} className="text-lg text-ink/30 hover:text-sky-500" title="Editar">
-                  ✏️
-                </button>
+              {abierto && (
+                <div className="px-3 pb-4 sm:px-4">
+                  <RichTextView html={d.contenido} />
+                </div>
               )}
             </div>
-          </div>
-        ))}
+          )
+        })}
         {devocionales.length === 0 && (
           <p className="p-6 text-center text-ink/50">
             {verTodos ? 'Todavía no hay devocionales publicados.' : 'No hay devocionales publicados este mes.'}
@@ -226,13 +257,10 @@ export default function Devocionales() {
           </div>
           <div>
             <label className="label">Reflexión para el niño/a</label>
-            <textarea
-              required
-              className="input"
-              rows={5}
-              placeholder="Escribe algo corto y sencillo que un niño pueda entender..."
+            <RichTextEditor
               value={form.contenido}
-              onChange={(e) => setForm({ ...form, contenido: e.target.value })}
+              onChange={(html) => setForm({ ...form, contenido: html })}
+              placeholder="Escribe algo corto y sencillo que un niño pueda entender..."
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
