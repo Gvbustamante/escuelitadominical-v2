@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMisClases } from '../../lib/useMisClases'
 import Spinner from '../../components/Spinner'
+import MultiFilePicker from '../../components/MultiFilePicker'
+import FotosGaleria from '../../components/FotosGaleria'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -93,21 +95,50 @@ function BitacoraForm({ nivelId, fecha, momento, registro, docenteId, onSaved })
   const esDespues = momento === 'despues'
 
   const [salonOk, setSalonOk] = useState(registro?.salon_ok ?? true)
-  const [salonFoto, setSalonFoto] = useState(null)
-  const [salonPreview, setSalonPreview] = useState(null)
+  const [salonFotos, setSalonFotos] = useState([])
   const [refrigerioDetalle, setRefrigerioDetalle] = useState(registro?.refrigerio_detalle || '')
-  const [refrigerioFoto, setRefrigerioFoto] = useState(null)
-  const [refrigerioPreview, setRefrigerioPreview] = useState(null)
+  const [refrigerioFotos, setRefrigerioFotos] = useState([])
   const [notas, setNotas] = useState(registro?.notas || '')
+  const [fotosExistentes, setFotosExistentes] = useState([])
   const [busy, setBusy] = useState(false)
   const [ok, setOk] = useState('')
   const [error, setError] = useState('')
 
-  async function subirFoto(file, tipo) {
-    const path = `bitacora/${nivelId}/${fecha}-${momento}-${tipo}-${Date.now()}-${file.name}`
-    const { error: upError } = await supabase.storage.from('actividades').upload(path, file)
-    if (upError) return null
-    return supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
+  useEffect(() => {
+    if (!registro?.id) {
+      setFotosExistentes([])
+      return
+    }
+    supabase
+      .from('bitacora_fotos')
+      .select('*')
+      .eq('bitacora_id', registro.id)
+      .then(({ data }) => setFotosExistentes(data || []))
+  }, [registro?.id])
+
+  const fotosSalonExistentes = [
+    registro?.salon_foto_url && { url: registro.salon_foto_url },
+    ...fotosExistentes.filter((f) => f.tipo === 'salon'),
+  ].filter(Boolean)
+  const fotosRefrigerioExistentes = [
+    registro?.refrigerio_foto_url && { url: registro.refrigerio_foto_url },
+    ...fotosExistentes.filter((f) => f.tipo === 'refrigerio'),
+  ].filter(Boolean)
+
+  async function subirFotos(archivos, tipo, bitacoraId) {
+    for (const file of archivos) {
+      const path = `bitacora/${nivelId}/${fecha}-${momento}-${tipo}-${Date.now()}-${file.name}`
+      const { error: upError } = await supabase.storage.from('actividades').upload(path, file)
+      if (!upError) {
+        await supabase.from('bitacora_fotos').insert({
+          bitacora_id: bitacoraId,
+          tipo,
+          storage_path: path,
+          nombre_archivo: file.name,
+          mime: file.type,
+        })
+      }
+    }
   }
 
   async function guardar(e) {
@@ -116,35 +147,33 @@ function BitacoraForm({ nivelId, fecha, momento, registro, docenteId, onSaved })
     setOk('')
     setError('')
 
-    let salon_foto_url = registro?.salon_foto_url || null
-    if (salonFoto) {
-      const url = await subirFoto(salonFoto, 'salon')
-      if (url) salon_foto_url = url
-    }
-    let refrigerio_foto_url = registro?.refrigerio_foto_url || null
-    if (esDespues && refrigerioFoto) {
-      const url = await subirFoto(refrigerioFoto, 'refrigerio')
-      if (url) refrigerio_foto_url = url
-    }
-
     const payload = {
       nivel_id: nivelId,
       fecha,
       momento,
       docente_id: docenteId,
       salon_ok: salonOk,
-      salon_foto_url,
       refrigerio_detalle: esDespues ? refrigerioDetalle || null : null,
-      refrigerio_foto_url: esDespues ? refrigerio_foto_url : null,
       notas: notas || null,
       updated_at: new Date().toISOString(),
     }
-    const { error: saveError } = await supabase.from('bitacora_clase').upsert(payload, { onConflict: 'nivel_id,fecha,momento' })
-    setBusy(false)
+    const { data: fila, error: saveError } = await supabase
+      .from('bitacora_clase')
+      .upsert(payload, { onConflict: 'nivel_id,fecha,momento' })
+      .select()
+      .single()
     if (saveError) {
+      setBusy(false)
       setError(saveError.message)
       return
     }
+
+    if (salonFotos.length > 0) await subirFotos(salonFotos, 'salon', fila.id)
+    if (esDespues && refrigerioFotos.length > 0) await subirFotos(refrigerioFotos, 'refrigerio', fila.id)
+
+    setBusy(false)
+    setSalonFotos([])
+    setRefrigerioFotos([])
     setOk('¡Guardado!')
     onSaved()
   }
@@ -169,20 +198,10 @@ function BitacoraForm({ nivelId, fecha, momento, registro, docenteId, onSaved })
             ⚠️ Hubo daños
           </button>
         </div>
-        <input
-          type="file"
-          accept="image/*"
-          className="input mt-2"
-          onChange={(e) => {
-            const f = e.target.files?.[0]
-            if (!f) return
-            setSalonFoto(f)
-            setSalonPreview(URL.createObjectURL(f))
-          }}
-        />
-        {(salonPreview || registro?.salon_foto_url) && (
-          <img src={salonPreview || registro.salon_foto_url} alt="Foto del salón" className="mt-2 h-32 w-full rounded-2xl object-cover" />
-        )}
+        <div className="mt-2">
+          <MultiFilePicker archivos={salonFotos} onChange={setSalonFotos} accept="image/*" label="📷 Agregar foto(s) del salón" />
+        </div>
+        <FotosGaleria fotos={fotosSalonExistentes} />
       </div>
 
       {esDespues && (
@@ -194,24 +213,15 @@ function BitacoraForm({ nivelId, fecha, momento, registro, docenteId, onSaved })
             value={refrigerioDetalle}
             onChange={(e) => setRefrigerioDetalle(e.target.value)}
           />
-          <input
-            type="file"
-            accept="image/*"
-            className="input mt-2"
-            onChange={(e) => {
-              const f = e.target.files?.[0]
-              if (!f) return
-              setRefrigerioFoto(f)
-              setRefrigerioPreview(URL.createObjectURL(f))
-            }}
-          />
-          {(refrigerioPreview || registro?.refrigerio_foto_url) && (
-            <img
-              src={refrigerioPreview || registro.refrigerio_foto_url}
-              alt="Foto del refrigerio"
-              className="mt-2 h-32 w-full rounded-2xl object-cover"
+          <div className="mt-2">
+            <MultiFilePicker
+              archivos={refrigerioFotos}
+              onChange={setRefrigerioFotos}
+              accept="image/*"
+              label="📷 Agregar foto(s) del refrigerio"
             />
-          )}
+          </div>
+          <FotosGaleria fotos={fotosRefrigerioExistentes} />
         </div>
       )}
 

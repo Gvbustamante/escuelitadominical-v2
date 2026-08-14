@@ -11,7 +11,7 @@ function esFoto(file) {
  * cada vez que se abre de nuevo el diálogo). Cada archivo agregado se
  * puede quitar individualmente antes de subir.
  */
-export default function MultiFilePicker({ archivos, onChange, label = '📎 Agregar archivo(s)' }) {
+export default function MultiFilePicker({ archivos, onChange, label = '📎 Agregar archivo(s)', accept }) {
   const inputRef = useRef(null)
 
   function agregar(fileList) {
@@ -39,6 +39,7 @@ export default function MultiFilePicker({ archivos, onChange, label = '📎 Agre
         ref={inputRef}
         type="file"
         multiple
+        accept={accept}
         className="hidden"
         onChange={(e) => {
           agregar(e.target.files)
