@@ -339,6 +339,16 @@ Los tres campos que hasta 5.28 seguían limitados a **una sola** foto/archivo ya
 - La evidencia de tarea, al poder ser cualquier tipo de archivo (no solo foto), se muestra con `ArticulosAdjuntos.jsx` (la misma lista con ícono + nombre + botón descargar que ya se usaba en las páginas extendidas de actividad/devocional, ver 5.24) tanto en `TareaHijoWidget.jsx` (vista del padre) como en `TareaEntregas.jsx` (checklist del docente/admin).
 - Detalle interno: `bitacora_fotos` ya tenía una columna `tipo` categórica (`'salon'`/`'refrigerio'`) desde 5.10, así que su columna de tipo-MIME se llama `mime` para no chocar con esa; `material_fotos` y `tarea_entrega_archivos` no tienen esa columna categórica, así que ahí el tipo-MIME sí se llama `tipo`, igual que en `actividad_archivos`/`devocional_archivos`.
 
+### 5.30 Barra de búsqueda en Nuestra comunidad, Devocionales (+ Versículos) y Actividades
+`src/lib/busqueda.js` exporta `coincide(query, ...campos)`: compara el texto buscado contra varios campos a la vez, ignorando mayúsculas, acentos y etiquetas HTML (para poder buscar dentro de un `descripcion`/`contenido` que viene del editor de texto enriquecido, ver 5.22). Es 100% en el navegador (filtra el arreglo que ya se cargó, no hace una consulta nueva a Supabase) — no toca la base de datos.
+
+Se agregó un `<input>` de búsqueda, con el mismo estilo que ya usaban Niños y Equipo, en:
+- **Nuestra comunidad** (`Foro.jsx`): un buscador que filtra según la pestaña activa — temas del foro (por título, quién lo creó, el evento ligado) o peticiones de oración (por texto, quién la escribió); se limpia solo al cambiar de pestaña.
+- **Devocionales** (`Devocionales.jsx`): filtra por título, versículo y el contenido de la reflexión, dentro del mes elegido o de "Ver todos". La pestaña **Versículos** (`CitasBiblicasAdmin.jsx`, embebida ahí, ver 5.27) tiene su propio buscador por texto y referencia.
+- **Actividades**, en las tres vistas por rol — `ActividadesAdmin.jsx`, `docente/Actividades.jsx` (busca en ambas secciones, "Mi clase" y "Para el equipo") y `padre/PadreActividades.jsx` — filtra por título, descripción, versículo clave, historia bíblica y (para el padre) el nombre de la clase.
+
+Cuando el filtro no encuentra nada se muestra un mensaje aparte ("No hay... que coincidan con...") distinto del de "todavía no hay nada" (lista vacía de verdad), para que quede claro que es la búsqueda y no que falta contenido.
+
 ## 6. Modelo de datos (Supabase / Postgres)
 
 Todo el esquema vive en [`supabase/schema.sql`](./supabase/schema.sql), pensado para copiar/pegar una sola vez en el SQL Editor de un proyecto Supabase nuevo.

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMisClases } from '../../lib/useMisClases'
+import { coincide } from '../../lib/busqueda'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
@@ -39,6 +40,7 @@ export default function Actividades() {
   const [actividades, setActividades] = useState(null)
   const [paraEquipo, setParaEquipo] = useState(null)
   const [misEntregas, setMisEntregas] = useState({})
+  const [busqueda, setBusqueda] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [confirmEliminar, setConfirmEliminar] = useState(null)
@@ -190,6 +192,13 @@ export default function Actividades() {
   if (!clases) return <Spinner />
   if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
 
+  const actividadesFiltradas = (actividades || []).filter((a) =>
+    coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica),
+  )
+  const paraEquipoFiltrado = (paraEquipo || []).filter((a) =>
+    coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica),
+  )
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -224,6 +233,13 @@ export default function Actividades() {
         </button>
       </div>
 
+      <input
+        className="input max-w-xs"
+        placeholder="Buscar actividad..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+      />
+
       {seccion === 'clase' ? (
         <>
           <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
@@ -238,10 +254,13 @@ export default function Actividades() {
             <Spinner />
           ) : (
             <div className="card divide-y divide-ink/5 !p-0">
-              {actividades.map((a) => (
+              {actividadesFiltradas.map((a) => (
                 <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} />
               ))}
               {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
+              {actividades.length > 0 && actividadesFiltradas.length === 0 && (
+                <p className="p-6 text-center text-ink/50">No hay actividades que coincidan con "{busqueda}".</p>
+              )}
             </div>
           )}
         </>
@@ -251,8 +270,10 @@ export default function Actividades() {
             <Spinner />
           ) : paraEquipo.length === 0 ? (
             <p className="card text-ink/50">Todavía no hay comunicados para el equipo docente.</p>
+          ) : paraEquipoFiltrado.length === 0 ? (
+            <p className="card text-ink/50">No hay comunicados que coincidan con "{busqueda}".</p>
           ) : (
-            paraEquipo.map((a, i) => (
+            paraEquipoFiltrado.map((a, i) => (
               <div
                 key={a.id}
                 className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"

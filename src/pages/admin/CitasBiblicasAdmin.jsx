@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import { coincide } from '../../lib/busqueda'
 import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
@@ -18,6 +19,7 @@ export default function CitasBiblicasAdmin() {
   const [confirmEliminar, setConfirmEliminar] = useState(null)
   const [confirmDesactivar, setConfirmDesactivar] = useState(null)
   const [confirmBusy, setConfirmBusy] = useState(false)
+  const [busqueda, setBusqueda] = useState('')
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -137,6 +139,7 @@ export default function CitasBiblicasAdmin() {
   }
 
   const hoy = hoyStr()
+  const citasFiltradas = citas.filter((c) => coincide(busqueda, c.texto, c.referencia))
 
   return (
     <div className="flex flex-col gap-6">
@@ -146,6 +149,13 @@ export default function CitasBiblicasAdmin() {
           + Nueva cita
         </button>
       </div>
+
+      <input
+        className="input max-w-xs"
+        placeholder="Buscar versículo..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+      />
 
       <div className="card overflow-x-auto p-0">
         <table className="w-full text-left text-sm">
@@ -159,7 +169,7 @@ export default function CitasBiblicasAdmin() {
             </tr>
           </thead>
           <tbody>
-            {citas.map((c) => (
+            {citasFiltradas.map((c) => (
               <tr key={c.id} className={`border-t border-ink/5 ${!c.activo ? 'opacity-50' : ''}`}>
                 <td className="max-w-[10rem] truncate px-3 py-1.5 italic text-ink/80 sm:max-w-xs sm:px-4 sm:py-2">"{c.texto}"</td>
                 <td className="px-3 py-1.5 sm:px-4 sm:py-2 font-bold text-ink/60">{c.referencia}</td>
@@ -206,6 +216,13 @@ export default function CitasBiblicasAdmin() {
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-center text-ink/40">
                   Aún no hay citas. ¡Agrega la primera!
+                </td>
+              </tr>
+            )}
+            {citas.length > 0 && citasFiltradas.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-6 text-center text-ink/40">
+                  No hay versículos que coincidan con "{busqueda}".
                 </td>
               </tr>
             )}

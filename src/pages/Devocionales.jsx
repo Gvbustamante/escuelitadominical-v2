@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
+import { coincide } from '../lib/busqueda'
 import Spinner from '../components/Spinner'
 import Modal from '../components/Modal'
 import RichTextEditor from '../components/RichTextEditor'
@@ -33,6 +34,7 @@ export default function Devocionales() {
   const [niveles, setNiveles] = useState([])
   const [mes, setMes] = useState(hoyYYYYMM())
   const [verTodos, setVerTodos] = useState(false)
+  const [busqueda, setBusqueda] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '' })
@@ -177,6 +179,10 @@ export default function Devocionales() {
 
   if (!devocionales) return <Spinner />
 
+  const devocionalesFiltrados = devocionales.filter((d) =>
+    coincide(busqueda, d.titulo, d.versiculo, d.contenido, d.nivel?.nombre),
+  )
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -215,6 +221,12 @@ export default function Devocionales() {
       ) : (
         <>
       <div className="flex flex-wrap items-center gap-3">
+        <input
+          className="input max-w-xs"
+          placeholder="Buscar devocional..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
         {!verTodos && (
           <input type="month" className="input max-w-xs" value={mes} onChange={(e) => setMes(e.target.value)} />
         )}
@@ -227,7 +239,7 @@ export default function Devocionales() {
       </div>
 
       <div className="card divide-y divide-ink/5 !p-0">
-        {devocionales.map((d) => (
+        {devocionalesFiltrados.map((d) => (
           <div
             key={d.id}
             className={`flex cursor-pointer flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-center sm:gap-3 sm:px-4 sm:py-3 ${d.activo ? 'bg-sunshine-50' : ''}`}
@@ -279,6 +291,9 @@ export default function Devocionales() {
           <p className="p-6 text-center text-ink/50">
             {verTodos ? 'Todavía no hay devocionales publicados.' : 'No hay devocionales publicados este mes.'}
           </p>
+        )}
+        {devocionales.length > 0 && devocionalesFiltrados.length === 0 && (
+          <p className="p-6 text-center text-ink/50">No hay devocionales que coincidan con "{busqueda}".</p>
         )}
       </div>
 
