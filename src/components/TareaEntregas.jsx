@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import Modal from './Modal'
 import RichTextView from './RichTextView'
+import ArticulosAdjuntos from './ArticulosAdjuntos'
 
 const ESTADO_BADGE = {
   pendiente: 'bg-ink/10 text-ink/50',
@@ -22,7 +23,7 @@ export default function TareaEntregas({ actividad, open, onClose }) {
     if (esDocentes) {
       const [{ data: d }, { data: e }] = await Promise.all([
         supabase.from('profiles').select('*').eq('role', 'docente').eq('activo', true).order('nombre_completo'),
-        supabase.from('tarea_entregas').select('*').eq('actividad_id', actividad.id),
+        supabase.from('tarea_entregas').select('*, tarea_entrega_archivos(*)').eq('actividad_id', actividad.id),
       ])
       setPersonas(d || [])
       const byDocente = {}
@@ -35,7 +36,7 @@ export default function TareaEntregas({ actividad, open, onClose }) {
     }
     const [{ data: n }, { data: e }] = await Promise.all([
       supabase.from('ninos').select('*').eq('nivel_id', actividad.nivel_id).eq('activo', true).order('nombre_completo'),
-      supabase.from('tarea_entregas').select('*').eq('actividad_id', actividad.id),
+      supabase.from('tarea_entregas').select('*, tarea_entrega_archivos(*)').eq('actividad_id', actividad.id),
     ])
     setPersonas(n || [])
     const byNino = {}
@@ -133,6 +134,11 @@ export default function TareaEntregas({ actividad, open, onClose }) {
                   >
                     📎 Ver evidencia
                   </a>
+                )}
+                {!pausadaPorNino && entrega?.tarea_entrega_archivos?.length > 0 && (
+                  <div className="mt-2">
+                    <ArticulosAdjuntos archivos={entrega.tarea_entrega_archivos} titulo="📎 Evidencia entregada" />
+                  </div>
                 )}
                 {!pausadaPorNino && entrega?.comentario_padre && <RichTextView html={entrega.comentario_padre} className="mt-1 text-sm text-ink/60" />}
 
