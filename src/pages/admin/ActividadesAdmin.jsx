@@ -7,6 +7,7 @@ import ActivityFiles from '../../components/ActivityFiles'
 import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
 import RichTextEditor from '../../components/RichTextEditor'
+import MultiFilePicker from '../../components/MultiFilePicker'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -35,7 +36,6 @@ export default function ActividadesAdmin() {
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(formVacio())
   const [archivos, setArchivos] = useState([])
-  const [previews, setPreviews] = useState([])
   const [busy, setBusy] = useState(false)
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
@@ -86,7 +86,6 @@ export default function ActividadesAdmin() {
     setEditing(null)
     setForm(formVacio())
     setArchivos([])
-    setPreviews([])
     setError('')
     setModalOpen(true)
   }
@@ -104,15 +103,8 @@ export default function ActividadesAdmin() {
       enlace_externo: actividad.enlace_externo || '',
     })
     setArchivos([])
-    setPreviews([])
     setError('')
     setModalOpen(true)
-  }
-
-  function handleArchivos(files) {
-    const lista = Array.from(files)
-    setArchivos(lista)
-    setPreviews(lista.filter((f) => f.type.startsWith('image/')).map((f) => URL.createObjectURL(f)))
   }
 
   async function handleSubmit(e) {
@@ -338,15 +330,7 @@ export default function ActividadesAdmin() {
           )}
           <div>
             <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
-            <input type="file" multiple className="input" onChange={(e) => handleArchivos(e.target.files)} />
-            {previews.length > 0 && (
-              <div className="mt-2 grid grid-cols-4 gap-2">
-                {previews.map((src, i) => (
-                  <img key={i} src={src} alt="" className="aspect-square w-full rounded-xl object-cover" />
-                ))}
-              </div>
-            )}
-            {archivos.length > 0 && <p className="mt-1 text-sm text-ink/50">{archivos.length} archivo(s) seleccionado(s)</p>}
+            <MultiFilePicker archivos={archivos} onChange={setArchivos} />
             {editing && <ActivityFiles archivos={editing.actividad_archivos} />}
           </div>
           {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}
