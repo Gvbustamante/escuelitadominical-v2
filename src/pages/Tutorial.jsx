@@ -42,13 +42,13 @@ function AdminGuide() {
         un servicio el mismo día (ej. 9:00 am y 11:00 am), agrégalos ahí mismo en <em>Horarios</em> — con uno solo no hace
         falta tocar nada.
       </Step>
-      <Step number="3" icon="🍎" title="Agrega a tus docentes" color="sunshine">
-        Ve a <strong>Docentes</strong> → <em>+ Agregar</em>. Escribe su nombre y cédula — te va a mostrar la contraseña que le
-        toca, para que se la des tú directamente (por WhatsApp, en persona, como prefieras). También puedes usar{' '}
-        <strong>Usuarios</strong>, que reúne cualquier tipo de cuenta (admin, coordinador, docente, padre) en un solo
-        lugar, con edición de datos y restablecer contraseña. Ahí mismo, en la pestaña <em>Roles y permisos</em>, puedes
-        prender o apagar cosas como que un docente edite/registre niños o vincule padres — vienen algunas activadas por
-        defecto y otras no.
+      <Step number="3" icon="🍎" title="Agrega a tu equipo (o a un padre/madre)" color="sunshine">
+        Ve a <strong>Equipo</strong> → <em>+ Nueva cuenta</em>. Reúne cualquier tipo de cuenta (admin, coordinador,
+        docente, padre) en un solo lugar, con búsqueda, edición de datos y restablecer contraseña. Al crear una,
+        escribe su nombre y un usuario (su cédula, o un código fácil si no la tienes a mano) — te va a mostrar la
+        contraseña que le toca, para que se la des tú directamente (por WhatsApp, en persona, como prefieras). En{' '}
+        <strong>Ajustes</strong> → <em>Roles y permisos</em>, puedes prender o apagar cosas como que un docente
+        edite/registre niños o vincule padres — vienen algunas activadas por defecto y otras no.
       </Step>
       <Step number="4" icon="🔗" title="Asigna cada docente a su clase" color="sky">
         En <strong>Clases</strong>, edita una clase y marca qué docente(s) la llevan. Si configuraste más de un horario,
@@ -154,8 +154,8 @@ function PadreGuide() {
   return (
     <>
       <Step number="1" icon="🔑" title="Recibe tus datos de acceso" color="sky">
-        El admin te da tu cédula y una contraseña (tu cédula seguida de un punto). Puedes cambiarla luego desde el botón
-        "Contraseña" del menú.
+        El admin te da tu usuario y una contraseña (tu usuario seguido de una @). Puedes cambiarla luego desde el
+        botón "Contraseña" del menú.
       </Step>
       <Step number="2" icon="🏠" title="Mira la información de tu hijo/a" color="grass">
         En el inicio ves su nombre, edad, clase y alergias registradas. Si tienes varios hijos, puedes cambiar entre ellos.
@@ -255,18 +255,19 @@ function RolesTab({ role }) {
   )
 }
 
-export default function Tutorial() {
+/**
+ * Todo el contenido de Ayuda, sin el encabezado — para poder embeberlo
+ * dentro de otra pantalla (Ajustes → pestaña Ayuda, para admin/coordinador)
+ * además de su propia ruta /ayuda (para docente y padre, que no tienen
+ * Ajustes).
+ */
+export function AyudaContenido() {
   const { profile } = useAuth()
-  const { title, Guide } = GUIDES[profile.role] || GUIDES.padre
+  const { Guide } = GUIDES[profile.role] || GUIDES.padre
   const [tab, setTab] = useState('guia')
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl font-bold">Ayuda 🎓</h1>
-        <p className="text-ink/50">{title}</p>
-      </div>
-
       <div className="flex gap-2">
         <button
           onClick={() => setTab('guia')}
@@ -320,6 +321,21 @@ export default function Tutorial() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+export default function Tutorial() {
+  const { profile } = useAuth()
+  const { title } = GUIDES[profile.role] || GUIDES.padre
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="text-3xl font-bold">Ayuda 🎓</h1>
+        <p className="text-ink/50">{title}</p>
+      </div>
+      <AyudaContenido />
     </div>
   )
 }

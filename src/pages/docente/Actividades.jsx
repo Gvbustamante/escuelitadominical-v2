@@ -9,15 +9,9 @@ import ConfirmModal from '../../components/ConfirmModal'
 import ActivityFiles from '../../components/ActivityFiles'
 import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
-import VistaToggle from '../../components/VistaToggle'
 import RichTextEditor from '../../components/RichTextEditor'
 import RichTextView from '../../components/RichTextView'
 import MiEntregaEquipoWidget from '../../components/MiEntregaEquipoWidget'
-
-const VISTA_OPTIONS = [
-  { value: 'compacta', label: '📃 Compacta' },
-  { value: 'tarjetas', label: '🔲 Tarjetas' },
-]
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -54,7 +48,6 @@ export default function Actividades() {
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
   const [tareaActividad, setTareaActividad] = useState(null)
-  const [vista, setVista] = useState('compacta')
 
   const load = useCallback(async () => {
     if (!nivelId) return
@@ -204,12 +197,9 @@ export default function Actividades() {
           <p className="text-ink/50">Comparte lo que hicieron en clase</p>
         </div>
         {seccion === 'clase' && (
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <VistaToggle vista={vista} onChange={setVista} options={VISTA_OPTIONS} />
-            <button className="btn-primary" onClick={openNew}>
-              + Nueva actividad
-            </button>
-          </div>
+          <button className="btn-primary" onClick={openNew}>
+            + Nueva actividad
+          </button>
         )}
       </div>
 
@@ -245,56 +235,12 @@ export default function Actividades() {
 
           {!actividades ? (
             <Spinner />
-          ) : vista === 'compacta' ? (
+          ) : (
             <div className="card divide-y divide-ink/5 !p-0">
               {actividades.map((a) => (
                 <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} />
               ))}
               {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {actividades.map((a, i) => (
-                <div
-                  key={a.id}
-                  className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
-                  style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex cursor-pointer flex-wrap items-center gap-2" onClick={() => navigate(`/actividades/${a.id}`)}>
-                      <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
-                      {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
-                      {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                      <span className="text-sm text-ink/40">{a.fecha}</span>
-                      <button onClick={() => openEdit(a)} className="text-lg text-ink/30 hover:text-sky-500" title="Editar">
-                        ✏️
-                      </button>
-                      <button onClick={() => pedirEliminar(a.id)} className="text-lg text-ink/30 hover:text-coral-500" title="Eliminar">
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                  <RichTextView html={a.descripcion} className="mt-1" />
-                  {(a.versiculo_clave || a.historia_biblica) && (
-                    <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
-                      {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
-                      {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
-                    </div>
-                  )}
-                  <ActivityFiles archivos={a.actividad_archivos} />
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-bold text-coral-500">{a.actividad_reacciones?.length || 0} reacciones ❤️</p>
-                    {a.es_tarea && (
-                      <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setTareaActividad(a)}>
-                        📋 Ver entregas
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {actividades.length === 0 && <p className="card text-ink/50">Aún no hay actividades para esta clase.</p>}
             </div>
           )}
         </>

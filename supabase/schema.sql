@@ -445,7 +445,7 @@ begin
   end if;
 
   v_email := lower(regexp_replace(v_cedula, '[^a-zA-Z0-9]', '', 'g')) || '@accesskids.local';
-  v_password := v_cedula || '.';
+  v_password := v_cedula || '@';
   new_user_id := gen_random_uuid();
 
   insert into auth.users (
@@ -514,13 +514,13 @@ begin
     raise exception 'Esta cuenta no tiene cédula registrada';
   end if;
 
-  v_password := target_cedula || '.';
+  v_password := target_cedula || '@';
   update auth.users set encrypted_password = crypt(v_password, gen_salt('bf')), updated_at = now() where id = p_user_id;
 
   return v_password;
 end;
 $$;
-comment on function public.admin_reset_password is 'Regenera la contraseña de una cuenta a "cédula." (el valor por defecto del sistema). Mismas reglas de quién puede tocar a quién que admin_create_invited_user.';
+comment on function public.admin_reset_password is 'Regenera la contraseña de una cuenta a "usuario@" (el valor por defecto del sistema). Mismas reglas de quién puede tocar a quién que admin_create_invited_user.';
 
 -- ---------- FUNCIÓN: revisar inactividad (pausar niños y padres) ----------
 
