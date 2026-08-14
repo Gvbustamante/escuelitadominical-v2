@@ -172,6 +172,29 @@ comment on column public.citas_biblicas.fecha_mostrar is 'Fecha calendario en la
 
 -- ---------- SEGURIDAD (RLS) ----------
 
+-- Helper para romper el ciclo ninos <-> ninos_padres: la política de
+-- "ninos" necesita saber si eres padre/madre de ese niño (consultando
+-- ninos_padres), y la política de "ninos_padres" (para que un docente
+-- vincule un padre) necesita consultar "ninos". Si ambas políticas se
+-- consultan directamente entre sí, Postgres da "infinite recursion
+-- detected in policy" al intentar armar el plan de la consulta — no
+-- importa quién hace la operación, el ciclo existe solo por el texto de
+-- las políticas. `security definer` hace que esta función consulte
+-- ninos_padres sin pasar de nuevo por su RLS, rompiendo el ciclo.
+create or replace function public.es_padre_de(p_nino_id uuid)
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.ninos_padres np
+    where np.nino_id = p_nino_id and np.padre_id = auth.uid()
+  );
+$$;
+comment on function public.es_padre_de is 'Helper RLS: ¿el usuario actual está vinculado como padre/madre de este niño/a? security definer para evitar el ciclo de recursión ninos <-> ninos_padres (ver política "leer ninos").';
+
 alter table public.profiles enable row level security;
 alter table public.niveles enable row level security;
 alter table public.docentes_niveles enable row level security;
@@ -220,7 +243,7 @@ create policy "gestionar asignaciones" on public.docentes_niveles for all to aut
 create policy "leer ninos" on public.ninos for select to authenticated
   using (
     exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
-    or exists (select 1 from public.ninos_padres np where np.nino_id = ninos.id and np.padre_id = auth.uid())
+    or public.es_padre_de(ninos.id)
   );
 create policy "gestionar ninos" on public.ninos for all to authenticated
   using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
