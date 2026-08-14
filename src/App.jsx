@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import Spinner from './components/Spinner'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -26,7 +26,6 @@ import BitacoraAdmin from './pages/admin/BitacoraAdmin'
 import Materiales from './pages/admin/Materiales'
 import ConfigEstrellas from './pages/admin/ConfigEstrellas'
 import Planeacion from './pages/admin/Planeacion'
-import Usuarios from './pages/admin/Usuarios'
 
 import DocenteHome from './pages/docente/DocenteHome'
 import Asistencia from './pages/docente/Asistencia'
@@ -82,14 +81,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/usuarios"
-          element={
-            <ProtectedRoute roles={STAFF}>
-              <Usuarios />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/usuarios" element={<Navigate to="/docentes" replace />} />
         <Route
           path="/clases"
           element={

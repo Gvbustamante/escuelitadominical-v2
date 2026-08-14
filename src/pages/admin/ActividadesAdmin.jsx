@@ -1,22 +1,12 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ActivityFiles from '../../components/ActivityFiles'
-import CalendarioAgenda from '../../components/CalendarioAgenda'
-import VistaToggle from '../../components/VistaToggle'
 import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
 import RichTextEditor from '../../components/RichTextEditor'
-import RichTextView from '../../components/RichTextView'
-
-const VISTA_OPTIONS = [
-  { value: 'compacta', label: '📃 Compacta' },
-  { value: 'calendario', label: '🗓️ Plan del mes' },
-  { value: 'lista', label: '☰ Lista' },
-]
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -49,8 +39,6 @@ export default function ActividadesAdmin() {
   const [busy, setBusy] = useState(false)
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
-  const [vista, setVista] = useState('compacta')
-  const [selectedDay, setSelectedDay] = useState(null)
   const [tareaActividad, setTareaActividad] = useState(null)
 
   useEffect(() => {
@@ -91,13 +79,12 @@ export default function ActividadesAdmin() {
 
   function cambiarAudiencia(nueva) {
     setAudiencia(nueva)
-    setSelectedDay(null)
     setActividades(null)
   }
 
   function openNew() {
     setEditing(null)
-    setForm(formVacio(selectedDay))
+    setForm(formVacio())
     setArchivos([])
     setPreviews([])
     setError('')
@@ -207,12 +194,9 @@ export default function ActividadesAdmin() {
           <h1 className="text-3xl font-bold">Actividades 🎨</h1>
           <p className="text-ink/50">Lo que se hace en cada clase — fotos, versículo e historia bíblica</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <VistaToggle vista={vista} onChange={setVista} options={VISTA_OPTIONS} />
-          <button className="btn-primary" onClick={openNew}>
-            + Nueva actividad
-          </button>
-        </div>
+        <button className="btn-primary" onClick={openNew}>
+          + Nueva actividad
+        </button>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -233,14 +217,7 @@ export default function ActividadesAdmin() {
           </button>
         </div>
         {audiencia === 'ninos' && (
-          <select
-            className="input max-w-xs"
-            value={nivelId}
-            onChange={(e) => {
-              setNivelId(e.target.value)
-              setSelectedDay(null)
-            }}
-          >
+          <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
             {niveles.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.nombre}
@@ -255,36 +232,12 @@ export default function ActividadesAdmin() {
 
       {!actividades ? (
         <Spinner />
-      ) : vista === 'calendario' ? (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <CalendarioAgenda eventos={actividades} selectedDay={selectedDay} onSelectDay={setSelectedDay} />
-          <div className="flex flex-col gap-4">
-            {selectedDay && (
-              <button onClick={() => setSelectedDay(null)} className="self-start text-sm font-bold text-sky-500 hover:underline">
-                ← Ver todas las actividades
-              </button>
-            )}
-            {(selectedDay ? actividades.filter((a) => a.fecha === selectedDay) : actividades).map((a, i) => (
-              <ActividadCard key={a.id} a={a} i={i} onEdit={openEdit} onDelete={eliminar} onVerEntregas={setTareaActividad} />
-            ))}
-            {(selectedDay ? actividades.filter((a) => a.fecha === selectedDay) : actividades).length === 0 && (
-              <p className="card text-ink/50">{selectedDay ? 'Nada planeado este día.' : 'Aún no hay actividades para esta clase.'}</p>
-            )}
-          </div>
-        </div>
-      ) : vista === 'compacta' ? (
+      ) : (
         <div className="card divide-y divide-ink/5 !p-0">
           {actividades.map((a) => (
             <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={eliminar} onVerEntregas={setTareaActividad} />
           ))}
           {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {actividades.map((a, i) => (
-            <ActividadCard key={a.id} a={a} i={i} onEdit={openEdit} onDelete={eliminar} onVerEntregas={setTareaActividad} />
-          ))}
-          {actividades.length === 0 && <p className="card text-ink/50">Aún no hay actividades para esta clase.</p>}
         </div>
       )}
 
@@ -405,50 +358,6 @@ export default function ActividadesAdmin() {
       </Modal>
 
       <TareaEntregas actividad={tareaActividad} open={!!tareaActividad} onClose={() => setTareaActividad(null)} />
-    </div>
-  )
-}
-
-function ActividadCard({ a, i, onEdit, onDelete, onVerEntregas }) {
-  const navigate = useNavigate()
-  return (
-    <div
-      className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
-      style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex cursor-pointer items-center gap-2" onClick={() => navigate(`/actividades/${a.id}`)}>
-          <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
-          {a.audiencia === 'docentes' && <span className="badge bg-grape-100 text-grape-700">🍎 Equipo docente</span>}
-          {a.visible_padres === false && a.audiencia !== 'docentes' && <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>}
-          {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-ink/40">{a.fecha}</span>
-          <button onClick={() => onEdit(a)} className="text-lg text-ink/30 hover:text-sky-500">
-            ✏️
-          </button>
-          <button onClick={() => onDelete(a.id)} className="text-lg text-ink/30 hover:text-coral-500">
-            🗑️
-          </button>
-        </div>
-      </div>
-      <RichTextView html={a.descripcion} className="mt-1" />
-      {(a.versiculo_clave || a.historia_biblica) && (
-        <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
-          {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
-          {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
-        </div>
-      )}
-      <ActivityFiles archivos={a.actividad_archivos} />
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-bold text-coral-500">{a.actividad_reacciones?.length || 0} reacciones ❤️</p>
-        {a.es_tarea && (
-          <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => onVerEntregas(a)}>
-            📋 Ver entregas
-          </button>
-        )}
-      </div>
     </div>
   )
 }

@@ -23,7 +23,7 @@ export default function Login() {
       : `${valor.toLowerCase().replace(/[^a-z0-9]/g, '')}@accesskids.local`
     const { error } = await signIn(email, password)
     setBusy(false)
-    if (error) setError('Cédula (o correo) o contraseña incorrectos.')
+    if (error) setError('Usuario (o correo) o contraseña incorrectos.')
   }
 
   return (
@@ -39,13 +39,13 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="label">Cédula</label>
+            <label className="label">Usuario</label>
             <input
               required
               className="input"
               value={usuario}
               onChange={(e) => setUsuario(e.target.value)}
-              placeholder="Tu número de cédula"
+              placeholder="Tu usuario"
               autoComplete="username"
             />
           </div>

@@ -18,13 +18,11 @@ const NAV = {
     { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/clases', label: 'Clases', icon: '🎒' },
-    { to: '/docentes', label: 'Docentes', icon: '🍎' },
-    { to: '/usuarios', label: 'Usuarios', icon: '👤' },
+    { to: '/docentes', label: 'Equipo', icon: '🍎' },
     { to: '/materiales', label: 'Materiales', icon: '🧰' },
     { to: '/estrellas', label: 'Estrellas', icon: '⭐' },
     { to: '/citas-biblicas', label: 'Versículos', icon: '📖' },
     { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
-    { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
   coordinador: [
     { to: '/', label: 'Inicio', icon: '🏠', end: true },
@@ -37,13 +35,11 @@ const NAV = {
     { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/clases', label: 'Clases', icon: '🎒' },
-    { to: '/docentes', label: 'Docentes', icon: '🍎' },
-    { to: '/usuarios', label: 'Usuarios', icon: '👤' },
+    { to: '/docentes', label: 'Equipo', icon: '🍎' },
     { to: '/materiales', label: 'Materiales', icon: '🧰' },
     { to: '/estrellas', label: 'Estrellas', icon: '⭐' },
     { to: '/citas-biblicas', label: 'Versículos', icon: '📖' },
     { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
-    { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
   docente: [
     { to: '/', label: 'Mis clases', icon: '🏠', end: true },
@@ -171,10 +167,12 @@ export default function Layout() {
             <p className="truncate text-sm font-bold">{profile?.nombre_completo}</p>
             <p className="text-xs text-ink/50">{ROLE_LABEL[profile?.role]}</p>
           </div>
-          <button onClick={() => setPwOpen(true)} className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
-            <span>🔑</span>
-            <span>Contraseña</span>
-          </button>
+          {!['admin', 'coordinador'].includes(profile?.role) && (
+            <button onClick={() => setPwOpen(true)} className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
+              <span>🔑</span>
+              <span>Contraseña</span>
+            </button>
+          )}
           <button onClick={signOut} className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
             <span>🚪</span>
             <span>Salir</span>
