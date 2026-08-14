@@ -20,10 +20,8 @@ import Docentes from './pages/admin/Docentes'
 import AsistenciaAdmin from './pages/admin/AsistenciaAdmin'
 import ActividadesAdmin from './pages/admin/ActividadesAdmin'
 import AgendaAdmin from './pages/admin/AgendaAdmin'
-import CitasBiblicasAdmin from './pages/admin/CitasBiblicasAdmin'
 import Ajustes from './pages/admin/Ajustes'
 import BitacoraAdmin from './pages/admin/BitacoraAdmin'
-import Materiales from './pages/admin/Materiales'
 import ConfigEstrellas from './pages/admin/ConfigEstrellas'
 import Planeacion from './pages/admin/Planeacion'
 
@@ -106,14 +104,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/citas-biblicas"
-          element={
-            <ProtectedRoute roles={STAFF}>
-              <CitasBiblicasAdmin />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/citas-biblicas" element={<Navigate to="/devocionales" replace />} />
         <Route
           path="/ajustes"
           element={
@@ -122,14 +113,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/materiales"
-          element={
-            <ProtectedRoute roles={STAFF}>
-              <Materiales />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/materiales" element={<Navigate to="/bitacora" replace />} />
         <Route
           path="/estrellas"
           element={

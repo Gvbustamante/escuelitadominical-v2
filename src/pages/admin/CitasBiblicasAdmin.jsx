@@ -125,14 +125,8 @@ export default function CitasBiblicasAdmin() {
 
   if (!citas) {
     return (
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="mt-2 h-4 w-64" />
-          </div>
-          <Skeleton className="h-12 w-40" />
-        </div>
+      <div className="flex flex-col gap-4">
+        <Skeleton className="h-12 w-40" />
         <div className="flex flex-col gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-24 w-full" />
@@ -147,10 +141,7 @@ export default function CitasBiblicasAdmin() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold">Versículos 📖</h1>
-          <p className="text-ink/50">Arma la lista de citas y programa cuál se muestra cada día.</p>
-        </div>
+        <p className="text-ink/50">Arma la lista de citas y programa cuál se muestra cada día.</p>
         <button className="btn-primary" onClick={openNew}>
           + Nueva cita
         </button>

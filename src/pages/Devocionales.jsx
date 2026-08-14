@@ -6,6 +6,7 @@ import Spinner from '../components/Spinner'
 import Modal from '../components/Modal'
 import RichTextEditor from '../components/RichTextEditor'
 import ArticulosAdjuntos from '../components/ArticulosAdjuntos'
+import CitasBiblicasAdmin from './admin/CitasBiblicasAdmin'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -24,6 +25,8 @@ export default function Devocionales() {
   const { user, profile } = useAuth()
   const navigate = useNavigate()
   const puedeCrear = ['admin', 'coordinador', 'docente'].includes(profile.role)
+  const puedeVerVersiculos = ['admin', 'coordinador'].includes(profile.role)
+  const [tab, setTab] = useState('devocionales')
 
   const [devocionales, setDevocionales] = useState(null)
   const [niveles, setNiveles] = useState([])
@@ -178,15 +181,38 @@ export default function Devocionales() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Devocionales 🙏</h1>
-          <p className="text-ink/50">Reflexiones cortas pensadas para niños</p>
+          <p className="text-ink/50">Reflexiones para niños, y el versículo que se muestra cada día</p>
         </div>
-        {puedeCrear && (
+        {tab === 'devocionales' && puedeCrear && (
           <button className="btn-primary" onClick={openNew}>
             + Nuevo devocional
           </button>
         )}
       </div>
 
+      {puedeVerVersiculos && (
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setTab('devocionales')}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'devocionales' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          >
+            🙏 Devocionales
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('versiculos')}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'versiculos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          >
+            📖 Versículos
+          </button>
+        </div>
+      )}
+
+      {tab === 'versiculos' && puedeVerVersiculos ? (
+        <CitasBiblicasAdmin />
+      ) : (
+        <>
       <div className="flex flex-wrap items-center gap-3">
         {!verTodos && (
           <input type="month" className="input max-w-xs" value={mes} onChange={(e) => setMes(e.target.value)} />
@@ -315,6 +341,8 @@ export default function Devocionales() {
           </button>
         </form>
       </Modal>
+        </>
+      )}
     </div>
   )
 }

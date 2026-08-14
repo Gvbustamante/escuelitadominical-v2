@@ -19,9 +19,7 @@ const NAV = {
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/clases', label: 'Clases', icon: '🎒' },
     { to: '/docentes', label: 'Equipo', icon: '🍎' },
-    { to: '/materiales', label: 'Materiales', icon: '🧰' },
     { to: '/estrellas', label: 'Estrellas', icon: '⭐' },
-    { to: '/citas-biblicas', label: 'Versículos', icon: '📖' },
     { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
   ],
   coordinador: [
@@ -36,9 +34,7 @@ const NAV = {
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/clases', label: 'Clases', icon: '🎒' },
     { to: '/docentes', label: 'Equipo', icon: '🍎' },
-    { to: '/materiales', label: 'Materiales', icon: '🧰' },
     { to: '/estrellas', label: 'Estrellas', icon: '⭐' },
-    { to: '/citas-biblicas', label: 'Versículos', icon: '📖' },
     { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
   ],
   docente: [
