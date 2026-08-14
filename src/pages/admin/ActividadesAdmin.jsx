@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
+import { coincide } from '../../lib/busqueda'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ActivityFiles from '../../components/ActivityFiles'
@@ -32,6 +33,7 @@ export default function ActividadesAdmin() {
   const [nivelId, setNivelId] = useState('')
   const [audiencia, setAudiencia] = useState('ninos')
   const [actividades, setActividades] = useState(null)
+  const [busqueda, setBusqueda] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(formVacio())
@@ -179,6 +181,10 @@ export default function ActividadesAdmin() {
   if (!niveles) return <Spinner />
   if (niveles.length === 0) return <p className="card text-ink/50">Todavía no hay clases creadas.</p>
 
+  const actividadesFiltradas = (actividades || []).filter((a) =>
+    coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica),
+  )
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -222,14 +228,24 @@ export default function ActividadesAdmin() {
         <p className="-mt-3 text-sm text-ink/50">Comunicados, capacitaciones o tareas dirigidas a todo el equipo docente, no a una clase en particular.</p>
       )}
 
+      <input
+        className="input max-w-xs"
+        placeholder="Buscar actividad..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+      />
+
       {!actividades ? (
         <Spinner />
       ) : (
         <div className="card divide-y divide-ink/5 !p-0">
-          {actividades.map((a) => (
+          {actividadesFiltradas.map((a) => (
             <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={eliminar} onVerEntregas={setTareaActividad} />
           ))}
           {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
+          {actividades.length > 0 && actividadesFiltradas.length === 0 && (
+            <p className="p-6 text-center text-ink/50">No hay actividades que coincidan con "{busqueda}".</p>
+          )}
         </div>
       )}
 

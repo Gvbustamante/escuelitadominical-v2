@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
+import { coincide } from '../lib/busqueda'
 import Spinner from '../components/Spinner'
 import Modal from '../components/Modal'
 
@@ -10,6 +11,7 @@ export default function Foro() {
   const esStaffAmplio = ['admin', 'coordinador', 'docente'].includes(profile.role)
 
   const [tabPrincipal, setTabPrincipal] = useState('foro')
+  const [busqueda, setBusqueda] = useState('')
 
   const [foros, setForos] = useState(null)
   const [eventos, setEventos] = useState([])
@@ -128,6 +130,9 @@ export default function Foro() {
 
   if (!foros || !peticiones) return <Spinner />
 
+  const forosFiltrados = foros.filter((f) => coincide(busqueda, f.titulo, f.creador?.nombre_completo, f.evento?.titulo))
+  const peticionesFiltradas = peticiones.filter((p) => coincide(busqueda, p.texto, p.autor?.nombre_completo))
+
   if (seleccionado) {
     return (
       <div className="flex flex-col gap-6">
@@ -213,29 +218,43 @@ export default function Foro() {
 
       <div className="flex flex-wrap gap-2">
         <button
-          onClick={() => setTabPrincipal('foro')}
+          onClick={() => {
+            setTabPrincipal('foro')
+            setBusqueda('')
+          }}
           className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'foro' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
         >
           💬 Foro
         </button>
         <button
-          onClick={() => setTabPrincipal('oracion')}
+          onClick={() => {
+            setTabPrincipal('oracion')
+            setBusqueda('')
+          }}
           className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'oracion' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
         >
           🙏 Peticiones de oración
         </button>
       </div>
 
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <input
+          className="input max-w-xs"
+          placeholder={tabPrincipal === 'foro' ? 'Buscar tema...' : 'Buscar petición...'}
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
+        {tabPrincipal === 'foro' && (
+          <button className="btn-primary" onClick={openNew}>
+            + Nuevo tema
+          </button>
+        )}
+      </div>
+
       {tabPrincipal === 'foro' ? (
         <>
-          <div className="flex justify-end">
-            <button className="btn-primary" onClick={openNew}>
-              + Nuevo tema
-            </button>
-          </div>
-
           <div className="flex flex-col gap-3">
-            {foros.map((f) => (
+            {forosFiltrados.map((f) => (
               <button key={f.id} onClick={() => abrirForo(f)} className="card-link flex items-center justify-between gap-3 text-left">
                 <div>
                   <div className="flex items-center gap-2">
@@ -255,6 +274,7 @@ export default function Foro() {
                 {esStaffAmplio ? 'Todavía no hay temas. ¡Crea el primero!' : 'Todavía no hay temas visibles para ti.'}
               </p>
             )}
+            {foros.length > 0 && forosFiltrados.length === 0 && <p className="card text-ink/50">No hay temas que coincidan con "{busqueda}".</p>}
           </div>
         </>
       ) : (
@@ -292,7 +312,7 @@ export default function Foro() {
           </form>
 
           <div className="flex flex-col gap-3">
-            {peticiones.map((p) => (
+            {peticionesFiltradas.map((p) => (
               <div key={p.id} className="card">
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -322,6 +342,9 @@ export default function Foro() {
               <p className="card text-ink/50">
                 {esStaffAmplio ? 'Todavía no hay peticiones de oración.' : 'Todavía no hay peticiones de oración públicas.'}
               </p>
+            )}
+            {peticiones.length > 0 && peticionesFiltradas.length === 0 && (
+              <p className="card text-ink/50">No hay peticiones que coincidan con "{busqueda}".</p>
             )}
           </div>
         </>

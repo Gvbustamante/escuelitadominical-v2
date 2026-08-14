@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMisHijos } from '../../lib/useMisHijos'
+import { coincide } from '../../lib/busqueda'
 import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
 import ActivityFiles from '../../components/ActivityFiles'
@@ -18,6 +19,7 @@ export default function PadreActividades() {
   const [actividades, setActividades] = useState(null)
   const [entregas, setEntregas] = useState({})
   const [selectedId, setSelectedId] = useState(null)
+  const [busqueda, setBusqueda] = useState('')
 
   const load = useCallback(async () => {
     if (!hijos) return
@@ -74,6 +76,9 @@ export default function PadreActividades() {
   if (!hijos || !actividades) return <Spinner />
 
   const hijosParaTarea = (nivelId) => (selectedId ? hijos.filter((h) => h.id === selectedId) : hijos).filter((h) => h.nivel_id === nivelId)
+  const actividadesFiltradas = actividades.filter((a) =>
+    coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica, a.nivel?.nombre),
+  )
 
   return (
     <div className="flex flex-col gap-6">
@@ -84,8 +89,15 @@ export default function PadreActividades() {
 
       <HijoSelector hijos={hijos} selectedId={selectedId} onChange={setSelectedId} />
 
+      <input
+        className="input max-w-xs"
+        placeholder="Buscar actividad..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+      />
+
       <div className="flex flex-col gap-4">
-        {actividades.map((a, i) => {
+        {actividadesFiltradas.map((a, i) => {
           const mia = a.actividad_reacciones.find((r) => r.padre_id === user.id)
           return (
             <div
@@ -153,6 +165,9 @@ export default function PadreActividades() {
           )
         })}
         {actividades.length === 0 && <p className="card text-ink/50">Aún no hay actividades publicadas.</p>}
+        {actividades.length > 0 && actividadesFiltradas.length === 0 && (
+          <p className="card text-ink/50">No hay actividades que coincidan con "{busqueda}".</p>
+        )}
       </div>
     </div>
   )
