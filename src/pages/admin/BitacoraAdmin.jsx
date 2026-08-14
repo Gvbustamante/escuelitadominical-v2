@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
+import Materiales from './Materiales'
 import { exportExcel } from '../../lib/exportExcel'
 
 function hoyYYYYMM() {
@@ -24,6 +25,7 @@ const MOMENTOS = [
 ]
 
 export default function BitacoraAdmin() {
+  const [tab, setTab] = useState('bitacora')
   const [niveles, setNiveles] = useState(null)
   const [nivelId, setNivelId] = useState('')
   const [mes, setMes] = useState(hoyYYYYMM())
@@ -94,18 +96,41 @@ export default function BitacoraAdmin() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Bitácora 📋</h1>
-          <p className="text-ink/50">Constancia de salón antes/después de clase, y refrigerio</p>
+          <p className="text-ink/50">Constancia de salón antes/después de clase, refrigerio, y materiales</p>
         </div>
-        <div className="flex gap-2">
-          <button className="btn-primary" onClick={() => setModalOpen(true)}>
-            📝 Registrar bitácora
-          </button>
-          <button className="btn-secondary" onClick={exportar} disabled={!registros || registros.length === 0}>
-            📊 Exportar
-          </button>
-        </div>
+        {tab === 'bitacora' && (
+          <div className="flex gap-2">
+            <button className="btn-primary" onClick={() => setModalOpen(true)}>
+              📝 Registrar bitácora
+            </button>
+            <button className="btn-secondary" onClick={exportar} disabled={!registros || registros.length === 0}>
+              📊 Exportar
+            </button>
+          </div>
+        )}
       </div>
 
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setTab('bitacora')}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'bitacora' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+        >
+          📋 Bitácora
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab('materiales')}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'materiales' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+        >
+          🧰 Materiales
+        </button>
+      </div>
+
+      {tab === 'materiales' ? (
+        <Materiales />
+      ) : (
+        <>
       <div className="flex flex-wrap gap-3">
         <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
           {niveles.map((n) => (
@@ -175,6 +200,8 @@ export default function BitacoraAdmin() {
             </div>
           ))}
         </div>
+      )}
+        </>
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Registrar bitácora">

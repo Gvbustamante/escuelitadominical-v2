@@ -108,11 +108,8 @@ export default function Materiales() {
 
   if (!materiales) {
     return (
-      <div className="flex flex-col gap-6">
-        <div>
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="mt-2 h-4 w-64" />
-        </div>
+      <div className="flex flex-col gap-4">
+        <Skeleton className="h-12 w-64" />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-40 w-full" />
@@ -125,16 +122,15 @@ export default function Materiales() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold">Materiales 🧰</h1>
-          <p className="text-ink/50">Qué hay disponible para los niños y para cada clase</p>
+        <p className="text-ink/50">Qué hay disponible para los niños y para cada clase</p>
+        <div className="flex gap-2">
+          <button className="btn-secondary" onClick={exportar}>
+            📊 Exportar
+          </button>
+          <button className="btn-primary" onClick={openNew}>
+            + Agregar material
+          </button>
         </div>
-        <button className="btn-secondary" onClick={exportar}>
-          📊 Exportar
-        </button>
-        <button className="btn-primary" onClick={openNew}>
-          + Agregar material
-        </button>
       </div>
 
       <div className="card overflow-x-auto p-0">
