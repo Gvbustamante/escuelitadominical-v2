@@ -12,6 +12,7 @@ import ActividadFila from '../../components/ActividadFila'
 import RichTextEditor from '../../components/RichTextEditor'
 import RichTextView from '../../components/RichTextView'
 import MiEntregaEquipoWidget from '../../components/MiEntregaEquipoWidget'
+import MultiFilePicker from '../../components/MultiFilePicker'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -378,13 +379,7 @@ export default function Actividades() {
           )}
           <div>
             <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
-            <input
-              type="file"
-              multiple
-              className="input"
-              onChange={(e) => setArchivos(Array.from(e.target.files))}
-            />
-            {archivos.length > 0 && <p className="mt-1 text-sm text-ink/50">{archivos.length} archivo(s) seleccionado(s)</p>}
+            <MultiFilePicker archivos={archivos} onChange={setArchivos} />
             {editing && <ActivityFiles archivos={editing.actividad_archivos} />}
           </div>
           {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}

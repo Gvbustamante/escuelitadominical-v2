@@ -322,11 +322,16 @@ Con el tiempo el menú de admin/coordinador había crecido a 17 links. Este camb
 Siguiendo la misma idea de 5.25, dos pares más de pantallas que ya vivían una junto a la otra en el menú se fusionaron en pestañas dentro de una sola:
 - **`Devocionales.jsx`** ganó una pestaña "📖 Versículos" (solo visible para admin/coordinador) que embebe `CitasBiblicasAdmin.jsx` — mismo componente de siempre, solo le quitamos su propio encabezado (`<h1>`) para que no se vea duplicado dentro de la pestaña. Docente y padre no ven la pestaña (nunca gestionaron versículos), así que para ellos la pantalla se ve exactamente igual que antes. La ruta vieja `/citas-biblicas` redirige a `/devocionales`.
 - **`BitacoraAdmin.jsx`** ganó una pestaña "🧰 Materiales" que embebe `Materiales.jsx` con el mismo tratamiento (sin su propio `<h1>`). Como `BitacoraAdmin.jsx` es la variante que solo ve admin/coordinador (`RoleSwitchBitacora`), el docente (`BitacoraDocente`) no se toca y sigue sin acceso a Materiales, igual que antes. La ruta vieja `/materiales` redirige a `/bitacora`.
-- El nav de admin/coordinador bajó otra vez, ahora de 15 a 13 links.
-- **Otras pantallas candidatas a fusionar**, para cuando se quiera seguir simplificando (ninguna se tocó todavía):
-  - **Estrellas** (`ConfigEstrellas.jsx`) podría pasar a ser otra pestaña dentro de **Ajustes**, con el mismo patrón que "Roles y permisos" — es una pantalla de configuración de uso poco frecuente, igual que las que ya están ahí.
-  - **Niños** y **Clases** podrían fusionarse en una sola pantalla con pestañas — ambas son pantallas de "organización" que se consultan juntas seguido (una clase es, en la práctica, un grupo de niños).
-  - **Agenda** y **Planeación** son ambas pantallas de calendario, pero cubren cosas distintas (eventos generales vs. planear día a día por clase) — fusionarlas es más discutible, se sugiere solo si de verdad se sienten redundantes en el uso diario.
+- **Dos rondas después**, las dos primeras candidatas sugeridas también se implementaron:
+  - **`Ajustes.jsx`** ganó una pestaña "🌟 Estrellas" que embebe `ConfigEstrellas.jsx` (sin su propio `<h1>`), mismo patrón que "Roles y permisos". La ruta vieja `/estrellas` redirige a `/ajustes`.
+  - **`Ninos.jsx`** ganó una pestaña "🎒 Clases" (solo admin/coordinador — el docente nunca gestionó clases, así que para él la pantalla no cambia) que embebe `Clases.jsx` (sin su propio `<h1>`). La ruta vieja `/clases` redirige a `/ninos`.
+- El nav de admin/coordinador bajó de 15 a 13 y después a **11 links**.
+- **Agenda + Planeación** se dejó **sin fusionar** a propósito: cubren cosas distintas (eventos generales vs. planear día a día por clase) y se consideró que fusionarlas sería más confuso que útil. Sigue siendo una candidata si en el uso diario se sienten redundantes.
+
+### 5.28 Selector de archivos que se agregan de a uno o varios a la vez
+`MultiFilePicker.jsx` reemplaza los `<input type="file" multiple>` sueltos en los formularios que suben **varios** archivos (actividades — admin y docente — y los materiales adjuntos de un devocional). El problema que resolvía: un `<input type="file multiple">` normal **reemplaza** toda la selección cada vez que se vuelve a abrir el diálogo, así que si alguien elegía una foto, la subía, y luego quería agregar otra por separado, perdía la primera sin darse cuenta. `MultiFilePicker` en cambio **acumula** — cada vez que se elige uno o varios archivos, se suman a los que ya estaban en la lista — y cada archivo elegido se puede quitar individualmente (✕) antes de guardar, con una miniatura si es foto o un ícono con el nombre si no. No toca la base de datos: es puramente la ergonomía de elegir los archivos antes de subirlos, sobre las mismas tablas de siempre (`actividad_archivos`, `devocional_archivos`).
+
+No se tocaron los campos que hoy son de **una sola** foto/archivo (Bitácora: salón y refrigerio; Materiales: foto; evidencia de tarea que sube un padre) — pasarlos a "varios" sí implica cambiar el esquema (serían columnas o tablas nuevas en vez de una sola URL), así que se dejó pendiente de confirmar antes de tocar la base de datos.
 
 ## 6. Modelo de datos (Supabase / Postgres)
 

@@ -7,6 +7,7 @@ import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleNinoModal from '../../components/DetalleNinoModal'
+import Clases from './Clases'
 import { BADGE_CLASSES } from '../../lib/colors'
 import { whatsappLink } from '../../lib/whatsapp'
 import { exportExcel } from '../../lib/exportExcel'
@@ -28,6 +29,7 @@ export default function Ninos() {
   const { profile, user } = useAuth()
   const esStaff = STAFF.includes(profile.role)
   const esDocente = profile.role === 'docente'
+  const [tab, setTab] = useState('ninos')
   const { tiene } = usePermisosRol()
   const puedeEditar = esStaff || (esDocente && tiene('docente', 'editar_ninos'))
   const puedeAgregar = esStaff || (esDocente && tiene('docente', 'agregar_ninos'))
@@ -283,20 +285,45 @@ export default function Ninos() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Niños 🧒</h1>
-          <p className="text-ink/50">{filtrados.length} de {ninosVisibles.length} en total</p>
+          <p className="text-ink/50">
+            {tab === 'ninos' ? `${filtrados.length} de ${ninosVisibles.length} en total` : 'Niveles por edad de tu escuelita'}
+          </p>
         </div>
-        {esStaff && (
+        {tab === 'ninos' && esStaff && (
           <button className="btn-secondary" onClick={exportar}>
             📊 Exportar
           </button>
         )}
-        {puedeAgregar && (
+        {tab === 'ninos' && puedeAgregar && (
           <button className="btn-primary" onClick={openNew}>
             + Nuevo niño/a
           </button>
         )}
       </div>
 
+      {esStaff && (
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setTab('ninos')}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'ninos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          >
+            🧒 Niños
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('clases')}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'clases' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          >
+            🎒 Clases
+          </button>
+        </div>
+      )}
+
+      {tab === 'clases' && esStaff ? (
+        <Clases />
+      ) : (
+        <>
       <div className="flex flex-wrap items-center gap-3">
         <input
           className="input max-w-xs"
@@ -419,6 +446,8 @@ export default function Ninos() {
             </tbody>
           </table>
         </div>
+        </>
+      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar niño/a' : 'Nuevo niño/a'}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

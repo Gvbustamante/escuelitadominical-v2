@@ -15,14 +15,12 @@ import Foro from './pages/Foro'
 
 import AdminHome from './pages/admin/AdminHome'
 import Ninos from './pages/admin/Ninos'
-import Clases from './pages/admin/Clases'
 import Docentes from './pages/admin/Docentes'
 import AsistenciaAdmin from './pages/admin/AsistenciaAdmin'
 import ActividadesAdmin from './pages/admin/ActividadesAdmin'
 import AgendaAdmin from './pages/admin/AgendaAdmin'
 import Ajustes from './pages/admin/Ajustes'
 import BitacoraAdmin from './pages/admin/BitacoraAdmin'
-import ConfigEstrellas from './pages/admin/ConfigEstrellas'
 import Planeacion from './pages/admin/Planeacion'
 
 import DocenteHome from './pages/docente/DocenteHome'
@@ -80,14 +78,7 @@ export default function App() {
           }
         />
         <Route path="/usuarios" element={<Navigate to="/docentes" replace />} />
-        <Route
-          path="/clases"
-          element={
-            <ProtectedRoute roles={STAFF}>
-              <Clases />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/clases" element={<Navigate to="/ninos" replace />} />
         <Route
           path="/docentes"
           element={
@@ -114,14 +105,7 @@ export default function App() {
           }
         />
         <Route path="/materiales" element={<Navigate to="/bitacora" replace />} />
-        <Route
-          path="/estrellas"
-          element={
-            <ProtectedRoute roles={STAFF}>
-              <ConfigEstrellas />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/estrellas" element={<Navigate to="/ajustes" replace />} />
         <Route
           path="/planeacion"
           element={

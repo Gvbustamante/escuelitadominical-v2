@@ -5,6 +5,7 @@ import Spinner from '../../components/Spinner'
 import AppLogo from '../../components/AppLogo'
 import PermisosTab from '../../components/PermisosTab'
 import CambiarPasswordModal from '../../components/CambiarPasswordModal'
+import ConfigEstrellas from './ConfigEstrellas'
 import { AyudaContenido } from '../Tutorial'
 import { useConfigIglesia, refreshConfigIglesia } from '../../lib/configIglesia'
 
@@ -188,6 +189,12 @@ export default function Ajustes() {
         >
           Ayuda
         </button>
+        <button
+          onClick={() => setTab('estrellas')}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'estrellas' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+        >
+          🌟 Estrellas
+        </button>
         {profile.role === 'admin' && (
           <button
             onClick={() => setTab('permisos')}
@@ -209,6 +216,8 @@ export default function Ajustes() {
       )}
 
       {tab === 'ayuda' && <AyudaContenido />}
+
+      {tab === 'estrellas' && <ConfigEstrellas />}
 
       {tab === 'permisos' && profile.role === 'admin' && <PermisosTab />}
 

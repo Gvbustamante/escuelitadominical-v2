@@ -153,14 +153,8 @@ export default function Clases() {
 
   if (!niveles) {
     return (
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Skeleton className="h-8 w-40" />
-            <Skeleton className="mt-2 h-4 w-56" />
-          </div>
-          <Skeleton className="h-12 w-40" />
-        </div>
+      <div className="flex flex-col gap-4">
+        <Skeleton className="h-12 w-40" />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-28 w-full" />
@@ -173,10 +167,7 @@ export default function Clases() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold">Clases 🎒</h1>
-          <p className="text-ink/50">Niveles por edad de tu escuelita</p>
-        </div>
+        <p className="text-ink/50">Niveles por edad de tu escuelita</p>
         <button className="btn-primary" onClick={openNew}>
           + Nueva clase
         </button>

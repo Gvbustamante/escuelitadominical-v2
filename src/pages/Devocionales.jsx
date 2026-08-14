@@ -6,6 +6,7 @@ import Spinner from '../components/Spinner'
 import Modal from '../components/Modal'
 import RichTextEditor from '../components/RichTextEditor'
 import ArticulosAdjuntos from '../components/ArticulosAdjuntos'
+import MultiFilePicker from '../components/MultiFilePicker'
 import CitasBiblicasAdmin from './admin/CitasBiblicasAdmin'
 
 function hoyISO() {
@@ -330,8 +331,7 @@ export default function Devocionales() {
           </div>
           <div>
             <label className="label">{editing ? 'Agregar más materiales (opcional)' : 'Materiales para descargar (opcional)'}</label>
-            <input type="file" multiple className="input" onChange={(e) => setArchivos(Array.from(e.target.files))} />
-            {archivos.length > 0 && <p className="mt-1 text-sm text-ink/50">{archivos.length} archivo(s) seleccionado(s)</p>}
+            <MultiFilePicker archivos={archivos} onChange={setArchivos} />
             {editing && <ArticulosAdjuntos archivos={editing.devocional_archivos} titulo="Ya subidos" />}
           </div>
           {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}

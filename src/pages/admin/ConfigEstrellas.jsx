@@ -88,10 +88,7 @@ export default function ConfigEstrellas() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl font-bold">Estrellas ⭐</h1>
-        <p className="text-ink/50">Configura los motivos rápidos y las insignias que ganan los niños</p>
-      </div>
+      <p className="text-ink/50">Configura los motivos rápidos y las insignias que ganan los niños</p>
 
       <div className="card max-w-2xl">
         <p className="label mb-1">Motivos de reconocimiento</p>
