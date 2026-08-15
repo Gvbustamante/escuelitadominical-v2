@@ -1137,9 +1137,11 @@ create table public.horarios (
   hora time,
   activo boolean not null default true,
   orden int not null default 0,
+  dia_semana int references public.dias_clase(dia_semana),
   created_at timestamptz not null default now()
 );
 comment on table public.horarios is 'Horarios/servicios del mismo día de clase (ej. "9:00 am", "11:00 am"). Toda iglesia arranca con uno solo ("Servicio único"); el admin agrega más si tiene varios servicios.';
+comment on column public.horarios.dia_semana is 'A qué día de la semana aplica este horario (0=domingo…6=sábado). null = aplica a todos los días de clase — así una iglesia con el mismo horario todos los días no tiene que configurar nada. Sirve para el caso de, ej., 3 servicios el domingo pero solo 1 el sábado: los 3 de domingo llevan dia_semana=0, y el del sábado dia_semana=6, así Planeación y Cobertura de hoy no mezclan los de un día con los de otro.';
 
 alter table public.horarios enable row level security;
 

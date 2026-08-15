@@ -38,6 +38,7 @@ export default function Ajustes() {
   const [diasClase, setDiasClase] = useState(null)
   const [horarios, setHorarios] = useState(null)
   const [nuevoHorario, setNuevoHorario] = useState('')
+  const [nuevoHorarioDia, setNuevoHorarioDia] = useState('')
   const [busyHorario, setBusyHorario] = useState(false)
 
   const loadHorarios = () => supabase.from('horarios').select('*').order('orden').then(({ data }) => setHorarios(data || []))
@@ -63,8 +64,11 @@ export default function Ajustes() {
     if (!nuevoHorario.trim()) return
     setBusyHorario(true)
     const orden = (horarios.reduce((max, h) => Math.max(max, h.orden), 0) || 0) + 1
-    await supabase.from('horarios').insert({ nombre: nuevoHorario.trim(), orden })
+    await supabase
+      .from('horarios')
+      .insert({ nombre: nuevoHorario.trim(), orden, dia_semana: nuevoHorarioDia === '' ? null : Number(nuevoHorarioDia) })
     setNuevoHorario('')
+    setNuevoHorarioDia('')
     setBusyHorario(false)
     loadHorarios()
   }
@@ -77,6 +81,11 @@ export default function Ajustes() {
   async function renombrarHorario(h, nombre) {
     if (!nombre.trim() || nombre === h.nombre) return
     await supabase.from('horarios').update({ nombre: nombre.trim() }).eq('id', h.id)
+    loadHorarios()
+  }
+
+  async function cambiarDiaHorario(h, valor) {
+    await supabase.from('horarios').update({ dia_semana: valor === '' ? null : Number(valor) }).eq('id', h.id)
     loadHorarios()
   }
 
@@ -321,19 +330,33 @@ export default function Ajustes() {
             <p className="label mb-1">Horarios</p>
             <p className="mb-4 text-sm text-ink/50">
               Si el mismo día de clase hay más de un servicio (ej. 9:00 am y 11:00 am), agrégalos aquí. Con uno solo
-              no necesitas tocar nada — ya viene creado por defecto.
+              no necesitas tocar nada — ya viene creado por defecto. Si un horario es solo de un día (ej. los 3
+              servicios son del domingo, pero el sábado solo hay uno), dile a cuál día pertenece para que Planeación
+              y "Cobertura de hoy" no lo mezclen con los demás días.
             </p>
             {!horarios ? (
               <p className="text-sm text-ink/40">Cargando...</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {horarios.map((h) => (
-                  <div key={h.id} className="flex items-center gap-2 rounded-xl bg-ink/5 px-3 py-2">
+                  <div key={h.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-ink/5 px-3 py-2">
                     <input
                       defaultValue={h.nombre}
                       onBlur={(e) => renombrarHorario(h, e.target.value)}
                       className="input !w-auto flex-1 !py-1.5 !text-sm"
                     />
+                    <select
+                      defaultValue={h.dia_semana ?? ''}
+                      onChange={(e) => cambiarDiaHorario(h, e.target.value)}
+                      className="input !w-auto !py-1.5 !text-sm"
+                    >
+                      <option value="">Todos los días</option>
+                      {DIAS_SEMANA.map((d) => (
+                        <option key={d.dia_semana} value={d.dia_semana}>
+                          {d.label}
+                        </option>
+                      ))}
+                    </select>
                     <button
                       type="button"
                       onClick={() => toggleHorarioActivo(h)}
@@ -353,6 +376,18 @@ export default function Ajustes() {
                 onChange={(e) => setNuevoHorario(e.target.value)}
                 placeholder="Ej. 11:00 am"
               />
+              <select
+                value={nuevoHorarioDia}
+                onChange={(e) => setNuevoHorarioDia(e.target.value)}
+                className="input !w-auto"
+              >
+                <option value="">Todos los días</option>
+                {DIAS_SEMANA.map((d) => (
+                  <option key={d.dia_semana} value={d.dia_semana}>
+                    {d.label}
+                  </option>
+                ))}
+              </select>
               <button disabled={busyHorario} className="btn-secondary shrink-0">
                 {busyHorario ? 'Agregando...' : '+ Agregar horario'}
               </button>

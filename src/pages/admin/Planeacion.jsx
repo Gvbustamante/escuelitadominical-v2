@@ -168,6 +168,12 @@ export default function Planeacion() {
   const hoy = hoyISO()
   const coberturaDelDia = coberturaMes.filter((c) => c.fecha === selectedDay)
   const actividadesDelDia = actividadesMes.filter((a) => a.fecha === selectedDay)
+  // Un horario con dia_semana=null aplica a cualquier día de clase; si tiene
+  // un día específico (ej. los 3 servicios son solo del domingo), solo se
+  // muestra cuando el día seleccionado es ese — así el sábado con un solo
+  // servicio no hereda los horarios del domingo.
+  const diaSemanaSeleccionado = selectedDay ? new Date(selectedDay + 'T00:00:00').getDay() : null
+  const horariosDelDia = horarios.filter((h) => h.dia_semana === null || h.dia_semana === diaSemanaSeleccionado)
 
   return (
     <div className="flex flex-col gap-6">
@@ -251,13 +257,13 @@ export default function Planeacion() {
                   .map((a) => a.docente?.nombre_completo)
                   .filter(Boolean)
                 const actividad = actividadesDelDia.find((a) => a.nivel_id === nivel.id)
-                const soloUnHorario = horarios.length <= 1
+                const soloUnHorario = horariosDelDia.length <= 1
                 return (
                   <div key={nivel.id} className="card">
                     <h3 className="font-bold">{nivel.nombre}</h3>
 
                     <div className="mt-2 flex flex-col gap-2">
-                      {horarios.map((horario) => {
+                      {horariosDelDia.map((horario) => {
                         const fijo = asignacionesHorario.find((a) => a.nivel_id === nivel.id && a.horario_id === horario.id)
                         const override = coberturaDelDia.find((c) => c.nivel_id === nivel.id && c.horario_id === horario.id)
                         const nombreFijo = fijo?.docente?.nombre_completo
@@ -298,7 +304,7 @@ export default function Planeacion() {
                           </div>
                         )
                       })}
-                      {horarios.length === 0 && <p className="text-sm text-ink/40">No hay horarios activos configurados.</p>}
+                      {horariosDelDia.length === 0 && <p className="text-sm text-ink/40">No hay horarios activos configurados para este día.</p>}
                     </div>
 
                     <div className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-ink/5 px-3 py-2">

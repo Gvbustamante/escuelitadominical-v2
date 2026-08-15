@@ -7,6 +7,7 @@ import ConfirmModal from '../../components/ConfirmModal'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 
 const COLOR_OPTIONS = ['sky', 'grass', 'sunshine', 'coral', 'grape']
+const DIA_LABEL = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
 
 export default function Clases() {
   const { profile } = useAuth()
@@ -335,7 +336,10 @@ export default function Clases() {
               <div className="flex flex-col gap-2">
                 {horarios.map((h) => (
                   <div key={h.id} className="flex items-center gap-2">
-                    <span className="w-24 shrink-0 text-sm font-bold text-ink/60">{h.nombre}</span>
+                    <span className="w-32 shrink-0 text-sm font-bold text-ink/60">
+                      {h.nombre}
+                      {h.dia_semana != null && <span className="font-normal text-ink/40"> · {DIA_LABEL[h.dia_semana]}</span>}
+                    </span>
                     <select
                       className="input !w-auto flex-1 !py-1.5 !text-sm"
                       value={horarioDocentes[h.id] || ''}
