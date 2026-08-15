@@ -27,8 +27,8 @@ export default function Clases() {
 
   const load = useCallback(async () => {
     const [{ data: n }, { data: d }, { data: a }, { data: h }, { data: ah }] = await Promise.all([
-      supabase.from('niveles').select('*').order('edad_min', { ascending: true, nullsFirst: true }),
-      supabase.from('profiles').select('id, nombre_completo').eq('role', 'docente').eq('activo', true),
+      supabase.from('niveles').select('*').order('orden', { ascending: true }),
+      supabase.from('profiles').select('id, nombre_completo').eq('role', 'docente').eq('activo', true).order('nombre_completo'),
       supabase.from('docentes_niveles').select('*'),
       supabase.from('horarios').select('*').eq('activo', true).order('orden'),
       supabase.from('asignacion_horario').select('*'),
@@ -98,7 +98,8 @@ export default function Clases() {
       const { error } = await supabase.from('niveles').update(payload).eq('id', editing.id)
       if (error) return fail(error)
     } else {
-      const { data, error } = await supabase.from('niveles').insert(payload).select().single()
+      const orden = niveles.reduce((max, n) => Math.max(max, n.orden ?? 0), 0) + 1
+      const { data, error } = await supabase.from('niveles').insert({ ...payload, orden }).select().single()
       if (error) return fail(error)
       nivelId = data.id
     }
@@ -136,6 +137,18 @@ export default function Clases() {
     load()
   }
 
+  async function mover(nivel, direccion) {
+    const i = niveles.findIndex((n) => n.id === nivel.id)
+    const j = i + direccion
+    if (j < 0 || j >= niveles.length) return
+    const vecino = niveles[j]
+    await Promise.all([
+      supabase.from('niveles').update({ orden: vecino.orden ?? 0 }).eq('id', nivel.id),
+      supabase.from('niveles').update({ orden: nivel.orden ?? 0 }).eq('id', vecino.id),
+    ])
+    load()
+  }
+
   function handleToggleClick(nivel) {
     if (nivel.activo) {
       setConfirmDesactivar(nivel)
@@ -167,7 +180,7 @@ export default function Clases() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-ink/50">Niveles por edad de tu escuelita</p>
+        <p className="text-ink/50">Niveles por edad de tu escuelita — usa ▲▼ para ordenarlas como quieras verlas</p>
         <button className="btn-primary" onClick={openNew}>
           + Nueva clase
         </button>
@@ -185,11 +198,35 @@ export default function Clases() {
             </tr>
           </thead>
           <tbody>
-            {niveles.map((nivel) => {
+            {niveles.map((nivel, i) => {
               const docs = asignaciones.filter((a) => a.nivel_id === nivel.id)
               return (
                 <tr key={nivel.id} className={`border-t border-ink/5 ${!nivel.activo ? 'opacity-50' : ''}`}>
-                  <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">{nivel.nombre}</td>
+                  <td className="px-3 py-2 sm:px-4 sm:py-3">
+                    <div className="flex items-center gap-1">
+                      <div className="flex flex-col">
+                        <button
+                          type="button"
+                          disabled={i === 0}
+                          onClick={() => mover(nivel, -1)}
+                          className="leading-none text-ink/30 hover:text-sky-500 disabled:opacity-20 disabled:hover:text-ink/30"
+                          title="Subir"
+                        >
+                          ▲
+                        </button>
+                        <button
+                          type="button"
+                          disabled={i === niveles.length - 1}
+                          onClick={() => mover(nivel, 1)}
+                          className="leading-none text-ink/30 hover:text-sky-500 disabled:opacity-20 disabled:hover:text-ink/30"
+                          title="Bajar"
+                        >
+                          ▼
+                        </button>
+                      </div>
+                      <span className="font-bold">{nivel.nombre}</span>
+                    </div>
+                  </td>
                   <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
                     {nivel.edad_min ?? '?'} - {nivel.edad_max ?? '?'} años
                   </td>
