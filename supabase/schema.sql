@@ -25,8 +25,10 @@ create table public.niveles (
   edad_max int,
   color text default 'sky',
   activo boolean not null default true,
+  orden int not null default 0,
   created_at timestamptz not null default now()
 );
+comment on column public.niveles.orden is 'Orden manual en que se muestran las clases (Clases, Planeación). Lo gestiona el admin con las flechas ↑/↓; no tiene que ver con edad_min/edad_max.';
 
 create table public.docentes_niveles (
   docente_id uuid references public.profiles(id) on delete cascade,

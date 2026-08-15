@@ -45,7 +45,7 @@ export default function Planeacion() {
       .from('niveles')
       .select('*')
       .eq('activo', true)
-      .order('edad_min', { ascending: true, nullsFirst: true })
+      .order('orden', { ascending: true })
       .then(({ data }) => setNiveles(data || []))
     supabase
       .from('profiles')
