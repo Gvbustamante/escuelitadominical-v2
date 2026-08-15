@@ -60,7 +60,12 @@ export default function CoberturaHoy() {
         if (!tomadaPorNivel[r.nivel_id]) tomadaPorNivel[r.nivel_id] = r.tomada_por?.nombre_completo || 'el equipo'
       })
 
-      const horariosActivos = horarios || []
+      // Un horario con dia_semana=null aplica a cualquier día de clase; si
+      // tiene un día específico (ej. los 3 servicios son solo del domingo),
+      // hoy solo cuenta si hoy es ese día — así un sábado con un solo
+      // servicio no hereda (ni marca como "sin docente") los horarios del
+      // domingo.
+      const horariosActivos = (horarios || []).filter((h) => h.dia_semana === null || h.dia_semana === diaSemana)
       const soloUnHorario = horariosActivos.length <= 1
 
       const filas = (niveles || []).map((n) => {
