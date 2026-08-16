@@ -125,7 +125,7 @@ export default function DevocionalDetalle() {
                     key={f.id}
                     type="button"
                     onClick={() => setPreview({
-                      url: fileUrl('actividades', f.storage_path),
+                      url: fileUrl(f.bucket || 'actividades', f.storage_path),
                       nombre: f.nombre_archivo,
                       mime: f.tipo,
                     })}

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-function fileUrl(path) {
-  return supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
+function fileUrl(path, bucket = 'actividades') {
+  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
 }
 
 function esFoto(f) {
@@ -29,7 +29,7 @@ export default function ActivityFiles({ archivos }) {
               className="group aspect-square overflow-hidden rounded-2xl bg-ink/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft"
             >
               <img
-                src={fileUrl(f.storage_path)}
+                src={fileUrl(f.storage_path, f.bucket)}
                 alt={f.nombre_archivo || 'Foto de la actividad'}
                 loading="lazy"
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
@@ -44,7 +44,7 @@ export default function ActivityFiles({ archivos }) {
           {otros.map((f) => (
             <a
               key={f.id}
-              href={fileUrl(f.storage_path)}
+              href={fileUrl(f.storage_path, f.bucket)}
               target="_blank"
               rel="noreferrer"
               className="rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
@@ -61,7 +61,7 @@ export default function ActivityFiles({ archivos }) {
           onClick={() => setLightbox(null)}
         >
           <img
-            src={fileUrl(lightbox.storage_path)}
+            src={fileUrl(lightbox.storage_path, lightbox.bucket)}
             alt={lightbox.nombre_archivo || 'Foto de la actividad'}
             className="max-h-[85vh] max-w-full rounded-2xl shadow-soft"
           />

@@ -95,6 +95,7 @@ create table public.actividad_archivos (
   storage_path text not null,
   nombre_archivo text,
   tipo text,
+  bucket text not null default 'actividades',
   created_at timestamptz not null default now()
 );
 
@@ -149,6 +150,7 @@ create table public.devocional_archivos (
   storage_path text not null,
   nombre_archivo text,
   tipo text,
+  bucket text not null default 'actividades',
   created_at timestamptz not null default now()
 );
 comment on table public.devocional_archivos is 'Archivos descargables de un devocional (guías, hojas de actividad, etc.), aparte de la imagen principal (devocionales_ninos.imagen_url).';
