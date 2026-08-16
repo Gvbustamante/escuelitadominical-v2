@@ -8,6 +8,7 @@ import Modal from '../components/Modal'
 import RichTextEditor from '../components/RichTextEditor'
 import ArticulosAdjuntos from '../components/ArticulosAdjuntos'
 import MultiFilePicker from '../components/MultiFilePicker'
+import DrivePicker from '../components/DrivePicker'
 import CitasBiblicasAdmin from './admin/CitasBiblicasAdmin'
 
 function hoyISO() {
@@ -44,6 +45,8 @@ export default function Devocionales() {
   const [busy, setBusy] = useState(false)
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
+  const [drivePickerOpen, setDrivePickerOpen] = useState(false)
+  const [archivosDrive, setArchivosDrive] = useState([])
 
   const load = useCallback(async () => {
     let query = supabase
@@ -70,6 +73,7 @@ export default function Devocionales() {
     setImagen(null)
     setPreview(null)
     setArchivos([])
+    setArchivosDrive([])
     setError('')
     setModalOpen(true)
   }
@@ -86,6 +90,7 @@ export default function Devocionales() {
     setImagen(null)
     setPreview(null)
     setArchivos([])
+    setArchivosDrive([])
     setError('')
     setModalOpen(true)
   }
@@ -169,6 +174,16 @@ export default function Devocionales() {
           tipo: file.type,
         })
       }
+    }
+
+    // Vincular archivos del Drive
+    for (const df of archivosDrive) {
+      await supabase.from('devocional_archivos').insert({
+        devocional_id: devocionalId,
+        storage_path: df.storage_path,
+        nombre_archivo: df.nombre,
+        tipo: df.tipo,
+      })
     }
 
     setProgreso('')
@@ -346,7 +361,22 @@ export default function Devocionales() {
           </div>
           <div>
             <label className="label">{editing ? 'Agregar más materiales (opcional)' : 'Materiales para descargar (opcional)'}</label>
-            <MultiFilePicker archivos={archivos} onChange={setArchivos} />
+            <div className="flex flex-wrap items-center gap-2">
+              <MultiFilePicker archivos={archivos} onChange={setArchivos} />
+              <button type="button" onClick={() => setDrivePickerOpen(true)} className="btn-secondary !py-2 !text-sm">
+                📁 Desde el Drive
+              </button>
+            </div>
+            {archivosDrive.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {archivosDrive.map((df, i) => (
+                  <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
+                    📁 {df.nombre}
+                    <button type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500">×</button>
+                  </span>
+                ))}
+              </div>
+            )}
             {editing && <ArticulosAdjuntos archivos={editing.devocional_archivos} titulo="Ya subidos" />}
           </div>
           {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}
@@ -356,6 +386,12 @@ export default function Devocionales() {
           </button>
         </form>
       </Modal>
+
+      <DrivePicker
+        open={drivePickerOpen}
+        onClose={() => setDrivePickerOpen(false)}
+        onSelect={(files) => setArchivosDrive([...archivosDrive, ...files])}
+      />
         </>
       )}
     </div>

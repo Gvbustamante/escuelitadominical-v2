@@ -3,8 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import Spinner from '../components/Spinner'
 import RichTextView from '../components/RichTextView'
-import ArticulosAdjuntos from '../components/ArticulosAdjuntos'
 import ReaccionesBar from '../components/ReaccionesBar'
+import FilePreview, { getFileIcon } from '../components/FilePreview'
+
+function fileUrl(bucket, path) {
+  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
+}
 
 export default function DevocionalDetalle() {
   const { id } = useParams()
@@ -12,6 +16,7 @@ export default function DevocionalDetalle() {
   const [devocional, setDevocional] = useState(null)
   const [notFound, setNotFound] = useState(false)
   const [sugeridos, setSugeridos] = useState(null)
+  const [preview, setPreview] = useState(null)
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
@@ -26,9 +31,7 @@ export default function DevocionalDetalle() {
     setDevocional(data)
   }, [id])
 
-  useEffect(() => {
-    load()
-  }, [load])
+  useEffect(() => { load() }, [load])
 
   useEffect(() => {
     setSugeridos(null)
@@ -51,72 +54,151 @@ export default function DevocionalDetalle() {
   }
   if (!devocional) return <Spinner />
 
+  const archivos = devocional.devocional_archivos || []
+
   return (
     <div className="flex flex-col gap-6">
       <BotonVolver navigate={navigate} />
 
-      <div className="card overflow-hidden !p-0">
-        {devocional.imagen_url && (
-          <img src={devocional.imagen_url} alt={devocional.titulo} className="h-56 w-full object-cover sm:h-80" />
-        )}
-        <div className="flex flex-col gap-4 p-4 sm:p-6">
+      {/* ═══ Hero con imagen ═══ */}
+      {devocional.imagen_url && (
+        <div className="relative overflow-hidden rounded-2xl shadow-soft">
+          <img
+            src={devocional.imagen_url}
+            alt={devocional.titulo}
+            className="w-full max-h-[380px] object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              {devocional.activo && <span className="badge bg-sunshine-200/90 text-sunshine-800">🟢 Activo</span>}
+              {devocional.nivel?.nombre && (
+                <span className="badge bg-white/20 text-white backdrop-blur-sm">{devocional.nivel.nombre}</span>
+              )}
+            </div>
+            <h1 className="text-2xl font-bold text-white sm:text-4xl drop-shadow-lg">{devocional.titulo}</h1>
+            <p className="mt-1 text-sm font-bold text-white/70">{devocional.fecha}</p>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ Sin imagen: encabezado normal ═══ */}
+      {!devocional.imagen_url && (
+        <div className="card">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-2xl font-bold sm:text-3xl">{devocional.titulo}</h1>
                 {devocional.activo && <span className="badge bg-sunshine-200 text-sunshine-800">🟢 Activo</span>}
               </div>
-              {devocional.nivel?.nombre && <p className="mt-1 text-sm font-bold uppercase text-sky-500">{devocional.nivel.nombre}</p>}
+              {devocional.nivel?.nombre && (
+                <p className="mt-1 text-sm font-bold uppercase text-sky-500">{devocional.nivel.nombre}</p>
+              )}
             </div>
-            <span className="text-sm text-ink/40">{devocional.fecha}</span>
-          </div>
-
-          {devocional.versiculo && (
-            <div className="rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
-              <p className="italic text-ink/80">📖 "{devocional.versiculo}"</p>
-            </div>
-          )}
-
-          <RichTextView html={devocional.contenido} />
-
-          <ArticulosAdjuntos archivos={devocional.devocional_archivos} />
-
-          <ReaccionesBar
-            tabla="devocional_reacciones"
-            columnaId="devocional_id"
-            columnaUsuario="usuario_id"
-            targetId={devocional.id}
-            reacciones={devocional.devocional_reacciones}
-            onChanged={load}
-          />
-        </div>
-      </div>
-
-      {sugeridos && sugeridos.length > 0 && (
-        <div>
-          <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">🙏 Otros devocionales</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {sugeridos.map((d) => (
-              <button
-                key={d.id}
-                onClick={() => navigate(`/devocionales/${d.id}`)}
-                className="card-link flex items-center gap-3 text-left !p-3"
-              >
-                {d.imagen_url ? (
-                  <img src={d.imagen_url} alt="" className="h-14 w-14 shrink-0 rounded-xl object-cover" />
-                ) : (
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-sunshine-100 text-2xl">🙏</div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-bold">{d.titulo}</p>
-                  {d.versiculo && <p className="truncate text-sm italic text-ink/50">"{d.versiculo}"</p>}
-                  <p className="mt-0.5 text-xs font-bold text-coral-500">{d.devocional_reacciones?.length || 0} reacciones ❤️</p>
-                </div>
-              </button>
-            ))}
+            <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/50">{devocional.fecha}</span>
           </div>
         </div>
       )}
+
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        {/* Columna principal */}
+        <div className="flex min-w-0 flex-1 flex-col gap-5">
+          {/* Versículo */}
+          {devocional.versiculo && (
+            <div className="rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-5">
+              <p className="text-lg italic text-ink/80 leading-relaxed">📖 "{devocional.versiculo}"</p>
+            </div>
+          )}
+
+          {/* Contenido */}
+          <div className="card">
+            <RichTextView html={devocional.contenido} />
+          </div>
+
+          {/* Materiales con preview */}
+          {archivos.length > 0 && (
+            <div className="card">
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📎 Materiales</p>
+              <div className="flex flex-col gap-2">
+                {archivos.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setPreview({
+                      url: fileUrl('actividades', f.storage_path),
+                      nombre: f.nombre_archivo,
+                      mime: f.tipo,
+                    })}
+                    className="flex items-center gap-3 rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 text-left transition-colors hover:border-sky-300 hover:bg-sky-50"
+                  >
+                    <span className="text-2xl">{getFileIcon(f.nombre_archivo, f.tipo)}</span>
+                    <span className="min-w-0 flex-1 truncate font-bold text-ink">{f.nombre_archivo || 'Archivo'}</span>
+                    <span className="shrink-0 text-sm font-bold text-sky-600">👁️ Ver</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Reacciones */}
+          <div className="card">
+            <ReaccionesBar
+              tabla="devocional_reacciones"
+              columnaId="devocional_id"
+              columnaUsuario="usuario_id"
+              targetId={devocional.id}
+              reacciones={devocional.devocional_reacciones}
+              onChanged={load}
+            />
+          </div>
+        </div>
+
+        {/* ═══ Sidebar: otros devocionales ═══ */}
+        <aside className="w-full shrink-0 lg:w-72 xl:w-80">
+          <div className="card sticky top-4">
+            <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">🙏 Otros devocionales</p>
+            {sugeridos === null ? (
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-14 animate-pulse rounded-xl bg-ink/5" />
+                ))}
+              </div>
+            ) : sugeridos.length === 0 ? (
+              <p className="text-sm text-ink/40">No hay otros devocionales aún.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {sugeridos.map((d) => (
+                  <button
+                    key={d.id}
+                    onClick={() => navigate(`/devocionales/${d.id}`)}
+                    className="flex items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-sky-50"
+                  >
+                    {d.imagen_url ? (
+                      <img src={d.imagen_url} alt="" className="h-11 w-11 shrink-0 rounded-lg object-cover" loading="lazy" />
+                    ) : (
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-sunshine-100 text-xl">🙏</div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold">{d.titulo}</p>
+                      {d.versiculo && <p className="truncate text-xs italic text-ink/50">"{d.versiculo}"</p>}
+                      <p className="mt-0.5 text-xs font-bold text-coral-500">{d.devocional_reacciones?.length || 0} ❤️</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
+
+      {/* Preview modal */}
+      <FilePreview
+        open={!!preview}
+        onClose={() => setPreview(null)}
+        url={preview?.url}
+        nombre={preview?.nombre}
+        mime={preview?.mime}
+      />
     </div>
   )
 }
