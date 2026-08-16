@@ -6,16 +6,30 @@ import { useMisHijos } from '../lib/useMisHijos'
 import { useMisClases } from '../lib/useMisClases'
 import Spinner from '../components/Spinner'
 import RichTextView from '../components/RichTextView'
-import ArticulosAdjuntos from '../components/ArticulosAdjuntos'
 import ReaccionesBar from '../components/ReaccionesBar'
 import TareaEntregas from '../components/TareaEntregas'
 import TareaHijoWidget from '../components/TareaHijoWidget'
 import MiEntregaEquipoWidget from '../components/MiEntregaEquipoWidget'
+import FilePreview, { getFileIcon, getFileType } from '../components/FilePreview'
 
 const STAFF = ['admin', 'coordinador']
 
 function esFoto(f) {
   return f.tipo?.startsWith('image/') || /\.(png|jpe?g|gif|webp|heic|avif)$/i.test(f.nombre_archivo || '')
+}
+
+function esVideo(f) {
+  return f.tipo?.startsWith('video/') || /\.(mp4|webm|mov|avi|mkv)$/i.test(f.nombre_archivo || '')
+}
+
+function fileUrl(path) {
+  return supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
+}
+
+function formatMes(fecha) {
+  if (!fecha) return ''
+  const d = new Date(fecha + 'T12:00:00')
+  return d.toLocaleDateString('es', { month: 'long', year: 'numeric' })
 }
 
 export default function ActividadDetalle() {
@@ -25,6 +39,9 @@ export default function ActividadDetalle() {
   const [actividad, setActividad] = useState(null)
   const [notFound, setNotFound] = useState(false)
   const [tareaModalOpen, setTareaModalOpen] = useState(false)
+  const [otrasDelMes, setOtrasDelMes] = useState(null)
+  const [preview, setPreview] = useState(null)
+  const [lightbox, setLightbox] = useState(null)
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
@@ -39,9 +56,25 @@ export default function ActividadDetalle() {
     setActividad(data)
   }, [id])
 
+  useEffect(() => { load() }, [load])
+
+  // Cargar otras actividades del mismo mes
   useEffect(() => {
-    load()
-  }, [load])
+    if (!actividad?.fecha) return
+    setOtrasDelMes(null)
+    const [year, month] = actividad.fecha.split('-')
+    const inicioMes = `${year}-${month}-01`
+    const finMes = `${year}-${month}-31`
+    supabase
+      .from('actividades')
+      .select('id, titulo, fecha, actividad_archivos(storage_path, tipo, nombre_archivo)')
+      .neq('id', id)
+      .gte('fecha', inicioMes)
+      .lte('fecha', finMes)
+      .order('fecha', { ascending: false })
+      .limit(8)
+      .then(({ data }) => setOtrasDelMes(data || []))
+  }, [id, actividad?.fecha])
 
   if (notFound) {
     return (
@@ -54,99 +87,250 @@ export default function ActividadDetalle() {
   if (!actividad) return <Spinner />
 
   const archivos = actividad.actividad_archivos || []
+  const video = archivos.find(esVideo)
   const fotos = archivos.filter(esFoto)
-  const hero = fotos[0]
-  const resto = archivos.filter((f) => f.id !== hero?.id)
+  const hero = !video ? fotos[0] : null
+  const restoFotos = video ? fotos : fotos.slice(1)
+  const adjuntos = archivos.filter((f) => !esFoto(f) && !esVideo(f))
 
   return (
     <div className="flex flex-col gap-6">
       <BotonVolver navigate={navigate} />
 
-      <div className="card overflow-hidden !p-0">
-        {hero && (
-          <img
-            src={supabase.storage.from('actividades').getPublicUrl(hero.storage_path).data.publicUrl}
-            alt={actividad.titulo}
-            className="h-56 w-full object-cover sm:h-80"
-          />
-        )}
-        <div className="flex flex-col gap-4 p-4 sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-bold sm:text-3xl">{actividad.titulo}</h1>
-                {actividad.audiencia === 'docentes' && <span className="badge bg-grape-100 text-grape-700">🍎 Equipo docente</span>}
-                {actividad.visible_padres === false && actividad.audiencia !== 'docentes' && (
-                  <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>
-                )}
-                {actividad.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
-              </div>
-              {actividad.nivel?.nombre && <p className="mt-1 text-sm font-bold uppercase text-sky-500">{actividad.nivel.nombre}</p>}
+      {/* ═══ Contenido principal estilo clase online ═══ */}
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        {/* Columna izquierda: video/hero + contenido */}
+        <div className="flex min-w-0 flex-1 flex-col gap-5">
+          {/* Video player o hero image */}
+          {video && (
+            <div className="overflow-hidden rounded-2xl bg-ink shadow-soft">
+              <video
+                src={fileUrl(video.storage_path)}
+                controls
+                poster={fotos[0] ? fileUrl(fotos[0].storage_path) : undefined}
+                className="aspect-video w-full"
+                controlsList="nodownload"
+              >
+                Tu navegador no soporta la reproducción de video.
+              </video>
             </div>
-            <span className="text-sm text-ink/40">{actividad.fecha}</span>
+          )}
+
+          {!video && hero && (
+            <div className="overflow-hidden rounded-2xl shadow-soft">
+              <img
+                src={fileUrl(hero.storage_path)}
+                alt={actividad.titulo}
+                className="w-full max-h-[420px] object-cover cursor-pointer"
+                onClick={() => setLightbox(hero)}
+              />
+            </div>
+          )}
+
+          {/* Encabezado */}
+          <div className="card">
+            <div className="flex flex-wrap items-start justify-between gap-2 mb-4">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-2xl font-bold sm:text-3xl">{actividad.titulo}</h1>
+                  {actividad.audiencia === 'docentes' && <span className="badge bg-grape-100 text-grape-700">🍎 Equipo docente</span>}
+                  {actividad.visible_padres === false && actividad.audiencia !== 'docentes' && (
+                    <span className="badge bg-grape-100 text-grape-700">🙈 Solo equipo</span>
+                  )}
+                  {actividad.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
+                </div>
+                {actividad.nivel?.nombre && (
+                  <p className="mt-1 text-sm font-bold uppercase text-sky-500">{actividad.nivel.nombre}</p>
+                )}
+              </div>
+              <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/50">{actividad.fecha}</span>
+            </div>
+
+            {/* Contenido como lección */}
+            <div className="border-t border-ink/5 pt-4">
+              <RichTextView html={actividad.descripcion} />
+            </div>
+
+            {/* Versículo / historia */}
+            {(actividad.versiculo_clave || actividad.historia_biblica) && (
+              <div className="mt-4 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-4">
+                {actividad.versiculo_clave && (
+                  <p className="text-base italic text-ink/80">📖 "{actividad.versiculo_clave}"</p>
+                )}
+                {actividad.historia_biblica && (
+                  <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {actividad.historia_biblica}</p>
+                )}
+              </div>
+            )}
+
+            {/* Enlace externo */}
+            {actividad.enlace_externo && (
+              <a
+                href={actividad.enlace_externo}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-block w-fit rounded-xl bg-sky-50 px-4 py-2.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
+              >
+                🔗 Abrir enlace externo
+              </a>
+            )}
           </div>
 
-          <RichTextView html={actividad.descripcion} />
-
-          {(actividad.versiculo_clave || actividad.historia_biblica) && (
-            <div className="rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
-              {actividad.versiculo_clave && <p className="italic text-ink/80">📖 "{actividad.versiculo_clave}"</p>}
-              {actividad.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {actividad.historia_biblica}</p>}
+          {/* Galería de fotos con preview */}
+          {restoFotos.length > 0 && (
+            <div className="card">
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📸 Galería de fotos</p>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                {restoFotos.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setLightbox(f)}
+                    className="group aspect-square overflow-hidden rounded-2xl bg-ink/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft"
+                  >
+                    <img
+                      src={fileUrl(f.storage_path)}
+                      alt={f.nombre_archivo || ''}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
-          {actividad.enlace_externo && (
-            <a
-              href={actividad.enlace_externo}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
-            >
-              🔗 Abrir enlace
-            </a>
-          )}
-
-          {resto.some(esFoto) && (
-            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-              {resto.filter(esFoto).map((f) => (
-                <a
-                  key={f.id}
-                  href={supabase.storage.from('actividades').getPublicUrl(f.storage_path).data.publicUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="aspect-square overflow-hidden rounded-2xl bg-ink/5"
-                >
-                  <img
-                    src={supabase.storage.from('actividades').getPublicUrl(f.storage_path).data.publicUrl}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                </a>
-              ))}
+          {/* Archivos adjuntos con preview */}
+          {adjuntos.length > 0 && (
+            <div className="card">
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📎 Materiales</p>
+              <div className="flex flex-col gap-2">
+                {adjuntos.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setPreview({
+                      url: fileUrl(f.storage_path),
+                      nombre: f.nombre_archivo,
+                      mime: f.tipo,
+                    })}
+                    className="flex items-center gap-3 rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 text-left transition-colors hover:border-sky-300 hover:bg-sky-50"
+                  >
+                    <span className="text-2xl">{getFileIcon(f.nombre_archivo, f.tipo)}</span>
+                    <span className="min-w-0 flex-1 truncate font-bold text-ink">{f.nombre_archivo || 'Archivo'}</span>
+                    <span className="shrink-0 text-sm font-bold text-sky-600">👁️ Ver</span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
-          <ArticulosAdjuntos archivos={resto.filter((f) => !esFoto(f))} />
-
-          {actividad.es_tarea && <TareaSeccion actividad={actividad} onVerEntregas={() => setTareaModalOpen(true)} onSaved={load} />}
-
-          {profile.role === 'padre' && (
-            <ReaccionesBar
-              tabla="actividad_reacciones"
-              columnaId="actividad_id"
-              columnaUsuario="padre_id"
-              targetId={actividad.id}
-              reacciones={actividad.actividad_reacciones}
-              onChanged={load}
-            />
+          {/* Tarea */}
+          {actividad.es_tarea && (
+            <div className="card">
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📝 Tarea</p>
+              <TareaSeccion actividad={actividad} onVerEntregas={() => setTareaModalOpen(true)} onSaved={load} />
+            </div>
           )}
-          {profile.role !== 'padre' && (
-            <p className="text-sm font-bold text-coral-500">{actividad.actividad_reacciones.length} reacciones ❤️</p>
-          )}
+
+          {/* Reacciones */}
+          <div className="card">
+            {profile.role === 'padre' ? (
+              <ReaccionesBar
+                tabla="actividad_reacciones"
+                columnaId="actividad_id"
+                columnaUsuario="padre_id"
+                targetId={actividad.id}
+                reacciones={actividad.actividad_reacciones}
+                onChanged={load}
+              />
+            ) : (
+              <p className="text-sm font-bold text-coral-500">{actividad.actividad_reacciones.length} reacciones ❤️</p>
+            )}
+          </div>
         </div>
+
+        {/* ═══ Sidebar: otras actividades del mes ═══ */}
+        <aside className="w-full shrink-0 lg:w-72 xl:w-80">
+          <div className="card sticky top-4">
+            <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">
+              📅 Más de {formatMes(actividad.fecha)}
+            </p>
+            {otrasDelMes === null ? (
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-14 animate-pulse rounded-xl bg-ink/5" />
+                ))}
+              </div>
+            ) : otrasDelMes.length === 0 ? (
+              <p className="text-sm text-ink/40">No hay otras actividades este mes.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {otrasDelMes.map((a) => {
+                  const thumb = (a.actividad_archivos || []).find((f) =>
+                    f.tipo?.startsWith('image/') || /\.(png|jpe?g|gif|webp)$/i.test(f.nombre_archivo || '')
+                  )
+                  return (
+                    <button
+                      key={a.id}
+                      onClick={() => navigate(`/actividades/${a.id}`)}
+                      className="flex items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-sky-50"
+                    >
+                      {thumb ? (
+                        <img
+                          src={fileUrl(thumb.storage_path)}
+                          alt=""
+                          className="h-11 w-11 shrink-0 rounded-lg object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-xl">🎨</div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold">{a.titulo}</p>
+                        <p className="text-xs text-ink/40">{a.fecha}</p>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </aside>
       </div>
 
       <TareaEntregas actividad={tareaModalOpen ? actividad : null} open={tareaModalOpen} onClose={() => setTareaModalOpen(false)} />
+
+      {/* Preview modal para archivos no-imagen */}
+      <FilePreview
+        open={!!preview}
+        onClose={() => setPreview(null)}
+        url={preview?.url}
+        nombre={preview?.nombre}
+        mime={preview?.mime}
+      />
+
+      {/* Lightbox para fotos */}
+      {lightbox && (
+        <div
+          className="animate-pop-in fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <img
+            src={fileUrl(lightbox.storage_path)}
+            alt={lightbox.nombre_archivo || ''}
+            className="max-h-[85vh] max-w-full rounded-2xl shadow-soft"
+          />
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-2xl leading-none text-ink hover:bg-white"
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   )
 }

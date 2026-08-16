@@ -9,6 +9,7 @@ import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
 import RichTextEditor from '../../components/RichTextEditor'
 import MultiFilePicker from '../../components/MultiFilePicker'
+import DrivePicker from '../../components/DrivePicker'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -42,6 +43,8 @@ export default function ActividadesAdmin() {
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
   const [tareaActividad, setTareaActividad] = useState(null)
+  const [drivePickerOpen, setDrivePickerOpen] = useState(false)
+  const [archivosDrive, setArchivosDrive] = useState([]) // archivos elegidos del drive
 
   useEffect(() => {
     supabase
@@ -88,6 +91,7 @@ export default function ActividadesAdmin() {
     setEditing(null)
     setForm(formVacio())
     setArchivos([])
+    setArchivosDrive([])
     setError('')
     setModalOpen(true)
   }
@@ -105,6 +109,7 @@ export default function ActividadesAdmin() {
       enlace_externo: actividad.enlace_externo || '',
     })
     setArchivos([])
+    setArchivosDrive([])
     setError('')
     setModalOpen(true)
   }
@@ -165,6 +170,16 @@ export default function ActividadesAdmin() {
           tipo: file.type,
         })
       }
+    }
+
+    // Vincular archivos elegidos del Drive (ya están subidos, solo crear registro)
+    for (const df of archivosDrive) {
+      await supabase.from('actividad_archivos').insert({
+        actividad_id: actividadId,
+        storage_path: df.storage_path,
+        nombre_archivo: df.nombre,
+        tipo: df.tipo,
+      })
     }
 
     setProgreso('')
@@ -346,7 +361,22 @@ export default function ActividadesAdmin() {
           )}
           <div>
             <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
-            <MultiFilePicker archivos={archivos} onChange={setArchivos} />
+            <div className="flex flex-wrap items-center gap-2">
+              <MultiFilePicker archivos={archivos} onChange={setArchivos} />
+              <button type="button" onClick={() => setDrivePickerOpen(true)} className="btn-secondary !py-2 !text-sm">
+                📁 Desde el Drive
+              </button>
+            </div>
+            {archivosDrive.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {archivosDrive.map((df, i) => (
+                  <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
+                    📁 {df.nombre}
+                    <button type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500">×</button>
+                  </span>
+                ))}
+              </div>
+            )}
             {editing && <ActivityFiles archivos={editing.actividad_archivos} />}
           </div>
           {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}
@@ -358,6 +388,12 @@ export default function ActividadesAdmin() {
       </Modal>
 
       <TareaEntregas actividad={tareaActividad} open={!!tareaActividad} onClose={() => setTareaActividad(null)} />
+
+      <DrivePicker
+        open={drivePickerOpen}
+        onClose={() => setDrivePickerOpen(false)}
+        onSelect={(files) => setArchivosDrive([...archivosDrive, ...files])}
+      />
     </div>
   )
 }

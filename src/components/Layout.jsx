@@ -16,6 +16,7 @@ const NAV = {
     { to: '/agenda', label: 'Agenda', icon: '📅' },
     { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
     { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
+    { to: '/drive', label: 'Drive', icon: '📁' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/docentes', label: 'Equipo', icon: '🍎' },
     { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
@@ -29,6 +30,7 @@ const NAV = {
     { to: '/agenda', label: 'Agenda', icon: '📅' },
     { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
     { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
+    { to: '/drive', label: 'Drive', icon: '📁' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/docentes', label: 'Equipo', icon: '🍎' },
     { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
@@ -44,6 +46,7 @@ const NAV = {
     { to: '/agenda', label: 'Agenda', icon: '📅' },
     { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
     { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
+    { to: '/drive', label: 'Drive', icon: '📁' },
     { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
   padre: [

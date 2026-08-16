@@ -12,6 +12,7 @@ import DevocionalDetalle from './pages/DevocionalDetalle'
 import ActividadDetalle from './pages/ActividadDetalle'
 import MiFamilia from './pages/MiFamilia'
 import Foro from './pages/Foro'
+import Drive from './pages/Drive'
 
 import AdminHome from './pages/admin/AdminHome'
 import Ninos from './pages/admin/Ninos'
@@ -64,6 +65,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={[...STAFF, 'docente']}>
               <MiFamilia />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/drive"
+          element={
+            <ProtectedRoute roles={[...STAFF, 'docente']}>
+              <Drive />
             </ProtectedRoute>
           }
         />
