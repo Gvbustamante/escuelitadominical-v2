@@ -22,8 +22,8 @@ function esVideo(f) {
   return f.tipo?.startsWith('video/') || /\.(mp4|webm|mov|avi|mkv)$/i.test(f.nombre_archivo || '')
 }
 
-function fileUrl(path) {
-  return supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
+function fileUrl(path, bucket = 'actividades') {
+  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
 }
 
 function formatMes(fecha) {
@@ -105,9 +105,9 @@ export default function ActividadDetalle() {
           {video && (
             <div className="overflow-hidden rounded-2xl bg-ink shadow-soft">
               <video
-                src={fileUrl(video.storage_path)}
+                src={fileUrl(video.storage_path, video.bucket)}
                 controls
-                poster={fotos[0] ? fileUrl(fotos[0].storage_path) : undefined}
+                poster={fotos[0] ? fileUrl(fotos[0].storage_path, fotos[0].bucket) : undefined}
                 className="aspect-video w-full"
                 controlsList="nodownload"
               >
@@ -119,7 +119,7 @@ export default function ActividadDetalle() {
           {!video && hero && (
             <div className="overflow-hidden rounded-2xl shadow-soft">
               <img
-                src={fileUrl(hero.storage_path)}
+                src={fileUrl(hero.storage_path, hero.bucket)}
                 alt={actividad.titulo}
                 className="w-full max-h-[420px] object-cover cursor-pointer"
                 onClick={() => setLightbox(hero)}
@@ -189,7 +189,7 @@ export default function ActividadDetalle() {
                     className="group aspect-square overflow-hidden rounded-2xl bg-ink/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft"
                   >
                     <img
-                      src={fileUrl(f.storage_path)}
+                      src={fileUrl(f.storage_path, f.bucket)}
                       alt={f.nombre_archivo || ''}
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
@@ -210,7 +210,7 @@ export default function ActividadDetalle() {
                     key={f.id}
                     type="button"
                     onClick={() => setPreview({
-                      url: fileUrl(f.storage_path),
+                      url: fileUrl(f.storage_path, f.bucket),
                       nombre: f.nombre_archivo,
                       mime: f.tipo,
                     })}
@@ -278,7 +278,7 @@ export default function ActividadDetalle() {
                     >
                       {thumb ? (
                         <img
-                          src={fileUrl(thumb.storage_path)}
+                          src={fileUrl(thumb.storage_path, thumb.bucket)}
                           alt=""
                           className="h-11 w-11 shrink-0 rounded-lg object-cover"
                           loading="lazy"
@@ -317,7 +317,7 @@ export default function ActividadDetalle() {
           onClick={() => setLightbox(null)}
         >
           <img
-            src={fileUrl(lightbox.storage_path)}
+            src={fileUrl(lightbox.storage_path, lightbox.bucket)}
             alt={lightbox.nombre_archivo || ''}
             className="max-h-[85vh] max-w-full rounded-2xl shadow-soft"
           />

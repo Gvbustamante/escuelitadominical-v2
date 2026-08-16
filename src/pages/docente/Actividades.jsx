@@ -182,6 +182,7 @@ export default function Actividades() {
         storage_path: df.storage_path,
         nombre_archivo: df.nombre,
         tipo: df.tipo,
+        bucket: 'drive',
       })
     }
 

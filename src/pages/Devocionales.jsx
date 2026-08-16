@@ -183,6 +183,7 @@ export default function Devocionales() {
         storage_path: df.storage_path,
         nombre_archivo: df.nombre,
         tipo: df.tipo,
+        bucket: 'drive',
       })
     }
 

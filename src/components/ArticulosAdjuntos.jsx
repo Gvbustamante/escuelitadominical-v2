@@ -30,7 +30,7 @@ export default function ArticulosAdjuntos({ archivos, bucket = 'actividades', ti
         {archivos.map((f) => (
           <a
             key={f.id}
-            href={fileUrl(bucket, f.storage_path)}
+            href={fileUrl(f.bucket || bucket, f.storage_path)}
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-3 rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 transition-colors hover:border-sky-300 hover:bg-sky-50"
