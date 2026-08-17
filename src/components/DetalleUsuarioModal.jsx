@@ -150,7 +150,7 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
           </div>
         )}
 
-        {persona.role === 'docente' && (
+        {['admin', 'coordinador', 'docente'].includes(persona.role) && (
           <div>
             <p className="mb-2 text-xs font-extrabold uppercase text-ink/40">Clases asignadas</p>
             {clases.length === 0 ? (

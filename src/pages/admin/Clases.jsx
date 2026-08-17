@@ -29,7 +29,7 @@ export default function Clases() {
   const load = useCallback(async () => {
     const [{ data: n }, { data: d }, { data: a }, { data: h }, { data: ah }] = await Promise.all([
       supabase.from('niveles').select('*').order('orden', { ascending: true }),
-      supabase.from('profiles').select('id, nombre_completo').eq('role', 'docente').eq('activo', true).order('nombre_completo'),
+      supabase.from('profiles').select('id, nombre_completo, role').in('role', ['admin', 'coordinador', 'docente']).eq('activo', true).order('nombre_completo'),
       supabase.from('docentes_niveles').select('*'),
       supabase.from('horarios').select('*').eq('activo', true).order('orden'),
       supabase.from('asignacion_horario').select('*'),
@@ -311,9 +311,10 @@ export default function Clases() {
             </div>
           </div>
           <div>
-            <label className="label">Docentes asignados</label>
+            <label className="label">Personas asignadas a esta clase</label>
+            <p className="mb-2 text-xs text-ink/40">Marca a quienes enseñan o ayudan en esta clase — pueden ser docentes, coordinadores o admins.</p>
             <div className="flex flex-col gap-2 rounded-2xl border-2 border-ink/10 p-3 max-h-40 overflow-y-auto">
-              {docentes.length === 0 && <p className="text-sm text-ink/40">Aún no hay docentes invitados.</p>}
+              {docentes.length === 0 && <p className="text-sm text-ink/40">Aún no hay cuentas de equipo.</p>}
               {docentes.map((d) => (
                 <label key={d.id} className="flex items-center gap-2 text-sm font-bold">
                   <input
@@ -323,6 +324,11 @@ export default function Clases() {
                     className="h-5 w-5 rounded"
                   />
                   {d.nombre_completo}
+                  {d.role !== 'docente' && (
+                    <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${d.role === 'admin' ? 'bg-grape-100 text-grape-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
+                      {d.role === 'admin' ? 'Admin' : 'Coord'}
+                    </span>
+                  )}
                 </label>
               ))}
             </div>

@@ -207,8 +207,8 @@ export default function Docentes() {
                     </td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">{u.cedula || '—'}</td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
-                      {u.role === 'docente'
-                        ? clasesPorDocente[u.id]?.join(', ') || 'Sin asignar'
+                      {['admin', 'coordinador', 'docente'].includes(u.role)
+                        ? clasesPorDocente[u.id]?.join(', ') || (u.role === 'docente' ? 'Sin asignar' : '—')
                         : u.role === 'padre'
                           ? hijosPorPadre[u.id]?.join(', ') || 'Sin vincular'
                           : '—'}
