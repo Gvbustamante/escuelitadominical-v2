@@ -13,7 +13,7 @@ const ROLE_BADGE = {
 const ROLES_TODOS = ['admin', 'coordinador', 'docente', 'padre']
 
 export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], open, onClose, onSaved, miRole, miId }) {
-  const [form, setForm] = useState({ nombre_completo: '', cedula: '', telefono: '', role: '' })
+  const [form, setForm] = useState({ nombre_completo: '', telefono: '', role: '' })
   const [busy, setBusy] = useState(false)
   const [ok, setOk] = useState(false)
   const [error, setError] = useState('')
@@ -24,7 +24,6 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
     if (open && persona) {
       setForm({
         nombre_completo: persona.nombre_completo || '',
-        cedula: persona.cedula || '',
         telefono: persona.telefono || '',
         role: persona.role,
       })
@@ -46,14 +45,13 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
     setError('')
     const payload = {
       nombre_completo: form.nombre_completo,
-      cedula: form.cedula || null,
       telefono: form.telefono || null,
     }
     if (puedeCambiarRole) payload.role = form.role
     const { error: saveError } = await supabase.from('profiles').update(payload).eq('id', persona.id)
     setBusy(false)
     if (saveError) {
-      setError(saveError.code === '23505' ? 'Ya hay otra cuenta con esa cédula.' : saveError.message)
+      setError(saveError.message)
       return
     }
     setOk(true)
@@ -95,10 +93,12 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
           />
         </div>
 
-        <div>
-          <label className="label">Cédula</label>
-          <input className="input" value={form.cedula} onChange={(e) => setForm({ ...form, cedula: e.target.value })} />
-        </div>
+        {persona.cedula && (
+          <div>
+            <label className="label">Usuario</label>
+            <p className="rounded-xl bg-ink/5 px-3 py-2.5 text-sm font-bold text-ink/70">{persona.cedula}</p>
+          </div>
+        )}
 
         <div>
           <label className="label">WhatsApp (con código de país, ej. 18091234567)</label>
