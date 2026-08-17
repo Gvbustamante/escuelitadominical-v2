@@ -429,6 +429,17 @@ export default function Actividades() {
               onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
             />
             <p className="mt-1 text-xs text-ink/40">Si pegas un enlace de YouTube o Vimeo se mostrará el video embebido.</p>
+            {form.enlace_externo && getVideoEmbedUrl(form.enlace_externo) && (
+              <div className="mt-2 overflow-hidden rounded-xl bg-ink shadow-soft">
+                <iframe
+                  src={getVideoEmbedUrl(form.enlace_externo)}
+                  title="Vista previa"
+                  className="aspect-video w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            )}
           </div>
           <div>
             <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
