@@ -350,14 +350,15 @@ export default function ActividadesAdmin() {
           </div>
           {form.es_tarea && (
             <div>
-              <label className="label">Enlace externo (opcional)</label>
+              <label className="label">Enlace externo / Video de YouTube o Vimeo (opcional)</label>
               <input
                 type="url"
                 className="input"
-                placeholder="https://... (video, formulario, etc.)"
+                placeholder="https://youtube.com/watch?v=... o cualquier URL"
                 value={form.enlace_externo}
                 onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
               />
+              <p className="mt-1 text-xs text-ink/40">Si pegas un enlace de YouTube o Vimeo se mostrará el video embebido.</p>
             </div>
           )}
           <div>

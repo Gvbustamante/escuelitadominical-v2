@@ -38,7 +38,7 @@ export default function Devocionales() {
   const [busqueda, setBusqueda] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '' })
+  const [form, setForm] = useState({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '', enlace_externo: '' })
   const [imagen, setImagen] = useState(null)
   const [preview, setPreview] = useState(null)
   const [archivos, setArchivos] = useState([])
@@ -69,7 +69,7 @@ export default function Devocionales() {
 
   function openNew() {
     setEditing(null)
-    setForm({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '' })
+    setForm({ titulo: '', versiculo: '', contenido: '', fecha: hoyISO(), nivel_id: '', enlace_externo: '' })
     setImagen(null)
     setPreview(null)
     setArchivos([])
@@ -86,6 +86,7 @@ export default function Devocionales() {
       contenido: d.contenido,
       fecha: d.fecha,
       nivel_id: d.nivel_id || '',
+      enlace_externo: d.enlace_externo || '',
     })
     setImagen(null)
     setPreview(null)
@@ -128,6 +129,7 @@ export default function Devocionales() {
       contenido: form.contenido,
       fecha: form.fecha,
       nivel_id: form.nivel_id || null,
+      enlace_externo: form.enlace_externo || null,
     }
 
     let devocionalId = editing?.id
@@ -352,6 +354,16 @@ export default function Devocionales() {
                 ))}
               </select>
             </div>
+          </div>
+          <div>
+            <label className="label">Enlace externo / Video de YouTube o Vimeo (opcional)</label>
+            <input
+              className="input"
+              placeholder="https://youtube.com/watch?v=... o cualquier URL"
+              value={form.enlace_externo}
+              onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
+            />
+            <p className="mt-1 text-xs text-ink/40">Si pegas un enlace de YouTube o Vimeo se mostrará el video embebido.</p>
           </div>
           <div>
             <label className="label">{editing ? 'Cambiar imagen principal (opcional)' : 'Imagen principal (opcional)'}</label>

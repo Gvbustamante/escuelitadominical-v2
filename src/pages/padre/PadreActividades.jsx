@@ -9,6 +9,7 @@ import HijoSelector from '../../components/HijoSelector'
 import ActivityFiles from '../../components/ActivityFiles'
 import RichTextView from '../../components/RichTextView'
 import TareaHijoWidget from '../../components/TareaHijoWidget'
+import { getVideoEmbedUrl } from '../../lib/videoEmbed'
 
 const REACCIONES = ['❤️', '👏', '🙌', '😍']
 
@@ -123,14 +124,26 @@ export default function PadreActividades() {
                 </div>
               )}
               {a.enlace_externo && (
-                <a
-                  href={a.enlace_externo}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-3 inline-block w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
-                >
-                  🔗 Abrir enlace de la tarea
-                </a>
+                getVideoEmbedUrl(a.enlace_externo) ? (
+                  <div className="mt-3 overflow-hidden rounded-2xl bg-ink shadow-soft">
+                    <iframe
+                      src={getVideoEmbedUrl(a.enlace_externo)}
+                      title="Video"
+                      className="aspect-video w-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : (
+                  <a
+                    href={a.enlace_externo}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-block w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
+                  >
+                    🔗 Abrir enlace de la tarea
+                  </a>
+                )
               )}
               <ActivityFiles archivos={a.actividad_archivos} />
 

@@ -11,6 +11,7 @@ import TareaEntregas from '../components/TareaEntregas'
 import TareaHijoWidget from '../components/TareaHijoWidget'
 import MiEntregaEquipoWidget from '../components/MiEntregaEquipoWidget'
 import FilePreview, { getFileIcon, getFileType } from '../components/FilePreview'
+import { getVideoEmbedUrl } from '../lib/videoEmbed'
 
 const STAFF = ['admin', 'coordinador']
 
@@ -163,16 +164,28 @@ export default function ActividadDetalle() {
               </div>
             )}
 
-            {/* Enlace externo */}
+            {/* Enlace externo — embeber si es YouTube/Vimeo */}
             {actividad.enlace_externo && (
-              <a
-                href={actividad.enlace_externo}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 inline-block w-fit rounded-xl bg-sky-50 px-4 py-2.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
-              >
-                🔗 Abrir enlace externo
-              </a>
+              getVideoEmbedUrl(actividad.enlace_externo) ? (
+                <div className="mt-4 overflow-hidden rounded-2xl bg-ink shadow-soft">
+                  <iframe
+                    src={getVideoEmbedUrl(actividad.enlace_externo)}
+                    title="Video"
+                    className="aspect-video w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <a
+                  href={actividad.enlace_externo}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 inline-block w-fit rounded-xl bg-sky-50 px-4 py-2.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
+                >
+                  🔗 Abrir enlace externo
+                </a>
+              )
             )}
           </div>
 

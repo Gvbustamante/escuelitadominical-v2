@@ -139,6 +139,7 @@ create table public.devocionales_ninos (
   imagen_url text,
   fecha date not null default current_date,
   activo boolean not null default false,
+  enlace_externo text,
   creado_por uuid references public.profiles(id),
   created_at timestamptz not null default now()
 );

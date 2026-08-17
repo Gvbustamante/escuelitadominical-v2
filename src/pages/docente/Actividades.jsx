@@ -15,6 +15,7 @@ import RichTextView from '../../components/RichTextView'
 import MiEntregaEquipoWidget from '../../components/MiEntregaEquipoWidget'
 import MultiFilePicker from '../../components/MultiFilePicker'
 import DrivePicker from '../../components/DrivePicker'
+import { getVideoEmbedUrl } from '../../lib/videoEmbed'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -310,14 +311,26 @@ export default function Actividades() {
                   </div>
                 )}
                 {a.enlace_externo && (
-                  <a
-                    href={a.enlace_externo}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-3 inline-block w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
-                  >
-                    🔗 Abrir enlace
-                  </a>
+                  getVideoEmbedUrl(a.enlace_externo) ? (
+                    <div className="mt-3 overflow-hidden rounded-2xl bg-ink shadow-soft">
+                      <iframe
+                        src={getVideoEmbedUrl(a.enlace_externo)}
+                        title="Video"
+                        className="aspect-video w-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : (
+                    <a
+                      href={a.enlace_externo}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-3 inline-block w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
+                    >
+                      🔗 Abrir enlace
+                    </a>
+                  )
                 )}
                 <ActivityFiles archivos={a.actividad_archivos} />
                 {a.es_tarea && <MiEntregaEquipoWidget actividad={a} entrega={misEntregas[a.id]} onSaved={loadEquipo} />}
@@ -404,14 +417,15 @@ export default function Actividades() {
           </div>
           {form.es_tarea && (
             <div>
-              <label className="label">Enlace externo (opcional)</label>
+              <label className="label">Enlace externo / Video de YouTube o Vimeo (opcional)</label>
               <input
                 type="url"
                 className="input"
-                placeholder="https://... (video, formulario, etc.)"
+                placeholder="https://youtube.com/watch?v=... o cualquier URL"
                 value={form.enlace_externo}
                 onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
               />
+              <p className="mt-1 text-xs text-ink/40">Si pegas un enlace de YouTube o Vimeo se mostrará el video embebido.</p>
             </div>
           )}
           <div>
