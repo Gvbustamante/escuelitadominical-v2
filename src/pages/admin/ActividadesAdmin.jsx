@@ -5,6 +5,7 @@ import { coincide } from '../../lib/busqueda'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ActivityFiles from '../../components/ActivityFiles'
+import ArchivosExistentes from '../../components/ArchivosExistentes'
 import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
 import RichTextEditor from '../../components/RichTextEditor'
@@ -45,6 +46,7 @@ export default function ActividadesAdmin() {
   const [tareaActividad, setTareaActividad] = useState(null)
   const [drivePickerOpen, setDrivePickerOpen] = useState(false)
   const [archivosDrive, setArchivosDrive] = useState([]) // archivos elegidos del drive
+  const [archivosExistentes, setArchivosExistentes] = useState([])
 
   useEffect(() => {
     supabase
@@ -92,6 +94,7 @@ export default function ActividadesAdmin() {
     setForm(formVacio())
     setArchivos([])
     setArchivosDrive([])
+    setArchivosExistentes([])
     setError('')
     setModalOpen(true)
   }
@@ -110,6 +113,7 @@ export default function ActividadesAdmin() {
     })
     setArchivos([])
     setArchivosDrive([])
+    setArchivosExistentes(actividad.actividad_archivos || [])
     setError('')
     setModalOpen(true)
   }
@@ -348,19 +352,17 @@ export default function ActividadesAdmin() {
               </p>
             )}
           </div>
-          {form.es_tarea && (
-            <div>
-              <label className="label">Enlace externo / Video de YouTube o Vimeo (opcional)</label>
-              <input
-                type="url"
-                className="input"
-                placeholder="https://youtube.com/watch?v=... o cualquier URL"
-                value={form.enlace_externo}
-                onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
-              />
-              <p className="mt-1 text-xs text-ink/40">Si pegas un enlace de YouTube o Vimeo se mostrará el video embebido.</p>
-            </div>
-          )}
+          <div>
+            <label className="label">Enlace externo / Video de YouTube o Vimeo (opcional)</label>
+            <input
+              type="url"
+              className="input"
+              placeholder="https://youtube.com/watch?v=... o cualquier URL"
+              value={form.enlace_externo}
+              onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
+            />
+            <p className="mt-1 text-xs text-ink/40">Si pegas un enlace de YouTube o Vimeo se mostrará el video embebido.</p>
+          </div>
           <div>
             <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
             <div className="flex flex-wrap items-center gap-2">
@@ -379,7 +381,13 @@ export default function ActividadesAdmin() {
                 ))}
               </div>
             )}
-            {editing && <ActivityFiles archivos={editing.actividad_archivos} />}
+            {editing && archivosExistentes.length > 0 && (
+              <ArchivosExistentes
+                archivos={archivosExistentes}
+                tabla="actividad_archivos"
+                onDeleted={(id) => setArchivosExistentes((prev) => prev.filter((a) => a.id !== id))}
+              />
+            )}
           </div>
           {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}

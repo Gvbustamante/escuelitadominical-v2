@@ -6,7 +6,7 @@ import { coincide } from '../lib/busqueda'
 import Spinner from '../components/Spinner'
 import Modal from '../components/Modal'
 import RichTextEditor from '../components/RichTextEditor'
-import ArticulosAdjuntos from '../components/ArticulosAdjuntos'
+import ArchivosExistentes from '../components/ArchivosExistentes'
 import MultiFilePicker from '../components/MultiFilePicker'
 import DrivePicker from '../components/DrivePicker'
 import CitasBiblicasAdmin from './admin/CitasBiblicasAdmin'
@@ -47,6 +47,7 @@ export default function Devocionales() {
   const [error, setError] = useState('')
   const [drivePickerOpen, setDrivePickerOpen] = useState(false)
   const [archivosDrive, setArchivosDrive] = useState([])
+  const [archivosExistentes, setArchivosExistentes] = useState([])
 
   const load = useCallback(async () => {
     let query = supabase
@@ -74,6 +75,7 @@ export default function Devocionales() {
     setPreview(null)
     setArchivos([])
     setArchivosDrive([])
+    setArchivosExistentes([])
     setError('')
     setModalOpen(true)
   }
@@ -92,6 +94,7 @@ export default function Devocionales() {
     setPreview(null)
     setArchivos([])
     setArchivosDrive([])
+    setArchivosExistentes(d.devocional_archivos || [])
     setError('')
     setModalOpen(true)
   }
@@ -390,7 +393,13 @@ export default function Devocionales() {
                 ))}
               </div>
             )}
-            {editing && <ArticulosAdjuntos archivos={editing.devocional_archivos} titulo="Ya subidos" />}
+            {editing && archivosExistentes.length > 0 && (
+              <ArchivosExistentes
+                archivos={archivosExistentes}
+                tabla="devocional_archivos"
+                onDeleted={(id) => setArchivosExistentes((prev) => prev.filter((a) => a.id !== id))}
+              />
+            )}
           </div>
           {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
