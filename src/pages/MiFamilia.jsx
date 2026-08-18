@@ -48,6 +48,13 @@ export default function MiFamilia() {
   const [datosPorHijo, setDatosPorHijo] = useState({})
   const esStaff = ['admin', 'coordinador', 'docente'].includes(profile?.role)
 
+  // Seleccionar el primer hijo automáticamente
+  useEffect(() => {
+    if (hijos && hijos.length > 0 && !selectedId) {
+      setSelectedId(hijos[0].id)
+    }
+  }, [hijos, selectedId])
+
   useEffect(() => {
     if (!hijos || hijos.length === 0) return
     let cancelado = false
@@ -109,7 +116,9 @@ export default function MiFamilia() {
     )
   }
 
-  const verTodos = !selectedId
+  const hijoActivo = hijos.find((h) => h.id === selectedId)
+
+  if (!hijoActivo) return <Spinner />
 
   return (
     <div className="flex flex-col gap-6">
@@ -124,70 +133,12 @@ export default function MiFamilia() {
 
       <HijoSelector hijos={hijos} selectedId={selectedId} onChange={setSelectedId} />
 
-      {/* ═══ Vista "Todos": tarjetas resumen ═══ */}
-      {verTodos && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {hijos.map((hijo, i) => {
-            const edad = calcularEdad(hijo.fecha_nacimiento)
-            const datos = datosPorHijo[hijo.id]
-            const ultimaNota = datos?.notas?.[0]
-            const totalActs = datos?.actividades?.length || 0
-            const totalEventos = datos?.eventos?.length || 0
-
-            return (
-              <button
-                key={hijo.id}
-                onClick={() => setSelectedId(hijo.id)}
-                className="card flex flex-col gap-3 text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-soft"
-              >
-                {/* Cabecera con avatar */}
-                <div className="flex items-center gap-3">
-                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-extrabold ${COLORES_AVATAR[i % COLORES_AVATAR.length]}`}>
-                    {iniciales(hijo.nombre_completo)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-base font-bold">{hijo.nombre_completo}</p>
-                    <p className="text-sm text-ink/50">
-                      {edad !== null ? `${edad} años` : ''}
-                      {hijo.parentesco && ` · ${hijo.parentesco}`}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Clase */}
-                {hijo.nivel && (
-                  <span className={`badge w-fit ${BADGE_CLASSES[hijo.nivel.color] || BADGE_CLASSES.sky}`}>
-                    {hijo.nivel.nombre}
-                  </span>
-                )}
-
-                {/* Alergias */}
-                {hijo.alergias && (
-                  <p className="rounded-xl bg-coral-50 px-3 py-1.5 text-xs font-bold text-coral-600">
-                    ⚠️ {hijo.alergias}
-                  </p>
-                )}
-
-                {/* Stats rápidos */}
-                <div className="flex items-center gap-4 border-t border-ink/5 pt-3 text-xs text-ink/40">
-                  <span>🎨 {totalActs} actividad{totalActs !== 1 ? 'es' : ''}</span>
-                  <span>📅 {totalEventos} evento{totalEventos !== 1 ? 's' : ''}</span>
-                  {ultimaNota?.emocion && <span>{ultimaNota.emocion}</span>}
-                </div>
-              </button>
-            )
-          })}
-        </div>
-      )}
-
-      {/* ═══ Vista detalle de un hijo ═══ */}
-      {!verTodos &&
-        hijos
-          .filter((h) => h.id === selectedId)
-          .map((hijo, i) => {
-            const edad = calcularEdad(hijo.fecha_nacimiento)
-            const datos = datosPorHijo[hijo.id]
-            const idx = hijos.findIndex((h) => h.id === hijo.id)
+      {/* ═══ Detalle del hijo seleccionado ═══ */}
+      {(() => {
+        const hijo = hijoActivo
+        const edad = calcularEdad(hijo.fecha_nacimiento)
+        const datos = datosPorHijo[hijo.id]
+        const idx = hijos.findIndex((h) => h.id === hijo.id)
 
             return (
               <div key={hijo.id} className="flex flex-col gap-5">
@@ -301,7 +252,9 @@ export default function MiFamilia() {
                 </div>
               </div>
             )
-          })}
+          }
+        )
+      })()}
     </div>
   )
 }
