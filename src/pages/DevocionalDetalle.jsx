@@ -63,6 +63,10 @@ export default function DevocionalDetalle() {
   if (!devocional) return <Spinner />
 
   const archivos = devocional.devocional_archivos || []
+  const esFotoDevocional = (f) =>
+    f.tipo?.startsWith('image/') || /\.(png|jpe?g|gif|webp|heic|avif)$/i.test(f.nombre_archivo || '')
+  const fotos = archivos.filter(esFotoDevocional)
+  const otrosArchivos = archivos.filter((f) => !esFotoDevocional(f))
 
   return (
     <div className="flex flex-col gap-6">
@@ -158,12 +162,40 @@ export default function DevocionalDetalle() {
             <RichTextView html={devocional.contenido} />
           </div>
 
-          {/* Materiales con preview */}
-          {archivos.length > 0 && (
+          {/* Fotos, en grande */}
+          {fotos.length > 0 && (
+            <div className="card">
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📸 Fotos</p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {fotos.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setPreview({
+                      url: fileUrl(f.bucket || 'actividades', f.storage_path),
+                      nombre: f.nombre_archivo,
+                      mime: f.tipo,
+                    })}
+                    className="group aspect-[4/3] overflow-hidden rounded-2xl bg-ink/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft"
+                  >
+                    <img
+                      src={fileUrl(f.bucket || 'actividades', f.storage_path)}
+                      alt={f.nombre_archivo || ''}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Otros materiales con preview */}
+          {otrosArchivos.length > 0 && (
             <div className="card">
               <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📎 Materiales</p>
               <div className="flex flex-col gap-2">
-                {archivos.map((f) => (
+                {otrosArchivos.map((f) => (
                   <button
                     key={f.id}
                     type="button"
