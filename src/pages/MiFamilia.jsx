@@ -46,8 +46,6 @@ export default function MiFamilia() {
   const hijos = useMisHijos()
   const [selectedId, setSelectedId] = useState(null)
   const [datosPorHijo, setDatosPorHijo] = useState({})
-  const esStaff = ['admin', 'coordinador', 'docente'].includes(profile?.role)
-
   // Seleccionar el primer hijo automáticamente
   useEffect(() => {
     if (hijos && hijos.length > 0 && !selectedId) {
@@ -106,11 +104,9 @@ export default function MiFamilia() {
   if (hijos.length === 0) {
     return (
       <div className="flex flex-col gap-6">
-        <h1 className="text-3xl font-bold">{esStaff ? 'Mis alumnos 👦👧' : 'Mi familia 👪'}</h1>
+        <h1 className="text-3xl font-bold">Mi familia 👪</h1>
         <p className="card text-ink/50">
-          {esStaff
-            ? 'No hay niños registrados en tus clases todavía.'
-            : 'Todavía no tienes ningún hijo/a vinculado en la escuelita.'}
+No hay niños registrados todavía.
         </p>
       </div>
     )
@@ -123,11 +119,11 @@ export default function MiFamilia() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">{esStaff ? 'Mis alumnos 👦👧' : 'Mi familia 👪'}</h1>
+        <h1 className="text-3xl font-bold">Mi familia 👪</h1>
         <p className="text-ink/50">
           {hijos.length === 1
-            ? (esStaff ? '1 niño/a en tus clases' : 'La información de tu hijo/a en la escuelita')
-            : `${hijos.length} ${esStaff ? 'niños/as en tus clases' : 'hijos/as vinculados'}`}
+            ? 'La información de tu hijo/a en la escuelita'
+            : `${hijos.length} hijos/as registrados`}
         </p>
       </div>
 

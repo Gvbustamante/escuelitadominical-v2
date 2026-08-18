@@ -118,7 +118,7 @@ export default function Layout() {
 
   const items = [...(NAV[profile?.role] || [])]
   if (tieneHijos && ['admin', 'coordinador', 'docente'].includes(profile?.role)) {
-    items.splice(1, 0, { to: '/mi-familia', label: 'Mis alumnos', icon: '👦' })
+    items.splice(1, 0, { to: '/mi-familia', label: 'Mi familia', icon: '👪' })
   }
 
   return (
