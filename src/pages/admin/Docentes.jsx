@@ -7,6 +7,7 @@ import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleUsuarioModal from '../../components/DetalleUsuarioModal'
+import Avatar from '../../components/Avatar'
 import { whatsappLink } from '../../lib/whatsapp'
 
 const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
@@ -201,7 +202,12 @@ export default function Docentes() {
               <tbody>
                 {filtrados.map((u) => (
                   <tr key={u.id} className={`border-t border-ink/5 ${!u.activo ? 'opacity-50' : ''}`}>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">{u.nombre_completo}</td>
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
+                      <div className="flex items-center gap-2">
+                        <Avatar nombre={u.nombre_completo} size="sm" />
+                        <span>{u.nombre_completo}</span>
+                      </div>
+                    </td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3">
                       <span className={`badge ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
                     </td>
