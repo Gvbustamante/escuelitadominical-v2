@@ -7,6 +7,7 @@ import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleNinoModal from '../../components/DetalleNinoModal'
+import Avatar from '../../components/Avatar'
 import Clases from './Clases'
 import { BADGE_CLASSES } from '../../lib/colors'
 import { whatsappLink } from '../../lib/whatsapp'
@@ -367,7 +368,12 @@ export default function Ninos() {
                 const padres = padresPorNino[nino.id] || []
                 return (
                   <tr key={nino.id} className={`border-t border-ink/5 ${!nino.activo || nino.pausado ? 'opacity-50 grayscale' : ''}`}>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">{nino.nombre_completo}</td>
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
+                      <div className="flex items-center gap-2">
+                        <Avatar nombre={nino.nombre_completo} size="sm" />
+                        <span>{nino.nombre_completo}</span>
+                      </div>
+                    </td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">{calcularEdad(nino.fecha_nacimiento)}</td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3">
                       {nivel ? (

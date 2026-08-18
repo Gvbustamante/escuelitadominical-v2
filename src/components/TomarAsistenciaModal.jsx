@@ -82,36 +82,87 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
             <p className="font-bold text-ink/60">
               {presentes} de {ninos.length} presentes
             </p>
-            <div className="grid max-h-80 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3">
-              {ninos.map((n) => {
-                const presente = !!marcados[n.id]
-                return (
-                  <div key={n.id} className="relative">
-                    <button
-                      type="button"
-                      onClick={() => toggle(n.id)}
-                      className={`flex w-full flex-col items-center gap-1 rounded-blob p-3 text-center shadow-pop transition-transform active:translate-y-1 active:shadow-none ${
-                        presente ? 'bg-grass-400 text-white' : 'bg-white text-ink'
-                      }`}
-                    >
-                      <span className="text-2xl">{presente ? '✅' : '🧒'}</span>
-                      <span className="text-sm font-bold leading-tight">{n.nombre_completo}</span>
-                    </button>
-                    {presente && onProgreso && (
+            {ninos.length > 10 ? (
+              <div className="max-h-80 overflow-y-auto rounded-2xl border-2 border-ink/10">
+                <table className="w-full text-left">
+                  <thead className="sticky top-0 bg-sky-50 text-xs font-bold uppercase text-ink/50">
+                    <tr>
+                      <th className="px-3 py-2">Niño/a</th>
+                      <th className="px-3 py-2 text-center">Presente</th>
+                      {onProgreso && <th className="px-3 py-2 text-center">Progreso</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ninos.map((n) => {
+                      const presente = !!marcados[n.id]
+                      return (
+                        <tr key={n.id} className={`border-t border-ink/5 ${presente ? 'bg-grass-50' : ''}`}>
+                          <td className="px-3 py-2 font-bold">{n.nombre_completo}</td>
+                          <td className="px-3 py-2 text-center">
+                            <button
+                              type="button"
+                              onClick={() => toggle(n.id)}
+                              aria-label={`Marcar presente a ${n.nombre_completo}`}
+                              className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full text-base shadow-pop transition-transform active:translate-y-0.5 active:shadow-none ${
+                                presente ? 'bg-grass-400 text-white' : 'bg-white text-ink/20 ring-2 ring-ink/10'
+                              }`}
+                            >
+                              {presente ? '✅' : ''}
+                            </button>
+                          </td>
+                          {onProgreso && (
+                            <td className="px-3 py-2 text-center">
+                              {presente && (
+                                <button
+                                  type="button"
+                                  onClick={() => onProgreso(n)}
+                                  title="Registrar progreso"
+                                  aria-label={`Registrar progreso de ${n.nombre_completo}`}
+                                  className="text-lg transition-transform hover:scale-110 active:scale-95"
+                                >
+                                  🌱
+                                </button>
+                              )}
+                            </td>
+                          )}
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="grid max-h-80 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3">
+                {ninos.map((n) => {
+                  const presente = !!marcados[n.id]
+                  return (
+                    <div key={n.id} className="relative">
                       <button
                         type="button"
-                        onClick={() => onProgreso(n)}
-                        title="Registrar progreso"
-                        aria-label={`Registrar progreso de ${n.nombre_completo}`}
-                        className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-base shadow-soft ring-2 ring-grass-200 transition-transform hover:scale-110 active:scale-95"
+                        onClick={() => toggle(n.id)}
+                        className={`flex w-full flex-col items-center gap-1 rounded-blob p-3 text-center shadow-pop transition-transform active:translate-y-1 active:shadow-none ${
+                          presente ? 'bg-grass-400 text-white' : 'bg-white text-ink'
+                        }`}
                       >
-                        🌱
+                        <span className="text-2xl">{presente ? '✅' : '🧒'}</span>
+                        <span className="text-sm font-bold leading-tight">{n.nombre_completo}</span>
                       </button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+                      {presente && onProgreso && (
+                        <button
+                          type="button"
+                          onClick={() => onProgreso(n)}
+                          title="Registrar progreso"
+                          aria-label={`Registrar progreso de ${n.nombre_completo}`}
+                          className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-base shadow-soft ring-2 ring-grass-200 transition-transform hover:scale-110 active:scale-95"
+                        >
+                          🌱
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
             <button onClick={guardar} disabled={saving} className="btn-success justify-center">
               {saving ? 'Guardando...' : '💾 Guardar asistencia'}
             </button>
