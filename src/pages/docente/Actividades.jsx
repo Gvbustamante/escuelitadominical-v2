@@ -7,7 +7,6 @@ import { coincide } from '../../lib/busqueda'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
-import ActivityFiles from '../../components/ActivityFiles'
 import ArchivosExistentes from '../../components/ArchivosExistentes'
 import TareaEntregas from '../../components/TareaEntregas'
 import ActividadFila from '../../components/ActividadFila'
@@ -17,9 +16,20 @@ import MiEntregaEquipoWidget from '../../components/MiEntregaEquipoWidget'
 import MultiFilePicker from '../../components/MultiFilePicker'
 import DrivePicker from '../../components/DrivePicker'
 import { getVideoEmbedUrl } from '../../lib/videoEmbed'
+import ActivityFiles from '../../components/ActivityFiles'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
+}
+
+function hoyYYYYMM() {
+  return new Date().toISOString().slice(0, 7)
+}
+
+function formatFecha(iso) {
+  if (!iso) return ''
+  const d = new Date(iso + 'T12:00:00')
+  return d.toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 function formVacio() {
@@ -44,6 +54,8 @@ export default function Actividades() {
   const [paraEquipo, setParaEquipo] = useState(null)
   const [misEntregas, setMisEntregas] = useState({})
   const [busqueda, setBusqueda] = useState('')
+  const [mesFiltro, setMesFiltro] = useState(hoyYYYYMM())
+  const [verTodosMeses, setVerTodosMeses] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [confirmEliminar, setConfirmEliminar] = useState(null)
@@ -180,7 +192,6 @@ export default function Actividades() {
       }
     }
 
-    // Vincular archivos del Drive
     for (const df of archivosDrive) {
       await supabase.from('actividad_archivos').insert({
         actividad_id: actividadId,
@@ -213,12 +224,19 @@ export default function Actividades() {
   if (!clases) return <Spinner />
   if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
 
-  const actividadesFiltradas = (actividades || []).filter((a) =>
+  // Filtrado por búsqueda + mes
+  let actividadesFiltradas = (actividades || []).filter((a) =>
     coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica),
   )
-  const paraEquipoFiltrado = (paraEquipo || []).filter((a) =>
+  if (!verTodosMeses && mesFiltro) {
+    actividadesFiltradas = actividadesFiltradas.filter((a) => a.fecha?.startsWith(mesFiltro))
+  }
+  let paraEquipoFiltrado = (paraEquipo || []).filter((a) =>
     coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica),
   )
+  if (!verTodosMeses && mesFiltro) {
+    paraEquipoFiltrado = paraEquipoFiltrado.filter((a) => a.fecha?.startsWith(mesFiltro))
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -254,12 +272,27 @@ export default function Actividades() {
         </button>
       </div>
 
-      <input
-        className="input max-w-xs"
-        placeholder="Buscar actividad..."
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-      />
+      {/* Búsqueda + filtro de mes */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">🔍</span>
+          <input
+            className="input max-w-xs !pl-9"
+            placeholder="Buscar actividad..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+        </div>
+        {!verTodosMeses && (
+          <input type="month" className="input max-w-[180px]" value={mesFiltro} onChange={(e) => setMesFiltro(e.target.value)} />
+        )}
+        <button
+          onClick={() => setVerTodosMeses((v) => !v)}
+          className={`rounded-full px-4 py-2 text-sm font-bold ${verTodosMeses ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+        >
+          {verTodosMeses ? 'Filtrar por mes' : 'Ver todos'}
+        </button>
+      </div>
 
       {seccion === 'clase' ? (
         <>
@@ -278,9 +311,20 @@ export default function Actividades() {
               {actividadesFiltradas.map((a) => (
                 <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} />
               ))}
-              {actividades.length === 0 && <p className="p-6 text-center text-ink/50">Aún no hay actividades para esta clase.</p>}
+              {actividades.length === 0 && (
+                <div className="flex flex-col items-center gap-3 py-12 text-center">
+                  <span className="text-5xl">🎨</span>
+                  <p className="text-ink/50">Aún no hay actividades para esta clase.</p>
+                  <button className="btn-primary mt-1" onClick={openNew}>+ Nueva actividad</button>
+                </div>
+              )}
               {actividades.length > 0 && actividadesFiltradas.length === 0 && (
-                <p className="p-6 text-center text-ink/50">No hay actividades que coincidan con "{busqueda}".</p>
+                <div className="flex flex-col items-center gap-2 py-8 text-center">
+                  <span className="text-4xl">🔍</span>
+                  <p className="text-ink/50">
+                    No hay actividades que coincidan{busqueda ? ` con "${busqueda}"` : ' en este mes'}.
+                  </p>
+                </div>
               )}
             </div>
           )}
@@ -290,9 +334,17 @@ export default function Actividades() {
           {!paraEquipo ? (
             <Spinner />
           ) : paraEquipo.length === 0 ? (
-            <p className="card text-ink/50">Todavía no hay comunicados para el equipo docente.</p>
+            <div className="card flex flex-col items-center gap-3 py-12 text-center">
+              <span className="text-5xl">🍎</span>
+              <p className="text-ink/50">Todavía no hay comunicados para el equipo docente.</p>
+            </div>
           ) : paraEquipoFiltrado.length === 0 ? (
-            <p className="card text-ink/50">No hay comunicados que coincidan con "{busqueda}".</p>
+            <div className="card flex flex-col items-center gap-2 py-8 text-center">
+              <span className="text-4xl">🔍</span>
+              <p className="text-ink/50">
+                No hay comunicados que coincidan{busqueda ? ` con "${busqueda}"` : ' en este mes'}.
+              </p>
+            </div>
           ) : (
             paraEquipoFiltrado.map((a, i) => (
               <div
@@ -305,12 +357,12 @@ export default function Actividades() {
                     <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
                     {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
                   </div>
-                  <span className="shrink-0 text-sm text-ink/40">{a.fecha}</span>
+                  <span className="shrink-0 text-xs text-ink/40">{formatFecha(a.fecha)}</span>
                 </div>
                 <RichTextView html={a.descripcion} className="mt-1" />
                 {(a.versiculo_clave || a.historia_biblica) && (
                   <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
-                    {a.versiculo_clave && <p className="italic text-ink/80">📖 "{a.versiculo_clave}"</p>}
+                    {a.versiculo_clave && <p className="italic text-ink/80">📖 &ldquo;{a.versiculo_clave}&rdquo;</p>}
                     {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
                   </div>
                 )}

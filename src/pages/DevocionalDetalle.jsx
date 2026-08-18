@@ -18,6 +18,7 @@ export default function DevocionalDetalle() {
   const [notFound, setNotFound] = useState(false)
   const [sugeridos, setSugeridos] = useState(null)
   const [preview, setPreview] = useState(null)
+  const [copiado, setCopiado] = useState(false)
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
@@ -45,10 +46,16 @@ export default function DevocionalDetalle() {
       .then(({ data }) => setSugeridos(data || []))
   }, [id])
 
+  function compartir() {
+    navigator.clipboard.writeText(window.location.href).catch(() => {})
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 2000)
+  }
+
   if (notFound) {
     return (
       <div className="flex flex-col gap-4">
-        <BotonVolver navigate={navigate} />
+        <Breadcrumb navigate={navigate} />
         <p className="card text-ink/50">No se encontró este devocional.</p>
       </div>
     )
@@ -59,7 +66,16 @@ export default function DevocionalDetalle() {
 
   return (
     <div className="flex flex-col gap-6">
-      <BotonVolver navigate={navigate} />
+      {/* ═══ Breadcrumb + Compartir ═══ */}
+      <div className="flex items-center justify-between">
+        <Breadcrumb navigate={navigate} titulo={devocional.titulo} />
+        <button
+          onClick={compartir}
+          className="flex items-center gap-1.5 rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/50 transition-colors hover:bg-sky-50 hover:text-sky-600"
+        >
+          {copiado ? '✅ Copiado' : '🔗 Compartir'}
+        </button>
+      </div>
 
       {/* ═══ Hero con imagen ═══ */}
       {devocional.imagen_url && (
@@ -107,7 +123,7 @@ export default function DevocionalDetalle() {
           {/* Versículo */}
           {devocional.versiculo && (
             <div className="rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-5">
-              <p className="text-lg italic text-ink/80 leading-relaxed">📖 "{devocional.versiculo}"</p>
+              <p className="text-lg italic text-ink/80 leading-relaxed">📖 &ldquo;{devocional.versiculo}&rdquo;</p>
             </div>
           )}
 
@@ -206,7 +222,7 @@ export default function DevocionalDetalle() {
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold">{d.titulo}</p>
-                      {d.versiculo && <p className="truncate text-xs italic text-ink/50">"{d.versiculo}"</p>}
+                      {d.versiculo && <p className="truncate text-xs italic text-ink/50">&ldquo;{d.versiculo}&rdquo;</p>}
                       <p className="mt-0.5 text-xs font-bold text-coral-500">{d.devocional_reacciones?.length || 0} ❤️</p>
                     </div>
                   </button>
@@ -229,10 +245,18 @@ export default function DevocionalDetalle() {
   )
 }
 
-function BotonVolver({ navigate }) {
+function Breadcrumb({ navigate, titulo }) {
   return (
-    <button onClick={() => navigate(-1)} className="self-start text-sm font-bold text-sky-500 hover:underline">
-      ← Volver
-    </button>
+    <nav className="flex items-center gap-1.5 text-sm">
+      <button onClick={() => navigate('/devocionales')} className="font-bold text-sky-500 hover:underline">
+        Devocionales
+      </button>
+      {titulo && (
+        <>
+          <span className="text-ink/30">›</span>
+          <span className="truncate text-ink/50">{titulo}</span>
+        </>
+      )}
+    </nav>
   )
 }

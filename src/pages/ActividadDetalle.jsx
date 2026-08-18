@@ -10,7 +10,7 @@ import ReaccionesBar from '../components/ReaccionesBar'
 import TareaEntregas from '../components/TareaEntregas'
 import TareaHijoWidget from '../components/TareaHijoWidget'
 import MiEntregaEquipoWidget from '../components/MiEntregaEquipoWidget'
-import FilePreview, { getFileIcon, getFileType } from '../components/FilePreview'
+import FilePreview, { getFileIcon } from '../components/FilePreview'
 import { getVideoEmbedUrl } from '../lib/videoEmbed'
 
 const STAFF = ['admin', 'coordinador']
@@ -41,6 +41,7 @@ export default function ActividadDetalle() {
   const [notFound, setNotFound] = useState(false)
   const [tareaModalOpen, setTareaModalOpen] = useState(false)
   const [otrasDelMes, setOtrasDelMes] = useState(null)
+  const [prevNext, setPrevNext] = useState({ prev: null, next: null })
   const [preview, setPreview] = useState(null)
   const [lightbox, setLightbox] = useState(null)
 
@@ -68,7 +69,7 @@ export default function ActividadDetalle() {
     const finMes = `${year}-${month}-31`
     supabase
       .from('actividades')
-      .select('id, titulo, fecha, actividad_archivos(storage_path, tipo, nombre_archivo)')
+      .select('id, titulo, fecha, actividad_archivos(storage_path, tipo, nombre_archivo, bucket)')
       .neq('id', id)
       .gte('fecha', inicioMes)
       .lte('fecha', finMes)
@@ -77,10 +78,36 @@ export default function ActividadDetalle() {
       .then(({ data }) => setOtrasDelMes(data || []))
   }, [id, actividad?.fecha])
 
+  // Cargar anterior y siguiente
+  useEffect(() => {
+    if (!actividad?.fecha) return
+    setPrevNext({ prev: null, next: null })
+    Promise.all([
+      supabase
+        .from('actividades')
+        .select('id, titulo')
+        .lte('fecha', actividad.fecha)
+        .neq('id', actividad.id)
+        .order('fecha', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from('actividades')
+        .select('id, titulo')
+        .gte('fecha', actividad.fecha)
+        .neq('id', actividad.id)
+        .order('fecha', { ascending: true })
+        .limit(1)
+        .maybeSingle(),
+    ]).then(([{ data: prev }, { data: next }]) => {
+      setPrevNext({ prev: prev || null, next: next || null })
+    })
+  }, [actividad?.id, actividad?.fecha])
+
   if (notFound) {
     return (
       <div className="flex flex-col gap-4">
-        <BotonVolver navigate={navigate} />
+        <Breadcrumb navigate={navigate} />
         <p className="card text-ink/50">No se encontró esta actividad, o no tienes acceso a ella.</p>
       </div>
     )
@@ -96,9 +123,10 @@ export default function ActividadDetalle() {
 
   return (
     <div className="flex flex-col gap-6">
-      <BotonVolver navigate={navigate} />
+      {/* ═══ Breadcrumb ═══ */}
+      <Breadcrumb navigate={navigate} titulo={actividad.titulo} />
 
-      {/* ═══ Contenido principal estilo clase online ═══ */}
+      {/* ═══ Contenido principal ═══ */}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         {/* Columna izquierda: video/hero + contenido */}
         <div className="flex min-w-0 flex-1 flex-col gap-5">
@@ -147,7 +175,7 @@ export default function ActividadDetalle() {
               <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/50">{actividad.fecha}</span>
             </div>
 
-            {/* Contenido como lección */}
+            {/* Contenido */}
             <div className="border-t border-ink/5 pt-4">
               <RichTextView html={actividad.descripcion} />
             </div>
@@ -156,7 +184,7 @@ export default function ActividadDetalle() {
             {(actividad.versiculo_clave || actividad.historia_biblica) && (
               <div className="mt-4 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-4">
                 {actividad.versiculo_clave && (
-                  <p className="text-base italic text-ink/80">📖 "{actividad.versiculo_clave}"</p>
+                  <p className="text-base italic text-ink/80">📖 &ldquo;{actividad.versiculo_clave}&rdquo;</p>
                 )}
                 {actividad.historia_biblica && (
                   <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {actividad.historia_biblica}</p>
@@ -189,7 +217,7 @@ export default function ActividadDetalle() {
             )}
           </div>
 
-          {/* Galería de fotos con preview */}
+          {/* Galería de fotos */}
           {restoFotos.length > 0 && (
             <div className="card">
               <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📸 Galería de fotos</p>
@@ -213,7 +241,7 @@ export default function ActividadDetalle() {
             </div>
           )}
 
-          {/* Archivos adjuntos con preview */}
+          {/* Archivos adjuntos */}
           {adjuntos.length > 0 && (
             <div className="card">
               <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📎 Materiales</p>
@@ -261,6 +289,40 @@ export default function ActividadDetalle() {
               <p className="text-sm font-bold text-coral-500">{actividad.actividad_reacciones.length} reacciones ❤️</p>
             )}
           </div>
+
+          {/* ═══ Navegación anterior/siguiente ═══ */}
+          {(prevNext.prev || prevNext.next) && (
+            <div className="flex items-stretch gap-3">
+              {prevNext.prev ? (
+                <button
+                  onClick={() => navigate(`/actividades/${prevNext.prev.id}`)}
+                  className="card flex min-w-0 flex-1 items-center gap-2 text-left transition-colors hover:bg-sky-50"
+                >
+                  <span className="text-lg text-ink/30">←</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-bold uppercase text-ink/30">Anterior</p>
+                    <p className="truncate text-sm font-bold">{prevNext.prev.titulo}</p>
+                  </div>
+                </button>
+              ) : (
+                <div className="flex-1" />
+              )}
+              {prevNext.next ? (
+                <button
+                  onClick={() => navigate(`/actividades/${prevNext.next.id}`)}
+                  className="card flex min-w-0 flex-1 items-center gap-2 text-right transition-colors hover:bg-sky-50"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-bold uppercase text-ink/30">Siguiente</p>
+                    <p className="truncate text-sm font-bold">{prevNext.next.titulo}</p>
+                  </div>
+                  <span className="text-lg text-ink/30">→</span>
+                </button>
+              ) : (
+                <div className="flex-1" />
+              )}
+            </div>
+          )}
         </div>
 
         {/* ═══ Sidebar: otras actividades del mes ═══ */}
@@ -314,7 +376,7 @@ export default function ActividadDetalle() {
 
       <TareaEntregas actividad={tareaModalOpen ? actividad : null} open={tareaModalOpen} onClose={() => setTareaModalOpen(false)} />
 
-      {/* Preview modal para archivos no-imagen */}
+      {/* Preview modal */}
       <FilePreview
         open={!!preview}
         onClose={() => setPreview(null)}
@@ -323,7 +385,7 @@ export default function ActividadDetalle() {
         mime={preview?.mime}
       />
 
-      {/* Lightbox para fotos */}
+      {/* Lightbox */}
       {lightbox && (
         <div
           className="animate-pop-in fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4"
@@ -348,11 +410,19 @@ export default function ActividadDetalle() {
   )
 }
 
-function BotonVolver({ navigate }) {
+function Breadcrumb({ navigate, titulo }) {
   return (
-    <button onClick={() => navigate(-1)} className="self-start text-sm font-bold text-sky-500 hover:underline">
-      ← Volver
-    </button>
+    <nav className="flex items-center gap-1.5 text-sm">
+      <button onClick={() => navigate('/actividades')} className="font-bold text-sky-500 hover:underline">
+        Actividades
+      </button>
+      {titulo && (
+        <>
+          <span className="text-ink/30">›</span>
+          <span className="truncate text-ink/50">{titulo}</span>
+        </>
+      )}
+    </nav>
   )
 }
 
