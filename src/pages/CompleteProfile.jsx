@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabaseClient'
+import PasswordInput from '../components/PasswordInput'
 
 export default function CompleteProfile() {
   const { user, profile, needsProfile, passwordRecovery, loading, refreshProfile, clearPasswordRecovery, signOut } = useAuth()
@@ -71,10 +72,8 @@ export default function CompleteProfile() {
           )}
           <div>
             <label className="label">Crea una contraseña</label>
-            <input
-              type="password"
+            <PasswordInput
               required
-              className="input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mínimo 6 caracteres"
@@ -82,13 +81,7 @@ export default function CompleteProfile() {
           </div>
           <div>
             <label className="label">Confirma tu contraseña</label>
-            <input
-              type="password"
-              required
-              className="input"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-            />
+            <PasswordInput required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
           </div>
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
           <button type="submit" disabled={busy} className="btn-primary mt-2 justify-center">
