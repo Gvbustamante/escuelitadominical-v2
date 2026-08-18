@@ -43,7 +43,6 @@ export default function ActividadDetalle() {
   const [otrasDelMes, setOtrasDelMes] = useState(null)
   const [prevNext, setPrevNext] = useState({ prev: null, next: null })
   const [preview, setPreview] = useState(null)
-  const [lightbox, setLightbox] = useState(null)
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
@@ -227,7 +226,11 @@ export default function ActividadDetalle() {
                   <button
                     key={f.id}
                     type="button"
-                    onClick={() => setLightbox(f)}
+                    onClick={() => setPreview({
+                      url: fileUrl(f.storage_path, f.bucket),
+                      nombre: f.nombre_archivo,
+                      mime: f.tipo,
+                    })}
                     className="group aspect-square overflow-hidden rounded-2xl bg-ink/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft"
                   >
                     <img
@@ -385,28 +388,6 @@ export default function ActividadDetalle() {
         nombre={preview?.nombre}
         mime={preview?.mime}
       />
-
-      {/* Lightbox */}
-      {lightbox && (
-        <div
-          className="animate-pop-in fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4"
-          onClick={() => setLightbox(null)}
-        >
-          <img
-            src={fileUrl(lightbox.storage_path, lightbox.bucket)}
-            alt={lightbox.nombre_archivo || ''}
-            className="max-h-[85vh] max-w-full rounded-2xl shadow-soft"
-          />
-          <button
-            type="button"
-            onClick={() => setLightbox(null)}
-            className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-2xl leading-none text-ink hover:bg-white"
-            aria-label="Cerrar"
-          >
-            ×
-          </button>
-        </div>
-      )}
     </div>
   )
 }

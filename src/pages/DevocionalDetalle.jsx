@@ -162,11 +162,11 @@ export default function DevocionalDetalle() {
             <RichTextView html={devocional.contenido} />
           </div>
 
-          {/* Fotos, en grande */}
+          {/* Galería de fotos */}
           {fotos.length > 0 && (
             <div className="card">
-              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📸 Fotos</p>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📸 Galería de fotos</p>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {fotos.map((f) => (
                   <button
                     key={f.id}
@@ -176,13 +176,13 @@ export default function DevocionalDetalle() {
                       nombre: f.nombre_archivo,
                       mime: f.tipo,
                     })}
-                    className="group aspect-[4/3] overflow-hidden rounded-2xl bg-ink/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft"
+                    className="group aspect-square overflow-hidden rounded-2xl bg-ink/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft"
                   >
                     <img
                       src={fileUrl(f.bucket || 'actividades', f.storage_path)}
                       alt={f.nombre_archivo || ''}
                       loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
                   </button>
                 ))}
