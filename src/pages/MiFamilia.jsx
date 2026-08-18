@@ -248,8 +248,6 @@ No hay niños registrados todavía.
                 </div>
               </div>
             )
-          }
-        )
       })()}
     </div>
   )
