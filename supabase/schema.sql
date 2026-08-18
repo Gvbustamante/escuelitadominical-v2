@@ -223,7 +223,7 @@ create policy "crear propio perfil" on public.profiles for insert to authenticat
     auth.uid() = id
     and (
       not exists (select 1 from public.profiles)
-      or role = (auth.jwt() -> 'app_metadata' ->> 'role')
+      or role = coalesce(auth.jwt() -> 'app_metadata' ->> 'role', 'padre')
     )
   );
 create policy "actualizar perfiles" on public.profiles for update to authenticated
@@ -486,7 +486,7 @@ begin
     new_user_id, 'authenticated', 'authenticated', v_email,
     crypt(v_password, gen_salt('bf')),
     now(),
-    jsonb_build_object('provider','email','providers', array['email']),
+    jsonb_build_object('provider','email','providers', array['email'], 'role', p_role),
     '{}'::jsonb,
     now(), now(), '', '', '', ''
   );

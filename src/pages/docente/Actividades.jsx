@@ -396,133 +396,170 @@ export default function Actividades() {
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar actividad' : 'Nueva actividad'}>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="label">Título</label>
-            <input required className="input" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
-          </div>
-          <div>
-            <label className="label">Descripción</label>
-            <RichTextEditor value={form.descripcion} onChange={(html) => setForm({ ...form, descripcion: html })} />
-          </div>
-          <div>
-            <label className="label">Fecha</label>
-            <input type="date" className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
-          </div>
-          <div>
-            <label className="label">Versículo clave (opcional)</label>
-            <input
-              className="input"
-              placeholder='Ej. "Todo lo puedo en Cristo..." — Filipenses 4:13'
-              value={form.versiculo_clave}
-              onChange={(e) => setForm({ ...form, versiculo_clave: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="label">Historia bíblica que aprendieron (opcional)</label>
-            <input
-              className="input"
-              placeholder="Ej. David y Goliat"
-              value={form.historia_biblica}
-              onChange={(e) => setForm({ ...form, historia_biblica: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="label">Quién la puede ver</label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, visible_padres: true })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
-              >
-                👀 Visible para padres
-              </button>
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, visible_padres: false })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.visible_padres ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
-              >
-                🙈 Solo el equipo
-              </button>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar actividad' : 'Nueva actividad'} wide>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {/* ═══ Sección: Información básica ═══ */}
+          <fieldset className="flex flex-col gap-4">
+            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+              📋 Información básica
+            </legend>
+            <div>
+              <label className="label">Título</label>
+              <input required className="input" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
             </div>
-          </div>
-          <div>
-            <label className="label">¿Pide una tarea?</label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, es_tarea: false })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.es_tarea ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
-              >
-                Solo informativa
-              </button>
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, es_tarea: true })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.es_tarea ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
-              >
-                📝 Es una tarea
-              </button>
+            <div>
+              <label className="label">Descripción</label>
+              <RichTextEditor value={form.descripcion} onChange={(html) => setForm({ ...form, descripcion: html })} />
             </div>
-            {form.es_tarea && (
-              <p className="mt-1 text-xs text-ink/40">
-                Cada niño del nivel podrá entregar su evidencia desde la cuenta de su padre/madre.
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="label">Enlace externo / Video de YouTube o Vimeo (opcional)</label>
-            <input
-              type="url"
-              className="input"
-              placeholder="https://youtube.com/watch?v=... o cualquier URL"
-              value={form.enlace_externo}
-              onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
-            />
-            <p className="mt-1 text-xs text-ink/40">Si pegas un enlace de YouTube o Vimeo se mostrará el video embebido.</p>
-            {form.enlace_externo && getVideoEmbedUrl(form.enlace_externo) && (
-              <div className="mt-2 overflow-hidden rounded-xl bg-ink shadow-soft">
-                <iframe
-                  src={getVideoEmbedUrl(form.enlace_externo)}
-                  title="Vista previa"
-                  className="aspect-video w-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="label">Fecha</label>
+                <input type="date" className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
+              </div>
+              <div>
+                <label className="label">Historia bíblica (opcional)</label>
+                <input
+                  className="input"
+                  placeholder="Ej. David y Goliat"
+                  value={form.historia_biblica}
+                  onChange={(e) => setForm({ ...form, historia_biblica: e.target.value })}
                 />
               </div>
-            )}
-          </div>
-          <div>
-            <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (fotos, PDFs, etc.)'}</label>
-            <div className="flex flex-wrap items-center gap-2">
-              <MultiFilePicker archivos={archivos} onChange={setArchivos} />
-              <button type="button" onClick={() => setDrivePickerOpen(true)} className="btn-secondary !py-2 !text-sm">
-                📁 Desde el Drive
-              </button>
             </div>
-            {archivosDrive.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {archivosDrive.map((df, i) => (
-                  <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
-                    📁 {df.nombre}
-                    <button type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500">×</button>
-                  </span>
-                ))}
-              </div>
-            )}
-            {editing && archivosExistentes.length > 0 && (
-              <ArchivosExistentes
-                archivos={archivosExistentes}
-                tabla="actividad_archivos"
-                onDeleted={(id) => setArchivosExistentes((prev) => prev.filter((a) => a.id !== id))}
+            <div>
+              <label className="label">Versículo clave (opcional)</label>
+              <input
+                className="input"
+                placeholder='Ej. "Todo lo puedo en Cristo..." — Filipenses 4:13'
+                value={form.versiculo_clave}
+                onChange={(e) => setForm({ ...form, versiculo_clave: e.target.value })}
               />
-            )}
-          </div>
-          {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}
-          {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
-          <button disabled={busy} className="btn-primary justify-center">
-            {busy ? 'Guardando...' : editing ? 'Guardar cambios' : 'Publicar actividad'}
+            </div>
+          </fieldset>
+
+          <hr className="border-ink/5" />
+
+          {/* ═══ Sección: Configuración ═══ */}
+          <fieldset className="flex flex-col gap-4">
+            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+              ⚙️ Configuración
+            </legend>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="label">Visibilidad</label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, visible_padres: true })}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.visible_padres ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                  >
+                    👀 Padres ven
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, visible_padres: false })}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.visible_padres ? 'bg-grape-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                  >
+                    🙈 Solo equipo
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="label">Tipo</label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, es_tarea: false })}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.es_tarea ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                  >
+                    📢 Informativa
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, es_tarea: true })}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.es_tarea ? 'bg-sunshine-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                  >
+                    📝 Tarea
+                  </button>
+                </div>
+                {form.es_tarea && (
+                  <p className="mt-1.5 rounded-xl bg-sunshine-50 px-3 py-1.5 text-xs text-sunshine-700">
+                    🔔 Cada niño del nivel podrá entregar su evidencia.
+                  </p>
+                )}
+              </div>
+            </div>
+          </fieldset>
+
+          <hr className="border-ink/5" />
+
+          {/* ═══ Sección: Multimedia ═══ */}
+          <fieldset className="flex flex-col gap-4">
+            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+              🎬 Multimedia
+            </legend>
+            <div>
+              <label className="label">Video o enlace externo (opcional)</label>
+              <input
+                type="url"
+                className="input"
+                placeholder="https://youtube.com/watch?v=... o cualquier URL"
+                value={form.enlace_externo}
+                onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
+              />
+              {form.enlace_externo && getVideoEmbedUrl(form.enlace_externo) && (
+                <div className="mt-2 overflow-hidden rounded-xl bg-ink shadow-soft">
+                  <iframe
+                    src={getVideoEmbedUrl(form.enlace_externo)}
+                    title="Vista previa"
+                    className="aspect-video w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              )}
+              {!form.enlace_externo && (
+                <p className="mt-1 text-xs text-ink/40">YouTube y Vimeo se muestran como video embebido.</p>
+              )}
+            </div>
+            <div>
+              <label className="label">{editing ? 'Agregar más archivos' : 'Fotos y archivos'}</label>
+              <div className="flex flex-wrap items-center gap-2">
+                <MultiFilePicker archivos={archivos} onChange={setArchivos} />
+                <button type="button" onClick={() => setDrivePickerOpen(true)} className="btn-secondary !py-2 !text-sm">
+                  📁 Desde el Drive
+                </button>
+              </div>
+              {archivosDrive.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {archivosDrive.map((df, i) => (
+                    <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
+                      📁 {df.nombre}
+                      <button type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500 hover:text-coral-700">×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              {editing && archivosExistentes.length > 0 && (
+                <ArchivosExistentes
+                  archivos={archivosExistentes}
+                  tabla="actividad_archivos"
+                  onDeleted={(id) => setArchivosExistentes((prev) => prev.filter((a) => a.id !== id))}
+                />
+              )}
+            </div>
+          </fieldset>
+
+          {/* ═══ Feedback ═══ */}
+          {progreso && (
+            <div className="flex items-center gap-2 rounded-xl bg-sky-50 px-4 py-2.5">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-sky-400 border-t-transparent" />
+              <span className="text-sm font-bold text-sky-600">{progreso}</span>
+            </div>
+          )}
+          {error && <p className="rounded-xl bg-coral-50 px-4 py-2.5 text-sm font-bold text-coral-600">⚠️ {error}</p>}
+          <button disabled={busy} className="btn-primary justify-center text-base">
+            {busy ? 'Guardando...' : editing ? '✓ Guardar cambios' : '🚀 Publicar actividad'}
           </button>
         </form>
       </Modal>

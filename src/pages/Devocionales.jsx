@@ -487,104 +487,147 @@ export default function Devocionales() {
           )}
 
           {/* ═══ Modal de crear/editar ═══ */}
-          <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar devocional' : 'Nuevo devocional'}>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div>
-                <label className="label">Título</label>
-                <input required className="input" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
-              </div>
-              <div>
-                <label className="label">Versículo (opcional)</label>
-                <input
-                  className="input"
-                  placeholder='Ej. "Todo lo puedo en Cristo..." — Filipenses 4:13'
-                  value={form.versiculo}
-                  onChange={(e) => setForm({ ...form, versiculo: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="label">Reflexión para el niño/a</label>
-                <RichTextEditor
-                  value={form.contenido}
-                  onChange={(html) => setForm({ ...form, contenido: html })}
-                  placeholder="Escribe algo corto y sencillo que un niño pueda entender..."
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+          <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar devocional' : 'Nuevo devocional'} wide>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              {/* ═══ Sección: Contenido ═══ */}
+              <fieldset className="flex flex-col gap-4">
+                <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+                  🙏 Contenido
+                </legend>
                 <div>
-                  <label className="label">Fecha</label>
-                  <input type="date" className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
+                  <label className="label">Título</label>
+                  <input required className="input" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
                 </div>
                 <div>
-                  <label className="label">Clase (opcional)</label>
-                  <select className="input" value={form.nivel_id} onChange={(e) => setForm({ ...form, nivel_id: e.target.value })}>
-                    <option value="">Para todas las clases</option>
-                    {niveles.map((n) => (
-                      <option key={n.id} value={n.id}>
-                        {n.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="label">Enlace externo / Video de YouTube o Vimeo (opcional)</label>
-                <input
-                  className="input"
-                  placeholder="https://youtube.com/watch?v=... o cualquier URL"
-                  value={form.enlace_externo}
-                  onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
-                />
-                <p className="mt-1 text-xs text-ink/40">Si pegas un enlace de YouTube o Vimeo se mostrará el video embebido.</p>
-                {form.enlace_externo && getVideoEmbedUrl(form.enlace_externo) && (
-                  <div className="mt-2 overflow-hidden rounded-xl bg-ink shadow-soft">
-                    <iframe
-                      src={getVideoEmbedUrl(form.enlace_externo)}
-                      title="Vista previa"
-                      className="aspect-video w-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                )}
-              </div>
-              <div>
-                <label className="label">{editing ? 'Cambiar imagen principal (opcional)' : 'Imagen principal (opcional)'}</label>
-                <input type="file" accept="image/*" className="input" onChange={handleImagen} />
-                {(preview || (editing && editing.imagen_url)) && (
-                  <img src={preview || editing.imagen_url} alt="" className="mt-2 h-32 w-full rounded-2xl object-cover" />
-                )}
-              </div>
-              <div>
-                <label className="label">{editing ? 'Agregar más materiales (opcional)' : 'Materiales para descargar (opcional)'}</label>
-                <div className="flex flex-wrap items-center gap-2">
-                  <MultiFilePicker archivos={archivos} onChange={setArchivos} />
-                  <button type="button" onClick={() => setDrivePickerOpen(true)} className="btn-secondary !py-2 !text-sm">
-                    📁 Desde el Drive
-                  </button>
-                </div>
-                {archivosDrive.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {archivosDrive.map((df, i) => (
-                      <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
-                        📁 {df.nombre}
-                        <button type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500">×</button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {editing && archivosExistentes.length > 0 && (
-                  <ArchivosExistentes
-                    archivos={archivosExistentes}
-                    tabla="devocional_archivos"
-                    onDeleted={(id) => setArchivosExistentes((prev) => prev.filter((a) => a.id !== id))}
+                  <label className="label">Versículo (opcional)</label>
+                  <input
+                    className="input"
+                    placeholder='Ej. "Todo lo puedo en Cristo..." — Filipenses 4:13'
+                    value={form.versiculo}
+                    onChange={(e) => setForm({ ...form, versiculo: e.target.value })}
                   />
-                )}
-              </div>
-              {progreso && <p className="text-sm font-bold text-sky-600">{progreso}</p>}
-              {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
-              <button disabled={busy} className="btn-primary justify-center">
-                {busy ? 'Guardando...' : editing ? 'Guardar cambios' : 'Publicar devocional'}
+                </div>
+                <div>
+                  <label className="label">Reflexión para el niño/a</label>
+                  <RichTextEditor
+                    value={form.contenido}
+                    onChange={(html) => setForm({ ...form, contenido: html })}
+                    placeholder="Escribe algo corto y sencillo que un niño pueda entender..."
+                  />
+                </div>
+              </fieldset>
+
+              <hr className="border-ink/5" />
+
+              {/* ═══ Sección: Detalles ═══ */}
+              <fieldset className="flex flex-col gap-4">
+                <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+                  📋 Detalles
+                </legend>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="label">Fecha</label>
+                    <input type="date" className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="label">Clase (opcional)</label>
+                    <select className="input" value={form.nivel_id} onChange={(e) => setForm({ ...form, nivel_id: e.target.value })}>
+                      <option value="">Para todas las clases</option>
+                      {niveles.map((n) => (
+                        <option key={n.id} value={n.id}>
+                          {n.nombre}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+
+              <hr className="border-ink/5" />
+
+              {/* ═══ Sección: Multimedia ═══ */}
+              <fieldset className="flex flex-col gap-4">
+                <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+                  🎬 Multimedia
+                </legend>
+                <div>
+                  <label className="label">{editing ? 'Cambiar imagen principal' : 'Imagen principal (opcional)'}</label>
+                  <label className="group flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-ink/10 bg-ink/[0.02] px-4 py-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50">
+                    {(preview || (editing && editing.imagen_url)) ? (
+                      <img src={preview || editing.imagen_url} alt="" className="h-36 w-full rounded-xl object-cover" />
+                    ) : (
+                      <>
+                        <span className="text-3xl">📷</span>
+                        <span className="text-sm font-bold text-ink/40 group-hover:text-sky-600">Toca para seleccionar una imagen</span>
+                      </>
+                    )}
+                    <input type="file" accept="image/*" className="hidden" onChange={handleImagen} />
+                    {(preview || (editing && editing.imagen_url)) && (
+                      <span className="text-xs font-bold text-sky-600">Cambiar imagen</span>
+                    )}
+                  </label>
+                </div>
+                <div>
+                  <label className="label">Video o enlace externo (opcional)</label>
+                  <input
+                    className="input"
+                    placeholder="https://youtube.com/watch?v=... o cualquier URL"
+                    value={form.enlace_externo}
+                    onChange={(e) => setForm({ ...form, enlace_externo: e.target.value })}
+                  />
+                  {form.enlace_externo && getVideoEmbedUrl(form.enlace_externo) && (
+                    <div className="mt-2 overflow-hidden rounded-xl bg-ink shadow-soft">
+                      <iframe
+                        src={getVideoEmbedUrl(form.enlace_externo)}
+                        title="Vista previa"
+                        className="aspect-video w-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
+                  {!form.enlace_externo && (
+                    <p className="mt-1 text-xs text-ink/40">YouTube y Vimeo se muestran como video embebido.</p>
+                  )}
+                </div>
+                <div>
+                  <label className="label">{editing ? 'Agregar más materiales' : 'Materiales para descargar (opcional)'}</label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <MultiFilePicker archivos={archivos} onChange={setArchivos} />
+                    <button type="button" onClick={() => setDrivePickerOpen(true)} className="btn-secondary !py-2 !text-sm">
+                      📁 Desde el Drive
+                    </button>
+                  </div>
+                  {archivosDrive.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {archivosDrive.map((df, i) => (
+                        <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
+                          📁 {df.nombre}
+                          <button type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500 hover:text-coral-700">×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {editing && archivosExistentes.length > 0 && (
+                    <ArchivosExistentes
+                      archivos={archivosExistentes}
+                      tabla="devocional_archivos"
+                      onDeleted={(id) => setArchivosExistentes((prev) => prev.filter((a) => a.id !== id))}
+                    />
+                  )}
+                </div>
+              </fieldset>
+
+              {/* ═══ Feedback ═══ */}
+              {progreso && (
+                <div className="flex items-center gap-2 rounded-xl bg-sky-50 px-4 py-2.5">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-sky-400 border-t-transparent" />
+                  <span className="text-sm font-bold text-sky-600">{progreso}</span>
+                </div>
+              )}
+              {error && <p className="rounded-xl bg-coral-50 px-4 py-2.5 text-sm font-bold text-coral-600">⚠️ {error}</p>}
+              <button disabled={busy} className="btn-primary justify-center text-base">
+                {busy ? 'Guardando...' : editing ? '✓ Guardar cambios' : '🚀 Publicar devocional'}
               </button>
             </form>
           </Modal>
