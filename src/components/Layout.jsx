@@ -88,11 +88,20 @@ export default function Layout() {
 
   useEffect(() => {
     if (!user || profile?.role === 'padre') return
-    supabase
-      .from('ninos_padres')
-      .select('nino_id', { count: 'exact', head: true })
-      .eq('padre_id', user.id)
-      .then(({ count }) => setTieneHijos((count || 0) > 0))
+    // Admin/coordinador siempre ven Mi Familia (ven todos los niños)
+    if (['admin', 'coordinador'].includes(profile?.role)) {
+      setTieneHijos(true)
+      return
+    }
+    // Docente: mostrar si tiene niveles asignados
+    if (profile?.role === 'docente') {
+      supabase
+        .from('docentes_niveles')
+        .select('nivel_id', { count: 'exact', head: true })
+        .eq('docente_id', user.id)
+        .then(({ count }) => setTieneHijos((count || 0) > 0))
+      return
+    }
   }, [user, profile?.role])
 
   useEffect(() => {
@@ -109,7 +118,7 @@ export default function Layout() {
 
   const items = [...(NAV[profile?.role] || [])]
   if (tieneHijos && ['admin', 'coordinador', 'docente'].includes(profile?.role)) {
-    items.splice(1, 0, { to: '/mi-familia', label: 'Mi familia', icon: '👪' })
+    items.splice(1, 0, { to: '/mi-familia', label: 'Mis alumnos', icon: '👦' })
   }
 
   return (

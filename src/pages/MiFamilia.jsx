@@ -41,36 +41,52 @@ const COLORES_AVATAR = [
 ]
 
 export default function MiFamilia() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const navigate = useNavigate()
   const hijos = useMisHijos()
   const [selectedId, setSelectedId] = useState(null)
   const [datosPorHijo, setDatosPorHijo] = useState({})
+  const esStaff = ['admin', 'coordinador', 'docente'].includes(profile?.role)
 
   useEffect(() => {
     if (!hijos || hijos.length === 0) return
     let cancelado = false
 
     async function loadAll() {
+      const ninoIds = hijos.map((h) => h.id)
+      const nivelIds = [...new Set(hijos.map((h) => h.nivel_id).filter(Boolean))]
+      const hoy = new Date().toISOString().slice(0, 10)
+
+      const [{ data: allActs }, { data: allNotas }, { data: allAgenda }] = await Promise.all([
+        nivelIds.length > 0
+          ? supabase
+              .from('actividades')
+              .select('id, titulo, fecha, nivel_id, actividad_archivos(id)')
+              .in('nivel_id', nivelIds)
+              .order('fecha', { ascending: false })
+          : { data: [] },
+        supabase
+          .from('progreso_notas')
+          .select('*')
+          .in('nino_id', ninoIds)
+          .order('fecha', { ascending: false }),
+        nivelIds.length > 0
+          ? supabase
+              .from('agenda')
+              .select('*')
+              .or(`nivel_id.is.null,nivel_id.in.(${nivelIds.join(',')})`)
+              .gte('fecha', hoy)
+              .order('fecha')
+          : { data: [] },
+      ])
+
       const result = {}
       for (const hijo of hijos) {
-        const [{ data: acts }, { data: prog }, { data: agenda }] = await Promise.all([
-          supabase
-            .from('actividades')
-            .select('id, titulo, fecha, actividad_archivos(id)')
-            .eq('nivel_id', hijo.nivel_id)
-            .order('fecha', { ascending: false })
-            .limit(5),
-          supabase.from('progreso_notas').select('*').eq('nino_id', hijo.id).order('fecha', { ascending: false }).limit(5),
-          supabase
-            .from('agenda')
-            .select('*')
-            .or(`nivel_id.is.null,nivel_id.eq.${hijo.nivel_id}`)
-            .gte('fecha', new Date().toISOString().slice(0, 10))
-            .order('fecha')
-            .limit(5),
-        ])
-        result[hijo.id] = { actividades: acts || [], notas: prog || [], eventos: agenda || [] }
+        result[hijo.id] = {
+          actividades: (allActs || []).filter((a) => a.nivel_id === hijo.nivel_id).slice(0, 5),
+          notas: (allNotas || []).filter((n) => n.nino_id === hijo.id).slice(0, 5),
+          eventos: (allAgenda || []).filter((e) => !e.nivel_id || e.nivel_id === hijo.nivel_id).slice(0, 5),
+        }
       }
       if (!cancelado) setDatosPorHijo(result)
     }
@@ -83,8 +99,12 @@ export default function MiFamilia() {
   if (hijos.length === 0) {
     return (
       <div className="flex flex-col gap-6">
-        <h1 className="text-3xl font-bold">Mi familia 👪</h1>
-        <p className="card text-ink/50">Todavía no tienes ningún hijo/a vinculado en la escuelita.</p>
+        <h1 className="text-3xl font-bold">{esStaff ? 'Mis alumnos 👦👧' : 'Mi familia 👪'}</h1>
+        <p className="card text-ink/50">
+          {esStaff
+            ? 'No hay niños registrados en tus clases todavía.'
+            : 'Todavía no tienes ningún hijo/a vinculado en la escuelita.'}
+        </p>
       </div>
     )
   }
@@ -94,11 +114,11 @@ export default function MiFamilia() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Mi familia 👪</h1>
+        <h1 className="text-3xl font-bold">{esStaff ? 'Mis alumnos 👦👧' : 'Mi familia 👪'}</h1>
         <p className="text-ink/50">
           {hijos.length === 1
-            ? 'La información de tu hijo/a en la escuelita'
-            : `${hijos.length} hijos/as vinculados`}
+            ? (esStaff ? '1 niño/a en tus clases' : 'La información de tu hijo/a en la escuelita')
+            : `${hijos.length} ${esStaff ? 'niños/as en tus clases' : 'hijos/as vinculados'}`}
         </p>
       </div>
 
