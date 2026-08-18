@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import Modal from './Modal'
+import PasswordInput from './PasswordInput'
 
 export default function CambiarPasswordModal({ open, onClose }) {
   const [password, setPassword] = useState('')
@@ -49,10 +50,8 @@ export default function CambiarPasswordModal({ open, onClose }) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="label">Nueva contraseña</label>
-            <input
-              type="password"
+            <PasswordInput
               required
-              className="input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mínimo 6 caracteres"
@@ -60,13 +59,7 @@ export default function CambiarPasswordModal({ open, onClose }) {
           </div>
           <div>
             <label className="label">Confirma la nueva contraseña</label>
-            <input
-              type="password"
-              required
-              className="input"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-            />
+            <PasswordInput required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
           </div>
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
           <button disabled={busy} className="btn-primary justify-center">

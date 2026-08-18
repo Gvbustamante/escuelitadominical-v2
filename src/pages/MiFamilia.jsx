@@ -46,12 +46,22 @@ export default function MiFamilia() {
   const hijos = useMisHijos()
   const [selectedId, setSelectedId] = useState(null)
   const [datosPorHijo, setDatosPorHijo] = useState({})
+  const [devocionalActivo, setDevocionalActivo] = useState(null)
   // Seleccionar el primer hijo automáticamente
   useEffect(() => {
     if (hijos && hijos.length > 0 && !selectedId) {
       setSelectedId(hijos[0].id)
     }
   }, [hijos, selectedId])
+
+  useEffect(() => {
+    supabase
+      .from('devocionales_ninos')
+      .select('id, titulo, versiculo, imagen_url')
+      .eq('activo', true)
+      .maybeSingle()
+      .then(({ data }) => setDevocionalActivo(data))
+  }, [])
 
   useEffect(() => {
     if (!hijos || hijos.length === 0) return
@@ -163,6 +173,34 @@ No hay niños registrados todavía.
                     </p>
                   )}
                 </div>
+
+                {/* Devocional activo */}
+                {devocionalActivo && (
+                  <div
+                    className="card flex cursor-pointer items-center gap-4 !p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-soft"
+                    onClick={() => navigate(`/devocionales/${devocionalActivo.id}`)}
+                  >
+                    {devocionalActivo.imagen_url ? (
+                      <img
+                        src={devocionalActivo.imagen_url}
+                        alt=""
+                        className="h-16 w-16 shrink-0 rounded-2xl object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-50 to-grape-50 text-3xl">
+                        🙏
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-600">⭐ Devocional de hoy</p>
+                      <h3 className="truncate text-base font-bold">{devocionalActivo.titulo}</h3>
+                      {devocionalActivo.versiculo && (
+                        <p className="truncate text-xs italic text-ink/50">📖 &ldquo;{devocionalActivo.versiculo}&rdquo;</p>
+                      )}
+                    </div>
+                    <span className="shrink-0 text-lg text-ink/30">→</span>
+                  </div>
+                )}
 
                 {/* Paneles de información */}
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

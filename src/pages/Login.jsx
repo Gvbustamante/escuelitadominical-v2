@@ -3,6 +3,7 @@ import { Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AppLogo from '../components/AppLogo'
 import AppName from '../components/AppName'
+import PasswordInput from '../components/PasswordInput'
 
 export default function Login() {
   const { session, signIn, loading } = useAuth()
@@ -51,10 +52,8 @@ export default function Login() {
           </div>
           <div>
             <label className="label">Contraseña</label>
-            <input
-              type="password"
+            <PasswordInput
               required
-              className="input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"

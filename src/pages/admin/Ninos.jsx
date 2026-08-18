@@ -415,16 +415,16 @@ export default function Ninos() {
                     <td className="px-3 py-2 sm:px-4 sm:py-3">
                       <div className="flex flex-wrap gap-2">
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetalleNino(nino)}>
-                          Ver detalle
+                          👁️ Ver detalle
                         </button>
                         {puedeEditar && (
                           <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nino)}>
-                            Editar
+                            ✏️ Editar
                           </button>
                         )}
                         {puedeVincularPadre && (
                           <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openInvite(nino)}>
-                            + Padre
+                            👪 + Padre
                           </button>
                         )}
                         {esStaff && (
@@ -433,7 +433,7 @@ export default function Ninos() {
                               {nino.pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
                             </button>
                             <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(nino)}>
-                              {nino.activo ? 'Desactivar' : 'Activar'}
+                              {nino.activo ? '🚫 Desactivar' : '✅ Activar'}
                             </button>
                           </>
                         )}

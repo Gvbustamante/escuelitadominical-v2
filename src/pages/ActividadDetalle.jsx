@@ -117,8 +117,9 @@ export default function ActividadDetalle() {
   const archivos = actividad.actividad_archivos || []
   const video = archivos.find(esVideo)
   const fotos = archivos.filter(esFoto)
-  const hero = !video ? fotos[0] : null
-  const restoFotos = video ? fotos : fotos.slice(1)
+  const heroAdjunto = !video && !actividad.imagen_url ? fotos[0] : null
+  const heroUrl = actividad.imagen_url || (heroAdjunto ? fileUrl(heroAdjunto.storage_path, heroAdjunto.bucket) : null)
+  const restoFotos = actividad.imagen_url ? fotos : video ? fotos : fotos.slice(1)
   const adjuntos = archivos.filter((f) => !esFoto(f) && !esVideo(f))
 
   return (
@@ -145,13 +146,13 @@ export default function ActividadDetalle() {
             </div>
           )}
 
-          {!video && hero && (
+          {!video && heroUrl && (
             <div className="overflow-hidden rounded-2xl shadow-soft">
               <img
-                src={fileUrl(hero.storage_path, hero.bucket)}
+                src={heroUrl}
                 alt={actividad.titulo}
                 className="w-full max-h-[420px] object-cover cursor-pointer"
-                onClick={() => setLightbox(hero)}
+                onClick={() => setPreview({ url: heroUrl, nombre: actividad.titulo, mime: 'image/*' })}
               />
             </div>
           )}
