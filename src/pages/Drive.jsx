@@ -34,6 +34,8 @@ export default function Drive() {
   const [vista, setVista] = useState(() => localStorage.getItem('drive-vista') || 'grid')
   const [busqueda, setBusqueda] = useState('')
 
+  const [verPapelera, setVerPapelera] = useState(false)
+
   // Modals
   const [carpetaModal, setCarpetaModal] = useState(false)
   const [carpetaEditando, setCarpetaEditando] = useState(null)
@@ -72,15 +74,20 @@ export default function Drive() {
     localStorage.setItem('drive-vista', vista)
   }, [vista])
 
-  // Carpetas y archivos de la ubicación actual
+  // Carpetas y archivos de la ubicación actual (o papelera)
   const carpetasAqui = (carpetas || []).filter((c) => {
+    if (verPapelera) return !!c.eliminado_at && coincide(busqueda, c.nombre)
     const enCarpeta = c.padre_id === carpetaActualId
-    return enCarpeta && coincide(busqueda, c.nombre)
+    return enCarpeta && !c.eliminado_at && coincide(busqueda, c.nombre)
   })
   const archivosAqui = (archivos || []).filter((a) => {
+    if (verPapelera) return !!a.eliminado_at && coincide(busqueda, a.nombre)
     const enCarpeta = a.carpeta_id === carpetaActualId
-    return enCarpeta && coincide(busqueda, a.nombre)
+    return enCarpeta && !a.eliminado_at && coincide(busqueda, a.nombre)
   })
+
+  // Conteo de items en papelera
+  const enPapelera = (carpetas || []).filter((c) => c.eliminado_at).length + (archivos || []).filter((a) => a.eliminado_at).length
 
   function entrar(carpeta) {
     setRuta([...ruta, { id: carpeta.id, nombre: carpeta.nombre }])
@@ -166,12 +173,49 @@ export default function Drive() {
     load()
   }
 
-  // --- Eliminar ---
+  // --- Eliminar (soft-delete → papelera) ---
   async function confirmarEliminar() {
     setConfirmBusy(true)
     const { tipo, item } = confirmEliminar
+    const ahora = new Date().toISOString()
     if (tipo === 'carpeta') {
-      // Eliminar archivos de storage dentro de la carpeta (recursivo en archivos_drive por cascade)
+      await supabase.from('carpetas_drive').update({ eliminado_at: ahora }).eq('id', item.id)
+      // Marcar archivos dentro de la carpeta también
+      const archivosEnCarpeta = (archivos || []).filter((a) => a.carpeta_id === item.id && !a.eliminado_at)
+      for (const a of archivosEnCarpeta) {
+        await supabase.from('archivos_drive').update({ eliminado_at: ahora }).eq('id', a.id)
+      }
+    } else {
+      await supabase.from('archivos_drive').update({ eliminado_at: ahora }).eq('id', item.id)
+    }
+    setConfirmBusy(false)
+    setConfirmEliminar(null)
+    load()
+  }
+
+  // --- Restaurar desde papelera ---
+  async function restaurar(tipo, item) {
+    if (tipo === 'carpeta') {
+      await supabase.from('carpetas_drive').update({ eliminado_at: null }).eq('id', item.id)
+      // Restaurar archivos que estaban en esa carpeta
+      const archivosEnCarpeta = (archivos || []).filter((a) => a.carpeta_id === item.id && a.eliminado_at)
+      for (const a of archivosEnCarpeta) {
+        await supabase.from('archivos_drive').update({ eliminado_at: null }).eq('id', a.id)
+      }
+    } else {
+      await supabase.from('archivos_drive').update({ eliminado_at: null }).eq('id', item.id)
+    }
+    load()
+  }
+
+  // --- Eliminar definitivamente ---
+  const [confirmDefinitivo, setConfirmDefinitivo] = useState(null)
+  const [confirmDefBusy, setConfirmDefBusy] = useState(false)
+
+  async function eliminarDefinitivamente() {
+    setConfirmDefBusy(true)
+    const { tipo, item } = confirmDefinitivo
+    if (tipo === 'carpeta') {
       const archivosEnCarpeta = (archivos || []).filter((a) => a.carpeta_id === item.id)
       for (const a of archivosEnCarpeta) {
         await supabase.storage.from('drive').remove([a.storage_path])
@@ -181,8 +225,25 @@ export default function Drive() {
       await supabase.storage.from('drive').remove([item.storage_path])
       await supabase.from('archivos_drive').delete().eq('id', item.id)
     }
-    setConfirmBusy(false)
-    setConfirmEliminar(null)
+    setConfirmDefBusy(false)
+    setConfirmDefinitivo(null)
+    load()
+  }
+
+  // --- Vaciar papelera ---
+  const [confirmVaciar, setConfirmVaciar] = useState(false)
+  const [vaciarBusy, setVaciarBusy] = useState(false)
+
+  async function vaciarPapelera() {
+    setVaciarBusy(true)
+    const archivosPapelera = (archivos || []).filter((a) => a.eliminado_at)
+    for (const a of archivosPapelera) {
+      await supabase.storage.from('drive').remove([a.storage_path])
+    }
+    await supabase.from('archivos_drive').delete().not('eliminado_at', 'is', null)
+    await supabase.from('carpetas_drive').delete().not('eliminado_at', 'is', null)
+    setVaciarBusy(false)
+    setConfirmVaciar(false)
     load()
   }
 
@@ -237,55 +298,80 @@ export default function Drive() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold sm:text-3xl">📁 Drive</h1>
-          <p className="text-sm text-ink/50">Archivos y materiales compartidos del equipo</p>
+          <h1 className="text-2xl font-bold sm:text-3xl">{verPapelera ? '🗑️ Papelera' : '📁 Drive'}</h1>
+          <p className="text-sm text-ink/50">
+            {verPapelera ? 'Archivos eliminados — puedes restaurarlos o borrarlos definitivamente' : 'Archivos y materiales compartidos del equipo'}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button className="btn-primary !py-2 !px-4 !text-sm" onClick={openNuevaCarpeta}>
-            📁 Nueva carpeta
-          </button>
+          {!verPapelera && (
+            <>
+              <button className="btn-primary !py-2 !px-4 !text-sm" onClick={openNuevaCarpeta}>
+                📁 Nueva carpeta
+              </button>
+              <button
+                className="btn-secondary !py-2 !px-4 !text-sm"
+                disabled={subiendo}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {subiendo ? '⏳ Subiendo...' : '📤 Subir archivos'}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  subirArchivos(e.target.files)
+                  e.target.value = ''
+                }}
+              />
+            </>
+          )}
+          {verPapelera && enPapelera > 0 && ['admin', 'coordinador'].includes(profile.role) && (
+            <button className="btn-secondary !py-2 !px-4 !text-sm !text-coral-600 !border-coral-200 hover:!bg-coral-50" onClick={() => setConfirmVaciar(true)}>
+              🗑️ Vaciar papelera
+            </button>
+          )}
           <button
-            className="btn-secondary !py-2 !px-4 !text-sm"
-            disabled={subiendo}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => { setVerPapelera(!verPapelera); setBusqueda(''); setRuta([]) }}
+            className={`relative rounded-full px-4 py-2 text-sm font-bold transition-colors ${verPapelera ? 'bg-coral-400 text-white' : 'bg-white text-ink/50 border-2 border-ink/10'}`}
           >
-            {subiendo ? '⏳ Subiendo...' : '📤 Subir archivos'}
+            🗑️ Papelera
+            {!verPapelera && enPapelera > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-coral-500 text-[10px] font-bold text-white">
+                {enPapelera}
+              </span>
+            )}
           </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            className="hidden"
-            onChange={(e) => {
-              subirArchivos(e.target.files)
-              e.target.value = ''
-            }}
-          />
         </div>
       </div>
 
       {/* Toolbar: breadcrumb + vista + busqueda */}
       <div className="card !p-3 flex flex-wrap items-center gap-3">
-        {/* Breadcrumb */}
-        <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto text-sm">
-          <button
-            onClick={irARaiz}
-            className={`shrink-0 rounded-lg px-2 py-1 font-bold transition-colors ${ruta.length === 0 ? 'bg-sky-100 text-sky-700' : 'text-ink/50 hover:bg-ink/5'}`}
-          >
-            🏠 Inicio
-          </button>
-          {ruta.map((r, i) => (
-            <span key={r.id} className="flex items-center gap-1">
-              <span className="text-ink/30">/</span>
-              <button
-                onClick={() => irA(i)}
-                className={`shrink-0 rounded-lg px-2 py-1 font-bold transition-colors ${i === ruta.length - 1 ? 'bg-sky-100 text-sky-700' : 'text-ink/50 hover:bg-ink/5'}`}
-              >
-                {r.nombre}
-              </button>
-            </span>
-          ))}
-        </nav>
+        {/* Breadcrumb (no en papelera) */}
+        {!verPapelera && (
+          <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto text-sm">
+            <button
+              onClick={irARaiz}
+              className={`shrink-0 rounded-lg px-2 py-1 font-bold transition-colors ${ruta.length === 0 ? 'bg-sky-100 text-sky-700' : 'text-ink/50 hover:bg-ink/5'}`}
+            >
+              🏠 Inicio
+            </button>
+            {ruta.map((r, i) => (
+              <span key={r.id} className="flex items-center gap-1">
+                <span className="text-ink/30">/</span>
+                <button
+                  onClick={() => irA(i)}
+                  className={`shrink-0 rounded-lg px-2 py-1 font-bold transition-colors ${i === ruta.length - 1 ? 'bg-sky-100 text-sky-700' : 'text-ink/50 hover:bg-ink/5'}`}
+                >
+                  {r.nombre}
+                </button>
+              </span>
+            ))}
+          </nav>
+        )}
+        {verPapelera && <span className="flex-1 text-sm font-bold text-ink/40">Mostrando elementos eliminados</span>}
 
         {/* Busqueda */}
         <input
@@ -314,47 +400,60 @@ export default function Drive() {
       {/* Contenido */}
       {!hayContenido ? (
         <div className="card text-center">
-          <p className="text-5xl mb-3">📂</p>
+          <p className="text-5xl mb-3">{verPapelera ? '🗑️' : '📂'}</p>
           <p className="text-ink/40 font-bold">
-            {busqueda ? 'No hay resultados para tu búsqueda.' : 'Esta carpeta está vacía.'}
+            {busqueda
+              ? 'No hay resultados para tu búsqueda.'
+              : verPapelera
+                ? 'La papelera está vacía.'
+                : 'Esta carpeta está vacía.'}
           </p>
-          <p className="text-sm text-ink/30 mt-1">Sube archivos o crea una carpeta para empezar.</p>
+          {!verPapelera && <p className="text-sm text-ink/30 mt-1">Sube archivos o crea una carpeta para empezar.</p>}
         </div>
       ) : vista === 'grid' ? (
         <GridView
           carpetas={carpetasAqui}
           archivos={archivosAqui}
-          onEntrar={entrar}
+          onEntrar={verPapelera ? undefined : entrar}
           onPreview={abrirPreview}
-          onEditarCarpeta={openEditarCarpeta}
-          onEliminar={(tipo, item) => setConfirmEliminar({ tipo, item })}
-          onRenombrar={openRenombrar}
-          onMover={openMover}
+          onEditarCarpeta={verPapelera ? undefined : openEditarCarpeta}
+          onEliminar={verPapelera ? undefined : (tipo, item) => setConfirmEliminar({ tipo, item })}
+          onRenombrar={verPapelera ? undefined : openRenombrar}
+          onMover={verPapelera ? undefined : openMover}
+          onRestaurar={verPapelera ? restaurar : undefined}
+          onEliminarDefinitivo={verPapelera ? (tipo, item) => setConfirmDefinitivo({ tipo, item }) : undefined}
           profile={profile}
+          papelera={verPapelera}
         />
       ) : vista === 'lista' ? (
         <ListaView
           carpetas={carpetasAqui}
           archivos={archivosAqui}
-          onEntrar={entrar}
+          onEntrar={verPapelera ? undefined : entrar}
           onPreview={abrirPreview}
-          onEditarCarpeta={openEditarCarpeta}
-          onEliminar={(tipo, item) => setConfirmEliminar({ tipo, item })}
-          onRenombrar={openRenombrar}
-          onMover={openMover}
+          onEditarCarpeta={verPapelera ? undefined : openEditarCarpeta}
+          onEliminar={verPapelera ? undefined : (tipo, item) => setConfirmEliminar({ tipo, item })}
+          onRenombrar={verPapelera ? undefined : openRenombrar}
+          onMover={verPapelera ? undefined : openMover}
+          onRestaurar={verPapelera ? restaurar : undefined}
+          onEliminarDefinitivo={verPapelera ? (tipo, item) => setConfirmDefinitivo({ tipo, item }) : undefined}
           profile={profile}
+          papelera={verPapelera}
         />
       ) : (
         <CompactaView
           carpetas={carpetasAqui}
           archivos={archivosAqui}
-          onEntrar={entrar}
+          onEntrar={verPapelera ? undefined : entrar}
           onPreview={abrirPreview}
-          onEditarCarpeta={openEditarCarpeta}
-          onEliminar={(tipo, item) => setConfirmEliminar({ tipo, item })}
-          onRenombrar={openRenombrar}
-          onMover={openMover}
+          onEditarCarpeta={verPapelera ? undefined : openEditarCarpeta}
+          onEliminar={verPapelera ? undefined : (tipo, item) => setConfirmEliminar({ tipo, item })}
+          onRenombrar={verPapelera ? undefined : openRenombrar}
+          onMover={verPapelera ? undefined : openMover}
+          onRestaurar={verPapelera ? restaurar : undefined}
+          onEliminarDefinitivo={verPapelera ? (tipo, item) => setConfirmDefinitivo({ tipo, item }) : undefined}
           profile={profile}
+          papelera={verPapelera}
         />
       )}
 
@@ -399,13 +498,33 @@ export default function Drive() {
         onClose={() => setConfirmEliminar(null)}
         onConfirm={confirmarEliminar}
         busy={confirmBusy}
-        title={confirmEliminar?.tipo === 'carpeta' ? '¿Eliminar carpeta?' : '¿Eliminar archivo?'}
-        confirmLabel="Sí, eliminar"
+        title={confirmEliminar?.tipo === 'carpeta' ? '¿Enviar carpeta a la papelera?' : '¿Enviar archivo a la papelera?'}
+        confirmLabel="Sí, mover a papelera"
         message={
           confirmEliminar?.tipo === 'carpeta'
-            ? `Se eliminará "${confirmEliminar.item.nombre}" y TODO su contenido (subcarpetas y archivos). Esta acción no se puede deshacer.`
-            : `Se eliminará "${confirmEliminar?.item.nombre}". Esta acción no se puede deshacer.`
+            ? `"${confirmEliminar.item.nombre}" y su contenido irán a la papelera. Podrás restaurarlo después.`
+            : `"${confirmEliminar?.item.nombre}" irá a la papelera. Podrás restaurarlo después.`
         }
+      />
+
+      <ConfirmModal
+        open={!!confirmDefinitivo}
+        onClose={() => setConfirmDefinitivo(null)}
+        onConfirm={eliminarDefinitivamente}
+        busy={confirmDefBusy}
+        title="¿Eliminar definitivamente?"
+        confirmLabel="Sí, eliminar para siempre"
+        message={`"${confirmDefinitivo?.item.nombre}" se borrará para siempre del servidor. Esta acción NO se puede deshacer.`}
+      />
+
+      <ConfirmModal
+        open={confirmVaciar}
+        onClose={() => setConfirmVaciar(false)}
+        onConfirm={vaciarPapelera}
+        busy={vaciarBusy}
+        title="¿Vaciar toda la papelera?"
+        confirmLabel="Sí, eliminar todo"
+        message={`Se eliminarán definitivamente ${enPapelera} elemento(s) del servidor. Esta acción NO se puede deshacer.`}
       />
 
       {/* Mover modal */}
@@ -447,7 +566,7 @@ export default function Drive() {
 }
 
 // ─── Vista Grid ────────────────────────────────────────────────
-function GridView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, onEliminar, onRenombrar, onMover, profile }) {
+function GridView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, onEliminar, onRenombrar, onMover, onRestaurar, onEliminarDefinitivo, profile, papelera }) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {carpetas.map((c) => (
@@ -458,7 +577,10 @@ function GridView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, on
           onEditar={onEditarCarpeta}
           onEliminar={onEliminar}
           onMover={onMover}
+          onRestaurar={onRestaurar}
+          onEliminarDefinitivo={onEliminarDefinitivo}
           profile={profile}
+          papelera={papelera}
         />
       ))}
       {archivos.map((a) => (
@@ -469,48 +591,62 @@ function GridView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, on
           onEliminar={onEliminar}
           onRenombrar={onRenombrar}
           onMover={onMover}
+          onRestaurar={onRestaurar}
+          onEliminarDefinitivo={onEliminarDefinitivo}
           profile={profile}
+          papelera={papelera}
         />
       ))}
     </div>
   )
 }
 
-function CarpetaCard({ carpeta, onEntrar, onEditar, onEliminar, onMover, profile }) {
+function CarpetaCard({ carpeta, onEntrar, onEditar, onEliminar, onMover, onRestaurar, onEliminarDefinitivo, profile, papelera }) {
   const [menu, setMenu] = useState(false)
   return (
-    <div className="card-link relative flex flex-col items-center gap-2 !p-4 text-center" onClick={() => onEntrar(carpeta)}>
+    <div className={`card-link relative flex flex-col items-center gap-2 !p-4 text-center ${papelera ? 'opacity-60' : ''}`} onClick={() => onEntrar?.(carpeta)}>
       <span className="text-5xl">📁</span>
       <p className="w-full truncate text-sm font-bold">{carpeta.nombre}</p>
-      <p className="text-[10px] text-ink/30">{carpeta.creador?.nombre_completo}</p>
-      <button
-        onClick={(e) => { e.stopPropagation(); setMenu(!menu) }}
-        className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-ink/30 hover:bg-ink/5 hover:text-ink/60"
-        aria-label="Opciones"
-      >
-        ⋮
-      </button>
-      {menu && (
-        <div className="absolute right-2 top-9 z-10 flex flex-col rounded-xl bg-white py-1 shadow-soft border border-ink/10" onClick={(e) => e.stopPropagation()}>
-          <button onClick={() => { setMenu(false); onEditar(carpeta) }} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">✏️ Renombrar</button>
-          <button onClick={() => { setMenu(false); onMover(carpeta, 'carpeta') }} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">📦 Mover</button>
+      <p className="text-[10px] text-ink/30">{papelera ? `Eliminado ${formatFecha(carpeta.eliminado_at)}` : carpeta.creador?.nombre_completo}</p>
+      {papelera ? (
+        <div className="flex gap-1 mt-1" onClick={(e) => e.stopPropagation()}>
+          <button onClick={() => onRestaurar?.('carpeta', carpeta)} className="rounded-lg bg-grass-50 px-2.5 py-1 text-xs font-bold text-grass-700 hover:bg-grass-100">♻️ Restaurar</button>
           {['admin', 'coordinador'].includes(profile.role) && (
-            <button onClick={() => { setMenu(false); onEliminar('carpeta', carpeta) }} className="px-4 py-2 text-left text-sm font-bold text-coral-600 hover:bg-coral-50">🗑️ Eliminar</button>
+            <button onClick={() => onEliminarDefinitivo?.('carpeta', carpeta)} className="rounded-lg bg-coral-50 px-2.5 py-1 text-xs font-bold text-coral-700 hover:bg-coral-100">🗑️ Borrar</button>
           )}
         </div>
+      ) : (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); setMenu(!menu) }}
+            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-ink/30 hover:bg-ink/5 hover:text-ink/60"
+            aria-label="Opciones"
+          >
+            ⋮
+          </button>
+          {menu && (
+            <div className="absolute right-2 top-9 z-10 flex flex-col rounded-xl bg-white py-1 shadow-soft border border-ink/10" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => { setMenu(false); onEditar(carpeta) }} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">✏️ Renombrar</button>
+              <button onClick={() => { setMenu(false); onMover(carpeta, 'carpeta') }} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">📦 Mover</button>
+              {['admin', 'coordinador'].includes(profile.role) && (
+                <button onClick={() => { setMenu(false); onEliminar('carpeta', carpeta) }} className="px-4 py-2 text-left text-sm font-bold text-coral-600 hover:bg-coral-50">🗑️ Eliminar</button>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   )
 }
 
-function ArchivoCard({ archivo, onPreview, onEliminar, onRenombrar, onMover, profile }) {
+function ArchivoCard({ archivo, onPreview, onEliminar, onRenombrar, onMover, onRestaurar, onEliminarDefinitivo, profile, papelera }) {
   const [menu, setMenu] = useState(false)
   const tipo = getFileType(archivo.nombre, archivo.tipo)
   const esImagen = tipo === 'imagen'
   const url = fileUrl(archivo.storage_path)
 
   return (
-    <div className="card-link relative flex flex-col items-center gap-2 !p-3 text-center" onClick={() => onPreview(archivo)}>
+    <div className={`card-link relative flex flex-col items-center gap-2 !p-3 text-center ${papelera ? 'opacity-60' : ''}`} onClick={() => onPreview(archivo)}>
       {esImagen ? (
         <div className="aspect-square w-full overflow-hidden rounded-xl bg-ink/5">
           <img src={url} alt={archivo.nombre} className="h-full w-full object-cover" loading="lazy" />
@@ -519,37 +655,48 @@ function ArchivoCard({ archivo, onPreview, onEliminar, onRenombrar, onMover, pro
         <span className="text-5xl py-3">{getFileIcon(archivo.nombre, archivo.tipo)}</span>
       )}
       <p className="w-full truncate text-xs font-bold">{archivo.nombre}</p>
-      <p className="text-[10px] text-ink/30">{formatBytes(archivo.tamano)}</p>
-      <button
-        onClick={(e) => { e.stopPropagation(); setMenu(!menu) }}
-        className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/80 text-ink/30 hover:bg-ink/5 hover:text-ink/60"
-        aria-label="Opciones"
-      >
-        ⋮
-      </button>
-      {menu && (
-        <div className="absolute right-2 top-9 z-10 flex flex-col rounded-xl bg-white py-1 shadow-soft border border-ink/10" onClick={(e) => e.stopPropagation()}>
-          <button onClick={() => { setMenu(false); onRenombrar(archivo) }} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">✏️ Renombrar</button>
-          <button onClick={() => { setMenu(false); onMover(archivo, 'archivo') }} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">📦 Mover</button>
-          <a href={url} target="_blank" rel="noreferrer" onClick={() => setMenu(false)} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">⬇️ Descargar</a>
+      <p className="text-[10px] text-ink/30">{papelera ? `Eliminado ${formatFecha(archivo.eliminado_at)}` : formatBytes(archivo.tamano)}</p>
+      {papelera ? (
+        <div className="flex gap-1 mt-1" onClick={(e) => e.stopPropagation()}>
+          <button onClick={() => onRestaurar?.('archivo', archivo)} className="rounded-lg bg-grass-50 px-2.5 py-1 text-xs font-bold text-grass-700 hover:bg-grass-100">♻️ Restaurar</button>
           {['admin', 'coordinador'].includes(profile.role) && (
-            <button onClick={() => { setMenu(false); onEliminar('archivo', archivo) }} className="px-4 py-2 text-left text-sm font-bold text-coral-600 hover:bg-coral-50">🗑️ Eliminar</button>
+            <button onClick={() => onEliminarDefinitivo?.('archivo', archivo)} className="rounded-lg bg-coral-50 px-2.5 py-1 text-xs font-bold text-coral-700 hover:bg-coral-100">🗑️ Borrar</button>
           )}
         </div>
+      ) : (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); setMenu(!menu) }}
+            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/80 text-ink/30 hover:bg-ink/5 hover:text-ink/60"
+            aria-label="Opciones"
+          >
+            ⋮
+          </button>
+          {menu && (
+            <div className="absolute right-2 top-9 z-10 flex flex-col rounded-xl bg-white py-1 shadow-soft border border-ink/10" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => { setMenu(false); onRenombrar(archivo) }} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">✏️ Renombrar</button>
+              <button onClick={() => { setMenu(false); onMover(archivo, 'archivo') }} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">📦 Mover</button>
+              <a href={url} target="_blank" rel="noreferrer" onClick={() => setMenu(false)} className="px-4 py-2 text-left text-sm font-bold hover:bg-ink/5">⬇️ Descargar</a>
+              {['admin', 'coordinador'].includes(profile.role) && (
+                <button onClick={() => { setMenu(false); onEliminar('archivo', archivo) }} className="px-4 py-2 text-left text-sm font-bold text-coral-600 hover:bg-coral-50">🗑️ Eliminar</button>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   )
 }
 
 // ─── Vista Lista (detallada) ───────────────────────────────────
-function ListaView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, onEliminar, onRenombrar, onMover, profile }) {
+function ListaView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, onEliminar, onRenombrar, onMover, onRestaurar, onEliminarDefinitivo, profile, papelera }) {
   return (
     <div className="card overflow-x-auto !p-0">
       <table className="w-full text-left">
         <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/40">
           <tr>
             <th className="px-3 py-2.5 sm:px-4">Nombre</th>
-            <th className="px-3 py-2.5 sm:px-4 hidden sm:table-cell">Tipo</th>
+            <th className="px-3 py-2.5 sm:px-4 hidden sm:table-cell">{papelera ? 'Eliminado' : 'Tipo'}</th>
             <th className="px-3 py-2.5 sm:px-4 hidden sm:table-cell">Tamaño</th>
             <th className="px-3 py-2.5 sm:px-4 hidden md:table-cell">Subido por</th>
             <th className="px-3 py-2.5 sm:px-4 hidden md:table-cell">Fecha</th>
@@ -558,93 +705,139 @@ function ListaView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, o
         </thead>
         <tbody>
           {carpetas.map((c) => (
-            <tr key={`c-${c.id}`} className="border-t border-ink/5 cursor-pointer hover:bg-sky-50/50" onClick={() => onEntrar(c)}>
+            <tr key={`c-${c.id}`} className={`border-t border-ink/5 hover:bg-sky-50/50 ${papelera ? 'opacity-60' : 'cursor-pointer'}`} onClick={() => onEntrar?.(c)}>
               <td className="px-3 py-2.5 sm:px-4">
                 <span className="flex items-center gap-2">
                   <span className="text-2xl">📁</span>
                   <span className="font-bold">{c.nombre}</span>
                 </span>
               </td>
-              <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden sm:table-cell">Carpeta</td>
+              <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden sm:table-cell">{papelera ? formatFecha(c.eliminado_at) : 'Carpeta'}</td>
               <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden sm:table-cell">—</td>
               <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden md:table-cell">{c.creador?.nombre_completo || '—'}</td>
               <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden md:table-cell">{formatFecha(c.created_at)}</td>
               <td className="px-3 py-2.5 sm:px-4" onClick={(e) => e.stopPropagation()}>
-                <AccionesDropdown
-                  items={[
-                    { label: '✏️ Renombrar', action: () => onEditarCarpeta(c) },
-                    { label: '📦 Mover', action: () => onMover(c, 'carpeta') },
-                    ...(['admin', 'coordinador'].includes(profile.role) ? [{ label: '🗑️ Eliminar', action: () => onEliminar('carpeta', c), danger: true }] : []),
-                  ]}
-                />
+                {papelera ? (
+                  <div className="flex gap-1">
+                    <button onClick={() => onRestaurar?.('carpeta', c)} className="rounded-lg bg-grass-50 px-2 py-1 text-xs font-bold text-grass-700 hover:bg-grass-100">♻️</button>
+                    {['admin', 'coordinador'].includes(profile.role) && (
+                      <button onClick={() => onEliminarDefinitivo?.('carpeta', c)} className="rounded-lg bg-coral-50 px-2 py-1 text-xs font-bold text-coral-700 hover:bg-coral-100">🗑️</button>
+                    )}
+                  </div>
+                ) : (
+                  <AccionesDropdown
+                    items={[
+                      { label: '✏️ Renombrar', action: () => onEditarCarpeta(c) },
+                      { label: '📦 Mover', action: () => onMover(c, 'carpeta') },
+                      ...(['admin', 'coordinador'].includes(profile.role) ? [{ label: '🗑️ Eliminar', action: () => onEliminar('carpeta', c), danger: true }] : []),
+                    ]}
+                  />
+                )}
               </td>
             </tr>
           ))}
           {archivos.map((a) => (
-            <tr key={`a-${a.id}`} className="border-t border-ink/5 cursor-pointer hover:bg-sky-50/50" onClick={() => onPreview(a)}>
+            <tr key={`a-${a.id}`} className={`border-t border-ink/5 hover:bg-sky-50/50 ${papelera ? 'opacity-60' : 'cursor-pointer'}`} onClick={() => onPreview(a)}>
               <td className="px-3 py-2.5 sm:px-4">
                 <span className="flex items-center gap-2">
                   <span className="text-2xl">{getFileIcon(a.nombre, a.tipo)}</span>
                   <span className="font-bold truncate max-w-[200px] sm:max-w-none">{a.nombre}</span>
                 </span>
               </td>
-              <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden sm:table-cell">{a.tipo?.split('/')[1] || '—'}</td>
+              <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden sm:table-cell">{papelera ? formatFecha(a.eliminado_at) : (a.tipo?.split('/')[1] || '—')}</td>
               <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden sm:table-cell">{formatBytes(a.tamano)}</td>
               <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden md:table-cell">{a.subidor?.nombre_completo || '—'}</td>
               <td className="px-3 py-2.5 sm:px-4 text-sm text-ink/40 hidden md:table-cell">{formatFecha(a.created_at)}</td>
               <td className="px-3 py-2.5 sm:px-4" onClick={(e) => e.stopPropagation()}>
-                <AccionesDropdown
-                  items={[
-                    { label: '👁️ Ver', action: () => onPreview(a) },
-                    { label: '✏️ Renombrar', action: () => onRenombrar(a) },
-                    { label: '📦 Mover', action: () => onMover(a, 'archivo') },
-                    ...(['admin', 'coordinador'].includes(profile.role) ? [{ label: '🗑️ Eliminar', action: () => onEliminar('archivo', a), danger: true }] : []),
-                  ]}
-                />
+                {papelera ? (
+                  <div className="flex gap-1">
+                    <button onClick={() => onRestaurar?.('archivo', a)} className="rounded-lg bg-grass-50 px-2 py-1 text-xs font-bold text-grass-700 hover:bg-grass-100">♻️</button>
+                    {['admin', 'coordinador'].includes(profile.role) && (
+                      <button onClick={() => onEliminarDefinitivo?.('archivo', a)} className="rounded-lg bg-coral-50 px-2 py-1 text-xs font-bold text-coral-700 hover:bg-coral-100">🗑️</button>
+                    )}
+                  </div>
+                ) : (
+                  <AccionesDropdown
+                    items={[
+                      { label: '👁️ Ver', action: () => onPreview(a) },
+                      { label: '✏️ Renombrar', action: () => onRenombrar(a) },
+                      { label: '📦 Mover', action: () => onMover(a, 'archivo') },
+                      ...(['admin', 'coordinador'].includes(profile.role) ? [{ label: '🗑️ Eliminar', action: () => onEliminar('archivo', a), danger: true }] : []),
+                    ]}
+                  />
+                )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       {carpetas.length === 0 && archivos.length === 0 && (
-        <p className="px-4 py-8 text-center text-ink/40">Carpeta vacía</p>
+        <p className="px-4 py-8 text-center text-ink/40">{papelera ? 'La papelera está vacía' : 'Carpeta vacía'}</p>
       )}
     </div>
   )
 }
 
 // ─── Vista Compacta ────────────────────────────────────────────
-function CompactaView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, onEliminar, onRenombrar, onMover, profile }) {
+function CompactaView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, onEliminar, onRenombrar, onMover, onRestaurar, onEliminarDefinitivo, profile, papelera }) {
   return (
     <div className="card !p-2 flex flex-col divide-y divide-ink/5">
       {carpetas.map((c) => (
-        <button key={`c-${c.id}`} onClick={() => onEntrar(c)} className="flex items-center gap-2 px-3 py-2 text-left hover:bg-sky-50/50 rounded-lg group">
+        <div key={`c-${c.id}`} onClick={() => onEntrar?.(c)} className={`flex items-center gap-2 px-3 py-2 text-left hover:bg-sky-50/50 rounded-lg group ${papelera ? 'opacity-60' : 'cursor-pointer'}`}>
           <span className="text-lg">📁</span>
           <span className="flex-1 truncate text-sm font-bold">{c.nombre}</span>
-          <span className="text-xs text-ink/30 hidden sm:inline">{formatFecha(c.created_at)}</span>
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => onEditarCarpeta(c)} className="text-xs text-sky-500 hover:underline">✏️</button>
-            <button onClick={() => onMover(c, 'carpeta')} className="text-xs text-sky-500 hover:underline">📦</button>
-            {['admin', 'coordinador'].includes(profile.role) && (
-              <button onClick={() => onEliminar('carpeta', c)} className="text-xs text-coral-500 hover:underline">🗑️</button>
-            )}
-          </span>
-        </button>
+          {papelera ? (
+            <span className="text-xs text-ink/30 hidden sm:inline">{formatFecha(c.eliminado_at)}</span>
+          ) : (
+            <span className="text-xs text-ink/30 hidden sm:inline">{formatFecha(c.created_at)}</span>
+          )}
+          {papelera ? (
+            <span className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => onRestaurar?.('carpeta', c)} className="rounded-lg bg-grass-50 px-2 py-1 text-xs font-bold text-grass-700 hover:bg-grass-100">♻️</button>
+              {['admin', 'coordinador'].includes(profile.role) && (
+                <button onClick={() => onEliminarDefinitivo?.('carpeta', c)} className="rounded-lg bg-coral-50 px-2 py-1 text-xs font-bold text-coral-700 hover:bg-coral-100">🗑️</button>
+              )}
+            </span>
+          ) : (
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => onEditarCarpeta(c)} className="text-xs text-sky-500 hover:underline">✏️</button>
+              <button onClick={() => onMover(c, 'carpeta')} className="text-xs text-sky-500 hover:underline">📦</button>
+              {['admin', 'coordinador'].includes(profile.role) && (
+                <button onClick={() => onEliminar('carpeta', c)} className="text-xs text-coral-500 hover:underline">🗑️</button>
+              )}
+            </span>
+          )}
+        </div>
       ))}
       {archivos.map((a) => (
-        <button key={`a-${a.id}`} onClick={() => onPreview(a)} className="flex items-center gap-2 px-3 py-2 text-left hover:bg-sky-50/50 rounded-lg group">
+        <div key={`a-${a.id}`} onClick={() => onPreview(a)} className={`flex items-center gap-2 px-3 py-2 text-left hover:bg-sky-50/50 rounded-lg group ${papelera ? 'opacity-60' : 'cursor-pointer'}`}>
           <span className="text-lg">{getFileIcon(a.nombre, a.tipo)}</span>
           <span className="flex-1 truncate text-sm font-bold">{a.nombre}</span>
-          <span className="text-xs text-ink/30 hidden sm:inline">{formatBytes(a.tamano)}</span>
-          <span className="text-xs text-ink/30 hidden md:inline ml-2">{formatFecha(a.created_at)}</span>
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => onRenombrar(a)} className="text-xs text-sky-500 hover:underline">✏️</button>
-            <button onClick={() => onMover(a, 'archivo')} className="text-xs text-sky-500 hover:underline">📦</button>
-            {['admin', 'coordinador'].includes(profile.role) && (
-              <button onClick={() => onEliminar('archivo', a)} className="text-xs text-coral-500 hover:underline">🗑️</button>
-            )}
-          </span>
-        </button>
+          {papelera ? (
+            <span className="text-xs text-ink/30 hidden sm:inline">{formatFecha(a.eliminado_at)}</span>
+          ) : (
+            <>
+              <span className="text-xs text-ink/30 hidden sm:inline">{formatBytes(a.tamano)}</span>
+              <span className="text-xs text-ink/30 hidden md:inline ml-2">{formatFecha(a.created_at)}</span>
+            </>
+          )}
+          {papelera ? (
+            <span className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => onRestaurar?.('archivo', a)} className="rounded-lg bg-grass-50 px-2 py-1 text-xs font-bold text-grass-700 hover:bg-grass-100">♻️</button>
+              {['admin', 'coordinador'].includes(profile.role) && (
+                <button onClick={() => onEliminarDefinitivo?.('archivo', a)} className="rounded-lg bg-coral-50 px-2 py-1 text-xs font-bold text-coral-700 hover:bg-coral-100">🗑️</button>
+              )}
+            </span>
+          ) : (
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => onRenombrar(a)} className="text-xs text-sky-500 hover:underline">✏️</button>
+              <button onClick={() => onMover(a, 'archivo')} className="text-xs text-sky-500 hover:underline">📦</button>
+              {['admin', 'coordinador'].includes(profile.role) && (
+                <button onClick={() => onEliminar('archivo', a)} className="text-xs text-coral-500 hover:underline">🗑️</button>
+              )}
+            </span>
+          )}
+        </div>
       ))}
     </div>
   )

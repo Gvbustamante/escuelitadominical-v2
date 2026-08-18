@@ -139,6 +139,7 @@ create table public.devocionales_ninos (
   imagen_url text,
   fecha date not null default current_date,
   activo boolean not null default false,
+  enlace_externo text,
   creado_por uuid references public.profiles(id),
   created_at timestamptz not null default now()
 );
@@ -222,7 +223,7 @@ create policy "crear propio perfil" on public.profiles for insert to authenticat
     auth.uid() = id
     and (
       not exists (select 1 from public.profiles)
-      or role = (auth.jwt() -> 'app_metadata' ->> 'role')
+      or role = coalesce(auth.jwt() -> 'app_metadata' ->> 'role', 'padre')
     )
   );
 create policy "actualizar perfiles" on public.profiles for update to authenticated
@@ -485,7 +486,7 @@ begin
     new_user_id, 'authenticated', 'authenticated', v_email,
     crypt(v_password, gen_salt('bf')),
     now(),
-    jsonb_build_object('provider','email','providers', array['email']),
+    jsonb_build_object('provider','email','providers', array['email'], 'role', p_role),
     '{}'::jsonb,
     now(), now(), '', '', '', ''
   );
@@ -1268,9 +1269,11 @@ create table public.carpetas_drive (
   nombre text not null,
   padre_id uuid references public.carpetas_drive(id) on delete cascade,
   creado_por uuid not null references public.profiles(id),
+  eliminado_at timestamptz,
   created_at timestamptz not null default now()
 );
 comment on table public.carpetas_drive is 'Carpetas del Drive compartido del equipo. padre_id = null → carpeta raíz. Soporta anidamiento.';
+comment on column public.carpetas_drive.eliminado_at is 'Soft-delete: si tiene valor, la carpeta está en la papelera.';
 
 create table public.archivos_drive (
   id uuid primary key default gen_random_uuid(),
@@ -1280,10 +1283,12 @@ create table public.archivos_drive (
   tipo text,
   tamano bigint,
   subido_por uuid not null references public.profiles(id),
+  eliminado_at timestamptz,
   created_at timestamptz not null default now()
 );
 comment on table public.archivos_drive is 'Archivos subidos al Drive compartido. carpeta_id = null → raíz. tipo = MIME type.';
 comment on column public.archivos_drive.tamano is 'Tamaño del archivo en bytes.';
+comment on column public.archivos_drive.eliminado_at is 'Soft-delete: si tiene valor, el archivo está en la papelera.';
 
 alter table public.carpetas_drive enable row level security;
 alter table public.archivos_drive enable row level security;

@@ -13,6 +13,7 @@ create table if not exists public.carpetas_drive (
   nombre text not null,
   padre_id uuid references public.carpetas_drive(id) on delete cascade,
   creado_por uuid not null references public.profiles(id),
+  eliminado_at timestamptz,
   created_at timestamptz not null default now()
 );
 comment on table public.carpetas_drive is 'Carpetas del Drive compartido del equipo. padre_id = null → carpeta raíz. Soporta anidamiento.';
@@ -26,6 +27,7 @@ create table if not exists public.archivos_drive (
   tipo text,
   tamano bigint,
   subido_por uuid not null references public.profiles(id),
+  eliminado_at timestamptz,
   created_at timestamptz not null default now()
 );
 comment on table public.archivos_drive is 'Archivos subidos al Drive compartido. carpeta_id = null → raíz. tipo = MIME type.';

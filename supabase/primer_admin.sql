@@ -22,7 +22,7 @@ begin
     new_user_id, 'authenticated', 'authenticated', v_email,
     crypt(v_password, gen_salt('bf')),
     now(),
-    jsonb_build_object('provider','email','providers', array['email']),
+    jsonb_build_object('provider','email','providers', array['email'], 'role', 'admin'),
     '{}'::jsonb,
     now(), now(), '', '', '', ''
   );

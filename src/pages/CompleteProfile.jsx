@@ -35,9 +35,10 @@ export default function CompleteProfile() {
     }
 
     if (needsProfile) {
+      const role = user.app_metadata?.role || 'padre'
       const { error: profileError } = await supabase.from('profiles').insert({
         id: user.id,
-        role: 'padre',
+        role,
         nombre_completo: nombre,
       })
       if (profileError) {
