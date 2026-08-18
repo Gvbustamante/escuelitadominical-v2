@@ -83,9 +83,10 @@ export default function DevocionalDetalle() {
           <img
             src={devocional.imagen_url}
             alt={devocional.titulo}
-            className="w-full max-h-[380px] object-cover"
+            className="w-full max-h-[380px] object-cover cursor-pointer"
+            onClick={() => setPreview({ url: devocional.imagen_url, nombre: devocional.titulo, mime: 'image/*' })}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               {devocional.activo && <span className="badge bg-sunshine-200/90 text-sunshine-800">🟢 Activo</span>}

@@ -39,10 +39,44 @@ export function getFileIcon(nombre, mime) {
   return iconoGrande(tipoArchivo(nombre, mime))
 }
 
+function imprimir(url, tipo) {
+  const iframe = document.createElement('iframe')
+  iframe.style.position = 'fixed'
+  iframe.style.right = '0'
+  iframe.style.bottom = '0'
+  iframe.style.width = '0'
+  iframe.style.height = '0'
+  iframe.style.border = '0'
+  document.body.appendChild(iframe)
+
+  function limpiar() {
+    setTimeout(() => document.body.removeChild(iframe), 1000)
+  }
+
+  function disparar() {
+    iframe.contentWindow.focus()
+    iframe.contentWindow.print()
+    limpiar()
+  }
+
+  if (tipo === 'pdf') {
+    iframe.onload = disparar
+    iframe.src = url
+  } else {
+    iframe.onload = () => {
+      const img = iframe.contentDocument.querySelector('img')
+      if (img.complete) disparar()
+      else img.onload = disparar
+    }
+    iframe.srcdoc = `<html><body style="margin:0"><img src="${url}" style="width:100%" /></body></html>`
+  }
+}
+
 export default function FilePreview({ url, nombre, mime, open, onClose }) {
   if (!open || !url) return null
 
   const tipo = tipoArchivo(nombre, mime)
+  const puedeImprimir = tipo === 'imagen' || tipo === 'pdf'
 
   return (
     <div
@@ -60,6 +94,15 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
             {nombre || 'Archivo'}
           </p>
           <div className="flex shrink-0 items-center gap-2">
+            {puedeImprimir && (
+              <button
+                type="button"
+                onClick={() => imprimir(url, tipo)}
+                className="rounded-xl bg-sky-50 px-3 py-1.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
+              >
+                🖨️ Imprimir
+              </button>
+            )}
             <a
               href={url}
               target="_blank"
