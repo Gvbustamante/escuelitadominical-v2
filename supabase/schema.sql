@@ -81,12 +81,14 @@ create table public.actividades (
   visible_padres boolean not null default true,
   es_tarea boolean not null default false,
   enlace_externo text,
+  imagen_url text,
   audiencia text not null default 'ninos' check (audiencia in ('ninos','docentes')),
   created_at timestamptz not null default now()
 );
 comment on column public.actividades.visible_padres is 'false = solo la ve staff (admin/coordinador/docente); los padres/niños no la ven aunque sea de su clase y ya haya pasado.';
 comment on column public.actividades.es_tarea is 'true = además de informativa, pide una entrega de cada niño del nivel (ver tarea_entregas). Si audiencia=docentes, cada docente marca su propia entrega en vez de cada niño.';
 comment on column public.actividades.enlace_externo is 'Link opcional si la tarea/actividad ocurre fuera de la plataforma (video, formulario, etc.).';
+comment on column public.actividades.imagen_url is 'Imagen principal (portada) de la actividad.';
 comment on column public.actividades.audiencia is '''ninos'' = actividad normal de una clase (nivel_id obligatorio en la práctica). ''docentes'' = comunicado/tarea para el equipo docente, sin nivel_id, la crea admin/coordinador y la ve cualquier docente.';
 
 create table public.actividad_archivos (
