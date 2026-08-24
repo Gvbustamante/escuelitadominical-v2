@@ -32,24 +32,78 @@ Todo lo que necesitas para poner en marcha la plataforma desde cero.
 
 ### Configurar Storage (archivos)
 
-1. En el menú izquierdo de Supabase, ve a **Storage**.
-2. Crea estos buckets (clic en **New bucket** para cada uno):
+La app necesita 3 "carpetas" (buckets) en Supabase Storage para guardar archivos. Esto NO lo hace el `schema.sql` — se configura manualmente en el panel de Supabase. Solo tienes que hacerlo una vez.
 
-| Bucket | Público | Para qué |
+#### Paso A: Crear los 3 buckets
+
+1. En el menú izquierdo de Supabase, clic en **Storage**.
+2. Clic en el botón **New bucket**.
+3. Crea el primero:
+   - **Name**: `actividades`
+   - **Public bucket**: ✅ actívalo (el toggle debe quedar encendido)
+   - Clic en **Create bucket**
+4. Repite para los otros dos:
+
+| Nombre del bucket | Público | Qué se guarda ahí |
 |---|---|---|
-| `actividades` | ✅ Sí | Archivos de actividades y tareas |
-| `devocionales` | ✅ Sí | Imágenes y archivos de devocionales |
-| `avatars` | ✅ Sí | Fotos de perfil |
-| `drive` | ✅ Sí | Archivos del drive compartido |
-| `bitacora` | ✅ Sí | Fotos de bitácora de clase |
-| `evidencias` | ✅ Sí | Evidencias y entregas de tareas |
-| `materiales` | ✅ Sí | Fotos de inventario de materiales |
+| `actividades` | ✅ Sí | Fotos de actividades, devocionales, bitácora, materiales, entregas de tareas |
+| `drive` | ✅ Sí | Archivos del drive compartido de la iglesia |
+| `logos` | ✅ Sí | Logo de la iglesia (el que aparece en el menú y login) |
 
-3. Para cada bucket, ve a **Policies** y agrega estas dos políticas:
-   - **SELECT** (lectura): Allow para `public` (todos).
-   - **INSERT / UPDATE / DELETE** (escritura): Allow para `authenticated` (usuarios logueados).
+> ⚠️ Los nombres deben ser **exactamente** esos, en minúsculas, sin espacios.
 
-> La forma rápida: en cada bucket → Policies → New Policy → "For full customization" → Policy name: `Lectura publica`, Allowed operation: SELECT, Target roles: (vacío = todos), USING: `true`. Repite con otra política: `Escritura autenticados`, Allowed operations: INSERT/UPDATE/DELETE, Target roles: `authenticated`, USING: `true`.
+Cuando termines debes ver los 3 buckets en la lista de Storage.
+
+#### Paso B: Crear las políticas de acceso (para cada bucket)
+
+Sin políticas, nadie puede subir ni ver archivos. Necesitas **2 políticas por bucket** (6 en total). Repite estos pasos para cada uno de los 3 buckets:
+
+**Política 1 — Lectura pública (cualquiera puede ver los archivos):**
+
+1. Clic en el bucket (ej: `actividades`).
+2. Clic en la pestaña **Policies** (arriba).
+3. Clic en **New policy**.
+4. Elige **For full customization** (o "Get started quickly" → "Allow access to all users").
+5. Llena así:
+   - **Policy name**: `Lectura publica`
+   - **Allowed operation**: `SELECT`
+   - **Target roles**: déjalo vacío (aplica a todos)
+   - **USING expression**: `true`
+6. Clic en **Review** → **Save policy**.
+
+**Política 2 — Escritura para usuarios logueados:**
+
+1. En el mismo bucket, clic en **New policy** otra vez.
+2. Elige **For full customization**.
+3. Llena así:
+   - **Policy name**: `Escritura autenticados`
+   - **Allowed operation**: selecciona **INSERT**, **UPDATE** y **DELETE** (los 3)
+   - **Target roles**: escribe `authenticated`
+   - **USING expression**: `true`
+   - **WITH CHECK expression**: `true`
+4. Clic en **Review** → **Save policy**.
+
+5. **Repite las 2 políticas** para el bucket `drive` y para el bucket `logos`.
+
+#### Verificar que quedó bien
+
+Cuando termines, cada bucket debe tener 2 políticas:
+
+```
+actividades
+  ├── Lectura publica    (SELECT, todos)
+  └── Escritura autenticados (INSERT/UPDATE/DELETE, authenticated)
+
+drive
+  ├── Lectura publica    (SELECT, todos)
+  └── Escritura autenticados (INSERT/UPDATE/DELETE, authenticated)
+
+logos
+  ├── Lectura publica    (SELECT, todos)
+  └── Escritura autenticados (INSERT/UPDATE/DELETE, authenticated)
+```
+
+> 💡 Si ya tienes un proyecto de Supabase con el schema pero sin buckets, solo necesitas hacer este paso. No tienes que volver a correr el schema.sql.
 
 ### Obtener las llaves
 
