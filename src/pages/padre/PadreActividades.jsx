@@ -75,7 +75,8 @@ export default function PadreActividades() {
     const { data } = await supabase
       .from('actividades')
       .select('*, nivel:niveles(nombre), actividad_archivos(*), actividad_reacciones(*)')
-      .in('nivel_id', nivelIds)
+      .or(`nivel_id.in.(${nivelIds.join(',')}),nivel_id.is.null`)
+      .eq('audiencia', 'ninos')
       .lte('fecha', new Date().toISOString().slice(0, 10))
       .order('fecha', { ascending: false })
     setActividades(data || [])

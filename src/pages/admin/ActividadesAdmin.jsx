@@ -79,12 +79,17 @@ export default function ActividadesAdmin() {
       return
     }
     if (!nivelId) return
-    const { data } = await supabase
+    let q = supabase
       .from('actividades')
-      .select('*, actividad_archivos(*), actividad_reacciones(*)')
-      .eq('nivel_id', nivelId)
+      .select('*, nivel:niveles(nombre), actividad_archivos(*), actividad_reacciones(*)')
       .eq('audiencia', 'ninos')
       .order('fecha', { ascending: false })
+    if (nivelId === '__todos__') {
+      q = q.is('nivel_id', null)
+    } else {
+      q = q.eq('nivel_id', nivelId)
+    }
+    const { data } = await q
     setActividades(data || [])
   }, [nivelId, audiencia])
 
@@ -166,7 +171,7 @@ export default function ActividadesAdmin() {
         .from('actividades')
         .insert({
           ...payload,
-          nivel_id: audiencia === 'docentes' ? null : nivelId,
+          nivel_id: audiencia === 'docentes' ? null : (nivelId === '__todos__' ? null : nivelId),
           audiencia,
           docente_id: user.id,
         })
@@ -267,6 +272,7 @@ export default function ActividadesAdmin() {
         </div>
         {audiencia === 'ninos' && (
           <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
+            <option value="__todos__">🏫 Toda la escuelita</option>
             {niveles.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.nombre}

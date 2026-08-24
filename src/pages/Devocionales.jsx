@@ -76,9 +76,12 @@ export default function Devocionales() {
     if (!verTodos) {
       query = query.gte('fecha', `${mes}-01`).lte('fecha', `${mes}-${String(diasEnMes(mes)).padStart(2, '0')}`)
     }
+    if (!puedeCrear) {
+      query = query.lte('fecha', hoyISO())
+    }
     const { data } = await query
     setDevocionales(data || [])
-  }, [mes, verTodos])
+  }, [mes, verTodos, puedeCrear])
 
   useEffect(() => {
     load()
