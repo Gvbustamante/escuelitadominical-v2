@@ -56,25 +56,6 @@ export default function Landing() {
         }
       `}</style>
 
-      {/* NAV */}
-      <nav className="sticky top-0 z-50 border-b border-white/70 bg-[#fffaf0]/90 px-5 py-3 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <a href="#inicio" className="flex items-center gap-2 font-extrabold text-sky-700">
-            <AppLogo emojiClassName="text-2xl" imgClassName="h-9 w-9 object-contain" />
-            <span className="hidden sm:inline text-xl">Kids<span className="text-coral-500">Min</span></span>
-          </a>
-          <div className="hidden items-center gap-6 text-sm font-bold text-ink/60 md:flex">
-            <a href="#que-es" className="hover:text-sky-600">¿Qué es?</a>
-            <a href="#funciones" className="hover:text-sky-600">Funciones</a>
-            <a href="#como-funciona" className="hover:text-sky-600">Cómo funciona</a>
-            <a href="#iglesias" className="hover:text-sky-600">Para iglesias</a>
-          </div>
-          <Link to="/login" className="rounded-full bg-sky-600 px-5 py-2.5 text-sm font-extrabold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-sky-700">
-            Acceder
-          </Link>
-        </div>
-      </nav>
-
       {/* HERO */}
       <header id="inicio" className="relative overflow-hidden bg-gradient-to-b from-sky-200 via-sky-100 to-[#fffaf0]">
         {/* Decoración de fondo */}
