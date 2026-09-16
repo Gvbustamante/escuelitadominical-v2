@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import AppLogo from '../components/AppLogo'
 import heroImg from '../assets/hero-ninos-cruz.jpg'
 import appScreen from '../assets/kidsmin-screen-clases.png'
+import loginScreen from '../assets/kidsmin-screen-login.png'
 
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xdaqpawn'
 
@@ -76,70 +77,98 @@ export default function Landing() {
 
       {/* HERO */}
       <header id="inicio" className="relative overflow-hidden bg-gradient-to-b from-sky-200 via-sky-100 to-[#fffaf0]">
-        <div className="pointer-events-none absolute right-8 top-8 h-24 w-24 rounded-full bg-sunshine-300 opacity-90 shadow-[0_0_70px_28px_rgba(255,199,44,.45)] sm:right-16 sm:h-32 sm:w-32" />
-        <span className="lp-star pointer-events-none absolute left-[13%] top-20 text-2xl text-white">✦</span>
-        <span className="lp-star pointer-events-none absolute right-[20%] top-28 text-lg text-white" style={{ animationDelay: '.9s' }}>✦</span>
-        <div className="lp-cloud pointer-events-none absolute left-[5%] top-24 flex items-center opacity-80">
+        <div className="pointer-events-none absolute right-8 top-10 h-24 w-24 rounded-full bg-sunshine-300 shadow-[0_0_70px_28px_rgba(255,199,44,.38)] sm:right-16 sm:h-32 sm:w-32" />
+        <span className="lp-star pointer-events-none absolute left-[10%] top-24 text-2xl text-white">✦</span>
+        <span className="lp-star pointer-events-none absolute left-[38%] top-14 text-xl text-white" style={{ animationDelay: '.8s' }}>✦</span>
+        <span className="lp-star pointer-events-none absolute right-[22%] top-32 text-lg text-white" style={{ animationDelay: '1.3s' }}>✦</span>
+
+        <div className="lp-cloud pointer-events-none absolute left-[4%] top-28 flex items-center opacity-80">
           <div className="h-7 w-16 rounded-full bg-white sm:h-9 sm:w-24" />
           <div className="-ml-6 h-10 w-16 rounded-full bg-white sm:-ml-8 sm:h-12 sm:w-20" />
         </div>
-        <div className="lp-bird pointer-events-none absolute right-[28%] top-20">
-          <span className="text-xl text-coral-500">⌁</span>
+        <div className="lp-cloud pointer-events-none absolute right-[8%] top-48 flex items-center opacity-60" style={{ animationDelay: '-8s' }}>
+          <div className="h-6 w-14 rounded-full bg-white sm:h-8 sm:w-20" />
+          <div className="-ml-5 h-8 w-14 rounded-full bg-white sm:-ml-6 sm:h-10 sm:w-16" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-12 lg:pb-20 lg:pt-16">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.02fr_.98fr]">
-            <div className="lp-in max-w-2xl">
-              <span className="inline-flex rounded-full bg-white/80 px-4 py-2 text-xs font-extrabold uppercase tracking-[.14em] text-sky-700 shadow-sm">
+        <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-10 lg:pb-20 lg:pt-14">
+          <div className="grid items-center gap-10 lg:grid-cols-[.92fr_1.08fr]">
+            <div className="lp-in relative z-10 max-w-2xl">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/85 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sky-700 shadow-sm">
+                <span>☀️</span>
                 Plataforma digital para ministerios infantiles
-              </span>
-              <h1 className="mt-5 text-5xl font-black leading-[.98] tracking-tight text-sky-700 sm:text-6xl lg:text-7xl">
-                El ministerio infantil de tu iglesia, <span className="text-coral-500">también en un solo lugar.</span>
+              </div>
+
+              <h1 className="text-5xl font-black leading-[.98] tracking-tight text-[#123b68] sm:text-6xl lg:text-[4.45rem]">
+                El ministerio infantil de tu iglesia,
+                <span className="block">
+                  <span className="text-sky-600">en un </span>
+                  <span className="text-coral-500">solo</span>
+                  <span className="text-sunshine-500"> lugar.</span>
+                </span>
               </h1>
+
               <p className="mt-6 max-w-xl text-lg font-semibold leading-relaxed text-ink/65 sm:text-xl">
                 KidsMin conecta a niños, familias, docentes y líderes para organizar clases, asistencia, actividades y acompañamiento espiritual desde una sola aplicación.
               </p>
+
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href="#iglesias" className="lp-pulse inline-flex items-center justify-center rounded-full bg-coral-500 px-7 py-4 text-base font-extrabold text-white shadow-soft transition hover:scale-[1.02]">
-                  Quiero KidsMin en mi iglesia
+                <a href="#iglesias" className="lp-pulse inline-flex items-center justify-center gap-2 rounded-full bg-coral-500 px-7 py-4 text-base font-extrabold text-white shadow-soft transition hover:scale-[1.02]">
+                  <span>⛪</span>
+                  Quiero KidsMin en mi iglesia →
                 </a>
-                <Link to="/login" className="inline-flex items-center justify-center rounded-full border-2 border-sky-600 bg-white/70 px-7 py-4 text-base font-extrabold text-sky-700 transition hover:bg-white">
+                <Link to="/login" className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white bg-white/90 px-7 py-4 text-base font-extrabold text-sky-700 shadow-sm transition hover:-translate-y-0.5">
+                  <span>↪</span>
                   Ya tengo KidsMin · Acceder
                 </Link>
               </div>
-              <p className="mt-4 text-sm font-bold text-ink/45">Pensada para iglesias y ministerios que quieren acompañar mejor a sus niños.</p>
+
+              <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs font-extrabold text-ink/50">
+                <span>💗 Fortalece tu ministerio</span>
+                <span>👨‍👩‍👧 Conecta a las familias</span>
+                <span>🛡️ Simple y organizado</span>
+              </div>
             </div>
 
-            <div className="lp-in relative mx-auto w-full max-w-xl lg:pl-6" style={{ animationDelay: '.12s' }}>
-              <div className="relative mx-auto max-w-[560px]">
-                <div className="relative rounded-[1.7rem] border-[7px] border-ink/90 bg-ink p-1 shadow-[0_28px_80px_rgba(24,57,76,.24)]">
+            {/* MOCKUP REAL DE LA APP */}
+            <div className="lp-in relative z-10 mx-auto w-full max-w-[650px]" style={{ animationDelay: '.12s' }}>
+              <div className="relative min-h-[430px] sm:min-h-[510px]">
+                {/* Laptop */}
+                <div className="absolute left-0 top-5 w-[91%] rounded-[1.65rem] border-[7px] border-[#18344c] bg-[#18344c] p-1 shadow-[0_30px_80px_rgba(24,57,76,.24)]">
                   <div className="mb-1 flex items-center justify-center gap-1.5 py-1">
                     <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
                     <span className="h-1.5 w-14 rounded-full bg-white/20" />
                     <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
                   </div>
                   <div className="overflow-hidden rounded-[1rem] bg-white">
-                    <img src={appScreen} alt="Pantalla real de KidsMin mostrando la gestión de clases" className="block h-auto w-full" />
+                    <img src={appScreen} alt="Pantalla real de KidsMin mostrando la gestión de niños y clases" className="block w-full" />
                   </div>
                 </div>
-                <div className="absolute -bottom-5 -left-4 hidden w-56 rounded-2xl border border-white bg-white/95 p-4 shadow-card sm:block">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-11 w-11 place-items-center rounded-xl bg-sky-100 text-xl">📱</div>
-                    <div>
-                      <p className="text-xs font-extrabold uppercase tracking-wide text-sky-600">Interfaz real</p>
-                      <p className="font-black text-ink">Así se ve KidsMin por dentro.</p>
-                    </div>
+
+                {/* Base de laptop */}
+                <div className="absolute left-[7%] top-[66%] z-0 h-5 w-[79%] rounded-b-[1rem] bg-[#18344c] shadow-lg sm:h-7" />
+                <div className="absolute left-[25%] top-[70%] z-0 h-2 w-[42%] rounded-full bg-[#45657a]" />
+
+                {/* Phone con login real */}
+                <div className="absolute bottom-0 right-0 z-20 w-[32%] min-w-[145px] max-w-[215px] rotate-[3deg] rounded-[1.7rem] border-[6px] border-[#18344c] bg-[#18344c] p-1 shadow-[0_25px_60px_rgba(24,57,76,.28)] sm:w-[34%]">
+                  <div className="relative overflow-hidden rounded-[1.2rem] bg-white">
+                    <div className="absolute left-1/2 top-1 z-10 h-3 w-16 -translate-x-1/2 rounded-full bg-[#18344c]" />
+                    <img src={loginScreen} alt="Pantalla real de acceso a KidsMin" className="block w-full" />
                   </div>
                 </div>
-                <div className="absolute -right-4 top-7 hidden rounded-2xl bg-sunshine-300 px-4 py-3 text-sm font-black text-ink shadow-card sm:block">
-                  Clases · asistencia · seguimiento
+
+                {/* Floating labels */}
+                <div className="absolute -right-2 top-1 z-30 hidden rounded-2xl bg-white px-4 py-3 shadow-card sm:block">
+                  <p className="text-xs font-extrabold uppercase tracking-wide text-sky-600">KidsMin</p>
+                  <p className="font-black text-ink">Organiza · conecta · acompaña</p>
                 </div>
-              </div>
-              <div className="mt-8 overflow-hidden rounded-[1.5rem] border-4 border-white/90 bg-white shadow-soft">
-                <img src={heroImg} alt="Niños compartiendo la Palabra" className="h-36 w-full object-cover sm:h-40" />
-                <div className="flex items-center justify-between gap-4 px-5 py-3">
-                  <p className="font-extrabold text-ink">Una herramienta para servir mejor.</p>
-                  <span className="hidden rounded-full bg-coral-100 px-3 py-1 text-xs font-black text-coral-600 sm:inline">Hecho con propósito</span>
+
+                <div className="absolute bottom-8 left-0 z-30 hidden rounded-2xl bg-sunshine-300 px-4 py-3 text-sm font-black text-ink shadow-card sm:block">
+                  ✨ También en tu celular
+                </div>
+
+                <div className="absolute right-[30%] top-[18%] z-30 hidden -rotate-6 text-sm font-black text-sky-700 sm:block">
+                  Organiza, conecta<br />y haz crecer tu ministerio ♥
                 </div>
               </div>
             </div>
@@ -165,6 +194,24 @@ export default function Landing() {
               <p className="mt-2 leading-relaxed text-ink/60">{role.text}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      {/* TRUST STRIP */}
+      <section className="mx-auto max-w-6xl px-6 pb-4">
+        <div className="grid gap-3 rounded-[1.5rem] bg-white/80 p-4 shadow-sm sm:grid-cols-3">
+          <div className="flex items-center gap-3 rounded-2xl px-4 py-3">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-coral-100 text-xl">💗</span>
+            <div><p className="font-black">Fortalece tu ministerio</p><p className="text-xs text-ink/50">Más orden y seguimiento</p></div>
+          </div>
+          <div className="flex items-center gap-3 rounded-2xl px-4 py-3">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-sky-100 text-xl">👨‍👩‍👧</span>
+            <div><p className="font-black">Conecta a las familias</p><p className="text-xs text-ink/50">Más cerca de lo que viven</p></div>
+          </div>
+          <div className="flex items-center gap-3 rounded-2xl px-4 py-3">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-sunshine-100 text-xl">🛡️</span>
+            <div><p className="font-black">Simple y organizado</p><p className="text-xs text-ink/50">Pensado para tu equipo</p></div>
+          </div>
         </div>
       </section>
 
@@ -234,6 +281,31 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* TWO PATHS */}
+      <section className="mx-auto max-w-6xl px-6 py-8 lg:py-10">
+        <div className="grid gap-5 md:grid-cols-2">
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-50 to-sky-50 p-7 shadow-sm">
+            <div className="absolute -right-5 -top-5 text-7xl opacity-20">⛪</div>
+            <span className="text-3xl">🏠</span>
+            <h3 className="mt-3 text-2xl font-black">¿Quieres llevar KidsMin a tu iglesia?</h3>
+            <p className="mt-2 max-w-md text-ink/60">Cuéntanos sobre tu ministerio y te explicaremos cómo comenzar.</p>
+            <a href="#iglesias" className="mt-5 inline-flex rounded-full bg-coral-500 px-6 py-3.5 font-extrabold text-white shadow-sm transition hover:-translate-y-0.5">
+              Quiero KidsMin en mi iglesia →
+            </a>
+          </div>
+
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-violet-50 to-sky-50 p-7 shadow-sm">
+            <div className="absolute -right-5 -top-5 text-7xl opacity-20">💻</div>
+            <span className="text-3xl">👋</span>
+            <h3 className="mt-3 text-2xl font-black">¿Tu iglesia ya usa KidsMin?</h3>
+            <p className="mt-2 max-w-md text-ink/60">Entonces ya puedes entrar directamente a tu cuenta.</p>
+            <Link to="/login" className="mt-5 inline-flex rounded-full bg-white px-6 py-3.5 font-extrabold text-sky-700 shadow-card transition hover:-translate-y-0.5">
+              Acceder a KidsMin →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* REQUEST */}
       <section id="iglesias" className="mx-auto max-w-5xl px-6 py-20 lg:py-24">
         <div className="mx-auto max-w-3xl text-center">
@@ -246,16 +318,6 @@ export default function Landing() {
         <div className="mx-auto mt-10 max-w-2xl rounded-[2rem] border border-ink/5 bg-white p-6 shadow-card sm:p-8">
           <ContactoForm />
         </div>
-      </section>
-
-      {/* EXISTING USERS */}
-      <section className="mx-6 mb-16 rounded-[2rem] bg-sunshine-100 px-6 py-12 text-center sm:px-10 lg:mx-auto lg:max-w-6xl">
-        <span className="text-4xl">👋</span>
-        <h2 className="mt-3 text-3xl font-black text-ink">¿Tu iglesia ya tiene KidsMin?</h2>
-        <p className="mx-auto mt-2 max-w-xl text-ink/60">Entra directamente a tu cuenta y continúa con tu ministerio.</p>
-        <Link to="/login" className="mt-6 inline-flex rounded-full bg-ink px-7 py-3.5 font-extrabold text-white transition hover:-translate-y-0.5">
-          Acceder a KidsMin →
-        </Link>
       </section>
 
       {/* FOOTER */}
