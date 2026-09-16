@@ -6,15 +6,14 @@ import Spinner from '../../components/Spinner'
 import ResumenAsistenciaMensual from '../../components/ResumenAsistenciaMensual'
 import ProgresoNinoModal from '../../components/ProgresoNinoModal'
 import AlertasAusencia from '../../components/AlertasAusencia'
-import TomarAsistenciaModal from '../../components/TomarAsistenciaModal'
+import TomarAsistenciaInline from '../../components/TomarAsistenciaInline'
 
 export default function Asistencia() {
   const { user } = useAuth()
   const { clases, nivelId, setNivelId } = useMisClases()
   const [ninos, setNinos] = useState(null)
-  const [tab, setTab] = useState('mes')
+  const [tab, setTab] = useState('tomar')
   const [progresoNino, setProgresoNino] = useState(null)
-  const [tomarOpen, setTomarOpen] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
   const load = useCallback(async () => {
@@ -32,31 +31,29 @@ export default function Asistencia() {
 
   const nivelActual = clases.find((c) => c.id === nivelId)
 
+  const tabs = [
+    ['tomar', '✅ Tomar asistencia'],
+    ['mes', '📊 Tabla del mes'],
+    ['ausencias', '⚠️ Ausencias'],
+  ]
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold">Asistencia ✅</h1>
-          <p className="text-ink/50">La tabla del mes y las ausencias, de un vistazo</p>
-        </div>
-        <button className="btn-primary" onClick={() => setTomarOpen(true)}>
-          + Tomar asistencia
-        </button>
+      <div>
+        <h1 className="text-3xl font-bold">Asistencia ✅</h1>
+        <p className="text-ink/50">Toma asistencia, revisa el mes y las ausencias</p>
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={() => setTab('mes')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'mes' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
-        >
-          Tabla del mes
-        </button>
-        <button
-          onClick={() => setTab('ausencias')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'ausencias' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
-        >
-          Ausencias
-        </button>
+      <div className="flex flex-wrap gap-2">
+        {tabs.map(([v, label]) => (
+          <button
+            key={v}
+            onClick={() => setTab(v)}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
@@ -67,25 +64,21 @@ export default function Asistencia() {
         ))}
       </select>
 
-      {tab === 'mes' ? (
+      {tab === 'tomar' ? (
+        <TomarAsistenciaInline
+          key={`tomar-${nivelId}`}
+          nivelId={nivelId}
+          nivelNombre={nivelActual?.nombre}
+          ninos={ninos}
+          userId={user.id}
+          onProgreso={(n) => setProgresoNino(n)}
+          onSaved={() => setRefreshKey((k) => k + 1)}
+        />
+      ) : tab === 'mes' ? (
         <ResumenAsistenciaMensual key={`${nivelId}-${refreshKey}`} nivelId={nivelId} ninos={ninos} />
       ) : (
         <AlertasAusencia nivelId={nivelId} ninos={ninos} />
       )}
-
-      <TomarAsistenciaModal
-        open={tomarOpen}
-        onClose={() => setTomarOpen(false)}
-        nivelId={nivelId}
-        nivelNombre={nivelActual?.nombre}
-        ninos={ninos}
-        userId={user.id}
-        onProgreso={(n) => setProgresoNino(n)}
-        onSaved={() => {
-          setTomarOpen(false)
-          setRefreshKey((k) => k + 1)
-        }}
-      />
 
       <ProgresoNinoModal nino={progresoNino} nivelId={nivelId} open={!!progresoNino} onClose={() => setProgresoNino(null)} />
     </div>

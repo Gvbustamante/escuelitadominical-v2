@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import Skeleton from '../../components/Skeleton'
 import ResumenAsistenciaMensual from '../../components/ResumenAsistenciaMensual'
 import ProgresoNinoModal from '../../components/ProgresoNinoModal'
-import TomarAsistenciaModal from '../../components/TomarAsistenciaModal'
+import TomarAsistenciaInline from '../../components/TomarAsistenciaInline'
 
 export default function AsistenciaAdmin() {
   const { user } = useAuth()
@@ -12,7 +12,7 @@ export default function AsistenciaAdmin() {
   const [nivelId, setNivelId] = useState('')
   const [ninos, setNinos] = useState(null)
   const [progresoNino, setProgresoNino] = useState(null)
-  const [tomarOpen, setTomarOpen] = useState(false)
+  const [tab, setTab] = useState('tomar')
   const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
@@ -54,16 +54,28 @@ export default function AsistenciaAdmin() {
 
   const nivelActual = niveles.find((n) => n.id === nivelId)
 
+  const tabs = [
+    ['tomar', '✅ Tomar asistencia'],
+    ['mes', '📊 Tabla del mes'],
+  ]
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold">Asistencia ✅</h1>
-          <p className="text-ink/50">Tabla mensual por clase</p>
-        </div>
-        <button className="btn-primary" onClick={() => setTomarOpen(true)}>
-          + Tomar asistencia
-        </button>
+      <div>
+        <h1 className="text-3xl font-bold">Asistencia ✅</h1>
+        <p className="text-ink/50">Toma asistencia y revisa la tabla mensual por clase</p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {tabs.map(([v, label]) => (
+          <button
+            key={v}
+            onClick={() => setTab(v)}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
@@ -74,21 +86,19 @@ export default function AsistenciaAdmin() {
         ))}
       </select>
 
-      <ResumenAsistenciaMensual key={`${nivelId}-${refreshKey}`} nivelId={nivelId} ninos={ninos} />
-
-      <TomarAsistenciaModal
-        open={tomarOpen}
-        onClose={() => setTomarOpen(false)}
-        nivelId={nivelId}
-        nivelNombre={nivelActual?.nombre}
-        ninos={ninos}
-        userId={user.id}
-        onProgreso={(n) => setProgresoNino(n)}
-        onSaved={() => {
-          setTomarOpen(false)
-          setRefreshKey((k) => k + 1)
-        }}
-      />
+      {tab === 'tomar' ? (
+        <TomarAsistenciaInline
+          key={`tomar-${nivelId}`}
+          nivelId={nivelId}
+          nivelNombre={nivelActual?.nombre}
+          ninos={ninos}
+          userId={user.id}
+          onProgreso={(n) => setProgresoNino(n)}
+          onSaved={() => setRefreshKey((k) => k + 1)}
+        />
+      ) : (
+        <ResumenAsistenciaMensual key={`${nivelId}-${refreshKey}`} nivelId={nivelId} ninos={ninos} />
+      )}
 
       <ProgresoNinoModal nino={progresoNino} nivelId={nivelId} open={!!progresoNino} onClose={() => setProgresoNino(null)} />
     </div>

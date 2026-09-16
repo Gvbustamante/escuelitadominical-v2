@@ -18,7 +18,7 @@ import { generarCodigoFacil } from '../../lib/codigoFacil'
 const STAFF = ['admin', 'coordinador']
 
 function calcularEdad(fecha) {
-  if (!fecha) return '—'
+  if (!fecha) return null
   const nacimiento = new Date(fecha)
   const hoy = new Date()
   let edad = hoy.getFullYear() - nacimiento.getFullYear()
@@ -68,7 +68,7 @@ export default function Ninos() {
   const [detalleNino, setDetalleNino] = useState(null)
   const [confirmDesactivar, setConfirmDesactivar] = useState(null)
   const [confirmBusy, setConfirmBusy] = useState(false)
-  const [confirmDesvincular, setConfirmDesvincular] = useState(null) // { nino, padre }
+  const [confirmDesvincular, setConfirmDesvincular] = useState(null)
 
   const load = useCallback(async () => {
     const mesActual = new Date().toISOString().slice(0, 7)
@@ -90,13 +90,11 @@ export default function Ninos() {
       grouped[row.nino_id].push(row)
     })
     setPadresPorNino(grouped)
-    // Contar estrellas por niño
     const estrellas = {}
     ;(recs || []).forEach((r) => {
       estrellas[r.nino_id] = (estrellas[r.nino_id] || 0) + 1
     })
     setEstrellasPorNino(estrellas)
-    // Contar asistencias del mes por niño
     const asist = {}
     ;(asistMes || []).forEach((a) => {
       asist[a.nino_id] = (asist[a.nino_id] || 0) + 1
@@ -182,7 +180,7 @@ export default function Ninos() {
       const badge = badgeActual(nivelesEstrella, numEstrellas)
       return [
         nino.nombre_completo,
-        calcularEdad(nino.fecha_nacimiento),
+        calcularEdad(nino.fecha_nacimiento) ?? '—',
         nivel?.nombre || '',
         `${badge.emoji} ${badge.nombre}`,
         numEstrellas,
@@ -317,16 +315,18 @@ export default function Ninos() {
             {tab === 'ninos' ? `${filtrados.length} de ${ninosVisibles.length} en total` : 'Niveles por edad de tu escuelita'}
           </p>
         </div>
-        {tab === 'ninos' && esStaff && (
-          <button className="btn-secondary" onClick={exportar}>
-            📊 Exportar
-          </button>
-        )}
-        {tab === 'ninos' && puedeAgregar && (
-          <button className="btn-primary" onClick={openNew}>
-            + Nuevo niño/a
-          </button>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {tab === 'ninos' && esStaff && (
+            <button className="btn-secondary" onClick={exportar}>
+              📊 Exportar
+            </button>
+          )}
+          {tab === 'ninos' && puedeAgregar && (
+            <button className="btn-primary" onClick={openNew}>
+              + Nuevo niño/a
+            </button>
+          )}
+        </div>
       </div>
 
       {esStaff && (
@@ -352,158 +352,156 @@ export default function Ninos() {
         <Clases />
       ) : (
         <>
-      <div className="flex flex-wrap items-center gap-3">
-        <input
-          className="input max-w-xs"
-          placeholder="Buscar por nombre..."
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
-        <select className="input !w-auto" value={filtroNivel} onChange={(e) => setFiltroNivel(e.target.value)}>
-          <option value="">Todas las clases</option>
-          {niveles.map((n) => (
-            <option key={n.id} value={n.id}>{n.nombre}</option>
-          ))}
-        </select>
-        <div className="flex gap-2">
-          {[
-            ['activos', 'Activos'],
-            ['inactivos', 'Inactivos'],
-            ['todos', 'Todos'],
-          ].map(([v, label]) => (
-            <button
-              key={v}
-              onClick={() => setFiltro(v)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <input
+              className="input max-w-xs"
+              placeholder="Buscar por nombre..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
+            <select className="input !w-auto" value={filtroNivel} onChange={(e) => setFiltroNivel(e.target.value)}>
+              <option value="">Todas las clases</option>
+              {niveles.map((n) => (
+                <option key={n.id} value={n.id}>{n.nombre}</option>
+              ))}
+            </select>
+            <div className="flex gap-2">
+              {[
+                ['activos', 'Activos'],
+                ['inactivos', 'Inactivos'],
+                ['todos', 'Todos'],
+              ].map(([v, label]) => (
+                <button
+                  key={v}
+                  onClick={() => setFiltro(v)}
+                  className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      <div className="card overflow-x-auto p-0">
-          <table className="w-full text-left">
-            <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
-              <tr>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Edad</th>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Clase</th>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Insignia</th>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Asist. mes</th>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Alergias</th>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Padres</th>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Estado</th>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtrados.map((nino) => {
+          {filtrados.length === 0 ? (
+            <div className="card py-12 text-center">
+              <p className="text-4xl">🔍</p>
+              <p className="mt-2 font-bold text-ink/40">No hay niños que coincidan.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {filtrados.map((nino, i) => {
                 const nivel = nivelesById[nino.nivel_id]
                 const padres = padresPorNino[nino.id] || []
                 const numEstrellas = estrellasPorNino[nino.id] || 0
                 const badge = badgeActual(nivelesEstrella, numEstrellas)
                 const asistMes = asistenciaPorNino[nino.id] || 0
+                const edad = calcularEdad(nino.fecha_nacimiento)
+                const inactivo = !nino.activo || nino.pausado
+
                 return (
-                  <tr key={nino.id} className={`border-t border-ink/5 ${!nino.activo || nino.pausado ? 'opacity-50 grayscale' : ''}`}>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
-                      <div className="flex items-center gap-2">
-                        <Avatar nombre={nino.nombre_completo} size="sm" />
-                        <span>{nino.nombre_completo}</span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">{calcularEdad(nino.fecha_nacimiento)}</td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3">
-                      {nivel ? (
-                        <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>
-                      ) : (
-                        <span className="text-ink/40">—</span>
-                      )}
-                    </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3">
-                      <div className="flex items-center gap-1.5" title={`${badge.nombre} — ${numEstrellas} ⭐`}>
-                        <span className="text-lg">{badge.emoji}</span>
-                        <div className="min-w-0">
-                          <p className="truncate text-xs font-bold leading-tight">{badge.nombre}</p>
-                          <p className="text-[0.65rem] text-ink/40">{numEstrellas} ⭐</p>
+                  <div
+                    key={nino.id}
+                    className={`card animate-pop-in !p-0 overflow-hidden transition-shadow hover:shadow-lg ${
+                      inactivo ? 'opacity-60 grayscale' : ''
+                    }`}
+                    style={{ animationDelay: `${Math.min(i, 11) * 40}ms` }}
+                  >
+                    <div className="flex items-start gap-3 p-4">
+                      <Avatar nombre={nino.nombre_completo} size="lg" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="truncate text-base font-bold leading-tight">{nino.nombre_completo}</p>
+                            <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                              {edad !== null && (
+                                <span className="text-xs text-ink/50">{edad} años</span>
+                              )}
+                              {nivel && (
+                                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.65rem] font-bold ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
+                                  {nivel.nombre}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex shrink-0 flex-col items-center">
+                            <span className="text-2xl leading-none">{badge.emoji}</span>
+                            <span className="mt-0.5 text-[0.6rem] font-bold text-ink/40">{numEstrellas} ⭐</span>
+                          </div>
+                        </div>
+
+                        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.65rem] font-bold ${
+                            asistMes > 0 ? 'bg-grass-100 text-grass-700' : 'bg-ink/5 text-ink/40'
+                          }`}>
+                            ✅ {asistMes} asist.
+                          </span>
+                          {nino.alergias && (
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-coral-50 px-2 py-0.5 text-[0.65rem] font-bold text-coral-600">
+                              ⚠️ {nino.alergias}
+                            </span>
+                          )}
+                          {!nino.activo && (
+                            <span className="inline-flex items-center rounded-full bg-coral-100 px-2 py-0.5 text-[0.65rem] font-bold text-coral-700">
+                              Inactivo
+                            </span>
+                          )}
+                          {nino.pausado && (
+                            <span className="inline-flex items-center rounded-full bg-ink/10 px-2 py-0.5 text-[0.65rem] font-bold text-ink/50">
+                              ⏸️ Pausado
+                            </span>
+                          )}
                         </div>
                       </div>
-                    </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-center">
-                      <span className={`badge ${asistMes > 0 ? 'bg-grass-100 text-grass-700' : 'bg-ink/5 text-ink/40'}`}>
-                        {asistMes}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
-                      {nino.alergias ? <span className="font-bold text-coral-600">⚠️ {nino.alergias}</span> : '—'}
-                    </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
-                      {padres.length === 0 ? (
-                        <span className="text-ink/30">Sin vincular</span>
-                      ) : (
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                          {padres.map((p, i) => (
-                            <span key={i} className="inline-flex items-center gap-1">
-                              {p.padre?.nombre_completo}
+                    </div>
+
+                    {padres.length > 0 && (
+                      <div className="border-t border-ink/5 bg-ink/[0.02] px-4 py-2">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                          {padres.map((p, j) => (
+                            <span key={j} className="inline-flex items-center gap-1 text-xs text-ink/50">
+                              <span className="font-bold text-ink/70">{p.padre?.nombre_completo}</span>
+                              {p.parentesco && <span>({p.parentesco})</span>}
                               {whatsappLink(p.padre?.telefono) && (
-                                <a href={whatsappLink(p.padre.telefono)} target="_blank" rel="noreferrer" title="Abrir WhatsApp">
+                                <a href={whatsappLink(p.padre.telefono)} target="_blank" rel="noreferrer" title="WhatsApp" className="text-grass-500 hover:text-grass-700">
                                   💬
                                 </a>
                               )}
-                              {i < padres.length - 1 && ','}
                             </span>
                           ))}
                         </div>
-                      )}
-                    </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3">
-                      <div className="flex flex-wrap gap-1">
-                        <span className={`badge ${nino.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
-                          {nino.activo ? 'Activo' : 'Inactivo'}
-                        </span>
-                        {nino.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado</span>}
                       </div>
-                    </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3">
-                      <div className="flex flex-wrap gap-2">
-                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetalleNino(nino)}>
-                          👁️ Ver detalle
+                    )}
+
+                    <div className="flex flex-wrap gap-1 border-t border-ink/5 px-3 py-2">
+                      <button className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-sky-600 hover:bg-sky-50" onClick={() => setDetalleNino(nino)}>
+                        👁️ Detalle
+                      </button>
+                      {puedeEditar && (
+                        <button className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-sky-600 hover:bg-sky-50" onClick={() => openEdit(nino)}>
+                          ✏️ Editar
                         </button>
-                        {puedeEditar && (
-                          <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nino)}>
-                            ✏️ Editar
+                      )}
+                      {puedeVincularPadre && (
+                        <button className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-sky-600 hover:bg-sky-50" onClick={() => openInvite(nino)}>
+                          👪 Padre
+                        </button>
+                      )}
+                      {esStaff && (
+                        <>
+                          <button className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-ink/40 hover:bg-ink/5" onClick={() => togglePausado(nino)}>
+                            {nino.pausado ? '▶️' : '⏸️'}
                           </button>
-                        )}
-                        {puedeVincularPadre && (
-                          <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openInvite(nino)}>
-                            👪 + Padre
+                          <button className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-ink/40 hover:bg-ink/5" onClick={() => handleToggleClick(nino)}>
+                            {nino.activo ? '🚫' : '✅'}
                           </button>
-                        )}
-                        {esStaff && (
-                          <>
-                            <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => togglePausado(nino)}>
-                              {nino.pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
-                            </button>
-                            <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(nino)}>
-                              {nino.activo ? '🚫 Desactivar' : '✅ Activar'}
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 )
               })}
-              {filtrados.length === 0 && (
-                <tr>
-                  <td colSpan={9} className="px-4 py-6 text-center text-ink/40">
-                    No hay niños que coincidan.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          )}
         </>
       )}
 
