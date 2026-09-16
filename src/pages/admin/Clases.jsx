@@ -180,8 +180,11 @@ export default function Clases() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 className="text-3xl font-bold">Clases 🎒</h1>
         <p className="text-ink/50">Niveles por edad de tu escuelita — usa ▲▼ para ordenarlas como quieras verlas</p>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <button className="btn-primary" onClick={openNew}>
           + Nueva clase
         </button>
