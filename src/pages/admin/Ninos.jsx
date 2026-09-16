@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { crearUsuario } from '../../lib/invite'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePermisosRol } from '../../lib/permisosRol'
+import { useNivelesEstrella, badgeActual } from '../../lib/nivelesEstrella'
 import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
@@ -32,6 +33,7 @@ export default function Ninos() {
   const esDocente = profile.role === 'docente'
   const [tab, setTab] = useState('ninos')
   const { tiene } = usePermisosRol()
+  const nivelesEstrella = useNivelesEstrella()
   const puedeEditar = esStaff || (esDocente && tiene('docente', 'editar_ninos'))
   const puedeAgregar = esStaff || (esDocente && tiene('docente', 'agregar_ninos'))
   const puedeVincularPadre = esStaff || (esDocente && tiene('docente', 'vincular_padres'))
@@ -39,8 +41,11 @@ export default function Ninos() {
   const [ninos, setNinos] = useState(null)
   const [niveles, setNiveles] = useState([])
   const [padresPorNino, setPadresPorNino] = useState({})
+  const [estrellasPorNino, setEstrellasPorNino] = useState({})
+  const [asistenciaPorNino, setAsistenciaPorNino] = useState({})
   const [misNivelIds, setMisNivelIds] = useState(null)
   const [filtro, setFiltro] = useState('activos')
+  const [filtroNivel, setFiltroNivel] = useState('')
   const [busqueda, setBusqueda] = useState('')
 
   const [modalOpen, setModalOpen] = useState(false)
@@ -66,13 +71,17 @@ export default function Ninos() {
   const [confirmDesvincular, setConfirmDesvincular] = useState(null) // { nino, padre }
 
   const load = useCallback(async () => {
+    const mesActual = new Date().toISOString().slice(0, 7)
+    const inicioMes = `${mesActual}-01`
     const queries = [
       supabase.from('ninos').select('*').order('nombre_completo'),
       supabase.from('niveles').select('*').eq('activo', true),
       supabase.from('ninos_padres').select('nino_id, parentesco, padre:profiles(id, nombre_completo, telefono, pausado)'),
+      supabase.from('reconocimientos').select('nino_id'),
+      supabase.from('asistencia').select('nino_id, presente').gte('fecha', inicioMes).eq('presente', true),
     ]
     if (esDocente) queries.push(supabase.from('docentes_niveles').select('nivel_id').eq('docente_id', user.id))
-    const [{ data: n }, { data: niv }, { data: np }, misAsig] = await Promise.all(queries)
+    const [{ data: n }, { data: niv }, { data: np }, { data: recs }, { data: asistMes }, misAsig] = await Promise.all(queries)
     setNinos(n || [])
     setNiveles(niv || [])
     const grouped = {}
@@ -81,6 +90,18 @@ export default function Ninos() {
       grouped[row.nino_id].push(row)
     })
     setPadresPorNino(grouped)
+    // Contar estrellas por niño
+    const estrellas = {}
+    ;(recs || []).forEach((r) => {
+      estrellas[r.nino_id] = (estrellas[r.nino_id] || 0) + 1
+    })
+    setEstrellasPorNino(estrellas)
+    // Contar asistencias del mes por niño
+    const asist = {}
+    ;(asistMes || []).forEach((a) => {
+      asist[a.nino_id] = (asist[a.nino_id] || 0) + 1
+    })
+    setAsistenciaPorNino(asist)
     if (esDocente) setMisNivelIds(new Set((misAsig?.data || []).map((a) => a.nivel_id)))
   }, [esDocente, user.id])
 
@@ -98,8 +119,9 @@ export default function Ninos() {
   const filtrados = useMemo(() => {
     return ninosVisibles
       .filter((n) => (filtro === 'activos' ? n.activo : filtro === 'inactivos' ? !n.activo : true))
+      .filter((n) => !filtroNivel || n.nivel_id === filtroNivel)
       .filter((n) => n.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()))
-  }, [ninosVisibles, filtro, busqueda])
+  }, [ninosVisibles, filtro, filtroNivel, busqueda])
 
   function openNew() {
     setEditing(null)
@@ -156,17 +178,22 @@ export default function Ninos() {
     const filas = filtrados.map((nino) => {
       const nivel = nivelesById[nino.nivel_id]
       const padres = padresPorNino[nino.id] || []
+      const numEstrellas = estrellasPorNino[nino.id] || 0
+      const badge = badgeActual(nivelesEstrella, numEstrellas)
       return [
         nino.nombre_completo,
         calcularEdad(nino.fecha_nacimiento),
         nivel?.nombre || '',
+        `${badge.emoji} ${badge.nombre}`,
+        numEstrellas,
+        asistenciaPorNino[nino.id] || 0,
         nino.alergias || '',
         padres.map((p) => p.padre?.nombre_completo).filter(Boolean).join(' / '),
         nino.activo ? 'Activo' : 'Inactivo',
         nino.pausado ? 'Sí' : 'No',
       ]
     })
-    exportExcel('ninos', ['Nombre', 'Edad', 'Clase', 'Alergias', 'Padres/encargados', 'Estado', 'Pausado'], filas)
+    exportExcel('ninos', ['Nombre', 'Edad', 'Clase', 'Insignia', 'Estrellas', 'Asist. mes', 'Alergias', 'Padres/encargados', 'Estado', 'Pausado'], filas)
   }
 
   function handleToggleClick(nino) {
@@ -332,6 +359,12 @@ export default function Ninos() {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
+        <select className="input !w-auto" value={filtroNivel} onChange={(e) => setFiltroNivel(e.target.value)}>
+          <option value="">Todas las clases</option>
+          {niveles.map((n) => (
+            <option key={n.id} value={n.id}>{n.nombre}</option>
+          ))}
+        </select>
         <div className="flex gap-2">
           {[
             ['activos', 'Activos'],
@@ -356,8 +389,10 @@ export default function Ninos() {
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Edad</th>
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Clase</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Insignia</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Asist. mes</th>
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Alergias</th>
-                <th className="px-3 py-2 sm:px-4 sm:py-3">Padres/encargados</th>
+                <th className="px-3 py-2 sm:px-4 sm:py-3">Padres</th>
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Estado</th>
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Acciones</th>
               </tr>
@@ -366,6 +401,9 @@ export default function Ninos() {
               {filtrados.map((nino) => {
                 const nivel = nivelesById[nino.nivel_id]
                 const padres = padresPorNino[nino.id] || []
+                const numEstrellas = estrellasPorNino[nino.id] || 0
+                const badge = badgeActual(nivelesEstrella, numEstrellas)
+                const asistMes = asistenciaPorNino[nino.id] || 0
                 return (
                   <tr key={nino.id} className={`border-t border-ink/5 ${!nino.activo || nino.pausado ? 'opacity-50 grayscale' : ''}`}>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
@@ -382,12 +420,26 @@ export default function Ninos() {
                         <span className="text-ink/40">—</span>
                       )}
                     </td>
+                    <td className="px-3 py-2 sm:px-4 sm:py-3">
+                      <div className="flex items-center gap-1.5" title={`${badge.nombre} — ${numEstrellas} ⭐`}>
+                        <span className="text-lg">{badge.emoji}</span>
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-bold leading-tight">{badge.nombre}</p>
+                          <p className="text-[0.65rem] text-ink/40">{numEstrellas} ⭐</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-center">
+                      <span className={`badge ${asistMes > 0 ? 'bg-grass-100 text-grass-700' : 'bg-ink/5 text-ink/40'}`}>
+                        {asistMes}
+                      </span>
+                    </td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
                       {nino.alergias ? <span className="font-bold text-coral-600">⚠️ {nino.alergias}</span> : '—'}
                     </td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
                       {padres.length === 0 ? (
-                        'Sin vincular'
+                        <span className="text-ink/30">Sin vincular</span>
                       ) : (
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                           {padres.map((p, i) => (
@@ -444,7 +496,7 @@ export default function Ninos() {
               })}
               {filtrados.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-6 text-center text-ink/40">
+                  <td colSpan={9} className="px-4 py-6 text-center text-ink/40">
                     No hay niños que coincidan.
                   </td>
                 </tr>

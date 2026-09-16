@@ -19,6 +19,7 @@ const NAV = {
     { to: '/drive', label: 'Drive', icon: '📁' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/docentes', label: 'Equipo', icon: '🍎' },
+    { to: '/reporte-docentes', label: 'Reporte docentes', icon: '📊' },
     { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
   ],
   coordinador: [
@@ -33,6 +34,7 @@ const NAV = {
     { to: '/drive', label: 'Drive', icon: '📁' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/docentes', label: 'Equipo', icon: '🍎' },
+    { to: '/reporte-docentes', label: 'Reporte docentes', icon: '📊' },
     { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
   ],
   docente: [

@@ -8,6 +8,7 @@ import CitaDelDia from '../../components/CitaDelDia'
 import CoberturaHoy from '../../components/CoberturaHoy'
 import ProximaAgenda from '../../components/ProximaAgenda'
 import ResumenHoy from '../../components/ResumenHoy'
+import ChecklistDocentesHoy from '../../components/ChecklistDocentesHoy'
 
 export default function AdminHome() {
   const { profile } = useAuth()
@@ -77,6 +78,8 @@ export default function AdminHome() {
       <CitaDelDia />
 
       <ResumenHoy />
+
+      <ChecklistDocentesHoy />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard icon="🧒" label="Niños activos" value={stats.ninos} color="sky" delay={0} />
