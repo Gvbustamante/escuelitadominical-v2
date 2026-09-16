@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppLogo from '../components/AppLogo'
 import heroImg from '../assets/hero-ninos-cruz.jpg'
+import appScreen from '../assets/kidsmin-screen-clases.png'
 
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xdaqpawn'
 
@@ -22,200 +23,265 @@ const FEATURES = [
   { icon: '📖', title: 'Versículo del día', text: 'Una palabra distinta cada día, para toda la familia.' },
 ]
 
+const ROLES = [
+  { icon: '👧', title: 'Niños', text: 'Un espacio pensado para que aprendan, participen y disfruten su tiempo en la iglesia.' },
+  { icon: '👨‍👩‍👧', title: 'Familias', text: 'Una forma sencilla de acompañar desde casa lo que sus hijos viven en el ministerio.' },
+  { icon: '👩‍🏫', title: 'Docentes y líderes', text: 'Herramientas para organizar clases, asistencia y acompañamiento sin enredos.' },
+]
+
+const STEPS = [
+  { number: '01', title: 'Conoce KidsMin', text: 'Descubre cómo puede funcionar en el ministerio infantil de tu iglesia.' },
+  { number: '02', title: 'Solicita acceso', text: 'Cuéntanos sobre tu iglesia y te orientamos para comenzar.' },
+  { number: '03', title: 'Conecta a tu equipo', text: 'Docentes y líderes pueden empezar a organizar su trabajo.' },
+  { number: '04', title: 'Acompaña a las familias', text: 'La información y las experiencias del ministerio llegan más cerca de casa.' },
+]
+
 export default function Landing() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#fffaf0] text-ink">
       <style>{`
         @keyframes lp-drift { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
-        @keyframes lp-sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
         @keyframes lp-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes lp-flap { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.55); } }
-        @keyframes lp-twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.9; } }
-        @keyframes lp-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,106,53,0.35); } 50% { box-shadow: 0 0 0 14px rgba(255,106,53,0); } }
+        @keyframes lp-twinkle { 0%, 100% { opacity: .25; } 50% { opacity: .9; } }
+        @keyframes lp-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,106,53,.32); } 50% { box-shadow: 0 0 0 12px rgba(255,106,53,0); } }
         @keyframes lp-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         .lp-cloud { animation: lp-drift 34s ease-in-out infinite alternate; }
-        .lp-cloud-slow { animation: lp-drift 48s ease-in-out infinite alternate; }
-        .lp-sway { animation: lp-sway 4.5s ease-in-out infinite; transform-origin: bottom center; }
         .lp-bird { animation: lp-bob 3.2s ease-in-out infinite; }
-        .lp-wing { animation: lp-flap 0.5s ease-in-out infinite; transform-origin: center; }
         .lp-star { animation: lp-twinkle 2.6s ease-in-out infinite; }
         .lp-pulse { animation: lp-pulse 2.6s ease-in-out infinite; }
-        .lp-in { animation: lp-in 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+        .lp-in { animation: lp-in .7s cubic-bezier(.22,1,.36,1) both; }
         @media (prefers-reduced-motion: reduce) {
-          .lp-cloud, .lp-cloud-slow, .lp-sway, .lp-bird, .lp-wing, .lp-star, .lp-pulse, .lp-in { animation: none !important; }
+          .lp-cloud, .lp-bird, .lp-star, .lp-pulse, .lp-in { animation: none !important; }
         }
       `}</style>
 
-      {/* HERO */}
-      <header className="relative overflow-hidden bg-gradient-to-b from-sky-200 via-sky-100 to-[#fffaf0] pb-4 pt-10 sm:pt-14">
-        {/* sol */}
-        <div className="pointer-events-none absolute right-6 top-8 h-24 w-24 rounded-full bg-sunshine-300 opacity-90 shadow-[0_0_70px_28px_rgba(255,199,44,0.45)] sm:right-12 sm:top-10 sm:h-32 sm:w-32" />
-
-        {/* estrellitas sutiles */}
-        <span className="lp-star pointer-events-none absolute left-[12%] top-10 text-xl text-white sm:text-2xl">✦</span>
-        <span className="lp-star pointer-events-none absolute left-[22%] top-24 text-sm text-white" style={{ animationDelay: '0.8s' }}>✦</span>
-        <span className="lp-star pointer-events-none absolute right-[28%] top-6 text-base text-white" style={{ animationDelay: '1.4s' }}>✦</span>
-
-        {/* nubes */}
-        <div className="lp-cloud pointer-events-none absolute left-[6%] top-16 flex items-center sm:top-20">
-          <div className="h-7 w-16 rounded-full bg-white/90 sm:h-9 sm:w-24" />
-          <div className="-ml-6 h-10 w-16 rounded-full bg-white/90 sm:-ml-8 sm:h-12 sm:w-20" />
-        </div>
-        <div className="lp-cloud-slow pointer-events-none absolute right-[10%] top-32 flex items-center sm:top-36">
-          <div className="h-6 w-14 rounded-full bg-white/80 sm:h-8 sm:w-20" />
-          <div className="-ml-5 h-8 w-14 rounded-full bg-white/80 sm:-ml-6 sm:h-10 sm:w-16" />
-        </div>
-
-        {/* arcoiris sutil */}
-        <svg className="pointer-events-none absolute -left-10 top-4 h-28 w-28 opacity-30 sm:h-36 sm:w-36" viewBox="0 0 100 100" fill="none">
-          <path d="M5 95 A 45 45 0 0 1 95 95" stroke="#ff6a35" strokeWidth="4" strokeLinecap="round" />
-          <path d="M14 95 A 36 36 0 0 1 86 95" stroke="#ffc72c" strokeWidth="4" strokeLinecap="round" />
-          <path d="M23 95 A 27 27 0 0 1 77 95" stroke="#1cade4" strokeWidth="4" strokeLinecap="round" />
-        </svg>
-
-        {/* pajaritos */}
-        <div className="lp-bird pointer-events-none absolute left-[38%] top-12 sm:top-16">
-          <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
-            <path className="lp-wing" d="M11 7 Q6 0 0 4 Q6 6 11 7Z" fill="#8339d6" />
-            <path className="lp-wing" d="M11 7 Q16 0 22 4 Q16 6 11 7Z" fill="#8339d6" style={{ animationDelay: '0.1s' }} />
-          </svg>
-        </div>
-        <div className="lp-bird pointer-events-none absolute right-[30%] top-20 sm:top-24" style={{ animationDelay: '0.6s' }}>
-          <svg width="16" height="10" viewBox="0 0 22 14" fill="none">
-            <path className="lp-wing" d="M11 7 Q6 0 0 4 Q6 6 11 7Z" fill="#f04e1d" />
-            <path className="lp-wing" d="M11 7 Q16 0 22 4 Q16 6 11 7Z" fill="#f04e1d" style={{ animationDelay: '0.15s' }} />
-          </svg>
-        </div>
-
-        {/* titulo */}
-        <div className="lp-in relative mx-auto max-w-2xl px-6 text-center">
-          <AppLogo emojiClassName="text-6xl" imgClassName="mx-auto h-20 w-20 object-contain" />
-          <h1 className="mt-3 text-4xl uppercase tracking-tight text-sky-600 sm:text-6xl">
-            Kids<span className="text-coral-500">Min</span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-lg text-lg font-bold text-ink/70 sm:text-xl">
-            Un espacio donde los niños descubren a Dios entre risas y colores,
-            y donde cuidar de ellos se vuelve muchísimo más simple.
-          </p>
-        </div>
-
-        {/* escena: foto real de niños compartiendo la Palabra */}
-        <div className="lp-in relative mx-auto mt-8 h-72 w-full max-w-4xl px-4 sm:h-96" style={{ animationDelay: '0.15s' }}>
-          <img
-            src={heroImg}
-            alt="Niños sonriendo mientras leen la Biblia juntos, con una cruz de madera en la colina"
-            className="h-full w-full rounded-blob object-cover shadow-soft"
-          />
-        </div>
-
-        <div className="relative mx-auto -mt-2 flex max-w-2xl justify-center px-6 pb-10">
-          <Link
-            to="/login"
-            className="lp-pulse lp-in rounded-full bg-coral-400 px-10 py-4 text-xl font-extrabold text-white shadow-soft transition-transform hover:scale-105 active:scale-95"
-            style={{ animationDelay: '0.3s' }}
-          >
-            Comenzar la aventura
+      {/* NAV */}
+      <nav className="sticky top-0 z-50 border-b border-white/70 bg-[#fffaf0]/90 px-5 py-3 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+          <a href="#inicio" className="flex items-center gap-2 font-extrabold text-sky-700">
+            <AppLogo emojiClassName="text-2xl" imgClassName="h-9 w-9 object-contain" />
+            <span className="hidden sm:inline text-xl">Kids<span className="text-coral-500">Min</span></span>
+          </a>
+          <div className="hidden items-center gap-6 text-sm font-bold text-ink/60 md:flex">
+            <a href="#que-es" className="hover:text-sky-600">¿Qué es?</a>
+            <a href="#funciones" className="hover:text-sky-600">Funciones</a>
+            <a href="#como-funciona" className="hover:text-sky-600">Cómo funciona</a>
+            <a href="#iglesias" className="hover:text-sky-600">Para iglesias</a>
+          </div>
+          <Link to="/login" className="rounded-full bg-sky-600 px-5 py-2.5 text-sm font-extrabold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-sky-700">
+            Acceder
           </Link>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <header id="inicio" className="relative overflow-hidden bg-gradient-to-b from-sky-200 via-sky-100 to-[#fffaf0]">
+        <div className="pointer-events-none absolute right-8 top-8 h-24 w-24 rounded-full bg-sunshine-300 opacity-90 shadow-[0_0_70px_28px_rgba(255,199,44,.45)] sm:right-16 sm:h-32 sm:w-32" />
+        <span className="lp-star pointer-events-none absolute left-[13%] top-20 text-2xl text-white">✦</span>
+        <span className="lp-star pointer-events-none absolute right-[20%] top-28 text-lg text-white" style={{ animationDelay: '.9s' }}>✦</span>
+        <div className="lp-cloud pointer-events-none absolute left-[5%] top-24 flex items-center opacity-80">
+          <div className="h-7 w-16 rounded-full bg-white sm:h-9 sm:w-24" />
+          <div className="-ml-6 h-10 w-16 rounded-full bg-white sm:-ml-8 sm:h-12 sm:w-20" />
+        </div>
+        <div className="lp-bird pointer-events-none absolute right-[28%] top-20">
+          <span className="text-xl text-coral-500">⌁</span>
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-12 lg:pb-20 lg:pt-16">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.02fr_.98fr]">
+            <div className="lp-in max-w-2xl">
+              <span className="inline-flex rounded-full bg-white/80 px-4 py-2 text-xs font-extrabold uppercase tracking-[.14em] text-sky-700 shadow-sm">
+                Plataforma digital para ministerios infantiles
+              </span>
+              <h1 className="mt-5 text-5xl font-black leading-[.98] tracking-tight text-sky-700 sm:text-6xl lg:text-7xl">
+                El ministerio infantil de tu iglesia, <span className="text-coral-500">también en un solo lugar.</span>
+              </h1>
+              <p className="mt-6 max-w-xl text-lg font-semibold leading-relaxed text-ink/65 sm:text-xl">
+                KidsMin conecta a niños, familias, docentes y líderes para organizar clases, asistencia, actividades y acompañamiento espiritual desde una sola aplicación.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <a href="#iglesias" className="lp-pulse inline-flex items-center justify-center rounded-full bg-coral-500 px-7 py-4 text-base font-extrabold text-white shadow-soft transition hover:scale-[1.02]">
+                  Quiero KidsMin en mi iglesia
+                </a>
+                <Link to="/login" className="inline-flex items-center justify-center rounded-full border-2 border-sky-600 bg-white/70 px-7 py-4 text-base font-extrabold text-sky-700 transition hover:bg-white">
+                  Ya tengo KidsMin · Acceder
+                </Link>
+              </div>
+              <p className="mt-4 text-sm font-bold text-ink/45">Pensada para iglesias y ministerios que quieren acompañar mejor a sus niños.</p>
+            </div>
+
+            <div className="lp-in relative mx-auto w-full max-w-xl lg:pl-6" style={{ animationDelay: '.12s' }}>
+              <div className="relative mx-auto max-w-[560px]">
+                <div className="relative rounded-[1.7rem] border-[7px] border-ink/90 bg-ink p-1 shadow-[0_28px_80px_rgba(24,57,76,.24)]">
+                  <div className="mb-1 flex items-center justify-center gap-1.5 py-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
+                    <span className="h-1.5 w-14 rounded-full bg-white/20" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
+                  </div>
+                  <div className="overflow-hidden rounded-[1rem] bg-white">
+                    <img src={appScreen} alt="Pantalla real de KidsMin mostrando la gestión de clases" className="block h-auto w-full" />
+                  </div>
+                </div>
+                <div className="absolute -bottom-5 -left-4 hidden w-56 rounded-2xl border border-white bg-white/95 p-4 shadow-card sm:block">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-11 w-11 place-items-center rounded-xl bg-sky-100 text-xl">📱</div>
+                    <div>
+                      <p className="text-xs font-extrabold uppercase tracking-wide text-sky-600">Interfaz real</p>
+                      <p className="font-black text-ink">Así se ve KidsMin por dentro.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -right-4 top-7 hidden rounded-2xl bg-sunshine-300 px-4 py-3 text-sm font-black text-ink shadow-card sm:block">
+                  Clases · asistencia · seguimiento
+                </div>
+              </div>
+              <div className="mt-8 overflow-hidden rounded-[1.5rem] border-4 border-white/90 bg-white shadow-soft">
+                <img src={heroImg} alt="Niños compartiendo la Palabra" className="h-36 w-full object-cover sm:h-40" />
+                <div className="flex items-center justify-between gap-4 px-5 py-3">
+                  <p className="font-extrabold text-ink">Una herramienta para servir mejor.</p>
+                  <span className="hidden rounded-full bg-coral-100 px-3 py-1 text-xs font-black text-coral-600 sm:inline">Hecho con propósito</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* FEATURES */}
-      <section className="mx-auto mt-10 max-w-5xl px-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="card">
-              <span className="text-3xl">{f.icon}</span>
-              <h3 className="mt-2 text-lg">{f.title}</h3>
-              <p className="mt-1 text-ink/60">{f.text}</p>
-            </div>
+      {/* WHAT IS IT */}
+      <section id="que-es" className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="rounded-full bg-sky-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sky-700">¿Qué es KidsMin?</span>
+          <h2 className="mt-4 text-4xl font-black tracking-tight text-ink sm:text-5xl">Una app para acompañar mejor a toda la comunidad infantil.</h2>
+          <p className="mt-5 text-lg leading-relaxed text-ink/60">
+            No es solo una agenda de clases. Es un punto de encuentro digital para las personas que hacen posible el ministerio infantil.
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
+          {ROLES.map((role) => (
+            <article key={role.title} className="rounded-[1.75rem] border border-ink/5 bg-white p-7 shadow-card transition duration-300 hover:-translate-y-1">
+              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-sky-50 text-3xl">{role.icon}</span>
+              <h3 className="mt-5 text-2xl font-black text-ink">{role.title}</h3>
+              <p className="mt-2 leading-relaxed text-ink/60">{role.text}</p>
+            </article>
           ))}
         </div>
       </section>
 
-      {/* HISTORIA */}
-      <section className="mx-auto mt-20 max-w-3xl px-6 text-center">
-        <span className="badge bg-coral-100 text-coral-600">Nuestra historia</span>
-        <h2 className="mt-3 text-3xl uppercase text-coral-500">Nació en el corazón</h2>
-        <p className="mt-4 text-lg leading-relaxed text-ink/70">
-          Esto nació de algo sencillo: quería que los niños de la iglesia tuvieran un espacio propio,
-          ordenado y bonito para conocer a Dios. Y que las docentes y los padres pudieran acompañarlos
-          sin enredos ni papeles perdidos, sin necesidad de ser expertos en tecnología.
-        </p>
-        <p className="mt-4 text-lg leading-relaxed text-ink/70">
-          La idea la llevaba en el corazón desde hacía tiempo. La primera vez que me senté a construirla
-          fue un mes antes de que naciera mi segundo hijo, así que no pude seguir. Cuando quise retomarla,
-          ya no pude entrar a ese proyecto, se había perdido. Pasaron casi dos años hasta que volví a
-          encontrar espacio en mi agenda, y esta vez la empecé desde cero.
-        </p>
-        <p className="mt-4 text-lg leading-relaxed text-ink/70">
-          KidsMin es un trabajo hecho con cariño, entregado como ofrenda al Señor. Para que la Palabra
-          se enseñe de una forma bonita, y para que cada niño y niña disfrute más su tiempo en la iglesia.
-        </p>
-        <div className="mt-5 flex flex-col items-center gap-1">
-          <a
-            href="https://gobeapp.com"
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm font-extrabold uppercase tracking-wide text-sky-600 hover:underline"
-          >
-            Gobe App Technology
-          </a>
-          <a
-            href="https://gobeapp.com/gise/"
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm font-extrabold uppercase tracking-wide text-coral-500 hover:underline"
-          >
-            Gisella Bustamante, creadora de KidsMin
-          </a>
-        </div>
-      </section>
+      {/* FEATURES */}
+      <section id="funciones" className="bg-white/65 px-6 py-20 lg:py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-2xl">
+            <span className="rounded-full bg-coral-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-coral-600">Dentro de la app</span>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-ink sm:text-5xl">Todo lo importante, sin complicarlo.</h2>
+          </div>
 
-      {/* OFRENDA */}
-      <section className="mx-auto mt-20 max-w-3xl px-6">
-        <div className="card border-4 border-sunshine-300 bg-sunshine-50 text-center">
-          <span className="text-4xl">💛</span>
-          <h2 className="mt-2 text-2xl uppercase text-sunshine-700">¿Quieres bendecir este proyecto?</h2>
-          <p className="mx-auto mt-3 max-w-lg text-ink/70">
-            KidsMin se entrega como ofrenda, de corazón. No es un pago obligatorio. Pero si esta
-            herramienta ha sido de bendición para tu iglesia y quieres sembrar para que llegue a más
-            escuelitas, hazlo con la libertad que Dios ponga en tu corazón.
-          </p>
-          <div className="mx-auto mt-5 inline-flex flex-col items-center gap-1 rounded-chunky bg-white px-6 py-4 shadow-card">
-            <span className="text-xs font-extrabold uppercase tracking-wide text-ink/40"> Nequi </span>
-            <span className="text-2xl font-extrabold tracking-wide text-sunshine-700">3246102594</span>
-            <span className="text-sm font-bold text-ink/60">Gise B</span>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((f) => (
+              <article key={f.title} className="group rounded-[1.5rem] border border-ink/5 bg-[#fffaf0] p-6 transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-card">
+                <span className="grid h-12 w-12 place-items-center rounded-xl bg-white text-2xl shadow-sm transition group-hover:scale-105">{f.icon}</span>
+                <h3 className="mt-4 text-xl font-black text-ink">{f.title}</h3>
+                <p className="mt-2 leading-relaxed text-ink/60">{f.text}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CONTACTO */}
-      <section className="mx-auto mt-20 max-w-2xl px-6">
-        <div className="text-center">
-          <span className="badge bg-sky-100 text-sky-700">Hablemos</span>
-          <h2 className="mt-3 text-3xl uppercase text-sky-600">¿Quieres tenerla en tu iglesia?</h2>
-          <p className="mx-auto mt-3 max-w-lg text-ink/60">
-            Escríbeme si quieres KidsMin para tu escuelita, si tienes una sugerencia, si necesitas
-            soporte o si quieres apoyar el proyecto de otra forma. Leo todos los mensajes.
+      {/* HOW IT WORKS */}
+      <section id="como-funciona" className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+        <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:items-start">
+          <div>
+            <span className="rounded-full bg-sunshine-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sunshine-700">Así funciona</span>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-ink sm:text-5xl">De la idea a tu iglesia, paso a paso.</h2>
+            <p className="mt-5 leading-relaxed text-ink/60">
+              Queremos que la tecnología quite trabajo, no que agregue más. Por eso el camino para comenzar debe ser sencillo.
+            </p>
+          </div>
+
+          <div className="grid gap-4">
+            {STEPS.map((step) => (
+              <div key={step.number} className="flex gap-5 rounded-[1.5rem] border border-ink/5 bg-white p-5 shadow-sm sm:p-6">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-sky-100 font-black text-sky-700">{step.number}</span>
+                <div>
+                  <h3 className="text-xl font-black">{step.title}</h3>
+                  <p className="mt-1 leading-relaxed text-ink/60">{step.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PURPOSE */}
+      <section className="mx-6 rounded-[2rem] bg-gradient-to-br from-sky-700 to-sky-600 px-6 py-16 text-white shadow-soft sm:px-10 lg:mx-auto lg:max-w-6xl lg:py-20">
+        <div className="grid gap-10 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
+          <div>
+            <span className="rounded-full bg-white/15 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-white">Hecho con propósito</span>
+            <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">Tecnología al servicio del ministerio.</h2>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/75">
+              KidsMin nació del deseo de crear un espacio propio, ordenado y bonito para el ministerio infantil, ayudando a docentes y familias a acompañar a los niños sin enredos ni papeles perdidos.
+            </p>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/75">
+              Es un proyecto construido con fe y entregado como ofrenda para que la Palabra se enseñe de una forma bonita y cada niño disfrute más su tiempo en la iglesia.
+            </p>
+          </div>
+          <div className="rounded-[1.75rem] bg-white/10 p-7 backdrop-blur-sm">
+            <p className="text-sm font-extrabold uppercase tracking-widest text-white/60">Creado por</p>
+            <p className="mt-2 text-2xl font-black">Gisella Bustamante</p>
+            <a href="https://gobeapp.com/gise/" target="_blank" rel="noreferrer" className="mt-2 inline-block font-bold text-sunshine-300 hover:underline">Conocer a la creadora →</a>
+          </div>
+        </div>
+      </section>
+
+      {/* REQUEST */}
+      <section id="iglesias" className="mx-auto max-w-5xl px-6 py-20 lg:py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="rounded-full bg-coral-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-coral-600">Para tu iglesia</span>
+          <h2 className="mt-4 text-4xl font-black tracking-tight text-ink sm:text-5xl">¿Quieres tener KidsMin en tu iglesia?</h2>
+          <p className="mt-4 text-lg leading-relaxed text-ink/60">
+            Cuéntanos un poco sobre tu ministerio y te explicaremos cómo empezar.
           </p>
         </div>
-        <div className="card mt-8">
+        <div className="mx-auto mt-10 max-w-2xl rounded-[2rem] border border-ink/5 bg-white p-6 shadow-card sm:p-8">
           <ContactoForm />
         </div>
       </section>
 
-      {/* CTA FINAL */}
-      <footer className="mt-20 bg-ink px-6 py-14 text-center text-white">
-        <h2 className="text-2xl uppercase">¿Lista tu escuelita para empezar?</h2>
-        <p className="mt-2 text-white/60">Entra con tu cuenta o pide que te inviten.</p>
-        <Link to="/login" className="btn-primary mt-6 inline-flex">
-          Ingresar
+      {/* EXISTING USERS */}
+      <section className="mx-6 mb-16 rounded-[2rem] bg-sunshine-100 px-6 py-12 text-center sm:px-10 lg:mx-auto lg:max-w-6xl">
+        <span className="text-4xl">👋</span>
+        <h2 className="mt-3 text-3xl font-black text-ink">¿Tu iglesia ya tiene KidsMin?</h2>
+        <p className="mx-auto mt-2 max-w-xl text-ink/60">Entra directamente a tu cuenta y continúa con tu ministerio.</p>
+        <Link to="/login" className="mt-6 inline-flex rounded-full bg-ink px-7 py-3.5 font-extrabold text-white transition hover:-translate-y-0.5">
+          Acceder a KidsMin →
         </Link>
-        <p className="mt-8 text-xs text-white/30">KidsMin, hecho con fe, como ofrenda para la gloria de Dios.</p>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-ink px-6 py-12 text-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-2xl font-black">Kids<span className="text-coral-400">Min</span></p>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-white/50">
+              Una herramienta creada con fe para acompañar a los ministerios infantiles.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-white/60">
+            <a href="#que-es" className="hover:text-white">¿Qué es?</a>
+            <a href="#funciones" className="hover:text-white">Funciones</a>
+            <a href="#iglesias" className="hover:text-white">Quiero KidsMin</a>
+            <Link to="/login" className="text-white hover:text-coral-300">Acceder</Link>
+          </div>
+        </div>
+        <div className="mx-auto mt-8 max-w-6xl border-t border-white/10 pt-5 text-xs text-white/30">
+          KidsMin · Hecho con fe, como ofrenda para la gloria de Dios.
+        </div>
       </footer>
     </div>
   )
 }
+
 
 function ContactoForm() {
   const [form, setForm] = useState({ nombre: '', iglesia: '', contacto: '', motivo: 'quiero-tenerla', mensaje: '' })
