@@ -23,6 +23,7 @@ import AgendaAdmin from './pages/admin/AgendaAdmin'
 import Ajustes from './pages/admin/Ajustes'
 import BitacoraAdmin from './pages/admin/BitacoraAdmin'
 import Planeacion from './pages/admin/Planeacion'
+import ReporteDocentes from './pages/admin/ReporteDocentes'
 
 import DocenteHome from './pages/docente/DocenteHome'
 import Asistencia from './pages/docente/Asistencia'
@@ -93,6 +94,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={STAFF}>
               <Docentes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reporte-docentes"
+          element={
+            <ProtectedRoute roles={STAFF}>
+              <ReporteDocentes />
             </ProtectedRoute>
           }
         />

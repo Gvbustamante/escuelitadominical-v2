@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useNivelesEstrella, badgeActual } from '../lib/nivelesEstrella'
 import Modal from './Modal'
 import RewardBurst from './RewardBurst'
 
@@ -10,8 +11,10 @@ function hoyISO() {
 const MENSAJES_COMPLETO = ['¡Asistencia completa! 🎉', '¡Todos presentes hoy! 🙌', '¡Qué domingo tan lleno! 🌟']
 
 export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNombre, ninos, userId, onSaved, onProgreso }) {
+  const nivelesEstrella = useNivelesEstrella()
   const [fecha, setFecha] = useState(hoyISO())
   const [marcados, setMarcados] = useState({})
+  const [estrellasPorNino, setEstrellasPorNino] = useState({})
   const [cargando, setCargando] = useState(false)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState(null)
@@ -25,17 +28,20 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
     if (!open || !nivelId) return
     setCargando(true)
     celebradoRef.current = false
-    supabase
-      .from('asistencia')
-      .select('nino_id, presente')
-      .eq('nivel_id', nivelId)
-      .eq('fecha', fecha)
-      .then(({ data }) => {
-        const map = {}
-        ;(data || []).forEach((r) => (map[r.nino_id] = r.presente))
-        setMarcados(map)
-        setCargando(false)
+    Promise.all([
+      supabase.from('asistencia').select('nino_id, presente').eq('nivel_id', nivelId).eq('fecha', fecha),
+      supabase.from('reconocimientos').select('nino_id').eq('nivel_id', nivelId),
+    ]).then(([{ data: asist }, { data: recs }]) => {
+      const map = {}
+      ;(asist || []).forEach((r) => (map[r.nino_id] = r.presente))
+      setMarcados(map)
+      const stars = {}
+      ;(recs || []).forEach((r) => {
+        stars[r.nino_id] = (stars[r.nino_id] || 0) + 1
       })
+      setEstrellasPorNino(stars)
+      setCargando(false)
+    })
   }, [open, nivelId, fecha])
 
   function toggle(ninoId) {
@@ -88,6 +94,7 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
                   <thead className="sticky top-0 bg-sky-50 text-xs font-bold uppercase text-ink/50">
                     <tr>
                       <th className="px-3 py-2">Niño/a</th>
+                      <th className="px-3 py-2 text-center">Insignia</th>
                       <th className="px-3 py-2 text-center">Presente</th>
                       {onProgreso && <th className="px-3 py-2 text-center">Progreso</th>}
                     </tr>
@@ -95,9 +102,14 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
                   <tbody>
                     {ninos.map((n) => {
                       const presente = !!marcados[n.id]
+                      const stars = estrellasPorNino[n.id] || 0
+                      const badge = badgeActual(nivelesEstrella, stars)
                       return (
                         <tr key={n.id} className={`border-t border-ink/5 ${presente ? 'bg-grass-50' : ''}`}>
                           <td className="px-3 py-2 font-bold">{n.nombre_completo}</td>
+                          <td className="px-3 py-2 text-center" title={`${badge.nombre} — ${stars} ⭐`}>
+                            <span className="text-lg">{badge.emoji}</span>
+                          </td>
                           <td className="px-3 py-2 text-center">
                             <button
                               type="button"
@@ -135,6 +147,8 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
               <div className="grid max-h-80 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3">
                 {ninos.map((n) => {
                   const presente = !!marcados[n.id]
+                  const stars = estrellasPorNino[n.id] || 0
+                  const badge = badgeActual(nivelesEstrella, stars)
                   return (
                     <div key={n.id} className="relative">
                       <button
@@ -144,8 +158,11 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
                           presente ? 'bg-grass-400 text-white' : 'bg-white text-ink'
                         }`}
                       >
-                        <span className="text-2xl">{presente ? '✅' : '🧒'}</span>
+                        <span className="text-2xl">{presente ? '✅' : badge.emoji}</span>
                         <span className="text-sm font-bold leading-tight">{n.nombre_completo}</span>
+                        <span className={`text-[0.6rem] font-bold leading-tight ${presente ? 'text-white/70' : 'text-ink/40'}`}>
+                          {badge.nombre} · {stars} ⭐
+                        </span>
                       </button>
                       {presente && onProgreso && (
                         <button
