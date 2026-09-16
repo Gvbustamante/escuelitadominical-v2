@@ -77,103 +77,157 @@ export default function Landing() {
 
       {/* HERO */}
       <header id="inicio" className="relative overflow-hidden bg-gradient-to-b from-sky-200 via-sky-100 to-[#fffaf0]">
-        <div className="pointer-events-none absolute right-8 top-10 h-24 w-24 rounded-full bg-sunshine-300 shadow-[0_0_70px_28px_rgba(255,199,44,.38)] sm:right-16 sm:h-32 sm:w-32" />
-        <span className="lp-star pointer-events-none absolute left-[10%] top-24 text-2xl text-white">✦</span>
-        <span className="lp-star pointer-events-none absolute left-[38%] top-14 text-xl text-white" style={{ animationDelay: '.8s' }}>✦</span>
-        <span className="lp-star pointer-events-none absolute right-[22%] top-32 text-lg text-white" style={{ animationDelay: '1.3s' }}>✦</span>
+        {/* Decoración de fondo */}
+        <div className="pointer-events-none absolute -left-24 top-40 h-72 w-72 rounded-full bg-white/45 blur-3xl" />
+        <div className="pointer-events-none absolute right-[-8rem] top-20 h-96 w-96 rounded-full bg-sunshine-200/45 blur-3xl" />
 
-        <div className="lp-cloud pointer-events-none absolute left-[4%] top-28 flex items-center opacity-80">
+        <div className="pointer-events-none absolute right-10 top-8 h-24 w-24 rounded-full bg-sunshine-300 shadow-[0_0_70px_28px_rgba(255,199,44,.36)] sm:right-20 sm:h-32 sm:w-32" />
+
+        <span className="lp-star pointer-events-none absolute left-[8%] top-24 text-2xl text-white">✦</span>
+        <span className="lp-star pointer-events-none absolute left-[45%] top-28 text-xl text-white" style={{ animationDelay: '.7s' }}>✦</span>
+        <span className="lp-star pointer-events-none absolute right-[25%] top-20 text-lg text-white" style={{ animationDelay: '1.2s' }}>✦</span>
+
+        {/* Nubes */}
+        <div className="lp-cloud pointer-events-none absolute left-[2%] top-24 flex items-center opacity-80">
           <div className="h-7 w-16 rounded-full bg-white sm:h-9 sm:w-24" />
           <div className="-ml-6 h-10 w-16 rounded-full bg-white sm:-ml-8 sm:h-12 sm:w-20" />
         </div>
-        <div className="lp-cloud pointer-events-none absolute right-[8%] top-48 flex items-center opacity-60" style={{ animationDelay: '-8s' }}>
+        <div className="lp-cloud pointer-events-none absolute right-[8%] top-44 flex items-center opacity-60" style={{ animationDelay: '-10s' }}>
           <div className="h-6 w-14 rounded-full bg-white sm:h-8 sm:w-20" />
           <div className="-ml-5 h-8 w-14 rounded-full bg-white sm:-ml-6 sm:h-10 sm:w-16" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-10 lg:pb-20 lg:pt-14">
-          <div className="grid items-center gap-10 lg:grid-cols-[.92fr_1.08fr]">
-            <div className="lp-in relative z-10 max-w-2xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/85 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sky-700 shadow-sm">
+        <div className="relative mx-auto max-w-7xl px-5 pb-14 pt-8 sm:px-6 lg:pb-16 lg:pt-10">
+          {/* Barra superior dentro del hero */}
+          <div className="mb-10 flex items-center justify-between">
+            <a href="#inicio" className="flex items-center gap-2">
+              <AppLogo emojiClassName="text-2xl" imgClassName="h-10 w-10 object-contain" />
+              <span className="text-xl font-black text-sky-700">Kids<span className="text-coral-500">Min</span></span>
+            </a>
+
+            <div className="hidden items-center gap-7 text-sm font-extrabold text-sky-800/75 md:flex">
+              <a href="#que-es" className="transition hover:text-sky-600">¿Qué es?</a>
+              <a href="#funciones" className="transition hover:text-sky-600">Funciones</a>
+              <a href="#como-funciona" className="transition hover:text-sky-600">Cómo funciona</a>
+              <a href="#iglesias" className="transition hover:text-sky-600">Para iglesias</a>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Link
+                to="/login"
+                className="hidden rounded-full bg-white px-5 py-3 text-sm font-extrabold text-sky-700 shadow-[0_8px_25px_rgba(32,106,150,.12)] transition hover:-translate-y-0.5 sm:inline-flex"
+              >
+                ↪ &nbsp;Acceder
+              </Link>
+              <a
+                href="#iglesias"
+                className="rounded-full bg-coral-500 px-5 py-3 text-sm font-extrabold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-coral-600"
+              >
+                Quiero KidsMin
+              </a>
+            </div>
+          </div>
+
+          <div className="grid items-center gap-8 lg:grid-cols-[.86fr_1.14fr] lg:gap-4">
+            {/* Copy */}
+            <div className="lp-in relative z-20 max-w-2xl lg:pb-7">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-[11px] font-black uppercase tracking-[.13em] text-sky-700 shadow-sm">
                 <span>☀️</span>
                 Plataforma digital para ministerios infantiles
               </div>
 
-              <h1 className="text-5xl font-black leading-[.98] tracking-tight text-[#123b68] sm:text-6xl lg:text-[4.45rem]">
+              <h1 className="mt-5 max-w-[680px] text-[3.25rem] font-black leading-[.96] tracking-[-.045em] text-[#123b68] sm:text-6xl lg:text-[4.55rem]">
                 El ministerio infantil de tu iglesia,
-                <span className="block">
+                <span className="mt-1 block">
                   <span className="text-sky-600">en un </span>
                   <span className="text-coral-500">solo</span>
                   <span className="text-sunshine-500"> lugar.</span>
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-xl text-lg font-semibold leading-relaxed text-ink/65 sm:text-xl">
+              <p className="mt-6 max-w-xl text-base font-semibold leading-relaxed text-ink/60 sm:text-lg">
                 KidsMin conecta a niños, familias, docentes y líderes para organizar clases, asistencia, actividades y acompañamiento espiritual desde una sola aplicación.
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href="#iglesias" className="lp-pulse inline-flex items-center justify-center gap-2 rounded-full bg-coral-500 px-7 py-4 text-base font-extrabold text-white shadow-soft transition hover:scale-[1.02]">
-                  <span>⛪</span>
-                  Quiero KidsMin en mi iglesia →
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href="#iglesias"
+                  className="lp-pulse inline-flex items-center justify-center gap-2 rounded-full bg-coral-500 px-7 py-4 text-base font-black text-white shadow-soft transition hover:scale-[1.02]"
+                >
+                  ⛪ Quiero KidsMin en mi iglesia →
                 </a>
-                <Link to="/login" className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white bg-white/90 px-7 py-4 text-base font-extrabold text-sky-700 shadow-sm transition hover:-translate-y-0.5">
-                  <span>↪</span>
-                  Ya tengo KidsMin · Acceder
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white bg-white/90 px-7 py-4 text-base font-black text-sky-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white"
+                >
+                  ↪ Ya tengo KidsMin · Acceder
                 </Link>
               </div>
 
-              <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs font-extrabold text-ink/50">
+              <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs font-extrabold text-ink/45">
                 <span>💗 Fortalece tu ministerio</span>
                 <span>👨‍👩‍👧 Conecta a las familias</span>
                 <span>🛡️ Simple y organizado</span>
               </div>
             </div>
 
-            {/* MOCKUP REAL DE LA APP */}
-            <div className="lp-in relative z-10 mx-auto w-full max-w-[650px]" style={{ animationDelay: '.12s' }}>
-              <div className="relative min-h-[430px] sm:min-h-[510px]">
-                {/* Laptop */}
-                <div className="absolute left-0 top-5 w-[91%] rounded-[1.65rem] border-[7px] border-[#18344c] bg-[#18344c] p-1 shadow-[0_30px_80px_rgba(24,57,76,.24)]">
-                  <div className="mb-1 flex items-center justify-center gap-1.5 py-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-                    <span className="h-1.5 w-14 rounded-full bg-white/20" />
-                    <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-                  </div>
-                  <div className="overflow-hidden rounded-[1rem] bg-white">
-                    <img src={appScreen} alt="Pantalla real de KidsMin mostrando la gestión de niños y clases" className="block w-full" />
-                  </div>
+            {/* Producto real: desktop + móvil */}
+            <div className="lp-in relative z-10 mx-auto min-h-[430px] w-full max-w-[760px] sm:min-h-[500px] lg:-ml-3" style={{ animationDelay: '.12s' }}>
+              {/* Texto manuscrito */}
+              <div className="absolute right-[12%] top-0 z-30 hidden rotate-[-3deg] text-right text-sm font-black leading-tight text-sky-700 sm:block">
+                Organiza, conecta<br />y haz crecer tu ministerio ♥
+              </div>
+
+              {/* Laptop */}
+              <div className="absolute left-[2%] top-[7%] w-[88%] rounded-[1.7rem] border-[7px] border-[#17384f] bg-[#17384f] p-1 shadow-[0_30px_75px_rgba(24,57,76,.27)] sm:left-[4%] sm:w-[89%]">
+                <div className="flex items-center justify-center gap-1.5 py-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
+                  <span className="h-1.5 w-16 rounded-full bg-white/20" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
                 </div>
-
-                {/* Base de laptop */}
-                <div className="absolute left-[7%] top-[66%] z-0 h-5 w-[79%] rounded-b-[1rem] bg-[#18344c] shadow-lg sm:h-7" />
-                <div className="absolute left-[25%] top-[70%] z-0 h-2 w-[42%] rounded-full bg-[#45657a]" />
-
-                {/* Phone con login real */}
-                <div className="absolute bottom-0 right-0 z-20 w-[32%] min-w-[145px] max-w-[215px] rotate-[3deg] rounded-[1.7rem] border-[6px] border-[#18344c] bg-[#18344c] p-1 shadow-[0_25px_60px_rgba(24,57,76,.28)] sm:w-[34%]">
-                  <div className="relative overflow-hidden rounded-[1.2rem] bg-white">
-                    <div className="absolute left-1/2 top-1 z-10 h-3 w-16 -translate-x-1/2 rounded-full bg-[#18344c]" />
-                    <img src={loginScreen} alt="Pantalla real de acceso a KidsMin" className="block w-full" />
-                  </div>
-                </div>
-
-                {/* Floating labels */}
-                <div className="absolute -right-2 top-1 z-30 hidden rounded-2xl bg-white px-4 py-3 shadow-card sm:block">
-                  <p className="text-xs font-extrabold uppercase tracking-wide text-sky-600">KidsMin</p>
-                  <p className="font-black text-ink">Organiza · conecta · acompaña</p>
-                </div>
-
-                <div className="absolute bottom-8 left-0 z-30 hidden rounded-2xl bg-sunshine-300 px-4 py-3 text-sm font-black text-ink shadow-card sm:block">
-                  ✨ También en tu celular
-                </div>
-
-                <div className="absolute right-[30%] top-[18%] z-30 hidden -rotate-6 text-sm font-black text-sky-700 sm:block">
-                  Organiza, conecta<br />y haz crecer tu ministerio ♥
+                <div className="overflow-hidden rounded-[1.05rem] bg-white">
+                  <img
+                    src={appScreen}
+                    alt="Pantalla real de KidsMin con niños y clases"
+                    className="block w-full"
+                  />
                 </div>
               </div>
+
+              {/* Base de laptop */}
+              <div className="absolute left-[10%] top-[69%] z-0 h-5 w-[75%] rounded-b-2xl bg-[#17384f] shadow-lg sm:h-7" />
+              <div className="absolute left-[30%] top-[72%] z-0 h-2 w-[35%] rounded-full bg-[#58748a]" />
+
+              {/* Teléfono */}
+              <div className="absolute bottom-[2%] right-[1%] z-30 w-[29%] min-w-[150px] max-w-[215px] rotate-[4deg] rounded-[1.8rem] border-[7px] border-[#17384f] bg-[#17384f] p-1 shadow-[0_28px_65px_rgba(24,57,76,.30)] sm:right-[0%] sm:w-[31%]">
+                <div className="relative overflow-hidden rounded-[1.25rem] bg-white">
+                  <div className="absolute left-1/2 top-1.5 z-20 h-3.5 w-16 -translate-x-1/2 rounded-full bg-[#17384f]" />
+                  <img
+                    src={loginScreen}
+                    alt="Pantalla real de acceso a KidsMin"
+                    className="block w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Chips de producto */}
+              <div className="absolute bottom-[13%] left-[1%] z-30 rounded-2xl bg-sunshine-300 px-4 py-3 text-xs font-black text-ink shadow-card">
+                ✨ También en tu celular
+              </div>
+
+              <div className="absolute right-[28%] top-[24%] z-30 hidden rounded-2xl bg-white/95 px-4 py-3 shadow-card backdrop-blur-sm sm:block">
+                <p className="text-[10px] font-black uppercase tracking-wide text-sky-600">KidsMin</p>
+                <p className="text-sm font-black text-ink">Organiza · conecta · acompaña</p>
+              </div>
+
+              <div className="absolute bottom-[7%] right-[33%] z-20 hidden text-2xl text-coral-500 sm:block">✦</div>
+              <div className="absolute right-[5%] top-[49%] z-20 hidden text-3xl text-sunshine-500 sm:block">✦</div>
             </div>
           </div>
         </div>
+
+        {/* transición suave */}
+        <div className="pointer-events-none absolute bottom-[-1px] left-0 right-0 h-12 bg-gradient-to-t from-[#fffaf0] to-transparent" />
       </header>
 
       {/* WHAT IS IT */}
