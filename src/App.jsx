@@ -24,6 +24,7 @@ import Ajustes from './pages/admin/Ajustes'
 import BitacoraAdmin from './pages/admin/BitacoraAdmin'
 import Planeacion from './pages/admin/Planeacion'
 import ReporteDocentes from './pages/admin/ReporteDocentes'
+import Clases from './pages/admin/Clases'
 
 import DocenteHome from './pages/docente/DocenteHome'
 import Asistencia from './pages/docente/Asistencia'
@@ -88,7 +89,14 @@ export default function App() {
           }
         />
         <Route path="/usuarios" element={<Navigate to="/docentes" replace />} />
-        <Route path="/clases" element={<Navigate to="/ninos" replace />} />
+        <Route
+          path="/clases"
+          element={
+            <ProtectedRoute roles={STAFF}>
+              <Clases />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/docentes"
           element={
