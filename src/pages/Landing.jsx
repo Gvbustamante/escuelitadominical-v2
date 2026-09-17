@@ -311,7 +311,7 @@ export default function Landing() {
           <div className="rounded-[1.75rem] bg-white/10 p-7 backdrop-blur-sm">
             <p className="text-sm font-extrabold uppercase tracking-widest text-white/60">Creado por</p>
             <p className="mt-2 text-2xl font-black">Gisella Bustamante</p>
-            <a href="https://www.gvbustamante.github.io/portafolio" target="_blank" rel="noreferrer" className="mt-2 inline-block font-bold text-sunshine-300 hover:underline">Conocer a la creadora →</a>
+            <a href="https://gvbustamante.github.io/portafolio" target="_blank" rel="noreferrer" className="mt-2 inline-block font-bold text-sunshine-300 hover:underline">Conocer a la creadora →</a>
           </div>
         </div>
       </section>
