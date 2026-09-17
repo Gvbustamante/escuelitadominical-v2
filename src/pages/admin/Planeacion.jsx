@@ -114,6 +114,20 @@ export default function Planeacion() {
   for (let i = 0; i < primerDia; i++) celdas.push(null)
   for (let d = 1; d <= diasEnMes; d++) celdas.push(d)
 
+  const resumenMes = useMemo(() => {
+    let planeadas = 0
+    let sinPlanear = 0
+    for (let d = 1; d <= diasEnMes; d++) {
+      const iso = toISO(year, month, d)
+      const diaSem = new Date(year, month, d).getDay()
+      if (!diasClaseSet.has(diaSem)) continue
+      const tieneAct = actividadesMes.some((a) => a.fecha === iso)
+      if (tieneAct) planeadas++
+      else sinPlanear++
+    }
+    return { planeadas, sinPlanear }
+  }, [actividadesMes, diasClaseSet, diasEnMes, year, month])
+
   function openActividad(nivel, actividadExistente) {
     setModalActividad({ nivel, actividad: actividadExistente })
     if (actividadExistente) {
@@ -187,20 +201,6 @@ export default function Planeacion() {
   const diaSemanaSeleccionado = selectedDay ? new Date(selectedDay + 'T00:00:00').getDay() : null
   const horariosDelDia = horarios.filter((h) => h.dia_semana === null || h.dia_semana === diaSemanaSeleccionado)
   const esDiaClase = diaSemanaSeleccionado !== null && diasClaseSet.has(diaSemanaSeleccionado)
-
-  const resumenMes = useMemo(() => {
-    let planeadas = 0
-    let sinPlanear = 0
-    for (let d = 1; d <= diasEnMes; d++) {
-      const iso = toISO(year, month, d)
-      const diaSem = new Date(year, month, d).getDay()
-      if (!diasClaseSet.has(diaSem)) continue
-      const tieneAct = actividadesMes.some((a) => a.fecha === iso)
-      if (tieneAct) planeadas++
-      else sinPlanear++
-    }
-    return { planeadas, sinPlanear }
-  }, [actividadesMes, diasClaseSet, diasEnMes, year, month])
 
   return (
     <div className="flex flex-col gap-6">
