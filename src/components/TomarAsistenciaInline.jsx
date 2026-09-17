@@ -10,7 +10,7 @@ function hoyISO() {
 
 const MENSAJES_COMPLETO = ['¡Asistencia completa! 🎉', '¡Todos presentes hoy! 🙌', '¡Qué domingo tan lleno! 🌟']
 
-export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, userId, onSaved, onProgreso }) {
+export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, userId, onSaved, onProgreso, esStaff }) {
   const nivelesEstrella = useNivelesEstrella()
   const [fecha, setFecha] = useState(hoyISO())
   const [marcados, setMarcados] = useState({})
@@ -19,6 +19,15 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState(null)
   const celebradoRef = useRef(false)
+  const [yaGuardado, setYaGuardado] = useState(false)
+  const [diasClaseSet, setDiasClaseSet] = useState(null)
+
+  useEffect(() => {
+    supabase.from('dias_clase').select('*').then(({ data }) => {
+      const activos = (data || []).filter((d) => d.activo).map((d) => d.dia_semana)
+      setDiasClaseSet(new Set(activos))
+    })
+  }, [])
 
   useEffect(() => {
     if (!nivelId) return
@@ -31,6 +40,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
       const map = {}
       ;(asist || []).forEach((r) => (map[r.nino_id] = r.presente))
       setMarcados(map)
+      setYaGuardado((asist || []).length > 0)
       const stars = {}
       ;(recs || []).forEach((r) => {
         stars[r.nino_id] = (stars[r.nino_id] || 0) + 1
@@ -40,7 +50,14 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
     })
   }, [nivelId, fecha])
 
+  const hoy = hoyISO()
+  const esHoy = fecha === hoy
+  const diaSemana = new Date(fecha + 'T00:00:00').getDay()
+  const esDiaClase = diasClaseSet ? diasClaseSet.has(diaSemana) : true
+  const bloqueado = !esStaff && (yaGuardado || !esHoy || !esDiaClase)
+
   function toggle(ninoId) {
+    if (bloqueado) return
     setMarcados((prev) => {
       const next = { ...prev, [ninoId]: !prev[ninoId] }
       const todosPresentes = ninos && ninos.length > 0 && ninos.every((n) => next[n.id])
@@ -54,7 +71,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
   }
 
   function marcarTodos() {
-    if (!ninos) return
+    if (bloqueado || !ninos) return
     const next = {}
     ninos.forEach((n) => (next[n.id] = true))
     setMarcados(next)
@@ -66,11 +83,13 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
   }
 
   function desmarcarTodos() {
+    if (bloqueado) return
     setMarcados({})
     celebradoRef.current = false
   }
 
   async function guardar() {
+    if (bloqueado) return
     setSaving(true)
     const rows = ninos.map((n) => ({
       nino_id: n.id,
@@ -81,12 +100,23 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
     }))
     await supabase.from('asistencia').upsert(rows, { onConflict: 'nino_id,fecha' })
     setSaving(false)
+    setYaGuardado(true)
     onSaved?.()
   }
 
   const presentes = Object.values(marcados).filter(Boolean).length
   const total = ninos?.length || 0
   const pct = total > 0 ? Math.round((presentes / total) * 100) : 0
+
+  if (!esStaff && diasClaseSet && !esDiaClase) {
+    return (
+      <div className="card flex flex-col items-center gap-3 py-12 text-center">
+        <span className="text-4xl">📅</span>
+        <p className="font-bold text-ink/40">Hoy no es día de clase</p>
+        <p className="text-sm text-ink/30">Solo puedes tomar asistencia los días de clase</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -96,9 +126,19 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
         <div className="flex flex-col gap-3 border-b-2 border-ink/5 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-lg font-bold">{nivelNombre || 'Tomar asistencia'}</p>
-            <p className="text-sm text-ink/50">Marca quién vino hoy</p>
+            {!esStaff && yaGuardado ? (
+              <p className="text-sm font-bold text-grass-600">✅ Asistencia registrada — no se puede modificar</p>
+            ) : !esStaff ? (
+              <p className="text-sm text-ink/50">Marca quién vino hoy</p>
+            ) : (
+              <p className="text-sm text-ink/50">Marca quién vino hoy</p>
+            )}
           </div>
-          <input type="date" className="input !w-auto" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+          {esStaff ? (
+            <input type="date" className="input !w-auto" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+          ) : (
+            <span className="text-sm font-bold text-ink/40">{new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+          )}
         </div>
 
         {cargando ? (
@@ -126,14 +166,16 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
                 </div>
                 <span className="text-xs font-bold text-ink/40">{pct}%</span>
               </div>
-              <div className="flex gap-2">
-                <button type="button" onClick={marcarTodos} className="rounded-xl px-3 py-1.5 text-xs font-bold text-sky-600 hover:bg-sky-50">
-                  ✅ Todos
-                </button>
-                <button type="button" onClick={desmarcarTodos} className="rounded-xl px-3 py-1.5 text-xs font-bold text-ink/40 hover:bg-ink/5">
-                  Limpiar
-                </button>
-              </div>
+              {!bloqueado && (
+                <div className="flex gap-2">
+                  <button type="button" onClick={marcarTodos} className="rounded-xl px-3 py-1.5 text-xs font-bold text-sky-600 hover:bg-sky-50">
+                    ✅ Todos
+                  </button>
+                  <button type="button" onClick={desmarcarTodos} className="rounded-xl px-3 py-1.5 text-xs font-bold text-ink/40 hover:bg-ink/5">
+                    Limpiar
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="divide-y divide-ink/5">
@@ -151,12 +193,13 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
                     <button
                       type="button"
                       onClick={() => toggle(n.id)}
+                      disabled={bloqueado}
                       aria-label={`Marcar presente a ${n.nombre_completo}`}
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg shadow-pop transition-all active:translate-y-0.5 active:shadow-none ${
                         presente
                           ? 'bg-grass-400 text-white ring-2 ring-grass-200'
                           : 'bg-white text-ink/20 ring-2 ring-ink/10 hover:ring-ink/20'
-                      }`}
+                      } ${bloqueado ? 'cursor-not-allowed opacity-60' : ''}`}
                     >
                       {presente ? '✓' : ''}
                     </button>
@@ -189,11 +232,13 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
               })}
             </div>
 
-            <div className="border-t-2 border-ink/5 p-4">
-              <button onClick={guardar} disabled={saving} className="btn-success w-full justify-center">
-                {saving ? 'Guardando...' : '💾 Guardar asistencia'}
-              </button>
-            </div>
+            {!bloqueado && (
+              <div className="border-t-2 border-ink/5 p-4">
+                <button onClick={guardar} disabled={saving} className="btn-success w-full justify-center">
+                  {saving ? 'Guardando...' : '💾 Guardar asistencia'}
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

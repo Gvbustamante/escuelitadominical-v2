@@ -93,6 +93,7 @@ export default function AsistenciaAdmin() {
           nivelNombre={nivelActual?.nombre}
           ninos={ninos}
           userId={user.id}
+          esStaff
           onProgreso={(n) => setProgresoNino(n)}
           onSaved={() => setRefreshKey((k) => k + 1)}
         />
