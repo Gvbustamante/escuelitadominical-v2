@@ -102,9 +102,10 @@ export default function Landing() {
               </Link>
               <a
                 href="#iglesias"
-                className="rounded-full bg-coral-500 px-5 py-3 text-sm font-extrabold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-coral-600"
+                className="rounded-full bg-coral-500 px-3.5 py-2.5 text-xs font-extrabold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-coral-600 sm:px-5 sm:py-3 sm:text-sm"
               >
-                Quiero KidsMin
+                <span className="sm:hidden">⛪ Quiero</span>
+                <span className="hidden sm:inline">Quiero KidsMin</span>
               </a>
             </div>
           </div>
@@ -117,7 +118,7 @@ export default function Landing() {
                 Plataforma digital para ministerios infantiles
               </div>
 
-              <h1 className="mt-5 max-w-[680px] text-[3.25rem] font-black leading-[.96] tracking-[-.045em] text-[#123b68] sm:text-6xl lg:text-[4.55rem]">
+              <h1 className="mt-5 max-w-[680px] text-[2.25rem] font-black leading-[.96] tracking-[-.045em] text-[#123b68] sm:text-5xl md:text-6xl lg:text-[4.55rem]">
                 El ministerio infantil de tu iglesia,
                 <span className="mt-1 block">
                   <span className="text-sky-600">en un </span>
@@ -126,20 +127,20 @@ export default function Landing() {
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-xl text-base font-semibold leading-relaxed text-ink/60 sm:text-lg">
+              <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-ink/60 sm:mt-6 sm:text-base lg:text-lg">
                 KidsMin conecta a niños, familias, docentes y líderes para organizar clases, asistencia, actividades y acompañamiento espiritual desde una sola aplicación.
               </p>
 
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-5 flex flex-col gap-2.5 sm:mt-7 sm:flex-row sm:gap-3">
                 <a
                   href="#iglesias"
-                  className="lp-pulse inline-flex items-center justify-center gap-2 rounded-full bg-coral-500 px-7 py-4 text-base font-black text-white shadow-soft transition hover:scale-[1.02]"
+                  className="lp-pulse inline-flex items-center justify-center gap-2 rounded-full bg-coral-500 px-5 py-3 text-sm font-black text-white shadow-soft transition hover:scale-[1.02] sm:px-7 sm:py-4 sm:text-base"
                 >
                   ⛪ Quiero KidsMin en mi iglesia →
                 </a>
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white bg-white/90 px-7 py-4 text-base font-black text-sky-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white bg-white/90 px-5 py-3 text-sm font-black text-sky-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white sm:px-7 sm:py-4 sm:text-base"
                 >
                   ↪ Ya tengo KidsMin · Acceder
                 </Link>
@@ -153,7 +154,7 @@ export default function Landing() {
             </div>
 
             {/* Producto real: desktop + móvil */}
-            <div className="lp-in relative z-10 mx-auto min-h-[430px] w-full max-w-[760px] sm:min-h-[500px] lg:-ml-3" style={{ animationDelay: '.12s' }}>
+            <div className="lp-in relative z-10 mx-auto min-h-[300px] w-full max-w-[760px] sm:min-h-[430px] md:min-h-[500px] lg:-ml-3" style={{ animationDelay: '.12s' }}>
               {/* Texto manuscrito */}
               <div className="absolute right-[12%] top-0 z-30 hidden rotate-[-3deg] text-right text-sm font-black leading-tight text-sky-700 sm:block">
                 Organiza, conecta<br />y haz crecer tu ministerio ♥
@@ -212,20 +213,20 @@ export default function Landing() {
       </header>
 
       {/* WHAT IS IT */}
-      <section id="que-es" className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+      <section id="que-es" className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-3xl text-center">
           <span className="rounded-full bg-sky-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sky-700">¿Qué es KidsMin?</span>
-          <h2 className="mt-4 text-4xl font-black tracking-tight text-ink sm:text-5xl">Una app para acompañar mejor a toda la comunidad infantil.</h2>
-          <p className="mt-5 text-lg leading-relaxed text-ink/60">
+          <h2 className="mt-4 text-2xl font-black tracking-tight text-ink sm:text-4xl md:text-5xl">Una app para acompañar mejor a toda la comunidad infantil.</h2>
+          <p className="mt-4 text-base leading-relaxed text-ink/60 sm:mt-5 sm:text-lg">
             No es solo una agenda de clases. Es un punto de encuentro digital para las personas que hacen posible el ministerio infantil.
           </p>
         </div>
 
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {ROLES.map((role) => (
-            <article key={role.title} className="rounded-[1.75rem] border border-ink/5 bg-white p-7 shadow-card transition duration-300 hover:-translate-y-1">
-              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-sky-50 text-3xl">{role.icon}</span>
-              <h3 className="mt-5 text-2xl font-black text-ink">{role.title}</h3>
+            <article key={role.title} className="rounded-[1.75rem] border border-ink/5 bg-white p-5 shadow-card transition duration-300 hover:-translate-y-1 sm:p-7">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-sky-50 text-2xl sm:h-14 sm:w-14 sm:text-3xl">{role.icon}</span>
+              <h3 className="mt-4 text-xl font-black text-ink sm:mt-5 sm:text-2xl">{role.title}</h3>
               <p className="mt-2 leading-relaxed text-ink/60">{role.text}</p>
             </article>
           ))}
@@ -233,7 +234,7 @@ export default function Landing() {
       </section>
 
       {/* TRUST STRIP */}
-      <section className="mx-auto max-w-6xl px-6 pb-4">
+      <section className="mx-auto max-w-6xl px-5 pb-4 sm:px-6">
         <div className="grid gap-3 rounded-[1.5rem] bg-white/80 p-4 shadow-sm sm:grid-cols-3">
           <div className="flex items-center gap-3 rounded-2xl px-4 py-3">
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-coral-100 text-xl">💗</span>
@@ -251,18 +252,18 @@ export default function Landing() {
       </section>
 
       {/* FEATURES */}
-      <section id="funciones" className="bg-white/65 px-6 py-20 lg:py-24">
+      <section id="funciones" className="bg-white/65 px-5 py-14 sm:px-6 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <span className="rounded-full bg-coral-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-coral-600">Dentro de la app</span>
-            <h2 className="mt-4 text-4xl font-black tracking-tight text-ink sm:text-5xl">Todo lo importante, sin complicarlo.</h2>
+            <h2 className="mt-4 text-2xl font-black tracking-tight text-ink sm:text-4xl md:text-5xl">Todo lo importante, sin complicarlo.</h2>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {FEATURES.map((f) => (
-              <article key={f.title} className="group rounded-[1.5rem] border border-ink/5 bg-[#fffaf0] p-6 transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-card">
-                <span className="grid h-12 w-12 place-items-center rounded-xl bg-white text-2xl shadow-sm transition group-hover:scale-105">{f.icon}</span>
-                <h3 className="mt-4 text-xl font-black text-ink">{f.title}</h3>
+              <article key={f.title} className="group rounded-[1.5rem] border border-ink/5 bg-[#fffaf0] p-5 transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-card sm:p-6">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-white text-xl shadow-sm transition group-hover:scale-105 sm:h-12 sm:w-12 sm:text-2xl">{f.icon}</span>
+                <h3 className="mt-3 text-lg font-black text-ink sm:mt-4 sm:text-xl">{f.title}</h3>
                 <p className="mt-2 leading-relaxed text-ink/60">{f.text}</p>
               </article>
             ))}
@@ -271,11 +272,11 @@ export default function Landing() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="como-funciona" className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
-        <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:items-start">
+      <section id="como-funciona" className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20 lg:py-24">
+        <div className="grid gap-8 sm:gap-12 lg:grid-cols-[.75fr_1.25fr] lg:items-start">
           <div>
             <span className="rounded-full bg-sunshine-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sunshine-700">Así funciona</span>
-            <h2 className="mt-4 text-4xl font-black tracking-tight text-ink sm:text-5xl">De la idea a tu iglesia, paso a paso.</h2>
+            <h2 className="mt-4 text-2xl font-black tracking-tight text-ink sm:text-4xl md:text-5xl">De la idea a tu iglesia, paso a paso.</h2>
             <p className="mt-5 leading-relaxed text-ink/60">
               Queremos que la tecnología quite trabajo, no que agregue más. Por eso el camino para comenzar debe ser sencillo.
             </p>
@@ -283,10 +284,10 @@ export default function Landing() {
 
           <div className="grid gap-4">
             {STEPS.map((step) => (
-              <div key={step.number} className="flex gap-5 rounded-[1.5rem] border border-ink/5 bg-white p-5 shadow-sm sm:p-6">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-sky-100 font-black text-sky-700">{step.number}</span>
+              <div key={step.number} className="flex gap-3.5 rounded-[1.5rem] border border-ink/5 bg-white p-4 shadow-sm sm:gap-5 sm:p-6">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-sky-100 text-sm font-black text-sky-700 sm:h-12 sm:w-12 sm:text-base">{step.number}</span>
                 <div>
-                  <h3 className="text-xl font-black">{step.title}</h3>
+                  <h3 className="text-lg font-black sm:text-xl">{step.title}</h3>
                   <p className="mt-1 leading-relaxed text-ink/60">{step.text}</p>
                 </div>
               </div>
@@ -296,19 +297,19 @@ export default function Landing() {
       </section>
 
       {/* PURPOSE */}
-      <section className="mx-6 rounded-[2rem] bg-gradient-to-br from-sky-700 to-sky-600 px-6 py-16 text-white shadow-soft sm:px-10 lg:mx-auto lg:max-w-6xl lg:py-20">
-        <div className="grid gap-10 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
+      <section className="mx-4 rounded-[1.5rem] bg-gradient-to-br from-sky-700 to-sky-600 px-5 py-12 text-white shadow-soft sm:mx-6 sm:rounded-[2rem] sm:px-10 sm:py-16 lg:mx-auto lg:max-w-6xl lg:py-20">
+        <div className="grid gap-8 sm:gap-10 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
           <div>
             <span className="rounded-full bg-white/15 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-white">Hecho con propósito</span>
-            <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">Tecnología al servicio del ministerio.</h2>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/75">
+            <h2 className="mt-4 text-2xl font-black tracking-tight sm:mt-5 sm:text-4xl md:text-5xl">Tecnología al servicio del ministerio.</h2>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/75 sm:mt-5 sm:text-lg">
               KidsMin nació del deseo de crear un espacio propio, ordenado y bonito para el ministerio infantil, ayudando a docentes y familias a acompañar a los niños sin enredos ni papeles perdidos.
             </p>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/75">
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/75 sm:mt-4 sm:text-lg">
               Es un proyecto construido con fe y entregado como ofrenda para que la Palabra se enseñe de una forma bonita y cada niño disfrute más su tiempo en la iglesia.
             </p>
           </div>
-          <div className="rounded-[1.75rem] bg-white/10 p-7 backdrop-blur-sm">
+          <div className="rounded-[1.75rem] bg-white/10 p-5 backdrop-blur-sm sm:p-7">
             <p className="text-sm font-extrabold uppercase tracking-widest text-white/60">Creado por</p>
             <p className="mt-2 text-2xl font-black">Gisella Bustamante</p>
             <a href="https://gvbustamante.github.io/portafolio/" target="_blank" rel="noreferrer" className="mt-2 inline-block font-bold text-sunshine-300 hover:underline">Conocer a la creadora →</a>
@@ -317,24 +318,24 @@ export default function Landing() {
       </section>
 
       {/* TWO PATHS */}
-      <section className="mx-auto max-w-6xl px-6 py-8 lg:py-10">
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-50 to-sky-50 p-7 shadow-sm">
-            <div className="absolute -right-5 -top-5 text-7xl opacity-20">⛪</div>
-            <span className="text-3xl">🏠</span>
-            <h3 className="mt-3 text-2xl font-black">¿Quieres llevar KidsMin a tu iglesia?</h3>
-            <p className="mt-2 max-w-md text-ink/60">Cuéntanos sobre tu ministerio y te explicaremos cómo comenzar.</p>
-            <a href="#iglesias" className="mt-5 inline-flex rounded-full bg-coral-500 px-6 py-3.5 font-extrabold text-white shadow-sm transition hover:-translate-y-0.5">
+      <section className="mx-auto max-w-6xl px-5 py-6 sm:px-6 sm:py-8 lg:py-10">
+        <div className="grid gap-4 sm:gap-5 md:grid-cols-2">
+          <div className="relative overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-emerald-50 to-sky-50 p-5 shadow-sm sm:rounded-[2rem] sm:p-7">
+            <div className="absolute -right-5 -top-5 text-6xl opacity-20 sm:text-7xl">⛪</div>
+            <span className="text-2xl sm:text-3xl">🏠</span>
+            <h3 className="mt-2 text-xl font-black sm:mt-3 sm:text-2xl">¿Quieres llevar KidsMin a tu iglesia?</h3>
+            <p className="mt-2 max-w-md text-sm text-ink/60 sm:text-base">Cuéntanos sobre tu ministerio y te explicaremos cómo comenzar.</p>
+            <a href="#iglesias" className="mt-4 inline-flex rounded-full bg-coral-500 px-5 py-3 text-sm font-extrabold text-white shadow-sm transition hover:-translate-y-0.5 sm:mt-5 sm:px-6 sm:py-3.5 sm:text-base">
               Quiero KidsMin en mi iglesia →
             </a>
           </div>
 
-          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-violet-50 to-sky-50 p-7 shadow-sm">
-            <div className="absolute -right-5 -top-5 text-7xl opacity-20">💻</div>
-            <span className="text-3xl">👋</span>
-            <h3 className="mt-3 text-2xl font-black">¿Tu iglesia ya usa KidsMin?</h3>
-            <p className="mt-2 max-w-md text-ink/60">Entonces ya puedes entrar directamente a tu cuenta.</p>
-            <Link to="/login" className="mt-5 inline-flex rounded-full bg-white px-6 py-3.5 font-extrabold text-sky-700 shadow-card transition hover:-translate-y-0.5">
+          <div className="relative overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-violet-50 to-sky-50 p-5 shadow-sm sm:rounded-[2rem] sm:p-7">
+            <div className="absolute -right-5 -top-5 text-6xl opacity-20 sm:text-7xl">💻</div>
+            <span className="text-2xl sm:text-3xl">👋</span>
+            <h3 className="mt-2 text-xl font-black sm:mt-3 sm:text-2xl">¿Tu iglesia ya usa KidsMin?</h3>
+            <p className="mt-2 max-w-md text-sm text-ink/60 sm:text-base">Entonces ya puedes entrar directamente a tu cuenta.</p>
+            <Link to="/login" className="mt-4 inline-flex rounded-full bg-white px-5 py-3 text-sm font-extrabold text-sky-700 shadow-card transition hover:-translate-y-0.5 sm:mt-5 sm:px-6 sm:py-3.5 sm:text-base">
               Acceder a KidsMin →
             </Link>
           </div>
@@ -342,21 +343,21 @@ export default function Landing() {
       </section>
 
       {/* REQUEST */}
-      <section id="iglesias" className="mx-auto max-w-5xl px-6 py-20 lg:py-24">
+      <section id="iglesias" className="mx-auto max-w-5xl px-5 py-14 sm:px-6 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-3xl text-center">
           <span className="rounded-full bg-coral-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-coral-600">Para tu iglesia</span>
-          <h2 className="mt-4 text-4xl font-black tracking-tight text-ink sm:text-5xl">¿Quieres tener KidsMin en tu iglesia?</h2>
-          <p className="mt-4 text-lg leading-relaxed text-ink/60">
+          <h2 className="mt-4 text-2xl font-black tracking-tight text-ink sm:text-4xl md:text-5xl">¿Quieres tener KidsMin en tu iglesia?</h2>
+          <p className="mt-3 text-base leading-relaxed text-ink/60 sm:mt-4 sm:text-lg">
             Cuéntanos un poco sobre tu ministerio y te explicaremos cómo empezar.
           </p>
         </div>
-        <div className="mx-auto mt-10 max-w-2xl rounded-[2rem] border border-ink/5 bg-white p-6 shadow-card sm:p-8">
+        <div className="mx-auto mt-8 max-w-2xl rounded-[1.5rem] border border-ink/5 bg-white p-5 shadow-card sm:mt-10 sm:rounded-[2rem] sm:p-8">
           <ContactoForm />
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-ink px-6 py-12 text-white">
+      <footer className="bg-ink px-5 py-10 text-white sm:px-6 sm:py-12">
         <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-2xl font-black">Kids<span className="text-coral-400">Min</span></p>
