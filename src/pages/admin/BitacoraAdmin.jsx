@@ -387,7 +387,7 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
           </button>
         </div>
         <div className="mt-2">
-          <MultiFilePicker archivos={salonFotos} onChange={setSalonFotos} accept="image/*" label="📷 Agregar foto(s) del salón" />
+          <MultiFilePicker archivos={salonFotos} onChange={setSalonFotos} label="📎 Agregar archivo(s) del salón" />
         </div>
         <FotosGaleria fotos={fotosSalonExistentes} />
       </div>
@@ -405,8 +405,7 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
             <MultiFilePicker
               archivos={refrigerioFotos}
               onChange={setRefrigerioFotos}
-              accept="image/*"
-              label="📷 Agregar foto(s) del refrigerio"
+              label="📎 Agregar archivo(s) del refrigerio"
             />
           </div>
           <FotosGaleria fotos={fotosRefrigerioExistentes} />
