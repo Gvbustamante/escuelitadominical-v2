@@ -204,7 +204,7 @@ export default function Ajustes() {
         >
           🌟 Estrellas
         </button>
-        {['superadmin', 'admin'].includes(profile.role) && (
+        {profile.role === 'superadmin' && (
           <button
             onClick={() => setTab('modulos')}
             className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'modulos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
@@ -404,7 +404,7 @@ export default function Ajustes() {
         </>
       )}
 
-      {tab === 'modulos' && ['superadmin', 'admin'].includes(profile.role) && (
+      {tab === 'modulos' && profile.role === 'superadmin' && (
         <ModulosTab config={config} />
       )}
 
