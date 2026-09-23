@@ -69,7 +69,7 @@ const NAV = {
 }
 
 const ROLE_LABEL = {
-  superadmin: 'Super Admin',
+  superadmin: 'Administrador',
   admin: 'Administrador',
   coordinador: 'Coordinador',
   docente: 'Docente',
