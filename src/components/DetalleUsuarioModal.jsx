@@ -14,7 +14,7 @@ const ROLE_BADGE = {
 const ROLES_TODOS = ['superadmin', 'admin', 'coordinador', 'docente', 'padre']
 
 export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], open, onClose, onSaved, miRole, miId }) {
-  const [form, setForm] = useState({ nombre_completo: '', telefono: '', role: '' })
+  const [form, setForm] = useState({ nombre_completo: '', telefono: '', email: '', whatsapp: '', role: '' })
   const [busy, setBusy] = useState(false)
   const [ok, setOk] = useState(false)
   const [error, setError] = useState('')
@@ -26,6 +26,8 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
       setForm({
         nombre_completo: persona.nombre_completo || '',
         telefono: persona.telefono || '',
+        email: persona.email || '',
+        whatsapp: persona.whatsapp || '',
         role: persona.role,
       })
       setOk(false)
@@ -47,6 +49,8 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
     const payload = {
       nombre_completo: form.nombre_completo,
       telefono: form.telefono || null,
+      email: form.email || null,
+      whatsapp: form.whatsapp || null,
     }
     if (puedeCambiarRole) payload.role = form.role
     const { error: saveError } = await supabase.from('profiles').update(payload).eq('id', persona.id)
@@ -72,7 +76,7 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
     setNuevaPassword(data)
   }
 
-  const link = whatsappLink(form.telefono)
+  const link = whatsappLink(form.whatsapp || form.telefono)
 
   return (
     <Modal open={open} onClose={onClose} title={`Detalle — ${persona.nombre_completo}`}>
@@ -102,11 +106,22 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
         )}
 
         <div>
-          <label className="label">WhatsApp (con código de país, ej. 18091234567)</label>
+          <label className="label">Correo electrónico</label>
           <input
             className="input"
-            value={form.telefono}
-            onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            placeholder="correo@ejemplo.com"
+          />
+        </div>
+
+        <div>
+          <label className="label">WhatsApp (con código de país)</label>
+          <input
+            className="input"
+            value={form.whatsapp || form.telefono}
+            onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
             placeholder="Ej. 18091234567"
           />
           {link && (
