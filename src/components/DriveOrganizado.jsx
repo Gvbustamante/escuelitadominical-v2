@@ -48,7 +48,7 @@ export default function DriveOrganizado() {
         supabase.from('bitacora_fotos').select('id, bitacora_id, storage_path, nombre_archivo, mime, tipo'),
         supabase.from('materiales').select('id, nombre, foto_url, created_at'),
         supabase.from('material_fotos').select('id, material_id, storage_path, nombre_archivo, tipo'),
-        supabase.from('profiles').select('id, nombre_completo, hoja_vida_url, role').not('hoja_vida_url', 'is', null),
+        supabase.from('profiles').select('id, nombre_completo, hoja_vida_url, role'),
         supabase.from('tarea_entregas').select('id, actividad_id, nino_id, docente_id, estado, archivo_url, entregado_at, actividad:actividades(titulo, fecha, audiencia, nivel_id, nivel:niveles(nombre))').eq('estado', 'entregada'),
         supabase.from('tarea_entrega_archivos').select('id, entrega_id, storage_path, nombre_archivo, tipo'),
         supabase.from('ninos').select('id, nombre_completo'),
@@ -74,6 +74,7 @@ export default function DriveOrganizado() {
     if (!datos) return null
     const result = {}
     const ninosMap = Object.fromEntries(datos.ninos.map((n) => [n.id, n.nombre_completo]))
+    const docentesMap = Object.fromEntries(datos.perfiles.map((p) => [p.id, p.nombre_completo]))
 
     // --- Actividades (split by audiencia: ninos / docentes) ---
     for (const aud of ['ninos', 'docentes']) {
@@ -124,7 +125,7 @@ export default function DriveOrganizado() {
         const ma = mesAnio(fecha)
         if (!ma) continue
         const nivel = e.actividad?.nivel?.nombre || 'Toda la escuelita'
-        const quien = aud === 'ninos' ? (ninosMap[e.nino_id] || 'Niño') : 'Docente'
+        const quien = aud === 'ninos' ? (ninosMap[e.nino_id] || 'Niño') : (docentesMap[e.docente_id] || 'Docente')
 
         if (e.archivo_url) {
           items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, url: e.archivo_url, fuente: `Entrega de ${quien}`, mime: null })
@@ -221,7 +222,7 @@ export default function DriveOrganizado() {
     result.materiales = agruparPorMes(matItems)
 
     // --- Hojas de vida (flat) ---
-    result.hojas_vida = datos.perfiles.map((p) => ({
+    result.hojas_vida = datos.perfiles.filter((p) => p.hoja_vida_url).map((p) => ({
       nombre: `${p.nombre_completo} — Hoja de vida`,
       url: p.hoja_vida_url,
       fuente: p.nombre_completo,
