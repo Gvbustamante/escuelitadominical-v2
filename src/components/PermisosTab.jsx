@@ -3,8 +3,9 @@ import { supabase } from '../lib/supabaseClient'
 import Skeleton from './Skeleton'
 import { usePermisosRol, refreshPermisosRol, PERMISOS_DISPONIBLES } from '../lib/permisosRol'
 
-const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
+const ROLE_LABEL = { superadmin: 'Super Admin', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
 const ROLE_BADGE = {
+  superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',
   coordinador: 'bg-sunshine-100 text-sunshine-700',
   docente: 'bg-sky-100 text-sky-700',

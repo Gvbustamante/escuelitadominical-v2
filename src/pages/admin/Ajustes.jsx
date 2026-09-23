@@ -204,7 +204,7 @@ export default function Ajustes() {
         >
           🌟 Estrellas
         </button>
-        {profile.role === 'admin' && (
+        {['superadmin', 'admin'].includes(profile.role) && (
           <button
             onClick={() => setTab('modulos')}
             className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'modulos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
@@ -212,7 +212,7 @@ export default function Ajustes() {
             📦 Módulos
           </button>
         )}
-        {profile.role === 'admin' && (
+        {['superadmin', 'admin'].includes(profile.role) && (
           <button
             onClick={() => setTab('permisos')}
             className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'permisos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
@@ -236,7 +236,7 @@ export default function Ajustes() {
 
       {tab === 'estrellas' && <ConfigEstrellas />}
 
-      {tab === 'permisos' && profile.role === 'admin' && <PermisosTab />}
+      {tab === 'permisos' && ['superadmin', 'admin'].includes(profile.role) && <PermisosTab />}
 
       {tab === 'general' && (
         <>
@@ -404,7 +404,7 @@ export default function Ajustes() {
         </>
       )}
 
-      {tab === 'modulos' && profile.role === 'admin' && (
+      {tab === 'modulos' && ['superadmin', 'admin'].includes(profile.role) && (
         <ModulosTab config={config} />
       )}
 

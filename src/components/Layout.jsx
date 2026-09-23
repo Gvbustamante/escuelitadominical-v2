@@ -7,23 +7,26 @@ import CambiarPasswordModal from './CambiarPasswordModal'
 import AppLogo from './AppLogo'
 import AppName from './AppName'
 
+const ADMIN_NAV = [
+  { to: '/', label: 'Inicio', icon: '🏠', end: true },
+  { to: '/devocionales', label: 'Devocionales', icon: '🙏', modulo: 'devocionales' },
+  { to: '/asistencia', label: 'Asistencia', icon: '✅', modulo: 'asistencia' },
+  { to: '/actividades', label: 'Actividades', icon: '🎨', modulo: 'actividades' },
+  { to: '/bitacora', label: 'Bitácora', icon: '📋', modulo: 'bitacora' },
+  { to: '/planeacion', label: 'Planeación', icon: '📆', modulo: 'planeacion' },
+  { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
+  { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
+  { to: '/drive', label: 'Drive', icon: '📁', modulo: 'drive' },
+  { to: '/ninos', label: 'Niños', icon: '🧒' },
+  { to: '/clases', label: 'Clases', icon: '🎒' },
+  { to: '/docentes', label: 'Equipo', icon: '🍎' },
+  { to: '/reporte-docentes', label: 'Reporte docentes', icon: '📊' },
+  { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
+]
+
 const NAV = {
-  admin: [
-    { to: '/', label: 'Inicio', icon: '🏠', end: true },
-    { to: '/devocionales', label: 'Devocionales', icon: '🙏', modulo: 'devocionales' },
-    { to: '/asistencia', label: 'Asistencia', icon: '✅', modulo: 'asistencia' },
-    { to: '/actividades', label: 'Actividades', icon: '🎨', modulo: 'actividades' },
-    { to: '/bitacora', label: 'Bitácora', icon: '📋', modulo: 'bitacora' },
-    { to: '/planeacion', label: 'Planeación', icon: '📆', modulo: 'planeacion' },
-    { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
-    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
-    { to: '/drive', label: 'Drive', icon: '📁', modulo: 'drive' },
-    { to: '/ninos', label: 'Niños', icon: '🧒' },
-    { to: '/clases', label: 'Clases', icon: '🎒' },
-    { to: '/docentes', label: 'Equipo', icon: '🍎' },
-    { to: '/reporte-docentes', label: 'Reporte docentes', icon: '📊' },
-    { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
-  ],
+  superadmin: ADMIN_NAV,
+  admin: ADMIN_NAV,
   coordinador: [
     { to: '/', label: 'Inicio', icon: '🏠', end: true },
     { to: '/devocionales', label: 'Devocionales', icon: '🙏', modulo: 'devocionales' },
@@ -66,6 +69,7 @@ const NAV = {
 }
 
 const ROLE_LABEL = {
+  superadmin: 'Super Admin',
   admin: 'Administrador',
   coordinador: 'Coordinador',
   docente: 'Docente',
@@ -115,7 +119,7 @@ export default function Layout() {
 
   const modulosActivos = config?.modulos_activos
   const allItems = [...(NAV[profile?.role] || [])]
-  if (tieneHijos && ['admin', 'coordinador', 'docente'].includes(profile?.role)) {
+  if (tieneHijos && ['superadmin', 'admin', 'coordinador', 'docente'].includes(profile?.role)) {
     allItems.splice(1, 0, { to: '/mi-familia', label: 'Mi familia', icon: '👪' })
   }
   const items = modulosActivos
@@ -172,7 +176,7 @@ export default function Layout() {
             <p className="truncate text-sm font-bold">{profile?.nombre_completo}</p>
             <p className="text-xs text-ink/50">{ROLE_LABEL[profile?.role]}</p>
           </div>
-          {!['admin', 'coordinador'].includes(profile?.role) && (
+          {!['superadmin', 'admin', 'coordinador'].includes(profile?.role) && (
             <button onClick={() => setPwOpen(true)} className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
               <span>🔑</span>
               <span>Contraseña</span>

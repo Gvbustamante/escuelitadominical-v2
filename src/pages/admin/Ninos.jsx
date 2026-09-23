@@ -14,7 +14,7 @@ import { whatsappLink } from '../../lib/whatsapp'
 import { exportExcel } from '../../lib/exportExcel'
 import { generarCodigoFacil } from '../../lib/codigoFacil'
 
-const STAFF = ['admin', 'coordinador']
+const STAFF = ['superadmin', 'admin', 'coordinador']
 
 function calcularEdad(fecha) {
   if (!fecha) return null

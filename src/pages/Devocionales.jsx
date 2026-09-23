@@ -44,8 +44,8 @@ function previewTexto(html, max = 100) {
 export default function Devocionales() {
   const { user, profile } = useAuth()
   const navigate = useNavigate()
-  const puedeCrear = ['admin', 'coordinador', 'docente'].includes(profile.role)
-  const puedeVerVersiculos = ['admin', 'coordinador'].includes(profile.role)
+  const puedeCrear = ['superadmin', 'admin', 'coordinador', 'docente'].includes(profile.role)
+  const puedeVerVersiculos = ['superadmin', 'admin', 'coordinador'].includes(profile.role)
   const [tab, setTab] = useState('devocionales')
   const [vista, setVista] = useState('tarjetas')
   const [nivelFiltro, setNivelFiltro] = useState('')
