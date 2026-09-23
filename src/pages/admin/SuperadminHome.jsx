@@ -119,7 +119,7 @@ export default function SuperadminHome() {
     docente: 'bg-sky-100 text-sky-700',
   }
   const ROLE_LABEL = {
-    superadmin: 'Super Admin',
+    superadmin: 'Admin',
     admin: 'Admin',
     coordinador: 'Coordinador',
     docente: 'Docente',

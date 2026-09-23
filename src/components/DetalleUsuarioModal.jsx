@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { whatsappLink } from '../lib/whatsapp'
 import Modal from './Modal'
 
-const ROLE_LABEL = { superadmin: 'Super Admin', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
+const ROLE_LABEL = { superadmin: 'Administrador', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
 const ROLE_BADGE = {
   superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',
@@ -11,7 +11,7 @@ const ROLE_BADGE = {
   docente: 'bg-sky-100 text-sky-700',
   padre: 'bg-coral-100 text-coral-700',
 }
-const ROLES_TODOS = ['superadmin', 'admin', 'coordinador', 'docente', 'padre']
+const ROLES_TODOS = ['admin', 'coordinador', 'docente', 'padre']
 
 export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], open, onClose, onSaved, miRole, miId }) {
   const [form, setForm] = useState({ nombre_completo: '', telefono: '', email: '', whatsapp: '', role: '' })

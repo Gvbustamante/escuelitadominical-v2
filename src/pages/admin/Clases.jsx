@@ -343,7 +343,7 @@ export default function Clases() {
                   {d.nombre_completo}
                   {d.role !== 'docente' && (
                     <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${['superadmin', 'admin'].includes(d.role) ? 'bg-grape-100 text-grape-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
-                      {d.role === 'superadmin' ? 'Super' : d.role === 'admin' ? 'Admin' : 'Coord'}
+                      {['superadmin', 'admin'].includes(d.role) ? 'Admin' : 'Coord'}
                     </span>
                   )}
                 </label>

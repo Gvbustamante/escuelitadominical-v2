@@ -4,7 +4,7 @@ import { whatsappLink } from '../lib/whatsapp'
 import Avatar from './Avatar'
 import Modal from './Modal'
 
-const ROLE_LABEL = { superadmin: 'Super Admin', admin: 'Admin', coordinador: 'Coordinador', docente: 'Docente' }
+const ROLE_LABEL = { superadmin: 'Admin', admin: 'Admin', coordinador: 'Coordinador', docente: 'Docente' }
 const ROLE_BADGE = {
   superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',

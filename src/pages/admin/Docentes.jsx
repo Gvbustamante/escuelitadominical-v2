@@ -11,7 +11,7 @@ import DocentesTab from '../../components/DocentesTab'
 import Avatar from '../../components/Avatar'
 import { whatsappLink } from '../../lib/whatsapp'
 
-const ROLE_LABEL = { superadmin: 'Super Admin', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
+const ROLE_LABEL = { superadmin: 'Administrador', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
 const ROLE_BADGE = {
   superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',
@@ -21,7 +21,6 @@ const ROLE_BADGE = {
 }
 const FILTROS_ROL = [
   ['todos', 'Todos'],
-  ['superadmin', 'Super Admin'],
   ['admin', 'Admin'],
   ['coordinador', 'Coordinador'],
   ['docente', 'Docente'],
@@ -86,7 +85,7 @@ export default function Docentes() {
   const rolesInvitables = ['superadmin', 'admin'].includes(profile.role) ? ['docente', 'coordinador', 'admin', 'padre'] : ['docente', 'padre']
 
   const filtrados = (usuarios || [])
-    .filter((u) => filtroRol === 'todos' || u.role === filtroRol)
+    .filter((u) => filtroRol === 'todos' || u.role === filtroRol || (filtroRol === 'admin' && u.role === 'superadmin'))
     .filter(
       (u) =>
         u.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()) || (u.cedula || '').includes(busqueda),
