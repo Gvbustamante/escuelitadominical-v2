@@ -199,7 +199,7 @@ function BitacoraForm({ nivelId, fecha, momento, registro, docenteId, onSaved })
           </button>
         </div>
         <div className="mt-2">
-          <MultiFilePicker archivos={salonFotos} onChange={setSalonFotos} accept="image/*" label="📷 Agregar foto(s) del salón" />
+          <MultiFilePicker archivos={salonFotos} onChange={setSalonFotos} label="📎 Agregar archivo(s) del salón" />
         </div>
         <FotosGaleria fotos={fotosSalonExistentes} />
       </div>
@@ -217,8 +217,7 @@ function BitacoraForm({ nivelId, fecha, momento, registro, docenteId, onSaved })
             <MultiFilePicker
               archivos={refrigerioFotos}
               onChange={setRefrigerioFotos}
-              accept="image/*"
-              label="📷 Agregar foto(s) del refrigerio"
+              label="📎 Agregar archivo(s) del refrigerio"
             />
           </div>
           <FotosGaleria fotos={fotosRefrigerioExistentes} />

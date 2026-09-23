@@ -242,8 +242,8 @@ export default function Materiales() {
             <textarea className="input" rows={2} value={form.notas} onChange={(e) => setForm({ ...form, notas: e.target.value })} />
           </div>
           <div>
-            <label className="label">{editing ? 'Agregar más fotos (opcional)' : 'Fotos (opcional)'}</label>
-            <MultiFilePicker archivos={fotos} onChange={setFotos} accept="image/*" label="📷 Agregar foto(s)" />
+            <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (opcional)'}</label>
+            <MultiFilePicker archivos={fotos} onChange={setFotos} label="📎 Agregar archivo(s)" />
             {editing && <FotosGaleria fotos={fotosDe(editing)} />}
           </div>
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
