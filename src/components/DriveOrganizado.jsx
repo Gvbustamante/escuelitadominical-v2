@@ -16,6 +16,30 @@ function mesAnio(fecha) {
   return { year: d.getFullYear(), month: d.getMonth() }
 }
 
+function fechaCorta(fecha) {
+  if (!fecha) return null
+  const s = fecha.length > 10 ? fecha.slice(0, 10) : fecha
+  const [y, m, d] = s.split('-')
+  return `${d}/${m}/${y}`
+}
+
+function tipoDeArchivo(mime, nombre, esEnlace) {
+  if (esEnlace) return 'Enlace'
+  if (mime?.startsWith('image/')) return 'Imagen'
+  if (mime?.startsWith('video/')) return 'Video'
+  if (mime?.startsWith('audio/')) return 'Audio'
+  if (mime?.includes('pdf')) return 'PDF'
+  if (mime?.includes('word') || mime?.includes('document')) return 'Documento'
+  if (mime?.includes('sheet') || mime?.includes('excel')) return 'Hoja de cálculo'
+  if (mime?.includes('presentation') || mime?.includes('powerpoint')) return 'Presentación'
+  if (nombre) {
+    const ext = nombre.split('.').pop()?.toLowerCase()
+    const map = { pdf: 'PDF', doc: 'Documento', docx: 'Documento', xls: 'Hoja de cálculo', xlsx: 'Hoja de cálculo', ppt: 'Presentación', pptx: 'Presentación', mp4: 'Video', mov: 'Video', mp3: 'Audio', wav: 'Audio', jpg: 'Imagen', jpeg: 'Imagen', png: 'Imagen', gif: 'Imagen', webp: 'Imagen', svg: 'Imagen' }
+    if (map[ext]) return map[ext]
+  }
+  return 'Archivo'
+}
+
 const SECCIONES = [
   { key: 'actividades_ninos', label: 'Actividades — Niños', icon: '🎨', color: 'sky' },
   { key: 'actividades_docentes', label: 'Actividades — Docentes', icon: '🍎', color: 'sky' },
@@ -41,10 +65,10 @@ export default function DriveOrganizado() {
   useEffect(() => {
     async function load() {
       const [acts, devos, devoArchivos, bitacoras, bitaFotos, mats, matFotos, perfiles, entregas, entregaArchivos, ninos] = await Promise.all([
-        supabase.from('actividades').select('id, titulo, fecha, imagen_url, enlace_externo, audiencia, es_tarea, nivel_id, nivel:niveles(nombre)').order('fecha', { ascending: false }),
-        supabase.from('devocionales_ninos').select('id, titulo, fecha, imagen_url, enlace_externo, nivel_id, nivel:niveles(nombre)').order('fecha', { ascending: false }),
+        supabase.from('actividades').select('id, titulo, fecha, imagen_url, enlace_externo, audiencia, es_tarea, nivel_id, docente_id, nivel:niveles(nombre)').order('fecha', { ascending: false }),
+        supabase.from('devocionales_ninos').select('id, titulo, fecha, imagen_url, enlace_externo, nivel_id, creado_por, nivel:niveles(nombre)').order('fecha', { ascending: false }),
         supabase.from('devocional_archivos').select('id, devocional_id, storage_path, nombre_archivo, tipo, bucket'),
-        supabase.from('bitacora_clase').select('id, fecha, momento, nivel_id, nivel:niveles(nombre), salon_foto_url, refrigerio_foto_url').order('fecha', { ascending: false }),
+        supabase.from('bitacora_clase').select('id, fecha, momento, nivel_id, docente_id, nivel:niveles(nombre), salon_foto_url, refrigerio_foto_url').order('fecha', { ascending: false }),
         supabase.from('bitacora_fotos').select('id, bitacora_id, storage_path, nombre_archivo, mime, tipo'),
         supabase.from('materiales').select('id, nombre, foto_url, created_at'),
         supabase.from('material_fotos').select('id, material_id, storage_path, nombre_archivo, tipo'),
@@ -85,11 +109,12 @@ export default function DriveOrganizado() {
         const ma = mesAnio(act.fecha)
         if (!ma) continue
         const nivel = act.nivel?.nombre || 'Toda la escuelita'
+        const quien = docentesMap[act.docente_id] || null
         if (act.imagen_url) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — portada`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, mime: 'image/*' })
+          items.push({ ...ma, nivel, nombre: `${act.titulo} — portada`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
         }
         if (act.enlace_externo) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, esEnlace: true })
+          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
         }
       }
       result[`actividades_${aud}`] = agruparPorMesYNivel(items)
@@ -103,14 +128,15 @@ export default function DriveOrganizado() {
         const ma = mesAnio(act.fecha)
         if (!ma) continue
         const nivel = act.nivel?.nombre || 'Toda la escuelita'
+        const quien = docentesMap[act.docente_id] || null
         if (act.imagen_url) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — archivo`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, mime: 'image/*' })
+          items.push({ ...ma, nivel, nombre: `${act.titulo} — archivo`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
         }
         if (act.enlace_externo) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, esEnlace: true })
+          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
         }
         if (!act.imagen_url && !act.enlace_externo) {
-          items.push({ ...ma, nivel, nombre: act.titulo, fuente: 'Tarea asignada', fuenteLink: `#/actividad/${act.id}`, soloInfo: true })
+          items.push({ ...ma, nivel, nombre: act.titulo, fuente: 'Tarea asignada', fuenteLink: `#/actividad/${act.id}`, soloInfo: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Tarea' })
         }
       }
       result[`tareas_${aud}`] = agruparPorMesYNivel(items)
@@ -121,14 +147,14 @@ export default function DriveOrganizado() {
       const items = []
       for (const e of datos.entregas) {
         if (e.actividad?.audiencia !== aud) continue
-        const fecha = e.entregado_at?.slice(0, 10) || e.actividad?.fecha
-        const ma = mesAnio(fecha)
+        const fechaStr = e.entregado_at?.slice(0, 10) || e.actividad?.fecha
+        const ma = mesAnio(fechaStr)
         if (!ma) continue
         const nivel = e.actividad?.nivel?.nombre || 'Toda la escuelita'
         const quien = aud === 'ninos' ? (ninosMap[e.nino_id] || 'Niño') : (docentesMap[e.docente_id] || 'Docente')
 
         if (e.archivo_url) {
-          items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, url: e.archivo_url, fuente: `Entrega de ${quien}`, mime: null })
+          items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, url: e.archivo_url, fuente: `Entrega de ${quien}`, mime: null, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(null, e.archivo_url) })
         }
         const archivos = datos.entregaArchivos.filter((a) => a.entrega_id === e.id)
         for (const a of archivos) {
@@ -138,10 +164,11 @@ export default function DriveOrganizado() {
             url: storageUrl('actividades', a.storage_path),
             fuente: `Entrega de ${quien}`,
             mime: a.tipo,
+            subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo),
           })
         }
         if (!e.archivo_url && archivos.length === 0) {
-          items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, fuente: 'Entregada (sin archivo)', soloInfo: true })
+          items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, fuente: 'Entregada (sin archivo)', soloInfo: true, subidoPor: quien, fecha: fechaStr, tipoArchivo: 'Entrega' })
         }
       }
       result[`entregas_${aud}`] = agruparPorMesYNivel(items)
@@ -153,11 +180,12 @@ export default function DriveOrganizado() {
       const ma = mesAnio(d.fecha)
       if (!ma) continue
       const nivel = d.nivel?.nombre || 'Toda la escuelita'
+      const quien = docentesMap[d.creado_por] || null
       if (d.imagen_url) {
-        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — imagen`, url: d.imagen_url, fuente: d.titulo, fuenteLink: `#/devocional/${d.id}`, mime: 'image/*' })
+        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — imagen`, url: d.imagen_url, fuente: d.titulo, fuenteLink: `#/devocional/${d.id}`, mime: 'image/*', subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Imagen' })
       }
       if (d.enlace_externo) {
-        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — enlace externo`, url: d.enlace_externo, fuente: d.titulo, fuenteLink: `#/devocional/${d.id}`, esEnlace: true })
+        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — enlace externo`, url: d.enlace_externo, fuente: d.titulo, fuenteLink: `#/devocional/${d.id}`, esEnlace: true, subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Enlace' })
       }
       const archivos = datos.devocionalArchivos.filter((a) => a.devocional_id === d.id)
       for (const a of archivos) {
@@ -168,6 +196,7 @@ export default function DriveOrganizado() {
           fuente: d.titulo,
           fuenteLink: `#/devocional/${d.id}`,
           mime: a.tipo,
+          subidoPor: quien, fecha: d.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo),
         })
       }
     }
@@ -180,12 +209,13 @@ export default function DriveOrganizado() {
       if (!ma) continue
       const nivel = b.nivel?.nombre || 'Clase'
       const label = `${nivel} — ${b.momento}`
+      const quien = docentesMap[b.docente_id] || null
 
       if (b.salon_foto_url) {
-        bitItems.push({ ...ma, nivel, nombre: `${label} — salón`, url: b.salon_foto_url, fuente: label, mime: 'image/*' })
+        bitItems.push({ ...ma, nivel, nombre: `${label} — salón`, url: b.salon_foto_url, fuente: label, mime: 'image/*', subidoPor: quien, fecha: b.fecha, tipoArchivo: 'Imagen' })
       }
       if (b.refrigerio_foto_url) {
-        bitItems.push({ ...ma, nivel, nombre: `${label} — refrigerio`, url: b.refrigerio_foto_url, fuente: label, mime: 'image/*' })
+        bitItems.push({ ...ma, nivel, nombre: `${label} — refrigerio`, url: b.refrigerio_foto_url, fuente: label, mime: 'image/*', subidoPor: quien, fecha: b.fecha, tipoArchivo: 'Imagen' })
       }
       const fotos = datos.bitacoraFotos.filter((f) => f.bitacora_id === b.id)
       for (const f of fotos) {
@@ -195,6 +225,7 @@ export default function DriveOrganizado() {
           url: storageUrl('actividades', f.storage_path),
           fuente: label,
           mime: f.mime,
+          subidoPor: quien, fecha: b.fecha, tipoArchivo: tipoDeArchivo(f.mime, f.nombre_archivo),
         })
       }
     }
@@ -205,8 +236,9 @@ export default function DriveOrganizado() {
     for (const m of datos.materiales) {
       const ma = mesAnio(m.created_at?.slice(0, 10))
       if (!ma) continue
+      const fechaMat = m.created_at?.slice(0, 10)
       if (m.foto_url) {
-        matItems.push({ ...ma, nombre: `${m.nombre} — foto`, url: m.foto_url, fuente: m.nombre, mime: 'image/*' })
+        matItems.push({ ...ma, nombre: `${m.nombre} — foto`, url: m.foto_url, fuente: m.nombre, mime: 'image/*', fecha: fechaMat, tipoArchivo: 'Imagen' })
       }
       const fotos = datos.materialFotos.filter((f) => f.material_id === m.id)
       for (const f of fotos) {
@@ -216,6 +248,7 @@ export default function DriveOrganizado() {
           url: storageUrl('actividades', f.storage_path),
           fuente: m.nombre,
           mime: f.tipo,
+          fecha: fechaMat, tipoArchivo: tipoDeArchivo(f.tipo, f.nombre_archivo),
         })
       }
     }
@@ -227,6 +260,7 @@ export default function DriveOrganizado() {
       url: p.hoja_vida_url,
       fuente: p.nombre_completo,
       mime: null,
+      subidoPor: p.nombre_completo, tipoArchivo: tipoDeArchivo(null, p.hoja_vida_url),
     }))
 
     return result
@@ -379,6 +413,19 @@ function MesesArbolInner({ meses, prefix, subAbierta, onToggle, onPreview }) {
   )
 }
 
+function MetaLinea({ a }) {
+  const parts = []
+  if (a.subidoPor) parts.push(a.subidoPor)
+  if (a.fecha) parts.push(fechaCorta(a.fecha))
+  if (a.tipoArchivo) parts.push(a.tipoArchivo)
+  if (parts.length === 0) return <p className="truncate text-[10px] text-ink/30">{a.fuente}</p>
+  return (
+    <p className="truncate text-[10px] text-ink/30">
+      {parts.join(' · ')}{a.fuente ? ` — ${a.fuente}` : ''}
+    </p>
+  )
+}
+
 function ArchivoLista({ archivos, onPreview }) {
   return (
     <div className="flex flex-col divide-y divide-ink/5 bg-ink/[0.01]">
@@ -389,7 +436,7 @@ function ArchivoLista({ archivos, onPreview }) {
               <span className="shrink-0 text-lg">📝</span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold text-ink/50">{a.nombre}</p>
-                <p className="truncate text-[10px] text-ink/30">{a.fuente}</p>
+                <MetaLinea a={a} />
               </div>
               {a.fuenteLink && (
                 <a href={a.fuenteLink} className="shrink-0 rounded-lg bg-ink/5 px-2 py-1 text-[10px] font-bold text-ink/40 hover:bg-sky-100 hover:text-sky-600">
@@ -406,7 +453,7 @@ function ArchivoLista({ archivos, onPreview }) {
               <span className="shrink-0 text-lg">🔗</span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold text-ink/70">{a.nombre}</p>
-                <p className="truncate text-[10px] text-ink/30">{a.fuente}</p>
+                <MetaLinea a={a} />
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
                 {a.fuenteLink && (
@@ -433,7 +480,7 @@ function ArchivoLista({ archivos, onPreview }) {
               <span className="shrink-0 text-lg">{icon}</span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold text-ink/70">{a.nombre}</p>
-                <p className="truncate text-[10px] text-ink/30">{a.fuente}</p>
+                <MetaLinea a={a} />
               </div>
             </button>
             <div className="flex shrink-0 items-center gap-1.5">
