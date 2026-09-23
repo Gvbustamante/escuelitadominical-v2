@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
+import HorarioSemanal from '../../components/HorarioSemanal'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 
 const MESES = [
@@ -52,6 +53,7 @@ export default function Planeacion() {
   const [coberturaMes, setCoberturaMes] = useState([])
   const [selectedDay, setSelectedDay] = useState(null)
 
+  const [vista, setVista] = useState('calendario')
   const [modalActividad, setModalActividad] = useState(null)
   const [form, setForm] = useState({ titulo: '', descripcion: '', versiculo_clave: '', historia_biblica: '', visible_padres: true, es_tarea: false })
   const [busy, setBusy] = useState(false)
@@ -193,6 +195,13 @@ export default function Planeacion() {
     loadMes()
   }
 
+  function reloadHorario() {
+    supabase
+      .from('asignacion_horario')
+      .select('nivel_id, horario_id, docente_id, docente:profiles(nombre_completo)')
+      .then(({ data }) => setAsignacionesHorario(data || []))
+  }
+
   if (diasClase === null) return <Spinner />
 
   const hoy = hoyISO()
@@ -209,6 +218,21 @@ export default function Planeacion() {
         <p className="text-ink/50">Organiza las clases: quién enseña, qué se enseña y cuándo</p>
       </div>
 
+      <div className="flex gap-2">
+        <button
+          onClick={() => setVista('calendario')}
+          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'calendario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+        >
+          📅 Calendario
+        </button>
+        <button
+          onClick={() => setVista('horario')}
+          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'horario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+        >
+          🗓️ Horario semanal
+        </button>
+      </div>
+
       {diasClaseSet.size === 0 && (
         <div className="card border-2 border-sunshine-200 bg-sunshine-50">
           <p className="font-bold text-sunshine-800">Todavía no configuraste los días de clase.</p>
@@ -218,7 +242,20 @@ export default function Planeacion() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.3fr]">
+      {vista === 'horario' && (
+        <HorarioSemanal
+          diasClase={diasClase}
+          niveles={niveles}
+          docentes={docentes}
+          horarios={horarios}
+          asignacionesHorario={asignacionesHorario}
+          esDocente={esDocente}
+          miId={user?.id}
+          onReload={reloadHorario}
+        />
+      )}
+
+      {vista === 'calendario' && <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.3fr]">
         {/* Calendario */}
         <div className="flex flex-col gap-4">
           <div className="card">
@@ -455,7 +492,7 @@ export default function Planeacion() {
             </>
           )}
         </div>
-      </div>
+      </div>}
 
       <Modal
         open={!!modalActividad}
