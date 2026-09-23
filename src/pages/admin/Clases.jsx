@@ -235,7 +235,21 @@ export default function Clases() {
                     {nivel.edad_min ?? '?'} - {nivel.edad_max ?? '?'} años
                   </td>
                   <td className="px-3 py-2 sm:px-4 sm:py-3">
-                    <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{docs.length} docente(s)</span>
+                    {docs.length === 0 ? (
+                      <span className="text-sm text-ink/30">Sin asignar</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-1">
+                        {docs.map((a) => {
+                          const doc = docentes.find((d) => d.id === a.docente_id)
+                          if (!doc) return null
+                          return (
+                            <span key={a.docente_id} className={`badge text-[11px] ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
+                              {doc.nombre_completo.split(' ').slice(0, 2).join(' ')}
+                            </span>
+                          )
+                        })}
+                      </div>
+                    )}
                   </td>
                   <td className="px-3 py-2 sm:px-4 sm:py-3">
                     <span className={`badge ${nivel.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
