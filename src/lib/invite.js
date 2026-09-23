@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient'
 
-export async function crearUsuario({ cedula, nombre_completo, role, nino_id, parentesco }) {
+export async function crearUsuario({ cedula, nombre_completo, role, nino_id, parentesco, email, whatsapp }) {
   const { data, error } = await supabase.rpc('admin_create_invited_user', {
     p_cedula: cedula,
     p_role: role,
@@ -10,5 +10,13 @@ export async function crearUsuario({ cedula, nombre_completo, role, nino_id, par
   })
   if (error) throw new Error(error.message)
   const row = Array.isArray(data) ? data[0] : data
+
+  if (email || whatsapp) {
+    const patch = {}
+    if (email) patch.email = email
+    if (whatsapp) patch.whatsapp = whatsapp
+    await supabase.from('profiles').update(patch).eq('id', row.id)
+  }
+
   return { id: row.id, password: row.password }
 }

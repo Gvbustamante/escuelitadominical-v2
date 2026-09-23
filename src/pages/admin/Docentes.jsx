@@ -7,6 +7,7 @@ import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleUsuarioModal from '../../components/DetalleUsuarioModal'
+import DocentesTab from '../../components/DocentesTab'
 import Avatar from '../../components/Avatar'
 import { whatsappLink } from '../../lib/whatsapp'
 
@@ -38,7 +39,7 @@ export default function Docentes() {
   const [busqueda, setBusqueda] = useState('')
 
   const [modalOpen, setModalOpen] = useState(false)
-  const [form, setForm] = useState({ cedula: '', nombre_completo: '', role: 'docente' })
+  const [form, setForm] = useState({ cedula: '', nombre_completo: '', role: 'docente', email: '', whatsapp: '' })
   const [busquedaNino, setBusquedaNino] = useState('')
   const [ninoSeleccionado, setNinoSeleccionado] = useState(null)
   const [parentesco, setParentesco] = useState('')
@@ -46,6 +47,7 @@ export default function Docentes() {
   const [creado, setCreado] = useState(null)
   const [busy, setBusy] = useState(false)
 
+  const [vista, setVista] = useState('todos')
   const [detallePersona, setDetallePersona] = useState(null)
   const [confirmDesactivar, setConfirmDesactivar] = useState(null)
   const [confirmBusy, setConfirmBusy] = useState(false)
@@ -95,7 +97,7 @@ export default function Docentes() {
     : []
 
   function openInvite() {
-    setForm({ cedula: '', nombre_completo: '', role: 'docente' })
+    setForm({ cedula: '', nombre_completo: '', role: 'docente', email: '', whatsapp: '' })
     setBusquedaNino('')
     setNinoSeleccionado(null)
     setParentesco('')
@@ -115,6 +117,8 @@ export default function Docentes() {
     try {
       const { password } = await crearUsuario({
         ...form,
+        email: form.email || undefined,
+        whatsapp: form.whatsapp || undefined,
         nino_id: form.role === 'padre' ? ninoSeleccionado.id : undefined,
         parentesco: form.role === 'padre' ? parentesco : undefined,
       })
@@ -153,14 +157,39 @@ export default function Docentes() {
         <p className="text-ink/50">Docentes, coordinadores, administradores y padres — todas las cuentas de tu escuelita</p>
       </div>
 
-      {!usuarios ? (
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setVista('todos')}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'todos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+        >
+          📋 Todas las cuentas
+        </button>
+        <button
+          onClick={() => setVista('docentes')}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'docentes' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+        >
+          🍎 Docentes
+        </button>
+      </div>
+
+      {vista === 'docentes' && (
+        <DocentesTab
+          usuarios={usuarios}
+          clasesPorDocente={clasesPorDocente}
+          onReload={load}
+          miRole={profile.role}
+        />
+      )}
+
+      {vista === 'todos' && !usuarios && (
         <div className="flex flex-col gap-4">
           <Skeleton className="h-12 w-full" />
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-14 w-full" />
           ))}
         </div>
-      ) : (
+      )}
+      {vista === 'todos' && usuarios && (
         <>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
@@ -320,6 +349,27 @@ export default function Docentes() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="label">Correo electrónico (opcional)</label>
+              <input
+                className="input"
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                placeholder="correo@ejemplo.com"
+              />
+            </div>
+            <div>
+              <label className="label">WhatsApp (opcional, con código de país)</label>
+              <input
+                className="input"
+                value={form.whatsapp}
+                onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+                placeholder="Ej. 18091234567"
+              />
+              <p className="mt-1 text-xs text-ink/40">Si no lo saben ahora, el docente puede agregarlo después.</p>
             </div>
 
             {form.role === 'padre' && (
