@@ -206,6 +206,14 @@ export default function Ajustes() {
         </button>
         {profile.role === 'admin' && (
           <button
+            onClick={() => setTab('modulos')}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'modulos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          >
+            📦 Módulos
+          </button>
+        )}
+        {profile.role === 'admin' && (
+          <button
             onClick={() => setTab('permisos')}
             className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'permisos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
           >
@@ -396,7 +404,83 @@ export default function Ajustes() {
         </>
       )}
 
+      {tab === 'modulos' && profile.role === 'admin' && (
+        <ModulosTab config={config} />
+      )}
+
       <CambiarPasswordModal open={pwOpen} onClose={() => setPwOpen(false)} />
+    </div>
+  )
+}
+
+const MODULOS_DISPONIBLES = [
+  { key: 'devocionales', label: 'Devocionales', icon: '🙏', desc: 'Reflexiones y devocionales para niños' },
+  { key: 'asistencia', label: 'Asistencia', icon: '✅', desc: 'Registro de asistencia semanal' },
+  { key: 'actividades', label: 'Actividades', icon: '🎨', desc: 'Fotos y actividades de clase' },
+  { key: 'bitacora', label: 'Bitácora', icon: '📋', desc: 'Registro del estado del salón y refrigerio' },
+  { key: 'planeacion', label: 'Planeación', icon: '📆', desc: 'Calendario y cobertura de clases' },
+  { key: 'agenda', label: 'Agenda', icon: '📅', desc: 'Eventos y reuniones del equipo' },
+  { key: 'foro', label: 'Comunidad / Foro', icon: '🤝', desc: 'Espacio de comunidad y peticiones de oración' },
+  { key: 'drive', label: 'Drive', icon: '📁', desc: 'Archivos compartidos del equipo' },
+  { key: 'progreso', label: 'Progreso', icon: '🌱', desc: 'Seguimiento del progreso de cada niño' },
+  { key: 'reconocimientos', label: 'Reconocimientos', icon: '⭐', desc: 'Estrellas e insignias de los niños' },
+]
+
+function ModulosTab({ config }) {
+  const [activos, setActivos] = useState(config?.modulos_activos || [])
+  const [saving, setSaving] = useState(false)
+  const [ok, setOk] = useState('')
+
+  useEffect(() => {
+    setActivos(config?.modulos_activos || [])
+  }, [config?.modulos_activos])
+
+  function toggle(key) {
+    setActivos((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]))
+    setOk('')
+  }
+
+  async function guardar() {
+    if (!config?.id) return
+    setSaving(true)
+    await supabase.from('config_iglesia').update({ modulos_activos: activos, updated_at: new Date().toISOString() }).eq('id', config.id)
+    setSaving(false)
+    setOk('¡Módulos actualizados! El menú se ajusta automáticamente.')
+    await refreshConfigIglesia()
+  }
+
+  return (
+    <div className="card max-w-xl">
+      <p className="label mb-1">Módulos activos</p>
+      <p className="mb-4 text-sm text-ink/50">
+        Activa o desactiva las secciones que usa tu iglesia. Los módulos desactivados se ocultan del menú para todos los usuarios.
+      </p>
+      <div className="flex flex-col gap-2">
+        {MODULOS_DISPONIBLES.map((m) => {
+          const on = activos.includes(m.key)
+          return (
+            <button
+              key={m.key}
+              type="button"
+              onClick={() => toggle(m.key)}
+              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors ${on ? 'bg-sky-50 ring-2 ring-sky-400' : 'bg-ink/5 ring-1 ring-ink/10'}`}
+            >
+              <span className="text-2xl">{m.icon}</span>
+              <div className="min-w-0 flex-1">
+                <p className={`text-sm font-bold ${on ? 'text-sky-700' : 'text-ink/40'}`}>{m.label}</p>
+                <p className="text-xs text-ink/40">{m.desc}</p>
+              </div>
+              <div className={`flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors ${on ? 'bg-sky-400' : 'bg-ink/20'}`}>
+                <div className={`h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${on ? 'translate-x-5' : 'translate-x-0'}`} />
+              </div>
+            </button>
+          )
+        })}
+      </div>
+      {ok && <p className="mt-3 rounded-xl bg-grass-50 px-3 py-2 text-sm font-bold text-grass-600">{ok}</p>}
+      <button type="button" onClick={guardar} disabled={saving} className="btn-primary mt-4 justify-center">
+        {saving ? 'Guardando...' : '💾 Guardar módulos'}
+      </button>
     </div>
   )
 }

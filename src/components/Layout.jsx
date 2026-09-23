@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useConfigIglesia } from '../lib/configIglesia'
 import { supabase } from '../lib/supabaseClient'
 import CambiarPasswordModal from './CambiarPasswordModal'
 import AppLogo from './AppLogo'
@@ -9,14 +10,14 @@ import AppName from './AppName'
 const NAV = {
   admin: [
     { to: '/', label: 'Inicio', icon: '🏠', end: true },
-    { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
-    { to: '/asistencia', label: 'Asistencia', icon: '✅' },
-    { to: '/actividades', label: 'Actividades', icon: '🎨' },
-    { to: '/bitacora', label: 'Bitácora', icon: '📋' },
-    { to: '/planeacion', label: 'Planeación', icon: '📆' },
-    { to: '/agenda', label: 'Agenda', icon: '📅' },
-    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
-    { to: '/drive', label: 'Drive', icon: '📁' },
+    { to: '/devocionales', label: 'Devocionales', icon: '🙏', modulo: 'devocionales' },
+    { to: '/asistencia', label: 'Asistencia', icon: '✅', modulo: 'asistencia' },
+    { to: '/actividades', label: 'Actividades', icon: '🎨', modulo: 'actividades' },
+    { to: '/bitacora', label: 'Bitácora', icon: '📋', modulo: 'bitacora' },
+    { to: '/planeacion', label: 'Planeación', icon: '📆', modulo: 'planeacion' },
+    { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
+    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
+    { to: '/drive', label: 'Drive', icon: '📁', modulo: 'drive' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/clases', label: 'Clases', icon: '🎒' },
     { to: '/docentes', label: 'Equipo', icon: '🍎' },
@@ -25,14 +26,14 @@ const NAV = {
   ],
   coordinador: [
     { to: '/', label: 'Inicio', icon: '🏠', end: true },
-    { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
-    { to: '/asistencia', label: 'Asistencia', icon: '✅' },
-    { to: '/actividades', label: 'Actividades', icon: '🎨' },
-    { to: '/bitacora', label: 'Bitácora', icon: '📋' },
-    { to: '/planeacion', label: 'Planeación', icon: '📆' },
-    { to: '/agenda', label: 'Agenda', icon: '📅' },
-    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
-    { to: '/drive', label: 'Drive', icon: '📁' },
+    { to: '/devocionales', label: 'Devocionales', icon: '🙏', modulo: 'devocionales' },
+    { to: '/asistencia', label: 'Asistencia', icon: '✅', modulo: 'asistencia' },
+    { to: '/actividades', label: 'Actividades', icon: '🎨', modulo: 'actividades' },
+    { to: '/bitacora', label: 'Bitácora', icon: '📋', modulo: 'bitacora' },
+    { to: '/planeacion', label: 'Planeación', icon: '📆', modulo: 'planeacion' },
+    { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
+    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
+    { to: '/drive', label: 'Drive', icon: '📁', modulo: 'drive' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/clases', label: 'Clases', icon: '🎒' },
     { to: '/docentes', label: 'Equipo', icon: '🍎' },
@@ -41,25 +42,25 @@ const NAV = {
   ],
   docente: [
     { to: '/', label: 'Mis clases', icon: '🏠', end: true },
-    { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
-    { to: '/asistencia', label: 'Asistencia', icon: '✅' },
-    { to: '/actividades', label: 'Actividades', icon: '🎨' },
-    { to: '/bitacora', label: 'Bitácora', icon: '📋' },
-    { to: '/planeacion', label: 'Planeación', icon: '📆' },
+    { to: '/devocionales', label: 'Devocionales', icon: '🙏', modulo: 'devocionales' },
+    { to: '/asistencia', label: 'Asistencia', icon: '✅', modulo: 'asistencia' },
+    { to: '/actividades', label: 'Actividades', icon: '🎨', modulo: 'actividades' },
+    { to: '/bitacora', label: 'Bitácora', icon: '📋', modulo: 'bitacora' },
+    { to: '/planeacion', label: 'Planeación', icon: '📆', modulo: 'planeacion' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
-    { to: '/progreso', label: 'Progreso', icon: '🌱' },
-    { to: '/agenda', label: 'Agenda', icon: '📅' },
-    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
-    { to: '/drive', label: 'Drive', icon: '📁' },
+    { to: '/progreso', label: 'Progreso', icon: '🌱', modulo: 'progreso' },
+    { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
+    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
+    { to: '/drive', label: 'Drive', icon: '📁', modulo: 'drive' },
     { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
   padre: [
     { to: '/', label: 'Mi hijo/a', icon: '🏠', end: true },
-    { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
-    { to: '/actividades', label: 'Actividades', icon: '🎨' },
-    { to: '/progreso', label: 'Progreso', icon: '🌱' },
-    { to: '/agenda', label: 'Agenda', icon: '📅' },
-    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
+    { to: '/devocionales', label: 'Devocionales', icon: '🙏', modulo: 'devocionales' },
+    { to: '/actividades', label: 'Actividades', icon: '🎨', modulo: 'actividades' },
+    { to: '/progreso', label: 'Progreso', icon: '🌱', modulo: 'progreso' },
+    { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
+    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
     { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
 }
@@ -73,6 +74,7 @@ const ROLE_LABEL = {
 
 export default function Layout() {
   const { profile, user, signOut, refreshProfile } = useAuth()
+  const config = useConfigIglesia()
   const { pathname } = useLocation()
   const [pwOpen, setPwOpen] = useState(false)
   const [tieneHijos, setTieneHijos] = useState(false)
@@ -111,10 +113,14 @@ export default function Layout() {
       .then(() => refreshProfile())
   }, [profile, refreshProfile])
 
-  const items = [...(NAV[profile?.role] || [])]
+  const modulosActivos = config?.modulos_activos
+  const allItems = [...(NAV[profile?.role] || [])]
   if (tieneHijos && ['admin', 'coordinador', 'docente'].includes(profile?.role)) {
-    items.splice(1, 0, { to: '/mi-familia', label: 'Mi familia', icon: '👪' })
+    allItems.splice(1, 0, { to: '/mi-familia', label: 'Mi familia', icon: '👪' })
   }
+  const items = modulosActivos
+    ? allItems.filter((item) => !item.modulo || modulosActivos.includes(item.modulo))
+    : allItems
 
   return (
     <div className="flex min-h-screen bg-cream">
