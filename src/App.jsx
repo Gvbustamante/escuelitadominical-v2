@@ -38,7 +38,7 @@ import PadreActividades from './pages/padre/PadreActividades'
 import PadreAgenda from './pages/padre/PadreAgenda'
 import PadreProgreso from './pages/padre/PadreProgreso'
 
-const STAFF = ['admin', 'coordinador']
+const STAFF = ['superadmin', 'admin', 'coordinador']
 
 export default function App() {
   const { loading } = useAuth()

@@ -3,14 +3,15 @@ import { supabase } from '../lib/supabaseClient'
 import { whatsappLink } from '../lib/whatsapp'
 import Modal from './Modal'
 
-const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
+const ROLE_LABEL = { superadmin: 'Super Admin', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
 const ROLE_BADGE = {
+  superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',
   coordinador: 'bg-sunshine-100 text-sunshine-700',
   docente: 'bg-sky-100 text-sky-700',
   padre: 'bg-coral-100 text-coral-700',
 }
-const ROLES_TODOS = ['admin', 'coordinador', 'docente', 'padre']
+const ROLES_TODOS = ['superadmin', 'admin', 'coordinador', 'docente', 'padre']
 
 export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], open, onClose, onSaved, miRole, miId }) {
   const [form, setForm] = useState({ nombre_completo: '', telefono: '', role: '' })
@@ -36,8 +37,8 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
   if (!persona) return null
 
   const esUnoMismo = persona.id === miId
-  const puedeCambiarRole = miRole === 'admin' && !esUnoMismo
-  const puedeResetear = !esUnoMismo && (miRole === 'admin' || (miRole === 'coordinador' && ['docente', 'padre'].includes(persona.role)))
+  const puedeCambiarRole = ['superadmin', 'admin'].includes(miRole) && !esUnoMismo
+  const puedeResetear = !esUnoMismo && (['superadmin', 'admin'].includes(miRole) || (miRole === 'coordinador' && ['docente', 'padre'].includes(persona.role)))
 
   async function guardar() {
     setBusy(true)
@@ -150,7 +151,7 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
           </div>
         )}
 
-        {['admin', 'coordinador', 'docente'].includes(persona.role) && (
+        {['superadmin', 'admin', 'coordinador', 'docente'].includes(persona.role) && (
           <div>
             <p className="mb-2 text-xs font-extrabold uppercase text-ink/40">Clases asignadas</p>
             {clases.length === 0 ? (

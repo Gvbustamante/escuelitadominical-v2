@@ -13,7 +13,7 @@ import MiEntregaEquipoWidget from '../components/MiEntregaEquipoWidget'
 import FilePreview, { getFileIcon } from '../components/FilePreview'
 import { getVideoEmbedUrl } from '../lib/videoEmbed'
 
-const STAFF = ['admin', 'coordinador']
+const STAFF = ['superadmin', 'admin', 'coordinador']
 
 function esFoto(f) {
   return f.tipo?.startsWith('image/') || /\.(png|jpe?g|gif|webp|heic|avif)$/i.test(f.nombre_archivo || '')

@@ -243,7 +243,7 @@ export default function Drive() {
   }
 
   const hayContenido = carpetasAqui.length > 0 || archivosAqui.length > 0
-  const esAdmin = ['admin', 'coordinador'].includes(profile.role)
+  const esAdmin = ['superadmin', 'admin', 'coordinador'].includes(profile.role)
 
   const viewProps = {
     carpetas: carpetasAqui, archivos: archivosAqui,

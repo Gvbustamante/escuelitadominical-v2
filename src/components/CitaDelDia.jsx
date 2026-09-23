@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 
-const STAFF = ['admin', 'coordinador']
+const STAFF = ['superadmin', 'admin', 'coordinador']
 
 function hoyStr() {
   return new Date().toISOString().slice(0, 10)

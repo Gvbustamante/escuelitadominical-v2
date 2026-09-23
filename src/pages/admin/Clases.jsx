@@ -29,7 +29,7 @@ export default function Clases() {
   const load = useCallback(async () => {
     const [{ data: n }, { data: d }, { data: a }, { data: h }, { data: ah }] = await Promise.all([
       supabase.from('niveles').select('*').order('orden', { ascending: true }),
-      supabase.from('profiles').select('id, nombre_completo, role').in('role', ['admin', 'coordinador', 'docente']).eq('activo', true).order('nombre_completo'),
+      supabase.from('profiles').select('id, nombre_completo, role').in('role', ['superadmin', 'admin', 'coordinador', 'docente']).eq('activo', true).order('nombre_completo'),
       supabase.from('docentes_niveles').select('*'),
       supabase.from('horarios').select('*').eq('activo', true).order('orden'),
       supabase.from('asignacion_horario').select('*'),
@@ -247,7 +247,7 @@ export default function Clases() {
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nivel)}>
                         Editar
                       </button>
-                      {profile.role === 'admin' && (
+                      {['superadmin', 'admin'].includes(profile.role) && (
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(nivel)}>
                           {nivel.activo ? 'Desactivar' : 'Activar'}
                         </button>
@@ -328,8 +328,8 @@ export default function Clases() {
                   />
                   {d.nombre_completo}
                   {d.role !== 'docente' && (
-                    <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${d.role === 'admin' ? 'bg-grape-100 text-grape-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
-                      {d.role === 'admin' ? 'Admin' : 'Coord'}
+                    <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${['superadmin', 'admin'].includes(d.role) ? 'bg-grape-100 text-grape-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
+                      {d.role === 'superadmin' ? 'Super' : d.role === 'admin' ? 'Admin' : 'Coord'}
                     </span>
                   )}
                 </label>

@@ -10,8 +10,9 @@ import DetalleUsuarioModal from '../../components/DetalleUsuarioModal'
 import Avatar from '../../components/Avatar'
 import { whatsappLink } from '../../lib/whatsapp'
 
-const ROLE_LABEL = { admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
+const ROLE_LABEL = { superadmin: 'Super Admin', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
 const ROLE_BADGE = {
+  superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',
   coordinador: 'bg-sunshine-100 text-sunshine-700',
   docente: 'bg-sky-100 text-sky-700',
@@ -19,6 +20,7 @@ const ROLE_BADGE = {
 }
 const FILTROS_ROL = [
   ['todos', 'Todos'],
+  ['superadmin', 'Super Admin'],
   ['admin', 'Admin'],
   ['coordinador', 'Coordinador'],
   ['docente', 'Docente'],
@@ -79,7 +81,7 @@ export default function Docentes() {
     load()
   }, [load])
 
-  const rolesInvitables = profile.role === 'admin' ? ['docente', 'coordinador', 'admin', 'padre'] : ['docente', 'padre']
+  const rolesInvitables = ['superadmin', 'admin'].includes(profile.role) ? ['docente', 'coordinador', 'admin', 'padre'] : ['docente', 'padre']
 
   const filtrados = (usuarios || [])
     .filter((u) => filtroRol === 'todos' || u.role === filtroRol)
@@ -213,7 +215,7 @@ export default function Docentes() {
                     </td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">{u.cedula || '—'}</td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
-                      {['admin', 'coordinador', 'docente'].includes(u.role)
+                      {['superadmin', 'admin', 'coordinador', 'docente'].includes(u.role)
                         ? clasesPorDocente[u.id]?.join(', ') || (u.role === 'docente' ? 'Sin asignar' : '—')
                         : u.role === 'padre'
                           ? hijosPorPadre[u.id]?.join(', ') || 'Sin vincular'
@@ -240,7 +242,7 @@ export default function Docentes() {
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetallePersona(u)}>
                           Ver detalle
                         </button>
-                        {profile.role === 'admin' && u.id !== profile.id && (
+                        {['superadmin', 'admin'].includes(profile.role) && u.id !== profile.id && (
                           <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(u)}>
                             {u.activo ? 'Desactivar' : 'Activar'}
                           </button>

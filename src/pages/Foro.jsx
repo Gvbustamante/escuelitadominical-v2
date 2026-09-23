@@ -7,8 +7,8 @@ import Modal from '../components/Modal'
 
 export default function Foro() {
   const { user, profile } = useAuth()
-  const esStaff = ['admin', 'coordinador'].includes(profile.role)
-  const esStaffAmplio = ['admin', 'coordinador', 'docente'].includes(profile.role)
+  const esStaff = ['superadmin', 'admin', 'coordinador'].includes(profile.role)
+  const esStaffAmplio = ['superadmin', 'admin', 'coordinador', 'docente'].includes(profile.role)
 
   const [tabPrincipal, setTabPrincipal] = useState('foro')
   const [busqueda, setBusqueda] = useState('')
