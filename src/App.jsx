@@ -15,6 +15,7 @@ import Foro from './pages/Foro'
 import Drive from './pages/Drive'
 
 import AdminHome from './pages/admin/AdminHome'
+import SuperadminHome from './pages/admin/SuperadminHome'
 import Ninos from './pages/admin/Ninos'
 import Docentes from './pages/admin/Docentes'
 import AsistenciaAdmin from './pages/admin/AsistenciaAdmin'
@@ -189,6 +190,7 @@ export default function App() {
 
 function RoleSwitchHome() {
   const { profile } = useAuth()
+  if (profile.role === 'superadmin') return <SuperadminHome />
   if (profile.role === 'docente') return <DocenteHome />
   if (profile.role === 'padre') return <PadreHome />
   return <AdminHome />
