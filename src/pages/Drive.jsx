@@ -5,6 +5,7 @@ import Skeleton from '../components/Skeleton'
 import Modal from '../components/Modal'
 import ConfirmModal from '../components/ConfirmModal'
 import FilePreview, { getFileIcon, getFileType } from '../components/FilePreview'
+import DriveOrganizado from '../components/DriveOrganizado'
 import { coincide } from '../lib/busqueda'
 
 function fileUrl(path) {
@@ -46,6 +47,7 @@ export default function Drive() {
   const [moverDestino, setMoverDestino] = useState(null)
   const [todasCarpetas, setTodasCarpetas] = useState([])
 
+  const [seccion, setSeccion] = useState('archivos')
   const fileInputRef = useRef(null)
   const dropRef = useRef(null)
   const carpetaActualId = ruta.length > 0 ? ruta[ruta.length - 1].id : null
@@ -268,6 +270,22 @@ export default function Drive() {
             {verPapelera ? 'Archivos eliminados' : 'Archivos compartidos del equipo'}
           </p>
         </div>
+        {!verPapelera && (
+          <div className="flex gap-1.5 sm:hidden">
+            <button
+              onClick={() => setSeccion('archivos')}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'archivos' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/50'}`}
+            >
+              📁
+            </button>
+            <button
+              onClick={() => setSeccion('organizado')}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'organizado' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/50'}`}
+            >
+              🗂️
+            </button>
+          </div>
+        )}
         <div className="flex items-center gap-1.5 sm:gap-2">
           {!verPapelera && (
             <>
@@ -314,8 +332,28 @@ export default function Drive() {
         </div>
       </div>
 
-      {/* Breadcrumb */}
+      {/* Section tabs */}
       {!verPapelera && (
+        <div className="hidden gap-2 sm:flex">
+          <button
+            onClick={() => setSeccion('archivos')}
+            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'archivos' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+          >
+            📁 Mis archivos
+          </button>
+          <button
+            onClick={() => setSeccion('organizado')}
+            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'organizado' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+          >
+            🗂️ Auto-organizado
+          </button>
+        </div>
+      )}
+
+      {seccion === 'organizado' && !verPapelera && <DriveOrganizado />}
+
+      {/* Breadcrumb */}
+      {seccion === 'archivos' && !verPapelera && (
         <nav className="flex items-center gap-1 overflow-x-auto text-sm">
           <button
             onClick={irARaiz}
@@ -338,7 +376,7 @@ export default function Drive() {
       )}
 
       {/* Search + View toggle */}
-      <div className="flex items-center gap-2">
+      {(seccion === 'archivos' || verPapelera) && <div className="flex items-center gap-2">
         <input
           type="text"
           placeholder="Buscar..."
@@ -358,8 +396,9 @@ export default function Drive() {
             </button>
           ))}
         </div>
-      </div>
+      </div>}
 
+      {(seccion === 'archivos' || verPapelera) && <>
       {/* Upload overlay */}
       {dragging && (
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-sky-400/20 backdrop-blur-sm">
@@ -401,6 +440,7 @@ export default function Drive() {
       ) : (
         <ListView {...viewProps} />
       )}
+      </>}
 
       {/* Modals */}
       <Modal open={carpetaModal} onClose={() => setCarpetaModal(false)} title={carpetaEditando ? 'Renombrar carpeta' : 'Nueva carpeta'}>
