@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useConfigIglesia } from '../lib/configIglesia'
@@ -74,6 +74,109 @@ const ROLE_LABEL = {
   coordinador: 'Coordinador',
   docente: 'Docente',
   padre: 'Padre / Madre',
+}
+
+function NavItem({ item }) {
+  return (
+    <NavLink
+      to={item.to}
+      end={item.end}
+      className={({ isActive }) =>
+        `flex items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold transition-colors sm:py-3 sm:text-lg ${
+          isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/60 hover:bg-sky-50'
+        }`
+      }
+    >
+      <span className="text-xl sm:text-2xl">{item.icon}</span>
+      <span>{item.label}</span>
+    </NavLink>
+  )
+}
+
+function NavSubItem({ item }) {
+  return (
+    <NavLink
+      to={item.to}
+      end={item.end}
+      className={({ isActive }) =>
+        `flex items-center gap-2 rounded-xl px-3 py-2 pl-9 text-sm font-bold transition-colors sm:text-base ${
+          isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/50 hover:bg-sky-50'
+        }`
+      }
+    >
+      <span className="text-base sm:text-lg">{item.icon}</span>
+      <span>{item.label}</span>
+    </NavLink>
+  )
+}
+
+function SidebarNav({ items, menuEstructura, pathname }) {
+  const estructura = Array.isArray(menuEstructura) && menuEstructura.length > 0 ? menuEstructura : null
+  const [openCats, setOpenCats] = useState({})
+
+  const toggleCat = useCallback((idx) => {
+    setOpenCats((prev) => ({ ...prev, [idx]: !prev[idx] }))
+  }, [])
+
+  useEffect(() => {
+    if (!estructura) return
+    const initial = {}
+    estructura.forEach((cat, idx) => {
+      if ((cat.items || []).some((ruta) => pathname === ruta)) {
+        initial[idx] = true
+      }
+    })
+    setOpenCats(initial)
+  }, [estructura, pathname])
+
+  if (!estructura) {
+    return (
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto sm:gap-2">
+        {items.map((item) => <NavItem key={item.to} item={item} />)}
+      </nav>
+    )
+  }
+
+  const itemMap = new Map(items.map((i) => [i.to, i]))
+  const asignados = new Set(estructura.flatMap((c) => c.items || []))
+
+  const inicio = itemMap.get('/')
+  const ajustes = itemMap.get('/ajustes')
+  const sueltos = items.filter((i) => i.to !== '/' && i.to !== '/ajustes' && !asignados.has(i.to))
+
+  return (
+    <nav className="flex flex-1 flex-col gap-1 overflow-y-auto sm:gap-2">
+      {inicio && <NavItem item={inicio} />}
+
+      {estructura.map((cat, idx) => {
+        const catItems = (cat.items || []).map((ruta) => itemMap.get(ruta)).filter(Boolean)
+        if (catItems.length === 0) return null
+        const open = !!openCats[idx]
+        return (
+          <div key={idx}>
+            <button
+              type="button"
+              onClick={() => toggleCat(idx)}
+              className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold text-ink/60 transition-colors hover:bg-sky-50 sm:py-3 sm:text-lg"
+            >
+              <span className="text-xl sm:text-2xl">{cat.icon}</span>
+              <span className="flex-1 text-left">{cat.nombre}</span>
+              <span className={`text-xs text-ink/30 transition-transform ${open ? 'rotate-90' : ''}`}>▶</span>
+            </button>
+            {open && (
+              <div className="flex flex-col gap-0.5">
+                {catItems.map((item) => <NavSubItem key={item.to} item={item} />)}
+              </div>
+            )}
+          </div>
+        )
+      })}
+
+      {sueltos.map((item) => <NavItem key={item.to} item={item} />)}
+
+      {ajustes && <NavItem item={ajustes} />}
+    </nav>
+  )
 }
 
 export default function Layout() {
@@ -153,23 +256,7 @@ export default function Layout() {
           </button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto sm:gap-2">
-          {items.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold transition-colors sm:py-3 sm:text-lg ${
-                  isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/60 hover:bg-sky-50'
-                }`
-              }
-            >
-              <span className="text-xl sm:text-2xl">{item.icon}</span>
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
+        <SidebarNav items={items} menuEstructura={config?.menu_estructura} pathname={pathname} />
 
         <div className="mt-2 flex flex-col gap-2 border-t-2 border-ink/5 pt-3 sm:mt-4 sm:pt-4">
           <div className="text-center">

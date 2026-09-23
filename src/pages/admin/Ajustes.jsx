@@ -6,6 +6,7 @@ import AppLogo from '../../components/AppLogo'
 import PermisosTab from '../../components/PermisosTab'
 import CambiarPasswordModal from '../../components/CambiarPasswordModal'
 import ConfigEstrellas from './ConfigEstrellas'
+import MenuTab from '../../components/MenuTab'
 import { AyudaContenido } from '../Tutorial'
 import { useConfigIglesia, refreshConfigIglesia } from '../../lib/configIglesia'
 
@@ -212,6 +213,14 @@ export default function Ajustes() {
             📦 Módulos
           </button>
         )}
+        {profile.role === 'superadmin' && (
+          <button
+            onClick={() => setTab('menu')}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'menu' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          >
+            📋 Menú
+          </button>
+        )}
         {['superadmin', 'admin'].includes(profile.role) && (
           <button
             onClick={() => setTab('permisos')}
@@ -406,6 +415,10 @@ export default function Ajustes() {
 
       {tab === 'modulos' && profile.role === 'superadmin' && (
         <ModulosTab config={config} />
+      )}
+
+      {tab === 'menu' && profile.role === 'superadmin' && (
+        <MenuTab config={config} />
       )}
 
       <CambiarPasswordModal open={pwOpen} onClose={() => setPwOpen(false)} />
