@@ -9,7 +9,7 @@ function esFoto(f) {
   return f.tipo?.startsWith('image/') || /\.(png|jpe?g|gif|webp|heic|avif)$/i.test(f.nombre_archivo || '')
 }
 
-export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas }) {
+export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDuplicate }) {
   const navigate = useNavigate()
   const archivos = a.actividad_archivos || []
   const fotos = archivos.filter(esFoto)
@@ -63,6 +63,11 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas }) {
           {a.es_tarea && onVerEntregas && (
             <button className="btn-secondary !py-1 !px-2 !text-xs" onClick={() => onVerEntregas(a)}>
               📋 Entregas
+            </button>
+          )}
+          {onDuplicate && (
+            <button onClick={() => onDuplicate(a)} className="text-lg text-ink/30 hover:text-grape-500" title="Duplicar para otra fecha">
+              📋
             </button>
           )}
           {onEdit && (

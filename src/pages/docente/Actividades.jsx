@@ -78,6 +78,9 @@ export default function Actividades() {
   const [progreso, setProgreso] = useState('')
   const [error, setError] = useState('')
   const [tareaActividad, setTareaActividad] = useState(null)
+  const [duplicando, setDuplicando] = useState(null)
+  const [dupFecha, setDupFecha] = useState('')
+  const [dupBusy, setDupBusy] = useState(false)
 
   const load = useCallback(async () => {
     if (!nivelId) return
@@ -250,6 +253,40 @@ export default function Actividades() {
     load()
   }
 
+  async function duplicarActividad() {
+    if (!duplicando || !dupFecha) return
+    setDupBusy(true)
+    const { data: nueva, error: insErr } = await supabase.from('actividades').insert({
+      titulo: duplicando.titulo,
+      descripcion: duplicando.descripcion,
+      fecha: dupFecha,
+      versiculo_clave: duplicando.versiculo_clave,
+      historia_biblica: duplicando.historia_biblica,
+      visible_padres: duplicando.visible_padres,
+      es_tarea: duplicando.es_tarea,
+      enlace_externo: duplicando.enlace_externo,
+      imagen_url: duplicando.imagen_url,
+      nivel_id: duplicando.nivel_id,
+      audiencia: duplicando.audiencia,
+      docente_id: user.id,
+    }).select().single()
+    if (!insErr && nueva) {
+      const archivosOrig = duplicando.actividad_archivos || []
+      for (const a of archivosOrig) {
+        await supabase.from('actividad_archivos').insert({
+          actividad_id: nueva.id,
+          storage_path: a.storage_path,
+          nombre_archivo: a.nombre_archivo,
+          tipo: a.tipo,
+          bucket: a.bucket || null,
+        })
+      }
+    }
+    setDupBusy(false)
+    setDuplicando(null)
+    load()
+  }
+
   if (!clases) return <Spinner />
   if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
 
@@ -373,7 +410,7 @@ export default function Actividades() {
                     {isOpen && (
                       <div className="divide-y divide-ink/5 border-t border-ink/5">
                         {acts.map(a => (
-                          <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} />
+                          <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} onDuplicate={(act) => { setDuplicando(act); setDupFecha(hoyISO()) }} />
                         ))}
                       </div>
                     )}
@@ -672,6 +709,23 @@ export default function Actividades() {
         onClose={() => setDrivePickerOpen(false)}
         onSelect={(files) => setArchivosDrive([...archivosDrive, ...files])}
       />
+
+      <Modal open={!!duplicando} onClose={() => setDuplicando(null)} title="Duplicar actividad">
+        {duplicando && (
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-ink/60">
+              Se creará una copia de <strong>{duplicando.titulo}</strong> con todos sus archivos adjuntos.
+            </p>
+            <div>
+              <label className="label">Nueva fecha</label>
+              <input type="date" className="input" value={dupFecha} onChange={(e) => setDupFecha(e.target.value)} />
+            </div>
+            <button disabled={dupBusy} onClick={duplicarActividad} className="btn-primary justify-center">
+              {dupBusy ? 'Duplicando...' : '📋 Duplicar actividad'}
+            </button>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

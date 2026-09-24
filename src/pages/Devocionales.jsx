@@ -67,6 +67,9 @@ export default function Devocionales() {
   const [drivePickerOpen, setDrivePickerOpen] = useState(false)
   const [archivosDrive, setArchivosDrive] = useState([])
   const [archivosExistentes, setArchivosExistentes] = useState([])
+  const [duplicando, setDuplicando] = useState(null)
+  const [dupFecha, setDupFecha] = useState('')
+  const [dupBusy, setDupBusy] = useState(false)
 
   const load = useCallback(async () => {
     let query = supabase
@@ -216,6 +219,36 @@ export default function Devocionales() {
     setProgreso('')
     setBusy(false)
     setModalOpen(false)
+    load()
+  }
+
+  async function duplicarDevocional() {
+    if (!duplicando || !dupFecha) return
+    setDupBusy(true)
+    const { data: nuevo, error: insErr } = await supabase.from('devocionales_ninos').insert({
+      titulo: duplicando.titulo,
+      versiculo: duplicando.versiculo,
+      contenido: duplicando.contenido,
+      fecha: dupFecha,
+      nivel_id: duplicando.nivel_id,
+      enlace_externo: duplicando.enlace_externo,
+      imagen_url: duplicando.imagen_url,
+      creado_por: user.id,
+    }).select().single()
+    if (!insErr && nuevo) {
+      const archivosOrig = duplicando.devocional_archivos || []
+      for (const a of archivosOrig) {
+        await supabase.from('devocional_archivos').insert({
+          devocional_id: nuevo.id,
+          storage_path: a.storage_path,
+          nombre_archivo: a.nombre_archivo,
+          tipo: a.tipo,
+          bucket: a.bucket || null,
+        })
+      }
+    }
+    setDupBusy(false)
+    setDuplicando(null)
     load()
   }
 
@@ -403,6 +436,11 @@ export default function Devocionales() {
                           </button>
                         )}
                         {puedeCrear && (
+                          <button onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-sm text-ink/30 hover:text-grape-500" title="Duplicar">
+                            📋
+                          </button>
+                        )}
+                        {puedeCrear && (
                           <button onClick={() => openEdit(d)} className="text-sm text-ink/30 hover:text-sky-500" title="Editar">
                             ✏️
                           </button>
@@ -454,6 +492,11 @@ export default function Devocionales() {
                         onClick={() => (d.activo ? quitarActivo(d) : marcarActivo(d))}
                       >
                         {d.activo ? 'Quitar activo' : '⭐ Marcar activo'}
+                      </button>
+                    )}
+                    {puedeCrear && (
+                      <button onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-lg text-ink/30 hover:text-grape-500" title="Duplicar">
+                        📋
                       </button>
                     )}
                     {puedeCrear && (
@@ -640,6 +683,23 @@ export default function Devocionales() {
             onClose={() => setDrivePickerOpen(false)}
             onSelect={(files) => setArchivosDrive([...archivosDrive, ...files])}
           />
+
+          <Modal open={!!duplicando} onClose={() => setDuplicando(null)} title="Duplicar devocional">
+            {duplicando && (
+              <div className="flex flex-col gap-4">
+                <p className="text-sm text-ink/60">
+                  Se creará una copia de <strong>{duplicando.titulo}</strong> con todos sus archivos adjuntos.
+                </p>
+                <div>
+                  <label className="label">Nueva fecha</label>
+                  <input type="date" className="input" value={dupFecha} onChange={(e) => setDupFecha(e.target.value)} />
+                </div>
+                <button disabled={dupBusy} onClick={duplicarDevocional} className="btn-primary justify-center">
+                  {dupBusy ? 'Duplicando...' : '📋 Duplicar devocional'}
+                </button>
+              </div>
+            )}
+          </Modal>
         </>
       )}
     </div>

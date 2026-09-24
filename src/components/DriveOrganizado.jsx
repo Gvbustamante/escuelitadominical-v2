@@ -76,6 +76,9 @@ export default function DriveOrganizado() {
   const [preview, setPreview] = useState(null)
   const [descargando, setDescargando] = useState(false)
   const [progresoDesc, setProgresoDesc] = useState('')
+  const [version, setVersion] = useState(0)
+
+  function recargar() { setVersion(v => v + 1) }
 
   useEffect(() => {
     async function load() {
@@ -102,7 +105,7 @@ export default function DriveOrganizado() {
       })
     }
     load()
-  }, [])
+  }, [version])
 
   const archivosOrganizados = useMemo(() => {
     if (!datos) return null
@@ -122,7 +125,7 @@ export default function DriveOrganizado() {
         if (act.enlace_externo) items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace`, url: act.enlace_externo, fuente: act.titulo, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
         const adjuntos = datos.actividadArchivos.filter(a => a.actividad_id === act.id)
         for (const a of adjuntos) {
-          items.push({ ...ma, nivel, nombre: a.nombre_archivo || a.storage_path.split('/').pop(), url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: act.titulo, mime: a.tipo, subidoPor: quien, fecha: act.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo) })
+          items.push({ ...ma, nivel, nombre: a.nombre_archivo || a.storage_path.split('/').pop(), url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: act.titulo, mime: a.tipo, subidoPor: quien, fecha: act.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo), _tabla: 'actividad_archivos', _id: a.id, _campo: 'nombre_archivo' })
         }
       }
       result[`actividades_${aud}`] = agruparPorMesYNivel(items)
@@ -140,7 +143,7 @@ export default function DriveOrganizado() {
         if (act.enlace_externo) items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace`, url: act.enlace_externo, fuente: act.titulo, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
         const adjuntos = datos.actividadArchivos.filter(a => a.actividad_id === act.id)
         for (const a of adjuntos) {
-          items.push({ ...ma, nivel, nombre: a.nombre_archivo || a.storage_path.split('/').pop(), url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: act.titulo, mime: a.tipo, subidoPor: quien, fecha: act.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo) })
+          items.push({ ...ma, nivel, nombre: a.nombre_archivo || a.storage_path.split('/').pop(), url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: act.titulo, mime: a.tipo, subidoPor: quien, fecha: act.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo), _tabla: 'actividad_archivos', _id: a.id, _campo: 'nombre_archivo' })
         }
         if (!act.imagen_url && !act.enlace_externo && adjuntos.length === 0) items.push({ ...ma, nivel, nombre: act.titulo, fuente: 'Tarea', soloInfo: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Tarea' })
       }
@@ -159,7 +162,7 @@ export default function DriveOrganizado() {
         if (e.archivo_url) items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, url: e.archivo_url, fuente: `Entrega de ${quien}`, mime: null, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(null, e.archivo_url) })
         const archivos = datos.entregaArchivos.filter(a => a.entrega_id === e.id)
         for (const a of archivos) {
-          items.push({ ...ma, nivel, nombre: a.nombre_archivo || `${e.actividad?.titulo} — ${quien}`, url: storageUrl('actividades', a.storage_path), fuente: `Entrega de ${quien}`, mime: a.tipo, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo) })
+          items.push({ ...ma, nivel, nombre: a.nombre_archivo || `${e.actividad?.titulo} — ${quien}`, url: storageUrl('actividades', a.storage_path), fuente: `Entrega de ${quien}`, mime: a.tipo, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo), _tabla: 'tarea_entrega_archivos', _id: a.id, _campo: 'nombre_archivo' })
         }
         if (!e.archivo_url && archivos.length === 0) items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, fuente: 'Sin archivo', soloInfo: true, subidoPor: quien, fecha: fechaStr, tipoArchivo: 'Entrega' })
       }
@@ -176,7 +179,7 @@ export default function DriveOrganizado() {
       if (d.enlace_externo) devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — enlace`, url: d.enlace_externo, fuente: d.titulo, esEnlace: true, subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Enlace' })
       const archivos = datos.devocionalArchivos.filter(a => a.devocional_id === d.id)
       for (const a of archivos) {
-        devoItems.push({ ...ma, nivel, nombre: a.nombre_archivo || a.storage_path.split('/').pop(), url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: d.titulo, mime: a.tipo, subidoPor: quien, fecha: d.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo) })
+        devoItems.push({ ...ma, nivel, nombre: a.nombre_archivo || a.storage_path.split('/').pop(), url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: d.titulo, mime: a.tipo, subidoPor: quien, fecha: d.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo), _tabla: 'devocional_archivos', _id: a.id, _campo: 'nombre_archivo' })
       }
     }
     result.devocionales = agruparPorMesYNivel(devoItems)
@@ -192,7 +195,7 @@ export default function DriveOrganizado() {
       if (b.refrigerio_foto_url) bitItems.push({ ...ma, nivel, nombre: `${label} — refrigerio`, url: b.refrigerio_foto_url, fuente: label, mime: 'image/*', subidoPor: quien, fecha: b.fecha, tipoArchivo: 'Imagen' })
       const fotos = datos.bitacoraFotos.filter(f => f.bitacora_id === b.id)
       for (const f of fotos) {
-        bitItems.push({ ...ma, nivel, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl('actividades', f.storage_path), fuente: label, mime: f.mime, subidoPor: quien, fecha: b.fecha, tipoArchivo: tipoDeArchivo(f.mime, f.nombre_archivo) })
+        bitItems.push({ ...ma, nivel, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl('actividades', f.storage_path), fuente: label, mime: f.mime, subidoPor: quien, fecha: b.fecha, tipoArchivo: tipoDeArchivo(f.mime, f.nombre_archivo), _tabla: 'bitacora_fotos', _id: f.id, _campo: 'nombre_archivo' })
       }
     }
     result.bitacora = agruparPorMesYNivel(bitItems)
@@ -205,7 +208,7 @@ export default function DriveOrganizado() {
       if (m.foto_url) matItems.push({ ...ma, nombre: `${m.nombre} — foto`, url: m.foto_url, fuente: m.nombre, mime: 'image/*', fecha: fechaMat, tipoArchivo: 'Imagen' })
       const fotos = datos.materialFotos.filter(f => f.material_id === m.id)
       for (const f of fotos) {
-        matItems.push({ ...ma, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl('actividades', f.storage_path), fuente: m.nombre, mime: f.tipo, fecha: fechaMat, tipoArchivo: tipoDeArchivo(f.tipo, f.nombre_archivo) })
+        matItems.push({ ...ma, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl('actividades', f.storage_path), fuente: m.nombre, mime: f.tipo, fecha: fechaMat, tipoArchivo: tipoDeArchivo(f.tipo, f.nombre_archivo), _tabla: 'material_fotos', _id: f.id, _campo: 'nombre_archivo' })
       }
     }
     result.materiales = agruparPorMes(matItems)
@@ -369,6 +372,13 @@ export default function DriveOrganizado() {
     setProgresoDesc('')
   }
 
+  async function renombrarArchivo(archivo, nuevoNombre) {
+    if (!archivo._tabla || !archivo._id || !archivo._campo || !nuevoNombre.trim()) return false
+    const { error } = await supabase.from(archivo._tabla).update({ [archivo._campo]: nuevoNombre.trim() }).eq('id', archivo._id)
+    if (!error) { recargar(); return true }
+    return false
+  }
+
   function descargarCarpeta(carpetaKey) {
     let node
     if (ruta.length === 0) {
@@ -479,6 +489,7 @@ export default function DriveOrganizado() {
                 onPreview={a.url && !a.esEnlace ? () => setPreview({ url: a.url, nombre: a.nombre, mime: a.mime }) : null}
                 onDownload={a.url && !a.esEnlace ? () => descargarArchivo(a.url, a.nombre) : null}
                 onOpenLink={a.esEnlace ? () => window.open(a.url, '_blank') : null}
+                onRename={a._tabla ? (nuevoNombre) => renombrarArchivo(a, nuevoNombre) : null}
               />
             )
           })}
@@ -552,9 +563,17 @@ function FolderCard({ folder, onClick, onDownload }) {
   )
 }
 
-function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLink }) {
+function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLink, onRename }) {
+  const [editando, setEditando] = useState(false)
+  const [nuevoNombre, setNuevoNombre] = useState('')
   const esImagen = archivo.mime?.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(archivo.nombre || '')
   const icon = archivo.esEnlace ? '🔗' : getFileIcon(archivo.nombre, archivo.mime)
+
+  async function guardarNombre() {
+    if (!nuevoNombre.trim() || nuevoNombre.trim() === archivo.nombre) { setEditando(false); return }
+    const ok = await onRename(nuevoNombre)
+    if (ok) setEditando(false)
+  }
 
   return (
     <div className={`group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${selected ? 'ring-2 ring-sky-400 ring-offset-1' : ''}`}>
@@ -568,7 +587,6 @@ function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLi
         ) : (
           <span className="text-4xl sm:text-5xl">{icon}</span>
         )}
-        {/* Selection checkbox */}
         {onToggle && (
           <div
             onClick={(e) => { e.stopPropagation(); onToggle() }}
@@ -581,12 +599,40 @@ function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLi
 
       {/* File info */}
       <div className="flex flex-col gap-0.5 px-3 py-2">
-        <p className="truncate text-xs font-bold text-ink/70" title={archivo.nombre}>{archivo.nombre}</p>
+        {editando ? (
+          <div className="flex items-center gap-1">
+            <input
+              autoFocus
+              className="min-w-0 flex-1 rounded border border-sky-300 px-1.5 py-0.5 text-xs font-bold text-ink/70 outline-none focus:ring-1 focus:ring-sky-400"
+              value={nuevoNombre}
+              onChange={(e) => setNuevoNombre(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') guardarNombre(); if (e.key === 'Escape') setEditando(false) }}
+              onBlur={guardarNombre}
+            />
+          </div>
+        ) : (
+          <p
+            className={`truncate text-xs font-bold text-ink/70 ${onRename ? 'cursor-text hover:text-sky-600' : ''}`}
+            title={archivo.nombre}
+            onDoubleClick={onRename ? () => { setNuevoNombre(archivo.nombre); setEditando(true) } : undefined}
+          >
+            {archivo.nombre}
+          </p>
+        )}
         <div className="flex items-center justify-between">
           <p className="truncate text-[10px] text-ink/30">
             {archivo.tipoArchivo || 'Archivo'}{archivo.fecha ? ` · ${fechaCorta(archivo.fecha)}` : ''}
           </p>
           <div className="flex shrink-0 items-center gap-0.5">
+            {onRename && !editando && (
+              <button
+                onClick={() => { setNuevoNombre(archivo.nombre); setEditando(true) }}
+                className="rounded p-1 text-[10px] text-ink/20 opacity-0 transition-all hover:bg-sky-50 hover:text-sky-600 group-hover:opacity-100"
+                title="Renombrar"
+              >
+                ✏️
+              </button>
+            )}
             {onDownload && (
               <button
                 onClick={onDownload}
