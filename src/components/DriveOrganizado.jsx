@@ -59,7 +59,7 @@ const SECTION_TEXT = { sky: 'text-sky-700', grape: 'text-grape-700', grass: 'tex
 export default function DriveOrganizado() {
   const [datos, setDatos] = useState(null)
   const [abierta, setAbierta] = useState(null)
-  const [subAbierta, setSubAbierta] = useState(null)
+  const [subAbierta, setSubAbierta] = useState(new Set())
   const [preview, setPreview] = useState(null)
 
   useEffect(() => {
@@ -276,11 +276,16 @@ export default function DriveOrganizado() {
 
   function toggle(key) {
     setAbierta(abierta === key ? null : key)
-    setSubAbierta(null)
+    setSubAbierta(new Set())
   }
 
   function toggleSub(key) {
-    setSubAbierta(subAbierta === key ? null : key)
+    setSubAbierta(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
   }
 
   return (
@@ -349,7 +354,7 @@ function NivelMesesArbol({ data, subAbierta, onToggle, onPreview }) {
       {niveles.map((nivel) => {
         const meses = data[nivel]
         const nivelKey = `nivel-${nivel}`
-        const nivelOpen = subAbierta === nivelKey
+        const nivelOpen = subAbierta.has(nivelKey)
         const nivelCount = contarEnMeses(meses)
         return (
           <div key={nivel}>
@@ -389,7 +394,7 @@ function MesesArbolInner({ meses, prefix, subAbierta, onToggle, onPreview }) {
             {monthKeys.map((month) => {
               const archivos = meses[year][month]
               const key = `${prefix}-${year}-${month}`
-              const isOpen = subAbierta === key
+              const isOpen = subAbierta.has(key)
               return (
                 <div key={key}>
                   <button
