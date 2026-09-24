@@ -26,6 +26,14 @@ function hoyYYYYMM() {
   return new Date().toISOString().slice(0, 7)
 }
 
+const MESES_NOMBRE = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+
+function mesLabel(yyyymm) {
+  if (!yyyymm || yyyymm === 'sin-fecha') return 'Sin fecha'
+  const [y, m] = yyyymm.split('-')
+  return `${MESES_NOMBRE[parseInt(m, 10) - 1]} ${y}`
+}
+
 function formatFecha(iso) {
   if (!iso) return ''
   const d = new Date(iso + 'T12:00:00')
@@ -54,8 +62,7 @@ export default function Actividades() {
   const [paraEquipo, setParaEquipo] = useState(null)
   const [misEntregas, setMisEntregas] = useState({})
   const [busqueda, setBusqueda] = useState('')
-  const [mesFiltro, setMesFiltro] = useState(hoyYYYYMM())
-  const [verTodosMeses, setVerTodosMeses] = useState(true)
+  const [mesesAbiertos, setMesesAbiertos] = useState(() => new Set([hoyYYYYMM()]))
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [confirmEliminar, setConfirmEliminar] = useState(null)
@@ -247,17 +254,36 @@ export default function Actividades() {
   if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
 
   // Filtrado por búsqueda + mes
-  let actividadesFiltradas = (actividades || []).filter((a) =>
+  const actividadesFiltradas = (actividades || []).filter((a) =>
     coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica),
   )
-  if (!verTodosMeses && mesFiltro) {
-    actividadesFiltradas = actividadesFiltradas.filter((a) => a.fecha?.startsWith(mesFiltro))
+  const paraEquipoFiltrado = (paraEquipo || []).filter((a) =>
+    coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica),
+  )
+
+  const gruposPorMes = {}
+  for (const a of actividadesFiltradas) {
+    const mes = a.fecha?.slice(0, 7) || 'sin-fecha'
+    if (!gruposPorMes[mes]) gruposPorMes[mes] = []
+    gruposPorMes[mes].push(a)
   }
-  let paraEquipoFiltrado = (paraEquipo || []).filter((a) =>
-    coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica),
-  )
-  if (!verTodosMeses && mesFiltro) {
-    paraEquipoFiltrado = paraEquipoFiltrado.filter((a) => a.fecha?.startsWith(mesFiltro))
+  const mesesOrdenados = Object.keys(gruposPorMes).sort((a, b) => b.localeCompare(a))
+
+  const gruposEquipo = {}
+  for (const a of paraEquipoFiltrado) {
+    const mes = a.fecha?.slice(0, 7) || 'sin-fecha'
+    if (!gruposEquipo[mes]) gruposEquipo[mes] = []
+    gruposEquipo[mes].push(a)
+  }
+  const mesesEquipo = Object.keys(gruposEquipo).sort((a, b) => b.localeCompare(a))
+
+  function toggleMes(mes) {
+    setMesesAbiertos(prev => {
+      const next = new Set(prev)
+      if (next.has(mes)) next.delete(mes)
+      else next.add(mes)
+      return next
+    })
   }
 
   return (
@@ -294,26 +320,14 @@ export default function Actividades() {
         </button>
       </div>
 
-      {/* Búsqueda + filtro de mes */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">🔍</span>
-          <input
-            className="input max-w-xs !pl-9"
-            placeholder="Buscar actividad..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-        </div>
-        {!verTodosMeses && (
-          <input type="month" className="input max-w-[180px]" value={mesFiltro} onChange={(e) => setMesFiltro(e.target.value)} />
-        )}
-        <button
-          onClick={() => setVerTodosMeses((v) => !v)}
-          className={`rounded-full px-4 py-2 text-sm font-bold ${verTodosMeses ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
-        >
-          {verTodosMeses ? 'Filtrar por mes' : 'Ver todos'}
-        </button>
+      <div className="relative">
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">🔍</span>
+        <input
+          className="input max-w-xs !pl-9"
+          placeholder="Buscar actividad..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
       </div>
 
       {seccion === 'clase' ? (
@@ -328,31 +342,49 @@ export default function Actividades() {
 
           {!actividades ? (
             <Spinner />
+          ) : actividades.length === 0 ? (
+            <div className="card flex flex-col items-center gap-3 py-12 text-center">
+              <span className="text-5xl">🎨</span>
+              <p className="text-ink/50">Aún no hay actividades para esta clase.</p>
+              <button className="btn-primary mt-1" onClick={openNew}>+ Nueva actividad</button>
+            </div>
+          ) : mesesOrdenados.length === 0 ? (
+            <div className="card flex flex-col items-center gap-2 py-8 text-center">
+              <span className="text-4xl">🔍</span>
+              <p className="text-ink/50">No hay actividades que coincidan con &ldquo;{busqueda}&rdquo;.</p>
+            </div>
           ) : (
-            <div className="card divide-y divide-ink/5 !p-0">
-              {actividadesFiltradas.map((a) => (
-                <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} />
-              ))}
-              {actividades.length === 0 && (
-                <div className="flex flex-col items-center gap-3 py-12 text-center">
-                  <span className="text-5xl">🎨</span>
-                  <p className="text-ink/50">Aún no hay actividades para esta clase.</p>
-                  <button className="btn-primary mt-1" onClick={openNew}>+ Nueva actividad</button>
-                </div>
-              )}
-              {actividades.length > 0 && actividadesFiltradas.length === 0 && (
-                <div className="flex flex-col items-center gap-2 py-8 text-center">
-                  <span className="text-4xl">🔍</span>
-                  <p className="text-ink/50">
-                    No hay actividades que coincidan{busqueda ? ` con "${busqueda}"` : ' en este mes'}.
-                  </p>
-                </div>
-              )}
+            <div className="flex flex-col gap-3">
+              {mesesOrdenados.map(mes => {
+                const acts = gruposPorMes[mes]
+                const isOpen = mesesAbiertos.has(mes)
+                return (
+                  <div key={mes} className="card !p-0 overflow-hidden">
+                    <button
+                      onClick={() => toggleMes(mes)}
+                      className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-ink/[0.02] ${isOpen ? 'bg-sky-50' : ''}`}
+                    >
+                      <span className={`font-bold ${isOpen ? 'text-sky-700' : ''}`}>📅 {mesLabel(mes)}</span>
+                      <span className="flex items-center gap-2">
+                        <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-bold text-ink/40">{acts.length}</span>
+                        <span className={`text-ink/30 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+                      </span>
+                    </button>
+                    {isOpen && (
+                      <div className="divide-y divide-ink/5 border-t border-ink/5">
+                        {acts.map(a => (
+                          <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={pedirEliminar} onVerEntregas={setTareaActividad} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           )}
         </>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {!paraEquipo ? (
             <Spinner />
           ) : paraEquipo.length === 0 ? (
@@ -360,60 +392,80 @@ export default function Actividades() {
               <span className="text-5xl">🍎</span>
               <p className="text-ink/50">Todavía no hay comunicados para el equipo docente.</p>
             </div>
-          ) : paraEquipoFiltrado.length === 0 ? (
+          ) : mesesEquipo.length === 0 ? (
             <div className="card flex flex-col items-center gap-2 py-8 text-center">
               <span className="text-4xl">🔍</span>
-              <p className="text-ink/50">
-                No hay comunicados que coincidan{busqueda ? ` con "${busqueda}"` : ' en este mes'}.
-              </p>
+              <p className="text-ink/50">No hay comunicados que coincidan con &ldquo;{busqueda}&rdquo;.</p>
             </div>
           ) : (
-            paraEquipoFiltrado.map((a, i) => (
-              <div
-                key={a.id}
-                className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
-                style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex cursor-pointer flex-wrap items-center gap-2" onClick={() => navigate(`/actividades/${a.id}`)}>
-                    <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
-                    {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
-                  </div>
-                  <span className="shrink-0 text-xs text-ink/40">{formatFecha(a.fecha)}</span>
-                </div>
-                <RichTextView html={a.descripcion} className="mt-1" />
-                {(a.versiculo_clave || a.historia_biblica) && (
-                  <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
-                    {a.versiculo_clave && <p className="italic text-ink/80">📖 &ldquo;{a.versiculo_clave}&rdquo;</p>}
-                    {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
-                  </div>
-                )}
-                {a.enlace_externo && (
-                  getVideoEmbedUrl(a.enlace_externo) ? (
-                    <div className="mt-3 overflow-hidden rounded-2xl bg-ink shadow-soft">
-                      <iframe
-                        src={getVideoEmbedUrl(a.enlace_externo)}
-                        title="Video"
-                        className="aspect-video w-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+            mesesEquipo.map(mes => {
+              const acts = gruposEquipo[mes]
+              const isOpen = mesesAbiertos.has(mes)
+              return (
+                <div key={mes} className="card !p-0 overflow-hidden">
+                  <button
+                    onClick={() => toggleMes(mes)}
+                    className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-ink/[0.02] ${isOpen ? 'bg-grape-50' : ''}`}
+                  >
+                    <span className={`font-bold ${isOpen ? 'text-grape-700' : ''}`}>📅 {mesLabel(mes)}</span>
+                    <span className="flex items-center gap-2">
+                      <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-bold text-ink/40">{acts.length}</span>
+                      <span className={`text-ink/30 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div className="flex flex-col gap-4 border-t border-ink/5 p-4">
+                      {acts.map((a, i) => (
+                        <div
+                          key={a.id}
+                          className="card animate-pop-in transition-transform duration-200 hover:-translate-y-0.5"
+                          style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex cursor-pointer flex-wrap items-center gap-2" onClick={() => navigate(`/actividades/${a.id}`)}>
+                              <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
+                              {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
+                            </div>
+                            <span className="shrink-0 text-xs text-ink/40">{formatFecha(a.fecha)}</span>
+                          </div>
+                          <RichTextView html={a.descripcion} className="mt-1" />
+                          {(a.versiculo_clave || a.historia_biblica) && (
+                            <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
+                              {a.versiculo_clave && <p className="italic text-ink/80">📖 &ldquo;{a.versiculo_clave}&rdquo;</p>}
+                              {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
+                            </div>
+                          )}
+                          {a.enlace_externo && (
+                            getVideoEmbedUrl(a.enlace_externo) ? (
+                              <div className="mt-3 overflow-hidden rounded-2xl bg-ink shadow-soft">
+                                <iframe
+                                  src={getVideoEmbedUrl(a.enlace_externo)}
+                                  title="Video"
+                                  className="aspect-video w-full"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                />
+                              </div>
+                            ) : (
+                              <a
+                                href={a.enlace_externo}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mt-3 inline-block w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
+                              >
+                                🔗 Abrir enlace
+                              </a>
+                            )
+                          )}
+                          <ActivityFiles archivos={a.actividad_archivos} />
+                          {a.es_tarea && <MiEntregaEquipoWidget actividad={a} entrega={misEntregas[a.id]} onSaved={loadEquipo} />}
+                        </div>
+                      ))}
                     </div>
-                  ) : (
-                    <a
-                      href={a.enlace_externo}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-3 inline-block w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
-                    >
-                      🔗 Abrir enlace
-                    </a>
-                  )
-                )}
-                <ActivityFiles archivos={a.actividad_archivos} />
-                {a.es_tarea && <MiEntregaEquipoWidget actividad={a} entrega={misEntregas[a.id]} onSaved={loadEquipo} />}
-              </div>
-            ))
+                  )}
+                </div>
+              )
+            })
           )}
         </div>
       )}

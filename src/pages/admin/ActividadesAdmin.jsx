@@ -20,6 +20,14 @@ function hoyYYYYMM() {
   return new Date().toISOString().slice(0, 7)
 }
 
+const MESES_NOMBRE = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+
+function mesLabel(yyyymm) {
+  if (!yyyymm || yyyymm === 'sin-fecha') return 'Sin fecha'
+  const [y, m] = yyyymm.split('-')
+  return `${MESES_NOMBRE[parseInt(m, 10) - 1]} ${y}`
+}
+
 function formVacio(fecha) {
   return {
     titulo: '',
@@ -40,8 +48,7 @@ export default function ActividadesAdmin() {
   const [audiencia, setAudiencia] = useState('ninos')
   const [actividades, setActividades] = useState(null)
   const [busqueda, setBusqueda] = useState('')
-  const [mesFiltro, setMesFiltro] = useState(hoyYYYYMM())
-  const [verTodosMeses, setVerTodosMeses] = useState(true)
+  const [mesesAbiertos, setMesesAbiertos] = useState(() => new Set([hoyYYYYMM()]))
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(formVacio())
@@ -234,11 +241,24 @@ export default function ActividadesAdmin() {
   if (niveles.length === 0) return <p className="card text-ink/50">Todavía no hay clases creadas.</p>
 
   // Filtrado por búsqueda + mes
-  let actividadesFiltradas = (actividades || []).filter((a) =>
+  const actividadesFiltradas = (actividades || []).filter((a) =>
     coincide(busqueda, a.titulo, a.descripcion, a.versiculo_clave, a.historia_biblica),
   )
-  if (!verTodosMeses && mesFiltro) {
-    actividadesFiltradas = actividadesFiltradas.filter((a) => a.fecha?.startsWith(mesFiltro))
+  const gruposPorMes = {}
+  for (const a of actividadesFiltradas) {
+    const mes = a.fecha?.slice(0, 7) || 'sin-fecha'
+    if (!gruposPorMes[mes]) gruposPorMes[mes] = []
+    gruposPorMes[mes].push(a)
+  }
+  const mesesOrdenados = Object.keys(gruposPorMes).sort((a, b) => b.localeCompare(a))
+
+  function toggleMes(mes) {
+    setMesesAbiertos(prev => {
+      const next = new Set(prev)
+      if (next.has(mes)) next.delete(mes)
+      else next.add(mes)
+      return next
+    })
   }
 
   return (
@@ -285,50 +305,56 @@ export default function ActividadesAdmin() {
         <p className="-mt-3 text-sm text-ink/50">Comunicados, capacitaciones o tareas dirigidas a todo el equipo docente, no a una clase en particular.</p>
       )}
 
-      {/* Búsqueda + filtro de mes */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">🔍</span>
-          <input
-            className="input max-w-xs !pl-9"
-            placeholder="Buscar actividad..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-        </div>
-        {!verTodosMeses && (
-          <input type="month" className="input max-w-[180px]" value={mesFiltro} onChange={(e) => setMesFiltro(e.target.value)} />
-        )}
-        <button
-          onClick={() => setVerTodosMeses((v) => !v)}
-          className={`rounded-full px-4 py-2 text-sm font-bold ${verTodosMeses ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
-        >
-          {verTodosMeses ? 'Filtrar por mes' : 'Ver todos'}
-        </button>
+      <div className="relative">
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">🔍</span>
+        <input
+          className="input max-w-xs !pl-9"
+          placeholder="Buscar actividad..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
       </div>
 
       {!actividades ? (
         <Spinner />
+      ) : actividades.length === 0 ? (
+        <div className="card flex flex-col items-center gap-3 py-12 text-center">
+          <span className="text-5xl">🎨</span>
+          <p className="text-ink/50">Aún no hay actividades para esta clase.</p>
+          <button className="btn-primary mt-1" onClick={openNew}>+ Nueva actividad</button>
+        </div>
+      ) : mesesOrdenados.length === 0 ? (
+        <div className="card flex flex-col items-center gap-2 py-8 text-center">
+          <span className="text-4xl">🔍</span>
+          <p className="text-ink/50">No hay actividades que coincidan con &ldquo;{busqueda}&rdquo;.</p>
+        </div>
       ) : (
-        <div className="card divide-y divide-ink/5 !p-0">
-          {actividadesFiltradas.map((a) => (
-            <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={eliminar} onVerEntregas={setTareaActividad} />
-          ))}
-          {actividades.length === 0 && (
-            <div className="flex flex-col items-center gap-3 py-12 text-center">
-              <span className="text-5xl">🎨</span>
-              <p className="text-ink/50">Aún no hay actividades para esta clase.</p>
-              <button className="btn-primary mt-1" onClick={openNew}>+ Nueva actividad</button>
-            </div>
-          )}
-          {actividades.length > 0 && actividadesFiltradas.length === 0 && (
-            <div className="flex flex-col items-center gap-2 py-8 text-center">
-              <span className="text-4xl">🔍</span>
-              <p className="text-ink/50">
-                No hay actividades que coincidan{busqueda ? ` con "${busqueda}"` : ' en este mes'}.
-              </p>
-            </div>
-          )}
+        <div className="flex flex-col gap-3">
+          {mesesOrdenados.map(mes => {
+            const acts = gruposPorMes[mes]
+            const isOpen = mesesAbiertos.has(mes)
+            return (
+              <div key={mes} className="card !p-0 overflow-hidden">
+                <button
+                  onClick={() => toggleMes(mes)}
+                  className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-ink/[0.02] ${isOpen ? 'bg-sky-50' : ''}`}
+                >
+                  <span className={`font-bold ${isOpen ? 'text-sky-700' : ''}`}>📅 {mesLabel(mes)}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-bold text-ink/40">{acts.length}</span>
+                    <span className={`text-ink/30 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+                  </span>
+                </button>
+                {isOpen && (
+                  <div className="divide-y divide-ink/5 border-t border-ink/5">
+                    {acts.map(a => (
+                      <ActividadFila key={a.id} a={a} onEdit={openEdit} onDelete={eliminar} onVerEntregas={setTareaActividad} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
 
