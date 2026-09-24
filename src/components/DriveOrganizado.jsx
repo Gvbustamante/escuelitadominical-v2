@@ -79,8 +79,9 @@ export default function DriveOrganizado() {
 
   useEffect(() => {
     async function load() {
-      const [acts, devos, devoArchivos, bitacoras, bitaFotos, mats, matFotos, perfiles, entregas, entregaArchivos, ninos] = await Promise.all([
+      const [acts, actArchivos, devos, devoArchivos, bitacoras, bitaFotos, mats, matFotos, perfiles, entregas, entregaArchivos, ninos] = await Promise.all([
         supabase.from('actividades').select('id, titulo, fecha, imagen_url, enlace_externo, audiencia, es_tarea, nivel_id, docente_id, nivel:niveles(nombre)').order('fecha', { ascending: false }),
+        supabase.from('actividad_archivos').select('id, actividad_id, storage_path, nombre_archivo, tipo, bucket'),
         supabase.from('devocionales_ninos').select('id, titulo, fecha, imagen_url, enlace_externo, nivel_id, creado_por, nivel:niveles(nombre)').order('fecha', { ascending: false }),
         supabase.from('devocional_archivos').select('id, devocional_id, storage_path, nombre_archivo, tipo, bucket'),
         supabase.from('bitacora_clase').select('id, fecha, momento, nivel_id, docente_id, nivel:niveles(nombre), salon_foto_url, refrigerio_foto_url').order('fecha', { ascending: false }),
@@ -93,7 +94,8 @@ export default function DriveOrganizado() {
         supabase.from('ninos').select('id, nombre_completo'),
       ])
       setDatos({
-        actividades: acts.data || [], devocionales: devos.data || [], devocionalArchivos: devoArchivos.data || [],
+        actividades: acts.data || [], actividadArchivos: actArchivos.data || [],
+        devocionales: devos.data || [], devocionalArchivos: devoArchivos.data || [],
         bitacoras: bitacoras.data || [], bitacoraFotos: bitaFotos.data || [], materiales: mats.data || [],
         materialFotos: matFotos.data || [], perfiles: perfiles.data || [], entregas: entregas.data || [],
         entregaArchivos: entregaArchivos.data || [], ninos: ninos.data || [],
@@ -118,6 +120,10 @@ export default function DriveOrganizado() {
         const quien = docentesMap[act.docente_id] || null
         if (act.imagen_url) items.push({ ...ma, nivel, nombre: `${act.titulo} — portada`, url: act.imagen_url, fuente: act.titulo, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
         if (act.enlace_externo) items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace`, url: act.enlace_externo, fuente: act.titulo, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
+        const adjuntos = datos.actividadArchivos.filter(a => a.actividad_id === act.id)
+        for (const a of adjuntos) {
+          items.push({ ...ma, nivel, nombre: a.nombre_archivo || a.storage_path.split('/').pop(), url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: act.titulo, mime: a.tipo, subidoPor: quien, fecha: act.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo) })
+        }
       }
       result[`actividades_${aud}`] = agruparPorMesYNivel(items)
     }
@@ -132,7 +138,11 @@ export default function DriveOrganizado() {
         const quien = docentesMap[act.docente_id] || null
         if (act.imagen_url) items.push({ ...ma, nivel, nombre: `${act.titulo} — archivo`, url: act.imagen_url, fuente: act.titulo, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
         if (act.enlace_externo) items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace`, url: act.enlace_externo, fuente: act.titulo, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
-        if (!act.imagen_url && !act.enlace_externo) items.push({ ...ma, nivel, nombre: act.titulo, fuente: 'Tarea', soloInfo: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Tarea' })
+        const adjuntos = datos.actividadArchivos.filter(a => a.actividad_id === act.id)
+        for (const a of adjuntos) {
+          items.push({ ...ma, nivel, nombre: a.nombre_archivo || a.storage_path.split('/').pop(), url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: act.titulo, mime: a.tipo, subidoPor: quien, fecha: act.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo) })
+        }
+        if (!act.imagen_url && !act.enlace_externo && adjuntos.length === 0) items.push({ ...ma, nivel, nombre: act.titulo, fuente: 'Tarea', soloInfo: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Tarea' })
       }
       result[`tareas_${aud}`] = agruparPorMesYNivel(items)
     }
