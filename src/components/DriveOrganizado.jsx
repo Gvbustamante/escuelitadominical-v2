@@ -41,26 +41,41 @@ function tipoDeArchivo(mime, nombre, esEnlace) {
 }
 
 const SECCIONES = [
-  { key: 'actividades_ninos', label: 'Actividades — Niños', icon: '🎨', color: 'sky' },
-  { key: 'actividades_docentes', label: 'Actividades — Docentes', icon: '🍎', color: 'sky' },
+  { key: 'actividades_ninos', label: 'Actividades Niños', icon: '🎨', color: 'sky' },
+  { key: 'actividades_docentes', label: 'Actividades Docentes', icon: '🍎', color: 'sky' },
   { key: 'devocionales', label: 'Devocionales', icon: '📖', color: 'grape' },
-  { key: 'tareas_ninos', label: 'Tareas — Niños', icon: '📝', color: 'sunshine' },
-  { key: 'tareas_docentes', label: 'Tareas — Docentes', icon: '📝', color: 'sunshine' },
-  { key: 'entregas_ninos', label: 'Entregas — Niños', icon: '✅', color: 'grass' },
-  { key: 'entregas_docentes', label: 'Entregas — Docentes', icon: '✅', color: 'grass' },
+  { key: 'tareas_ninos', label: 'Tareas Niños', icon: '📝', color: 'sunshine' },
+  { key: 'tareas_docentes', label: 'Tareas Docentes', icon: '📝', color: 'sunshine' },
+  { key: 'entregas_ninos', label: 'Entregas Niños', icon: '✅', color: 'grass' },
+  { key: 'entregas_docentes', label: 'Entregas Docentes', icon: '✅', color: 'grass' },
   { key: 'bitacora', label: 'Bitácora', icon: '📋', color: 'grass' },
   { key: 'materiales', label: 'Materiales', icon: '🧩', color: 'sunshine' },
   { key: 'hojas_vida', label: 'Hojas de vida', icon: '📄', color: 'coral' },
 ]
 
-const SECTION_BG = { sky: 'bg-sky-50', grape: 'bg-grape-50', grass: 'bg-grass-50', sunshine: 'bg-sunshine-50', coral: 'bg-coral-50' }
-const SECTION_TEXT = { sky: 'text-sky-700', grape: 'text-grape-700', grass: 'text-grass-700', sunshine: 'text-sunshine-700', coral: 'text-coral-700' }
+const FOLDER_COLORS = {
+  sky: { bg: 'bg-sky-50', fill: '#38bdf8', ring: 'ring-sky-300' },
+  grape: { bg: 'bg-purple-50', fill: '#a78bfa', ring: 'ring-purple-300' },
+  grass: { bg: 'bg-emerald-50', fill: '#34d399', ring: 'ring-emerald-300' },
+  sunshine: { bg: 'bg-amber-50', fill: '#fbbf24', ring: 'ring-amber-300' },
+  coral: { bg: 'bg-rose-50', fill: '#f97066', ring: 'ring-rose-300' },
+}
+
+function flattenFiles(node) {
+  if (!node) return []
+  if (Array.isArray(node)) return node.filter(a => a.url && !a.esEnlace && !a.soloInfo)
+  const result = []
+  for (const v of Object.values(node)) result.push(...flattenFiles(v))
+  return result
+}
 
 export default function DriveOrganizado() {
   const [datos, setDatos] = useState(null)
-  const [abierta, setAbierta] = useState(null)
-  const [subAbierta, setSubAbierta] = useState(new Set())
+  const [ruta, setRuta] = useState([])
+  const [seleccion, setSeleccion] = useState(new Set())
   const [preview, setPreview] = useState(null)
+  const [descargando, setDescargando] = useState(false)
+  const [progresoDesc, setProgresoDesc] = useState('')
 
   useEffect(() => {
     async function load() {
@@ -78,17 +93,10 @@ export default function DriveOrganizado() {
         supabase.from('ninos').select('id, nombre_completo'),
       ])
       setDatos({
-        actividades: acts.data || [],
-        devocionales: devos.data || [],
-        devocionalArchivos: devoArchivos.data || [],
-        bitacoras: bitacoras.data || [],
-        bitacoraFotos: bitaFotos.data || [],
-        materiales: mats.data || [],
-        materialFotos: matFotos.data || [],
-        perfiles: perfiles.data || [],
-        entregas: entregas.data || [],
-        entregaArchivos: entregaArchivos.data || [],
-        ninos: ninos.data || [],
+        actividades: acts.data || [], devocionales: devos.data || [], devocionalArchivos: devoArchivos.data || [],
+        bitacoras: bitacoras.data || [], bitacoraFotos: bitaFotos.data || [], materiales: mats.data || [],
+        materialFotos: matFotos.data || [], perfiles: perfiles.data || [], entregas: entregas.data || [],
+        entregaArchivos: entregaArchivos.data || [], ninos: ninos.data || [],
       })
     }
     load()
@@ -97,30 +105,23 @@ export default function DriveOrganizado() {
   const archivosOrganizados = useMemo(() => {
     if (!datos) return null
     const result = {}
-    const ninosMap = Object.fromEntries(datos.ninos.map((n) => [n.id, n.nombre_completo]))
-    const docentesMap = Object.fromEntries(datos.perfiles.map((p) => [p.id, p.nombre_completo]))
+    const ninosMap = Object.fromEntries(datos.ninos.map(n => [n.id, n.nombre_completo]))
+    const docentesMap = Object.fromEntries(datos.perfiles.map(p => [p.id, p.nombre_completo]))
 
-    // --- Actividades (split by audiencia: ninos / docentes) ---
     for (const aud of ['ninos', 'docentes']) {
       const items = []
       for (const act of datos.actividades) {
-        if (act.audiencia !== aud) continue
-        if (act.es_tarea) continue
+        if (act.audiencia !== aud || act.es_tarea) continue
         const ma = mesAnio(act.fecha)
         if (!ma) continue
         const nivel = act.nivel?.nombre || 'Toda la escuelita'
         const quien = docentesMap[act.docente_id] || null
-        if (act.imagen_url) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — portada`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividades/${act.id}`, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
-        }
-        if (act.enlace_externo) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividades/${act.id}`, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
-        }
+        if (act.imagen_url) items.push({ ...ma, nivel, nombre: `${act.titulo} — portada`, url: act.imagen_url, fuente: act.titulo, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
+        if (act.enlace_externo) items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace`, url: act.enlace_externo, fuente: act.titulo, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
       }
       result[`actividades_${aud}`] = agruparPorMesYNivel(items)
     }
 
-    // --- Tareas (split by audiencia, only es_tarea=true) ---
     for (const aud of ['ninos', 'docentes']) {
       const items = []
       for (const act of datos.actividades) {
@@ -129,20 +130,13 @@ export default function DriveOrganizado() {
         if (!ma) continue
         const nivel = act.nivel?.nombre || 'Toda la escuelita'
         const quien = docentesMap[act.docente_id] || null
-        if (act.imagen_url) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — archivo`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividades/${act.id}`, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
-        }
-        if (act.enlace_externo) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividades/${act.id}`, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
-        }
-        if (!act.imagen_url && !act.enlace_externo) {
-          items.push({ ...ma, nivel, nombre: act.titulo, fuente: 'Tarea asignada', fuenteLink: `#/actividades/${act.id}`, soloInfo: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Tarea' })
-        }
+        if (act.imagen_url) items.push({ ...ma, nivel, nombre: `${act.titulo} — archivo`, url: act.imagen_url, fuente: act.titulo, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
+        if (act.enlace_externo) items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace`, url: act.enlace_externo, fuente: act.titulo, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
+        if (!act.imagen_url && !act.enlace_externo) items.push({ ...ma, nivel, nombre: act.titulo, fuente: 'Tarea', soloInfo: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Tarea' })
       }
       result[`tareas_${aud}`] = agruparPorMesYNivel(items)
     }
 
-    // --- Entregas (split by audiencia from actividad) ---
     for (const aud of ['ninos', 'docentes']) {
       const items = []
       for (const e of datos.entregas) {
@@ -152,57 +146,31 @@ export default function DriveOrganizado() {
         if (!ma) continue
         const nivel = e.actividad?.nivel?.nombre || 'Toda la escuelita'
         const quien = aud === 'ninos' ? (ninosMap[e.nino_id] || 'Niño') : (docentesMap[e.docente_id] || 'Docente')
-
-        if (e.archivo_url) {
-          items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, url: e.archivo_url, fuente: `Entrega de ${quien}`, mime: null, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(null, e.archivo_url) })
-        }
-        const archivos = datos.entregaArchivos.filter((a) => a.entrega_id === e.id)
+        if (e.archivo_url) items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, url: e.archivo_url, fuente: `Entrega de ${quien}`, mime: null, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(null, e.archivo_url) })
+        const archivos = datos.entregaArchivos.filter(a => a.entrega_id === e.id)
         for (const a of archivos) {
-          items.push({
-            ...ma, nivel,
-            nombre: a.nombre_archivo || `${e.actividad?.titulo} — ${quien}`,
-            url: storageUrl('actividades', a.storage_path),
-            fuente: `Entrega de ${quien}`,
-            mime: a.tipo,
-            subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo),
-          })
+          items.push({ ...ma, nivel, nombre: a.nombre_archivo || `${e.actividad?.titulo} — ${quien}`, url: storageUrl('actividades', a.storage_path), fuente: `Entrega de ${quien}`, mime: a.tipo, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo) })
         }
-        if (!e.archivo_url && archivos.length === 0) {
-          items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, fuente: 'Entregada (sin archivo)', soloInfo: true, subidoPor: quien, fecha: fechaStr, tipoArchivo: 'Entrega' })
-        }
+        if (!e.archivo_url && archivos.length === 0) items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, fuente: 'Sin archivo', soloInfo: true, subidoPor: quien, fecha: fechaStr, tipoArchivo: 'Entrega' })
       }
       result[`entregas_${aud}`] = agruparPorMesYNivel(items)
     }
 
-    // --- Devocionales (by nivel) ---
     const devoItems = []
     for (const d of datos.devocionales) {
       const ma = mesAnio(d.fecha)
       if (!ma) continue
       const nivel = d.nivel?.nombre || 'Toda la escuelita'
       const quien = docentesMap[d.creado_por] || null
-      if (d.imagen_url) {
-        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — imagen`, url: d.imagen_url, fuente: d.titulo, fuenteLink: `#/devocionales/${d.id}`, mime: 'image/*', subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Imagen' })
-      }
-      if (d.enlace_externo) {
-        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — enlace externo`, url: d.enlace_externo, fuente: d.titulo, fuenteLink: `#/devocionales/${d.id}`, esEnlace: true, subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Enlace' })
-      }
-      const archivos = datos.devocionalArchivos.filter((a) => a.devocional_id === d.id)
+      if (d.imagen_url) devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — imagen`, url: d.imagen_url, fuente: d.titulo, mime: 'image/*', subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Imagen' })
+      if (d.enlace_externo) devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — enlace`, url: d.enlace_externo, fuente: d.titulo, esEnlace: true, subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Enlace' })
+      const archivos = datos.devocionalArchivos.filter(a => a.devocional_id === d.id)
       for (const a of archivos) {
-        devoItems.push({
-          ...ma, nivel,
-          nombre: a.nombre_archivo || a.storage_path.split('/').pop(),
-          url: storageUrl(a.bucket || 'actividades', a.storage_path),
-          fuente: d.titulo,
-          fuenteLink: `#/devocionales/${d.id}`,
-          mime: a.tipo,
-          subidoPor: quien, fecha: d.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo),
-        })
+        devoItems.push({ ...ma, nivel, nombre: a.nombre_archivo || a.storage_path.split('/').pop(), url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: d.titulo, mime: a.tipo, subidoPor: quien, fecha: d.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo) })
       }
     }
     result.devocionales = agruparPorMesYNivel(devoItems)
 
-    // --- Bitácora (by nivel) ---
     const bitItems = []
     for (const b of datos.bitacoras) {
       const ma = mesAnio(b.fecha)
@@ -210,57 +178,30 @@ export default function DriveOrganizado() {
       const nivel = b.nivel?.nombre || 'Clase'
       const label = `${nivel} — ${b.momento}`
       const quien = docentesMap[b.docente_id] || null
-
-      if (b.salon_foto_url) {
-        bitItems.push({ ...ma, nivel, nombre: `${label} — salón`, url: b.salon_foto_url, fuente: label, mime: 'image/*', subidoPor: quien, fecha: b.fecha, tipoArchivo: 'Imagen' })
-      }
-      if (b.refrigerio_foto_url) {
-        bitItems.push({ ...ma, nivel, nombre: `${label} — refrigerio`, url: b.refrigerio_foto_url, fuente: label, mime: 'image/*', subidoPor: quien, fecha: b.fecha, tipoArchivo: 'Imagen' })
-      }
-      const fotos = datos.bitacoraFotos.filter((f) => f.bitacora_id === b.id)
+      if (b.salon_foto_url) bitItems.push({ ...ma, nivel, nombre: `${label} — salón`, url: b.salon_foto_url, fuente: label, mime: 'image/*', subidoPor: quien, fecha: b.fecha, tipoArchivo: 'Imagen' })
+      if (b.refrigerio_foto_url) bitItems.push({ ...ma, nivel, nombre: `${label} — refrigerio`, url: b.refrigerio_foto_url, fuente: label, mime: 'image/*', subidoPor: quien, fecha: b.fecha, tipoArchivo: 'Imagen' })
+      const fotos = datos.bitacoraFotos.filter(f => f.bitacora_id === b.id)
       for (const f of fotos) {
-        bitItems.push({
-          ...ma, nivel,
-          nombre: f.nombre_archivo || f.storage_path.split('/').pop(),
-          url: storageUrl('actividades', f.storage_path),
-          fuente: label,
-          mime: f.mime,
-          subidoPor: quien, fecha: b.fecha, tipoArchivo: tipoDeArchivo(f.mime, f.nombre_archivo),
-        })
+        bitItems.push({ ...ma, nivel, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl('actividades', f.storage_path), fuente: label, mime: f.mime, subidoPor: quien, fecha: b.fecha, tipoArchivo: tipoDeArchivo(f.mime, f.nombre_archivo) })
       }
     }
     result.bitacora = agruparPorMesYNivel(bitItems)
 
-    // --- Materiales (no level, just year/month) ---
     const matItems = []
     for (const m of datos.materiales) {
       const ma = mesAnio(m.created_at?.slice(0, 10))
       if (!ma) continue
       const fechaMat = m.created_at?.slice(0, 10)
-      if (m.foto_url) {
-        matItems.push({ ...ma, nombre: `${m.nombre} — foto`, url: m.foto_url, fuente: m.nombre, mime: 'image/*', fecha: fechaMat, tipoArchivo: 'Imagen' })
-      }
-      const fotos = datos.materialFotos.filter((f) => f.material_id === m.id)
+      if (m.foto_url) matItems.push({ ...ma, nombre: `${m.nombre} — foto`, url: m.foto_url, fuente: m.nombre, mime: 'image/*', fecha: fechaMat, tipoArchivo: 'Imagen' })
+      const fotos = datos.materialFotos.filter(f => f.material_id === m.id)
       for (const f of fotos) {
-        matItems.push({
-          ...ma,
-          nombre: f.nombre_archivo || f.storage_path.split('/').pop(),
-          url: storageUrl('actividades', f.storage_path),
-          fuente: m.nombre,
-          mime: f.tipo,
-          fecha: fechaMat, tipoArchivo: tipoDeArchivo(f.tipo, f.nombre_archivo),
-        })
+        matItems.push({ ...ma, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl('actividades', f.storage_path), fuente: m.nombre, mime: f.tipo, fecha: fechaMat, tipoArchivo: tipoDeArchivo(f.tipo, f.nombre_archivo) })
       }
     }
     result.materiales = agruparPorMes(matItems)
 
-    // --- Hojas de vida (flat) ---
-    result.hojas_vida = datos.perfiles.filter((p) => p.hoja_vida_url).map((p) => ({
-      nombre: `${p.nombre_completo} — Hoja de vida`,
-      url: p.hoja_vida_url,
-      fuente: p.nombre_completo,
-      mime: null,
-      subidoPor: p.nombre_completo, tipoArchivo: tipoDeArchivo(null, p.hoja_vida_url),
+    result.hojas_vida = datos.perfiles.filter(p => p.hoja_vida_url).map(p => ({
+      nombre: `${p.nombre_completo} — Hoja de vida`, url: p.hoja_vida_url, fuente: p.nombre_completo, mime: null, subidoPor: p.nombre_completo, tipoArchivo: tipoDeArchivo(null, p.hoja_vida_url),
     }))
 
     return result
@@ -268,244 +209,398 @@ export default function DriveOrganizado() {
 
   if (!datos) {
     return (
-      <div className="flex flex-col gap-3">
-        {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
+      <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-36 w-full rounded-2xl" />)}
+        </div>
       </div>
     )
   }
 
-  function toggle(key) {
-    setAbierta(abierta === key ? null : key)
-    setSubAbierta(new Set())
+  function navegar(key) {
+    setRuta(prev => [...prev, key])
+    setSeleccion(new Set())
   }
 
-  function toggleSub(key) {
-    setSubAbierta(prev => {
+  function irA(index) {
+    setRuta(prev => prev.slice(0, index))
+    setSeleccion(new Set())
+  }
+
+  function toggleSel(i) {
+    setSeleccion(prev => {
       const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
+      if (next.has(i)) next.delete(i)
+      else next.add(i)
       return next
     })
   }
 
+  function getContenido() {
+    if (!archivosOrganizados) return { carpetas: [], archivos: [] }
+
+    if (ruta.length === 0) {
+      const carpetas = SECCIONES.map(sec => ({
+        ...sec, count: flattenFiles(archivosOrganizados[sec.key]).length,
+      }))
+      return { carpetas, archivos: [] }
+    }
+
+    const secKey = ruta[0]
+    const sec = SECCIONES.find(s => s.key === secKey)
+    const data = archivosOrganizados[secKey]
+    if (!data) return { carpetas: [], archivos: [] }
+
+    if (secKey === 'hojas_vida') {
+      return { carpetas: [], archivos: (data || []).filter(a => a.url) }
+    }
+
+    if (secKey === 'materiales') {
+      if (ruta.length === 1) {
+        return { carpetas: Object.keys(data).sort((a, b) => b - a).map(y => ({ key: y, label: y, icon: '📅', color: sec.color, count: flattenFiles(data[y]).length })), archivos: [] }
+      }
+      if (ruta.length === 2) {
+        const yearData = data[ruta[1]] || {}
+        return { carpetas: Object.keys(yearData).sort((a, b) => b - a).map(m => ({ key: m, label: MESES[m], icon: '📅', color: sec.color, count: (yearData[m] || []).filter(a => a.url && !a.esEnlace && !a.soloInfo).length })), archivos: [] }
+      }
+      return { carpetas: [], archivos: (data[ruta[1]]?.[ruta[2]] || []).filter(a => !a.soloInfo) }
+    }
+
+    if (ruta.length === 1) {
+      const niveles = Object.keys(data).sort((a, b) => {
+        if (a === 'Toda la escuelita') return -1
+        if (b === 'Toda la escuelita') return 1
+        return a.localeCompare(b)
+      })
+      return { carpetas: niveles.map(n => ({ key: n, label: n, icon: '📚', color: sec.color, count: flattenFiles(data[n]).length })), archivos: [] }
+    }
+    if (ruta.length === 2) {
+      const nivelData = data[ruta[1]] || {}
+      return { carpetas: Object.keys(nivelData).sort((a, b) => b - a).map(y => ({ key: y, label: y, icon: '📅', color: sec.color, count: flattenFiles(nivelData[y]).length })), archivos: [] }
+    }
+    if (ruta.length === 3) {
+      const yearData = data[ruta[1]]?.[ruta[2]] || {}
+      return { carpetas: Object.keys(yearData).sort((a, b) => b - a).map(m => ({ key: m, label: MESES[m], icon: '📅', color: sec.color, count: (yearData[m] || []).filter(a => a.url && !a.esEnlace && !a.soloInfo).length })), archivos: [] }
+    }
+    return { carpetas: [], archivos: (data[ruta[1]]?.[ruta[2]]?.[ruta[3]] || []).filter(a => !a.soloInfo) }
+  }
+
+  function getBreadcrumbs() {
+    const crumbs = [{ label: 'Drive', icon: '📁' }]
+    if (ruta.length === 0) return crumbs
+    const sec = SECCIONES.find(s => s.key === ruta[0])
+    crumbs.push({ label: sec?.label || ruta[0], icon: sec?.icon })
+    const sinNivel = ruta[0] === 'materiales'
+    if (ruta[0] === 'hojas_vida' || ruta.length < 2) return crumbs
+    if (sinNivel) {
+      if (ruta.length >= 2) crumbs.push({ label: ruta[1] })
+      if (ruta.length >= 3) crumbs.push({ label: MESES[parseInt(ruta[2])] || ruta[2] })
+    } else {
+      if (ruta.length >= 2) crumbs.push({ label: ruta[1] })
+      if (ruta.length >= 3) crumbs.push({ label: ruta[2] })
+      if (ruta.length >= 4) crumbs.push({ label: MESES[parseInt(ruta[3])] || ruta[3] })
+    }
+    return crumbs
+  }
+
+  async function descargarArchivo(url, nombre) {
+    try {
+      const response = await fetch(url)
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = nombre || 'archivo'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(blobUrl)
+    } catch {
+      window.open(url, '_blank')
+    }
+  }
+
+  async function descargarZip(archivos, nombreZip) {
+    if (!archivos || archivos.length === 0) return
+    if (archivos.length === 1) return descargarArchivo(archivos[0].url, archivos[0].nombre)
+    setDescargando(true)
+    setProgresoDesc('Preparando archivos...')
+    try {
+      const JSZip = (await import('jszip')).default
+      const zip = new JSZip()
+      const usedNames = new Set()
+      for (let i = 0; i < archivos.length; i++) {
+        const a = archivos[i]
+        if (!a.url) continue
+        setProgresoDesc(`Descargando ${i + 1} de ${archivos.length}...`)
+        try {
+          const response = await fetch(a.url)
+          const blob = await response.blob()
+          let name = a.nombre || `archivo-${i + 1}`
+          while (usedNames.has(name)) name = `${i + 1}-${name}`
+          usedNames.add(name)
+          zip.file(name, blob)
+        } catch { /* skip failed files */ }
+      }
+      setProgresoDesc('Generando ZIP...')
+      const content = await zip.generateAsync({ type: 'blob' })
+      const url = URL.createObjectURL(content)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${nombreZip}.zip`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      console.error('Error ZIP', e)
+    }
+    setDescargando(false)
+    setProgresoDesc('')
+  }
+
+  function descargarCarpeta(carpetaKey) {
+    let node
+    if (ruta.length === 0) {
+      node = archivosOrganizados[carpetaKey]
+    } else {
+      const secKey = ruta[0]
+      node = archivosOrganizados[secKey]
+      for (let i = 1; i < ruta.length; i++) {
+        if (node && typeof node === 'object' && !Array.isArray(node)) node = node[ruta[i]]
+        else { node = null; break }
+      }
+      if (node && typeof node === 'object' && !Array.isArray(node)) node = node[carpetaKey]
+    }
+    const files = flattenFiles(node)
+    const sec = SECCIONES.find(s => s.key === (ruta[0] || carpetaKey))
+    descargarZip(files, sec?.label || carpetaKey)
+  }
+
+  function descargarSeleccionados() {
+    const { archivos } = getContenido()
+    const descargables = archivos.filter(a => a.url && !a.esEnlace)
+    const selected = descargables.filter((_, i) => seleccion.has(i))
+    const crumbs = getBreadcrumbs()
+    descargarZip(selected, crumbs[crumbs.length - 1]?.label || 'archivos')
+  }
+
+  const { carpetas, archivos } = getContenido()
+  const archivosDescargables = archivos.filter(a => a.url && !a.esEnlace)
+  const crumbs = getBreadcrumbs()
+
   return (
-    <div className="flex flex-col gap-3">
-      <p className="text-sm text-ink/50">
-        Todos los archivos del sistema organizados por módulo, nivel y fecha. Sin duplicados — cada archivo enlaza al original.
-      </p>
-
-      {SECCIONES.map((sec) => {
-        const items = archivosOrganizados?.[sec.key]
-        const esFlat = sec.key === 'hojas_vida'
-        const sinNivel = sec.key === 'materiales'
-        const count = esFlat
-          ? (items?.length || 0)
-          : sinNivel
-            ? contarEnMeses(items)
-            : contarEnNivelMeses(items)
-        const isOpen = abierta === sec.key
-
-        return (
-          <div key={sec.key} className="card !p-0 overflow-hidden">
-            <button
-              onClick={() => toggle(sec.key)}
-              className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-ink/[0.02] ${isOpen ? SECTION_BG[sec.color] : ''}`}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{sec.icon}</span>
-                <span className={`font-bold ${isOpen ? SECTION_TEXT[sec.color] : ''}`}>{sec.label}</span>
-                {count > 0 && <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-bold text-ink/40">{count}</span>}
-              </div>
-              <span className={`text-ink/30 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
-            </button>
-
-            {isOpen && (
-              <div className="border-t border-ink/5">
-                {count === 0 ? (
-                  <p className="px-4 py-4 text-sm text-ink/30">Sin archivos aún.</p>
-                ) : esFlat ? (
-                  <ArchivoLista archivos={items} onPreview={setPreview} />
-                ) : sinNivel ? (
-                  <MesesArbol meses={items} subAbierta={subAbierta} onToggle={toggleSub} onPreview={setPreview} />
-                ) : (
-                  <NivelMesesArbol data={items} subAbierta={subAbierta} onToggle={toggleSub} onPreview={setPreview} />
-                )}
-              </div>
+    <div className="flex flex-col gap-4">
+      {/* Breadcrumb */}
+      <div className="flex flex-wrap items-center gap-1.5 text-sm">
+        {crumbs.map((c, i) => (
+          <span key={i} className="flex items-center gap-1.5">
+            {i > 0 && <span className="text-ink/20">/</span>}
+            {i < crumbs.length - 1 ? (
+              <button onClick={() => irA(i)} className="font-bold text-sky-600 hover:text-sky-700 hover:underline">
+                {c.icon && <span className="mr-0.5">{c.icon}</span>}{c.label}
+              </button>
+            ) : (
+              <span className="font-bold text-ink/70">
+                {c.icon && <span className="mr-0.5">{c.icon}</span>}{c.label}
+              </span>
             )}
+          </span>
+        ))}
+      </div>
+
+      {/* Toolbar */}
+      {archivos.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {archivosDescargables.length > 0 && (
+            <button
+              onClick={() => {
+                if (seleccion.size === archivosDescargables.length) setSeleccion(new Set())
+                else setSeleccion(new Set(archivosDescargables.map((_, i) => i)))
+              }}
+              className="rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/50 hover:bg-ink/10"
+            >
+              {seleccion.size === archivosDescargables.length && seleccion.size > 0 ? '☑ Deseleccionar' : '☐ Seleccionar todos'}
+            </button>
+          )}
+          {seleccion.size > 0 && (
+            <button onClick={descargarSeleccionados} className="rounded-xl bg-sky-400 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-500">
+              📥 Descargar {seleccion.size} como ZIP
+            </button>
+          )}
+          {archivosDescargables.length > 1 && seleccion.size === 0 && (
+            <button
+              onClick={() => descargarZip(archivosDescargables, crumbs[crumbs.length - 1]?.label || 'archivos')}
+              className="rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/50 hover:bg-ink/10"
+            >
+              📥 Descargar todo ({archivosDescargables.length})
+            </button>
+          )}
+          <span className="text-xs text-ink/30">{archivos.length} archivo{archivos.length !== 1 ? 's' : ''}</span>
+        </div>
+      )}
+
+      {/* Folder grid */}
+      {carpetas.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {carpetas.map(c => (
+            <FolderCard
+              key={c.key}
+              folder={c}
+              onClick={() => navegar(c.key)}
+              onDownload={c.count > 0 ? () => descargarCarpeta(c.key) : null}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* File grid */}
+      {archivos.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {archivos.map((a, i) => {
+            const canSelect = a.url && !a.esEnlace
+            const selIdx = canSelect ? archivosDescargables.indexOf(a) : -1
+            return (
+              <FileCard
+                key={i}
+                archivo={a}
+                selected={selIdx >= 0 && seleccion.has(selIdx)}
+                onToggle={selIdx >= 0 ? () => toggleSel(selIdx) : null}
+                onPreview={a.url && !a.esEnlace ? () => setPreview({ url: a.url, nombre: a.nombre, mime: a.mime }) : null}
+                onDownload={a.url && !a.esEnlace ? () => descargarArchivo(a.url, a.nombre) : null}
+                onOpenLink={a.esEnlace ? () => window.open(a.url, '_blank') : null}
+              />
+            )
+          })}
+        </div>
+      )}
+
+      {/* Empty */}
+      {carpetas.length === 0 && archivos.length === 0 && (
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <span className="text-6xl opacity-30">📂</span>
+          <p className="font-bold text-ink/30">Esta carpeta está vacía</p>
+          {ruta.length > 0 && (
+            <button onClick={() => irA(ruta.length - 1)} className="rounded-xl bg-ink/5 px-4 py-2 text-sm font-bold text-ink/50 hover:bg-ink/10">
+              ← Volver
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Download overlay */}
+      {descargando && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="card flex flex-col items-center gap-4 px-12 py-8">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-sky-400 border-t-transparent" />
+            <p className="text-sm font-bold text-ink/60">{progresoDesc}</p>
           </div>
-        )
-      })}
+        </div>
+      )}
 
       <FilePreview open={!!preview} onClose={() => setPreview(null)} url={preview?.url} nombre={preview?.nombre} mime={preview?.mime} />
     </div>
   )
 }
 
-// --- Tree: Nivel → Year → Month → files ---
-function NivelMesesArbol({ data, subAbierta, onToggle, onPreview }) {
-  if (!data) return null
-  const niveles = Object.keys(data).sort((a, b) => {
-    if (a === 'Toda la escuelita') return -1
-    if (b === 'Toda la escuelita') return 1
-    return a.localeCompare(b)
-  })
+function FolderIcon({ color, size = 52 }) {
   return (
-    <div className="flex flex-col">
-      {niveles.map((nivel) => {
-        const meses = data[nivel]
-        const nivelKey = `nivel-${nivel}`
-        const nivelOpen = subAbierta.has(nivelKey)
-        const nivelCount = contarEnMeses(meses)
-        return (
-          <div key={nivel}>
-            <button
-              onClick={() => onToggle(nivelKey)}
-              className="flex w-full items-center justify-between bg-ink/[0.02] px-4 py-2 text-left text-sm font-bold text-ink/60 hover:bg-ink/[0.04]"
-            >
-              <span>📚 {nivel}</span>
-              <span className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-ink/30">{nivelCount}</span>
-                <span className={`text-ink/20 transition-transform ${nivelOpen ? 'rotate-180' : ''}`}>▼</span>
-              </span>
-            </button>
-            {nivelOpen && <MesesArbolInner meses={meses} prefix={nivel} subAbierta={subAbierta} onToggle={onToggle} onPreview={onPreview} />}
-          </div>
-        )
-      })}
+    <svg width={size} height={size * 0.78} viewBox="0 0 52 40" fill="none">
+      <path d="M2 10C2 8.34 3.34 7 5 7H18L22 3H47C48.66 3 50 4.34 50 6V36C50 37.66 48.66 39 47 39H5C3.34 39 2 37.66 2 36V10Z" fill={color} opacity="0.15" />
+      <path d="M2 14C2 12.34 3.34 11 5 11H47C48.66 11 50 12.34 50 14V36C50 37.66 48.66 39 47 39H5C3.34 39 2 37.66 2 36V14Z" fill={color} />
+    </svg>
+  )
+}
+
+function FolderCard({ folder, onClick, onDownload }) {
+  const colors = FOLDER_COLORS[folder.color] || FOLDER_COLORS.sky
+  return (
+    <div
+      className={`group relative flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-transparent bg-white p-4 pb-3 shadow-sm transition-all hover:-translate-y-1 hover:border-sky-200 hover:shadow-md`}
+      onClick={onClick}
+    >
+      <div className="relative">
+        <FolderIcon color={colors.fill} />
+        {folder.count > 0 && (
+          <span className="absolute -right-2 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-sky-400 px-1 text-[10px] font-extrabold text-white">
+            {folder.count}
+          </span>
+        )}
+      </div>
+      <p className="w-full truncate text-center text-sm font-bold text-ink/70">{folder.label}</p>
+      <p className="text-[10px] text-ink/30">{folder.count || 0} archivo{folder.count !== 1 ? 's' : ''}</p>
+      {onDownload && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onDownload() }}
+          className="absolute right-2 top-2 rounded-lg bg-ink/5 p-1.5 text-xs text-ink/30 opacity-0 transition-all hover:bg-sky-100 hover:text-sky-600 group-hover:opacity-100"
+          title="Descargar como ZIP"
+        >
+          📥
+        </button>
+      )}
     </div>
   )
 }
 
-// --- Tree: Year → Month → files (shared by both flat and nested) ---
-function MesesArbol({ meses, subAbierta, onToggle, onPreview }) {
-  return <MesesArbolInner meses={meses} prefix="" subAbierta={subAbierta} onToggle={onToggle} onPreview={onPreview} />
-}
+function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLink }) {
+  const esImagen = archivo.mime?.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(archivo.nombre || '')
+  const icon = archivo.esEnlace ? '🔗' : getFileIcon(archivo.nombre, archivo.mime)
 
-function MesesArbolInner({ meses, prefix, subAbierta, onToggle, onPreview }) {
-  if (!meses) return null
-  const years = Object.keys(meses).sort((a, b) => b - a)
   return (
-    <div className="flex flex-col">
-      {years.map((year) => {
-        const monthKeys = Object.keys(meses[year]).sort((a, b) => b - a)
-        return (
-          <div key={year}>
-            <p className="bg-ink/[0.02] px-6 py-1.5 text-xs font-extrabold uppercase text-ink/40">{year}</p>
-            {monthKeys.map((month) => {
-              const archivos = meses[year][month]
-              const key = `${prefix}-${year}-${month}`
-              const isOpen = subAbierta.has(key)
-              return (
-                <div key={key}>
-                  <button
-                    onClick={() => onToggle(key)}
-                    className="flex w-full items-center justify-between px-8 py-2 text-left text-sm font-bold text-ink/60 hover:bg-ink/[0.02]"
-                  >
-                    <span>📅 {MESES[month]}</span>
-                    <span className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-ink/30">{archivos.length} archivo{archivos.length !== 1 ? 's' : ''}</span>
-                      <span className={`text-ink/20 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
-                    </span>
-                  </button>
-                  {isOpen && <ArchivoLista archivos={archivos} onPreview={onPreview} />}
-                </div>
-              )
-            })}
+    <div className={`group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${selected ? 'ring-2 ring-sky-400 ring-offset-1' : ''}`}>
+      {/* Thumbnail area */}
+      <div
+        onClick={onPreview || onOpenLink}
+        className="relative flex h-28 w-full cursor-pointer items-center justify-center bg-ink/[0.03] sm:h-32"
+      >
+        {esImagen && archivo.url ? (
+          <img src={archivo.url} alt="" className="h-full w-full object-cover" loading="lazy" />
+        ) : (
+          <span className="text-4xl sm:text-5xl">{icon}</span>
+        )}
+        {/* Selection checkbox */}
+        {onToggle && (
+          <div
+            onClick={(e) => { e.stopPropagation(); onToggle() }}
+            className={`absolute left-2 top-2 flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg border-2 text-xs font-bold transition-all ${selected ? 'border-sky-400 bg-sky-400 text-white' : 'border-white/80 bg-white/70 text-transparent hover:border-sky-300'}`}
+          >
+            {selected ? '✓' : ''}
           </div>
-        )
-      })}
+        )}
+      </div>
+
+      {/* File info */}
+      <div className="flex flex-col gap-0.5 px-3 py-2">
+        <p className="truncate text-xs font-bold text-ink/70" title={archivo.nombre}>{archivo.nombre}</p>
+        <div className="flex items-center justify-between">
+          <p className="truncate text-[10px] text-ink/30">
+            {archivo.tipoArchivo || 'Archivo'}{archivo.fecha ? ` · ${fechaCorta(archivo.fecha)}` : ''}
+          </p>
+          <div className="flex shrink-0 items-center gap-0.5">
+            {onDownload && (
+              <button
+                onClick={onDownload}
+                className="rounded p-1 text-[10px] text-ink/20 opacity-0 transition-all hover:bg-sky-50 hover:text-sky-600 group-hover:opacity-100"
+                title="Descargar"
+              >
+                ⬇️
+              </button>
+            )}
+            {onOpenLink && (
+              <button
+                onClick={onOpenLink}
+                className="rounded p-1 text-[10px] text-ink/30 hover:text-sky-600"
+                title="Abrir enlace"
+              >
+                ↗️
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
-
-function MetaLinea({ a }) {
-  const parts = []
-  if (a.subidoPor) parts.push(a.subidoPor)
-  if (a.fecha) parts.push(fechaCorta(a.fecha))
-  if (a.tipoArchivo) parts.push(a.tipoArchivo)
-  if (parts.length === 0) return <p className="truncate text-[10px] text-ink/30">{a.fuente}</p>
-  return (
-    <p className="truncate text-[10px] text-ink/30">
-      {parts.join(' · ')}{a.fuente ? ` — ${a.fuente}` : ''}
-    </p>
-  )
-}
-
-function ArchivoLista({ archivos, onPreview }) {
-  return (
-    <div className="flex flex-col divide-y divide-ink/5 bg-ink/[0.01]">
-      {archivos.map((a, i) => {
-        if (a.soloInfo) {
-          return (
-            <div key={i} className="flex items-center gap-3 px-8 py-2 text-sm sm:px-10">
-              <span className="shrink-0 text-lg">📝</span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-bold text-ink/50">{a.nombre}</p>
-                <MetaLinea a={a} />
-              </div>
-              {a.fuenteLink && (
-                <a href={a.fuenteLink} className="shrink-0 rounded-lg bg-ink/5 px-2 py-1 text-[10px] font-bold text-ink/40 hover:bg-sky-100 hover:text-sky-600">
-                  Ver origen
-                </a>
-              )}
-            </div>
-          )
-        }
-
-        if (a.esEnlace) {
-          return (
-            <div key={i} className="flex items-center gap-3 px-8 py-2 text-sm sm:px-10">
-              <span className="shrink-0 text-lg">🔗</span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-bold text-ink/70">{a.nombre}</p>
-                <MetaLinea a={a} />
-              </div>
-              <div className="flex shrink-0 items-center gap-1.5">
-                {a.fuenteLink && (
-                  <a href={a.fuenteLink} className="rounded-lg bg-ink/5 px-2 py-1 text-[10px] font-bold text-ink/40 hover:bg-sky-100 hover:text-sky-600">
-                    Ver origen
-                  </a>
-                )}
-                <a href={a.url} target="_blank" rel="noreferrer" className="rounded-lg bg-sky-50 px-2 py-1 text-[10px] font-bold text-sky-600 hover:bg-sky-100">
-                  Abrir enlace
-                </a>
-              </div>
-            </div>
-          )
-        }
-
-        const esImagen = a.mime?.startsWith('image/')
-        const icon = esImagen ? '🖼️' : getFileIcon(a.nombre, a.mime)
-        return (
-          <div key={i} className="flex items-center gap-3 px-8 py-2 text-sm transition-colors hover:bg-sky-50/50 sm:px-10">
-            <button
-              onClick={() => onPreview({ url: a.url, nombre: a.nombre, mime: a.mime })}
-              className="flex min-w-0 flex-1 items-center gap-2 text-left"
-            >
-              <span className="shrink-0 text-lg">{icon}</span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-bold text-ink/70">{a.nombre}</p>
-                <MetaLinea a={a} />
-              </div>
-            </button>
-            <div className="flex shrink-0 items-center gap-1.5">
-              {a.fuenteLink && (
-                <a href={a.fuenteLink} className="rounded-lg bg-ink/5 px-2 py-1 text-[10px] font-bold text-ink/40 hover:bg-sky-100 hover:text-sky-600">
-                  Ver origen
-                </a>
-              )}
-              <a href={a.url} target="_blank" rel="noreferrer" className="rounded-lg bg-ink/5 px-2 py-1 text-[10px] font-bold text-ink/40 hover:bg-sky-100 hover:text-sky-600">
-                Abrir
-              </a>
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-// --- Grouping helpers ---
 
 function agruparPorMes(items) {
   const grouped = {}
@@ -529,24 +624,4 @@ function agruparPorMesYNivel(items) {
     grouped[nivel][year][month].push(item)
   }
   return grouped
-}
-
-function contarEnMeses(meses) {
-  if (!meses) return 0
-  let c = 0
-  for (const y of Object.values(meses)) {
-    for (const arr of Object.values(y)) {
-      c += arr.length
-    }
-  }
-  return c
-}
-
-function contarEnNivelMeses(data) {
-  if (!data) return 0
-  let c = 0
-  for (const meses of Object.values(data)) {
-    c += contarEnMeses(meses)
-  }
-  return c
 }
