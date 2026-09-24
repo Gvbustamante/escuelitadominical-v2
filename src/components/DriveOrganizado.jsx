@@ -111,10 +111,10 @@ export default function DriveOrganizado() {
         const nivel = act.nivel?.nombre || 'Toda la escuelita'
         const quien = docentesMap[act.docente_id] || null
         if (act.imagen_url) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — portada`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
+          items.push({ ...ma, nivel, nombre: `${act.titulo} — portada`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividades/${act.id}`, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
         }
         if (act.enlace_externo) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
+          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividades/${act.id}`, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
         }
       }
       result[`actividades_${aud}`] = agruparPorMesYNivel(items)
@@ -130,13 +130,13 @@ export default function DriveOrganizado() {
         const nivel = act.nivel?.nombre || 'Toda la escuelita'
         const quien = docentesMap[act.docente_id] || null
         if (act.imagen_url) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — archivo`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
+          items.push({ ...ma, nivel, nombre: `${act.titulo} — archivo`, url: act.imagen_url, fuente: act.titulo, fuenteLink: `#/actividades/${act.id}`, mime: 'image/*', subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Imagen' })
         }
         if (act.enlace_externo) {
-          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividad/${act.id}`, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
+          items.push({ ...ma, nivel, nombre: `${act.titulo} — enlace externo`, url: act.enlace_externo, fuente: act.titulo, fuenteLink: `#/actividades/${act.id}`, esEnlace: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Enlace' })
         }
         if (!act.imagen_url && !act.enlace_externo) {
-          items.push({ ...ma, nivel, nombre: act.titulo, fuente: 'Tarea asignada', fuenteLink: `#/actividad/${act.id}`, soloInfo: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Tarea' })
+          items.push({ ...ma, nivel, nombre: act.titulo, fuente: 'Tarea asignada', fuenteLink: `#/actividades/${act.id}`, soloInfo: true, subidoPor: quien, fecha: act.fecha, tipoArchivo: 'Tarea' })
         }
       }
       result[`tareas_${aud}`] = agruparPorMesYNivel(items)
@@ -182,10 +182,10 @@ export default function DriveOrganizado() {
       const nivel = d.nivel?.nombre || 'Toda la escuelita'
       const quien = docentesMap[d.creado_por] || null
       if (d.imagen_url) {
-        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — imagen`, url: d.imagen_url, fuente: d.titulo, fuenteLink: `#/devocional/${d.id}`, mime: 'image/*', subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Imagen' })
+        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — imagen`, url: d.imagen_url, fuente: d.titulo, fuenteLink: `#/devocionales/${d.id}`, mime: 'image/*', subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Imagen' })
       }
       if (d.enlace_externo) {
-        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — enlace externo`, url: d.enlace_externo, fuente: d.titulo, fuenteLink: `#/devocional/${d.id}`, esEnlace: true, subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Enlace' })
+        devoItems.push({ ...ma, nivel, nombre: `${d.titulo} — enlace externo`, url: d.enlace_externo, fuente: d.titulo, fuenteLink: `#/devocionales/${d.id}`, esEnlace: true, subidoPor: quien, fecha: d.fecha, tipoArchivo: 'Enlace' })
       }
       const archivos = datos.devocionalArchivos.filter((a) => a.devocional_id === d.id)
       for (const a of archivos) {
@@ -194,7 +194,7 @@ export default function DriveOrganizado() {
           nombre: a.nombre_archivo || a.storage_path.split('/').pop(),
           url: storageUrl(a.bucket || 'actividades', a.storage_path),
           fuente: d.titulo,
-          fuenteLink: `#/devocional/${d.id}`,
+          fuenteLink: `#/devocionales/${d.id}`,
           mime: a.tipo,
           subidoPor: quien, fecha: d.fecha, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo),
         })
