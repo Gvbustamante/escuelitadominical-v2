@@ -61,6 +61,8 @@ export default function Actividades() {
   const [confirmEliminar, setConfirmEliminar] = useState(null)
   const [confirmBusy, setConfirmBusy] = useState(false)
   const [form, setForm] = useState(formVacio())
+  const [imagen, setImagen] = useState(null)
+  const [imagenPreview, setImagenPreview] = useState(null)
   const [archivos, setArchivos] = useState([])
   const [drivePickerOpen, setDrivePickerOpen] = useState(false)
   const [archivosDrive, setArchivosDrive] = useState([])
@@ -113,6 +115,8 @@ export default function Actividades() {
   function openNew() {
     setEditing(null)
     setForm(formVacio())
+    setImagen(null)
+    setImagenPreview(null)
     setArchivos([])
     setArchivosDrive([])
     setArchivosExistentes([])
@@ -132,11 +136,20 @@ export default function Actividades() {
       es_tarea: actividad.es_tarea ?? false,
       enlace_externo: actividad.enlace_externo || '',
     })
+    setImagen(null)
+    setImagenPreview(null)
     setArchivos([])
     setArchivosDrive([])
     setArchivosExistentes(actividad.actividad_archivos || [])
     setError('')
     setModalOpen(true)
+  }
+
+  function handleImagen(e) {
+    const f = e.target.files?.[0]
+    if (!f) return
+    setImagen(f)
+    setImagenPreview(URL.createObjectURL(f))
   }
 
   async function handleSubmit(e) {
@@ -175,6 +188,15 @@ export default function Actividades() {
         return
       }
       actividadId = actividad.id
+    }
+
+    if (imagen) {
+      const path = `${nivelId}/${actividadId}/${Date.now()}-${imagen.name}`
+      const { error: upError } = await supabase.storage.from('actividades').upload(path, imagen)
+      if (!upError) {
+        const imagen_url = supabase.storage.from('actividades').getPublicUrl(path).data.publicUrl
+        await supabase.from('actividades').update({ imagen_url }).eq('id', actividadId)
+      }
     }
 
     for (let i = 0; i < archivos.length; i++) {
@@ -499,6 +521,23 @@ export default function Actividades() {
               🎬 Multimedia
             </legend>
             <div>
+              <label className="label">{editing ? 'Cambiar imagen principal' : 'Imagen principal (opcional)'}</label>
+              <label className="group flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-ink/10 bg-ink/[0.02] px-4 py-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50">
+                {(imagenPreview || (editing && editing.imagen_url)) ? (
+                  <img src={imagenPreview || editing.imagen_url} alt="" className="h-36 w-full rounded-xl object-cover" />
+                ) : (
+                  <>
+                    <span className="text-3xl">📷</span>
+                    <span className="text-sm font-bold text-ink/40 group-hover:text-sky-600">Toca para seleccionar una imagen</span>
+                  </>
+                )}
+                <input type="file" accept="image/*" className="hidden" onChange={handleImagen} />
+                {(imagenPreview || (editing && editing.imagen_url)) && (
+                  <span className="text-xs font-bold text-sky-600">Cambiar imagen</span>
+                )}
+              </label>
+            </div>
+            <div>
               <label className="label">Video o enlace externo (opcional)</label>
               <input
                 type="url"
@@ -523,7 +562,7 @@ export default function Actividades() {
               )}
             </div>
             <div>
-              <label className="label">{editing ? 'Agregar más archivos' : 'Fotos y archivos'}</label>
+              <label className="label">{editing ? 'Agregar más archivos' : 'Fotos y archivos adicionales (opcional)'}</label>
               <div className="flex flex-wrap items-center gap-2">
                 <MultiFilePicker archivos={archivos} onChange={setArchivos} />
                 <button type="button" onClick={() => setDrivePickerOpen(true)} className="btn-secondary !py-2 !text-sm">
