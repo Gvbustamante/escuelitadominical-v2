@@ -1367,9 +1367,13 @@ create policy "cualquiera inserta solicitud reset" on public.solicitudes_reset
 
 create policy "staff lee solicitudes reset" on public.solicitudes_reset
   for select to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador') and p.activo = true));
 
 create policy "staff actualiza solicitudes reset" on public.solicitudes_reset
   for update to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador') and p.activo = true))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador') and p.activo = true));
+
+create policy "staff borra solicitudes reset" on public.solicitudes_reset
+  for delete to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador') and p.activo = true));
