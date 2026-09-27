@@ -43,7 +43,7 @@ export default function Ninos() {
   const [asistenciaPorNino, setAsistenciaPorNino] = useState({})
   const [misNivelIds, setMisNivelIds] = useState(null)
   const [filtro, setFiltro] = useState('activos')
-  const [filtroNivel, setFiltroNivel] = useState('')
+  const [filtroNivel, setFiltroNivel] = useState(esDocente ? '__mios__' : '')
   const [busqueda, setBusqueda] = useState('')
 
   const [modalOpen, setModalOpen] = useState(false)
@@ -109,15 +109,19 @@ export default function Ninos() {
 
   const ninosVisibles = useMemo(() => {
     if (!ninos) return []
-    return esDocente ? ninos.filter((n) => misNivelIds?.has(n.nivel_id)) : ninos
-  }, [ninos, esDocente, misNivelIds])
+    return ninos
+  }, [ninos])
 
   const filtrados = useMemo(() => {
     return ninosVisibles
       .filter((n) => (filtro === 'activos' ? n.activo : filtro === 'inactivos' ? !n.activo : true))
-      .filter((n) => !filtroNivel || n.nivel_id === filtroNivel)
+      .filter((n) => {
+        if (!filtroNivel) return true
+        if (filtroNivel === '__mios__') return misNivelIds?.has(n.nivel_id)
+        return n.nivel_id === filtroNivel
+      })
       .filter((n) => n.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()))
-  }, [ninosVisibles, filtro, filtroNivel, busqueda])
+  }, [ninosVisibles, filtro, filtroNivel, busqueda, misNivelIds])
 
   function openNew() {
     setEditing(null)
@@ -342,6 +346,7 @@ export default function Ninos() {
             />
             <select className="input !w-auto" value={filtroNivel} onChange={(e) => setFiltroNivel(e.target.value)}>
               <option value="">Todas las clases</option>
+              {esDocente && <option value="__mios__">Mi clase</option>}
               {niveles.map((n) => (
                 <option key={n.id} value={n.id}>{n.nombre}</option>
               ))}
@@ -438,12 +443,12 @@ export default function Ninos() {
                         <button className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => setDetalleNino(nino)} title="Detalle">
                           👁️
                         </button>
-                        {puedeEditar && (
+                        {puedeEditar && (!esDocente || misNivelIds?.has(nino.nivel_id)) && (
                           <button className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => openEdit(nino)} title="Editar">
                             ✏️
                           </button>
                         )}
-                        {puedeVincularPadre && (
+                        {puedeVincularPadre && (!esDocente || misNivelIds?.has(nino.nivel_id)) && (
                           <button className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => openInvite(nino)} title="Vincular padre">
                             👪
                           </button>
