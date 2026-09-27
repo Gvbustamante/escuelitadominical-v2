@@ -236,30 +236,30 @@ create policy "crear propio perfil" on public.profiles for insert to authenticat
 create policy "actualizar perfiles" on public.profiles for update to authenticated
   using (
     auth.uid() = id
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   );
 
 -- NIVELES
 create policy "leer niveles" on public.niveles for select to authenticated using (true);
 create policy "gestionar niveles" on public.niveles for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 -- DOCENTES_NIVELES
 create policy "leer asignaciones" on public.docentes_niveles for select to authenticated using (true);
 create policy "gestionar asignaciones" on public.docentes_niveles for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 -- NINOS
 create policy "leer ninos" on public.ninos for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
     or public.es_padre_de(ninos.id)
   );
 create policy "gestionar ninos" on public.ninos for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 -- "docente actualiza ninos de su nivel" y las políticas de agregar/vincular
 -- por permiso se crean más abajo, junto con permisos_rol (sección PERMISOS_ROL).
 
@@ -267,32 +267,32 @@ create policy "gestionar ninos" on public.ninos for all to authenticated
 create policy "leer vinculos" on public.ninos_padres for select to authenticated
   using (
     padre_id = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
   );
 create policy "gestionar vinculos" on public.ninos_padres for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 -- ASISTENCIA
 create policy "leer asistencia" on public.asistencia for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
     or exists (select 1 from public.ninos_padres np where np.nino_id = asistencia.nino_id and np.padre_id = auth.uid())
   );
 create policy "gestionar asistencia" on public.asistencia for all to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = asistencia.nivel_id and dn.docente_id = auth.uid())
   )
   with check (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = asistencia.nivel_id and dn.docente_id = auth.uid())
   );
 
 -- ACTIVIDADES
 create policy "leer actividades" on public.actividades for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
     or (
       actividades.visible_padres
       and exists (
@@ -303,11 +303,11 @@ create policy "leer actividades" on public.actividades for select to authenticat
   );
 create policy "gestionar actividades" on public.actividades for all to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = actividades.nivel_id and dn.docente_id = auth.uid())
   )
   with check (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = actividades.nivel_id and dn.docente_id = auth.uid())
   );
 
@@ -316,14 +316,14 @@ create policy "leer archivos" on public.actividad_archivos for select to authent
   using (exists (select 1 from public.actividades a where a.id = actividad_archivos.actividad_id));
 create policy "gestionar archivos" on public.actividad_archivos for all to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.actividades a join public.docentes_niveles dn on dn.nivel_id = a.nivel_id
       where a.id = actividad_archivos.actividad_id and dn.docente_id = auth.uid()
     )
   )
   with check (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.actividades a join public.docentes_niveles dn on dn.nivel_id = a.nivel_id
       where a.id = actividad_archivos.actividad_id and dn.docente_id = auth.uid()
@@ -338,7 +338,7 @@ create policy "gestionar propia reaccion" on public.actividad_reacciones for all
 -- AGENDA
 create policy "leer agenda" on public.agenda for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
     or agenda.nivel_id is null
     or exists (
       select 1 from public.ninos_padres np join public.ninos n on n.id = np.nino_id
@@ -347,40 +347,40 @@ create policy "leer agenda" on public.agenda for select to authenticated
   );
 create policy "gestionar agenda" on public.agenda for all to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = agenda.nivel_id and dn.docente_id = auth.uid())
   )
   with check (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = agenda.nivel_id and dn.docente_id = auth.uid())
   );
 
 -- PROGRESO_NOTAS
 create policy "leer progreso" on public.progreso_notas for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
     or exists (select 1 from public.ninos_padres np where np.nino_id = progreso_notas.nino_id and np.padre_id = auth.uid())
   );
 create policy "gestionar progreso" on public.progreso_notas for all to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = progreso_notas.nivel_id and dn.docente_id = auth.uid())
   )
   with check (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = progreso_notas.nivel_id and dn.docente_id = auth.uid())
   );
 
 -- DEVOCIONALES_NINOS
 create policy "leer devocionales ninos" on public.devocionales_ninos for select to authenticated using (true);
 create policy "gestionar devocionales ninos" on public.devocionales_ninos for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 
 create policy "leer archivos de devocional" on public.devocional_archivos for select to authenticated using (true);
 create policy "gestionar archivos de devocional" on public.devocional_archivos for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 
 create policy "leer reacciones de devocional" on public.devocional_reacciones for select to authenticated using (true);
 create policy "gestionar propia reaccion de devocional" on public.devocional_reacciones for all to authenticated
@@ -389,8 +389,8 @@ create policy "gestionar propia reaccion de devocional" on public.devocional_rea
 -- CITAS_BIBLICAS
 create policy "leer citas biblicas" on public.citas_biblicas for select to authenticated using (true);
 create policy "gestionar citas biblicas" on public.citas_biblicas for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 -- ---------- STORAGE (archivos de actividades) ----------
 
@@ -406,14 +406,14 @@ create policy "staff sube archivos de actividades"
   on storage.objects for insert to authenticated
   with check (
     bucket_id = 'actividades'
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
   );
 
 create policy "staff elimina archivos de actividades"
   on storage.objects for delete to authenticated
   using (
     bucket_id = 'actividades'
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
   );
 
 -- ---------- FUNCIÓN: crear usuarios con cédula (admin/coordinador) ----------
@@ -439,7 +439,7 @@ declare
 begin
   select p.role into caller_role from public.profiles p where p.id = auth.uid();
 
-  if caller_role is null or caller_role not in ('admin','coordinador','docente') then
+  if caller_role is null or caller_role not in ('superadmin','admin','coordinador','docente') then
     raise exception 'No autorizado';
   end if;
 
@@ -532,7 +532,7 @@ declare
   v_password text;
 begin
   select p.role into caller_role from public.profiles p where p.id = auth.uid();
-  if caller_role is null or caller_role not in ('admin','coordinador') then
+  if caller_role is null or caller_role not in ('superadmin','admin','coordinador') then
     raise exception 'No autorizado';
   end if;
 
@@ -572,7 +572,7 @@ declare
 begin
   select role into caller_role from public.profiles where id = auth.uid();
 
-  if caller_role is null or caller_role not in ('admin','coordinador') then
+  if caller_role is null or caller_role not in ('superadmin','admin','coordinador') then
     raise exception 'No autorizado';
   end if;
 
@@ -662,23 +662,23 @@ create policy "leer foros" on public.foros for select to authenticated
   using (
     privado = false
     or creado_por = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
   );
 create policy "crear foro" on public.foros for insert to authenticated
   with check (creado_por = auth.uid());
 create policy "cambiar privacidad propio o staff" on public.foros for update to authenticated
   using (
     creado_por = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   )
   with check (
     creado_por = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   );
 create policy "borrar foro propio o staff" on public.foros for delete to authenticated
   using (
     creado_por = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   );
 
 create policy "leer mensajes" on public.foro_mensajes for select to authenticated
@@ -689,7 +689,7 @@ create policy "leer mensajes" on public.foro_mensajes for select to authenticate
       and (
         f.privado = false
         or f.creado_por = auth.uid()
-        or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+        or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
       )
     )
   );
@@ -702,14 +702,14 @@ create policy "crear mensaje" on public.foro_mensajes for insert to authenticate
       and (
         f.privado = false
         or f.creado_por = auth.uid()
-        or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+        or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
       )
     )
   );
 create policy "borrar mensaje propio o staff" on public.foro_mensajes for delete to authenticated
   using (
     autor_id = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   );
 
 -- ---------- RECONOCIMIENTOS (estrellas de gamificación) ----------
@@ -729,17 +729,17 @@ alter table public.reconocimientos enable row level security;
 
 create policy "leer reconocimientos" on public.reconocimientos for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
     or exists (select 1 from public.ninos_padres np where np.nino_id = reconocimientos.nino_id and np.padre_id = auth.uid())
   );
 create policy "otorgar reconocimientos" on public.reconocimientos for insert to authenticated
   with check (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = reconocimientos.nivel_id and dn.docente_id = auth.uid())
   );
 create policy "borrar reconocimiento propio o staff" on public.reconocimientos for delete to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or otorgado_por = auth.uid()
   );
 
@@ -760,23 +760,23 @@ create policy "leer peticiones" on public.peticiones_oracion for select to authe
   using (
     privado = false
     or autor_id = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
   );
 create policy "crear peticion propia" on public.peticiones_oracion for insert to authenticated
   with check (autor_id = auth.uid());
 create policy "actualizar peticion propia o staff" on public.peticiones_oracion for update to authenticated
   using (
     autor_id = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   )
   with check (
     autor_id = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   );
 create policy "borrar peticion propia o staff" on public.peticiones_oracion for delete to authenticated
   using (
     autor_id = auth.uid()
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   );
 
 -- ---------- CONFIG_IGLESIA (logo y nombre personalizables) ----------
@@ -794,8 +794,8 @@ alter table public.config_iglesia enable row level security;
 
 create policy "lectura publica de config_iglesia" on public.config_iglesia for select to anon, authenticated using (true);
 create policy "staff administra config_iglesia" on public.config_iglesia for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 insert into storage.buckets (id, name, public)
 values ('logos', 'logos', true)
@@ -807,19 +807,19 @@ create policy "lectura publica de logos" on storage.objects for select
 create policy "staff sube logos" on storage.objects for insert to authenticated
   with check (
     bucket_id = 'logos'
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   );
 
 create policy "staff actualiza logos" on storage.objects for update to authenticated
   using (
     bucket_id = 'logos'
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   );
 
 create policy "staff elimina logos" on storage.objects for delete to authenticated
   using (
     bucket_id = 'logos'
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
   );
 
 -- ---------- STORAGE: hojas de vida ----------
@@ -861,16 +861,16 @@ alter table public.bitacora_clase enable row level security;
 
 create policy "leer bitacora" on public.bitacora_clase for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = bitacora_clase.nivel_id and dn.docente_id = auth.uid())
   );
 create policy "gestionar bitacora" on public.bitacora_clase for all to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = bitacora_clase.nivel_id and dn.docente_id = auth.uid())
   )
   with check (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = bitacora_clase.nivel_id and dn.docente_id = auth.uid())
   );
 
@@ -889,7 +889,7 @@ alter table public.bitacora_fotos enable row level security;
 
 create policy "leer fotos de bitacora" on public.bitacora_fotos for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.bitacora_clase b join public.docentes_niveles dn on dn.nivel_id = b.nivel_id
       where b.id = bitacora_fotos.bitacora_id and dn.docente_id = auth.uid()
@@ -897,14 +897,14 @@ create policy "leer fotos de bitacora" on public.bitacora_fotos for select to au
   );
 create policy "gestionar fotos de bitacora" on public.bitacora_fotos for all to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.bitacora_clase b join public.docentes_niveles dn on dn.nivel_id = b.nivel_id
       where b.id = bitacora_fotos.bitacora_id and dn.docente_id = auth.uid()
     )
   )
   with check (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.bitacora_clase b join public.docentes_niveles dn on dn.nivel_id = b.nivel_id
       where b.id = bitacora_fotos.bitacora_id and dn.docente_id = auth.uid()
@@ -929,10 +929,10 @@ comment on table public.materiales is 'Inventario de materiales disponibles, gen
 alter table public.materiales enable row level security;
 
 create policy "leer materiales" on public.materiales for select to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 create policy "gestionar materiales" on public.materiales for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 create table public.material_fotos (
   id uuid primary key default gen_random_uuid(),
@@ -947,10 +947,10 @@ comment on table public.material_fotos is 'Fotos adicionales de un material — 
 alter table public.material_fotos enable row level security;
 
 create policy "leer fotos de materiales" on public.material_fotos for select to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 create policy "gestionar fotos de materiales" on public.material_fotos for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 -- ---------- TAREA_ENTREGAS (entregas de tareas de actividades) ----------
 
@@ -979,7 +979,7 @@ alter table public.tarea_entregas enable row level security;
 
 create policy "leer tarea_entregas" on public.tarea_entregas for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.actividades a join public.docentes_niveles dn on dn.nivel_id = a.nivel_id
       where a.id = tarea_entregas.actividad_id and dn.docente_id = auth.uid()
@@ -990,7 +990,7 @@ create policy "leer tarea_entregas" on public.tarea_entregas for select to authe
 create policy "padre entrega su tarea" on public.tarea_entregas for insert to authenticated
   with check (
     exists (select 1 from public.ninos_padres np where np.nino_id = tarea_entregas.nino_id and np.padre_id = auth.uid())
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.actividades a join public.docentes_niveles dn on dn.nivel_id = a.nivel_id
       where a.id = tarea_entregas.actividad_id and dn.docente_id = auth.uid()
@@ -1000,7 +1000,7 @@ create policy "padre entrega su tarea" on public.tarea_entregas for insert to au
 create policy "actualizar tarea_entregas propia o staff" on public.tarea_entregas for update to authenticated
   using (
     exists (select 1 from public.ninos_padres np where np.nino_id = tarea_entregas.nino_id and np.padre_id = auth.uid())
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.actividades a join public.docentes_niveles dn on dn.nivel_id = a.nivel_id
       where a.id = tarea_entregas.actividad_id and dn.docente_id = auth.uid()
@@ -1009,7 +1009,7 @@ create policy "actualizar tarea_entregas propia o staff" on public.tarea_entrega
   )
   with check (
     exists (select 1 from public.ninos_padres np where np.nino_id = tarea_entregas.nino_id and np.padre_id = auth.uid())
-    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.actividades a join public.docentes_niveles dn on dn.nivel_id = a.nivel_id
       where a.id = tarea_entregas.actividad_id and dn.docente_id = auth.uid()
@@ -1031,7 +1031,7 @@ alter table public.tarea_entrega_archivos enable row level security;
 
 create policy "leer archivos de entrega" on public.tarea_entrega_archivos for select to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.tarea_entregas te
       join public.actividades a on a.id = te.actividad_id
@@ -1046,7 +1046,7 @@ create policy "leer archivos de entrega" on public.tarea_entrega_archivos for se
   );
 create policy "gestionar archivos de entrega" on public.tarea_entrega_archivos for all to authenticated
   using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.tarea_entregas te
       join public.actividades a on a.id = te.actividad_id
@@ -1060,7 +1060,7 @@ create policy "gestionar archivos de entrega" on public.tarea_entrega_archivos f
     or exists (select 1 from public.tarea_entregas te where te.id = tarea_entrega_archivos.entrega_id and te.docente_id = auth.uid())
   )
   with check (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (
       select 1 from public.tarea_entregas te
       join public.actividades a on a.id = te.actividad_id
@@ -1090,8 +1090,8 @@ alter table public.motivos_reconocimiento enable row level security;
 
 create policy "leer motivos_reconocimiento" on public.motivos_reconocimiento for select to authenticated using (true);
 create policy "gestionar motivos_reconocimiento" on public.motivos_reconocimiento for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 insert into public.motivos_reconocimiento (emoji, texto, orden) values
 ('🌟', 'Buen comportamiento', 1),
@@ -1117,8 +1117,8 @@ alter table public.niveles_estrella enable row level security;
 
 create policy "leer niveles_estrella" on public.niveles_estrella for select to authenticated using (true);
 create policy "gestionar niveles_estrella" on public.niveles_estrella for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 insert into public.niveles_estrella (min_estrellas, emoji, nombre, orden) values
 (0, '🐣', 'Explorador nuevo', 1),
@@ -1149,8 +1149,8 @@ alter table public.dias_clase enable row level security;
 
 create policy "leer dias_clase" on public.dias_clase for select to authenticated using (true);
 create policy "gestionar dias_clase" on public.dias_clase for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 insert into public.dias_clase (dia_semana, activo) values
 (0, true), (1, false), (2, false), (3, false), (4, false), (5, false), (6, false);
@@ -1173,8 +1173,8 @@ alter table public.horarios enable row level security;
 
 create policy "leer horarios" on public.horarios for select to authenticated using (true);
 create policy "gestionar horarios" on public.horarios for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 insert into public.horarios (nombre, orden) values ('Servicio único', 1);
 
@@ -1193,8 +1193,8 @@ alter table public.asignacion_horario enable row level security;
 
 create policy "leer asignacion_horario" on public.asignacion_horario for select to authenticated using (true);
 create policy "gestionar asignacion_horario" on public.asignacion_horario for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 -- ---------- COBERTURA_DIA (quién cubre cada clase, en una fecha y horario puntual) ----------
 
@@ -1214,10 +1214,10 @@ comment on table public.cobertura_dia is 'Quién cubre de verdad cada clase, en 
 alter table public.cobertura_dia enable row level security;
 
 create policy "leer cobertura_dia" on public.cobertura_dia for select to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 create policy "gestionar cobertura_dia" on public.cobertura_dia for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
 
 -- ---------- PERMISOS_ROL (interruptores de permisos extra por rol) ----------
 
@@ -1235,8 +1235,8 @@ alter table public.permisos_rol enable row level security;
 
 create policy "leer permisos_rol" on public.permisos_rol for select to authenticated using (true);
 create policy "gestionar permisos_rol" on public.permisos_rol for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin')));
 
 create or replace function public.tiene_permiso(p_rol text, p_permiso text)
 returns boolean
@@ -1317,18 +1317,18 @@ alter table public.carpetas_drive enable row level security;
 alter table public.archivos_drive enable row level security;
 
 create policy "leer carpetas drive" on public.carpetas_drive for select to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 
 create policy "gestionar carpetas drive" on public.carpetas_drive for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 
 create policy "leer archivos drive" on public.archivos_drive for select to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 
 create policy "gestionar archivos drive" on public.archivos_drive for all to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente')));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 
 insert into storage.buckets (id, name, public) values ('drive', 'drive', true)
 on conflict (id) do nothing;
@@ -1339,13 +1339,13 @@ create policy "lectura publica de archivos drive" on storage.objects for select 
 create policy "staff sube archivos drive" on storage.objects for insert to authenticated
   with check (
     bucket_id = 'drive'
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
   );
 
 create policy "staff elimina archivos drive" on storage.objects for delete to authenticated
   using (
     bucket_id = 'drive'
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
   );
 
 -- ---------- SOLICITUDES RESET ----------
@@ -1367,13 +1367,13 @@ create policy "cualquiera inserta solicitud reset" on public.solicitudes_reset
 
 create policy "staff lee solicitudes reset" on public.solicitudes_reset
   for select to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador') and p.activo = true));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador') and p.activo = true));
 
 create policy "staff actualiza solicitudes reset" on public.solicitudes_reset
   for update to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador') and p.activo = true))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador') and p.activo = true));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador') and p.activo = true))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador') and p.activo = true));
 
 create policy "staff borra solicitudes reset" on public.solicitudes_reset
   for delete to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador') and p.activo = true));
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador') and p.activo = true));
