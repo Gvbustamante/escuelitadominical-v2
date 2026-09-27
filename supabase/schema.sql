@@ -14,6 +14,7 @@ create table public.profiles (
   telefono text,
   activo boolean not null default true,
   pausado boolean not null default false,
+  desactivado_en timestamptz,
   created_at timestamptz not null default now()
 );
 comment on column public.profiles.pausado is 'Marca visual, no bloquea el login. Para un padre: la cuenta lleva mucho tiempo sin entrar (ver revisar_inactividad()). Se limpia sola la próxima vez que esa persona entra.';
@@ -43,6 +44,7 @@ create table public.ninos (
   nivel_id uuid references public.niveles(id) on delete set null,
   alergias text,
   notas text,
+  sexo text check (sexo in ('M', 'F')),
   activo boolean not null default true,
   pausado boolean not null default false,
   creado_por uuid references public.profiles(id),
@@ -1326,3 +1328,27 @@ create policy "staff elimina archivos drive" on storage.objects for delete to au
     bucket_id = 'drive'
     and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador','docente'))
   );
+
+-- ---------- SOLICITUDES RESET ----------
+
+create table public.solicitudes_reset (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  nombre text,
+  estado text not null default 'pendiente' check (estado in ('pendiente', 'aprobada', 'rechazada')),
+  created_at timestamptz not null default now()
+);
+
+alter table public.solicitudes_reset enable row level security;
+
+create policy "cualquiera inserta solicitud reset" on public.solicitudes_reset
+  for insert to authenticated with check (true);
+
+create policy "staff lee solicitudes reset" on public.solicitudes_reset
+  for select to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
+
+create policy "staff actualiza solicitudes reset" on public.solicitudes_reset
+  for update to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador')));
