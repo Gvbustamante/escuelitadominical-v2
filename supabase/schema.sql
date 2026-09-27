@@ -12,6 +12,9 @@ create table public.profiles (
   nombre_completo text not null,
   cedula text unique,
   telefono text,
+  email text,
+  whatsapp text,
+  hoja_vida_url text,
   activo boolean not null default true,
   pausado boolean not null default false,
   desactivado_en timestamptz,
@@ -782,6 +785,7 @@ create table public.config_iglesia (
   id uuid primary key default gen_random_uuid(),
   nombre_iglesia text,
   logo_url text,
+  menu_estructura jsonb,
   updated_at timestamptz not null default now()
 );
 comment on table public.config_iglesia is 'Configuracion general de la iglesia/escuelita (una sola fila). Logo personalizable por el admin.';
@@ -817,6 +821,21 @@ create policy "staff elimina logos" on storage.objects for delete to authenticat
     bucket_id = 'logos'
     and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
   );
+
+-- ---------- STORAGE: hojas de vida ----------
+
+insert into storage.buckets (id, name, public)
+values ('hojas_vida', 'hojas_vida', true)
+on conflict (id) do nothing;
+
+create policy "Staff puede subir hojas de vida" on storage.objects for insert to authenticated
+  with check (bucket_id = 'hojas_vida');
+
+create policy "Todos pueden ver hojas de vida" on storage.objects for select to authenticated
+  using (bucket_id = 'hojas_vida');
+
+create policy "Staff puede borrar hojas de vida" on storage.objects for delete to authenticated
+  using (bucket_id = 'hojas_vida');
 
 -- ---------- BITÁCORA DE CLASE (salón + refrigerio) ----------
 
@@ -1336,7 +1355,9 @@ create table public.solicitudes_reset (
   email text not null,
   nombre text,
   estado text not null default 'pendiente' check (estado in ('pendiente', 'aprobada', 'rechazada')),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  resuelta_en timestamptz,
+  resuelta_por uuid references auth.users(id)
 );
 
 alter table public.solicitudes_reset enable row level security;
