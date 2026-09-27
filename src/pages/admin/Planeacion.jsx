@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
@@ -38,6 +39,7 @@ const BG_LIGHT = {
 
 export default function Planeacion() {
   const { user, profile } = useAuth()
+  const navigate = useNavigate()
   const esDocente = profile?.role === 'docente'
   const [cursor, setCursor] = useState(() => {
     const h = new Date()
@@ -50,6 +52,7 @@ export default function Planeacion() {
   const [horarios, setHorarios] = useState([])
   const [asignacionesHorario, setAsignacionesHorario] = useState([])
   const [actividadesMes, setActividadesMes] = useState([])
+  const [devocionalesMes, setDevocionalesMes] = useState([])
   const [coberturaMes, setCoberturaMes] = useState([])
   const [selectedDay, setSelectedDay] = useState(null)
 
@@ -86,8 +89,9 @@ export default function Planeacion() {
   const finMes = toISO(year, month, new Date(year, month + 1, 0).getDate())
 
   const loadMes = useCallback(async () => {
-    const [{ data: acts }, { data: cob }] = await Promise.all([
+    const [{ data: acts }, { data: devos }, { data: cob }] = await Promise.all([
       supabase.from('actividades').select('id, nivel_id, fecha, titulo').gte('fecha', inicioMes).lte('fecha', finMes),
+      supabase.from('devocionales_ninos').select('id, nivel_id, fecha, titulo, versiculo').gte('fecha', inicioMes).lte('fecha', finMes),
       supabase
         .from('cobertura_dia')
         .select('*, docente:profiles(nombre_completo)')
@@ -95,6 +99,7 @@ export default function Planeacion() {
         .lte('fecha', finMes),
     ])
     setActividadesMes(acts || [])
+    setDevocionalesMes(devos || [])
     setCoberturaMes(cob || [])
   }, [inicioMes, finMes])
 
@@ -123,12 +128,12 @@ export default function Planeacion() {
       const iso = toISO(year, month, d)
       const diaSem = new Date(year, month, d).getDay()
       if (!diasClaseSet.has(diaSem)) continue
-      const tieneAct = actividadesMes.some((a) => a.fecha === iso)
-      if (tieneAct) planeadas++
+      const tieneContenido = actividadesMes.some((a) => a.fecha === iso) || devocionalesMes.some((dv) => dv.fecha === iso)
+      if (tieneContenido) planeadas++
       else sinPlanear++
     }
     return { planeadas, sinPlanear }
-  }, [actividadesMes, diasClaseSet, diasEnMes, year, month])
+  }, [actividadesMes, devocionalesMes, diasClaseSet, diasEnMes, year, month])
 
   function openActividad(nivel, actividadExistente) {
     setModalActividad({ nivel, actividad: actividadExistente })
@@ -206,6 +211,7 @@ export default function Planeacion() {
 
   const hoy = hoyISO()
   const coberturaDelDia = coberturaMes.filter((c) => c.fecha === selectedDay)
+  const devocionalesDelDia = devocionalesMes.filter((dv) => dv.fecha === selectedDay)
   const actividadesDelDia = actividadesMes.filter((a) => a.fecha === selectedDay)
   const diaSemanaSeleccionado = selectedDay ? new Date(selectedDay + 'T00:00:00').getDay() : null
   const horariosDelDia = horarios.filter((h) => h.dia_semana === null || h.dia_semana === diaSemanaSeleccionado)
@@ -290,6 +296,7 @@ export default function Planeacion() {
                 const esClase = diasClaseSet.has(diaSemana)
                 const esHoy = iso === hoy
                 const seleccionado = iso === selectedDay
+                const tieneDevocional = devocionalesMes.some((dv) => dv.fecha === iso)
                 const tieneActividad = actividadesMes.some((a) => a.fecha === iso)
                 const tieneCobertura = coberturaMes.some((c) => c.fecha === iso)
                 return (
@@ -303,8 +310,9 @@ export default function Planeacion() {
                     <span>{d}</span>
                     <div className="flex gap-0.5">
                       {esClase && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white' : 'bg-sky-400'}`} />}
+                      {tieneDevocional && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-sunshine-400'}`} />}
                       {tieneActividad && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-grass-400'}`} />}
-                      {tieneCobertura && !tieneActividad && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-grape-400'}`} />}
+                      {tieneCobertura && !tieneActividad && !tieneDevocional && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-grape-400'}`} />}
                     </div>
                   </button>
                 )
@@ -312,8 +320,9 @@ export default function Planeacion() {
             </div>
             <div className="mt-3 flex flex-wrap gap-3 text-[0.65rem] font-bold text-ink/40">
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-sky-400" /> Día de clase</span>
-              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grass-400" /> Actividad planeada</span>
-              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grape-400" /> Cobertura asignada</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-sunshine-400" /> Devocional</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grass-400" /> Actividad</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grape-400" /> Cobertura</span>
             </div>
           </div>
 
@@ -321,7 +330,7 @@ export default function Planeacion() {
           <div className="grid grid-cols-2 gap-3">
             <div className="card flex flex-col items-center gap-1 !p-3 text-center">
               <span className="text-lg font-extrabold text-grass-600">{resumenMes.planeadas}</span>
-              <span className="text-[0.65rem] font-bold text-ink/40">Días con actividad</span>
+              <span className="text-[0.65rem] font-bold text-ink/40">Días con contenido</span>
             </div>
             <div className="card flex flex-col items-center gap-1 !p-3 text-center">
               <span className={`text-lg font-extrabold ${resumenMes.sinPlanear > 0 ? 'text-coral-600' : 'text-grass-600'}`}>{resumenMes.sinPlanear}</span>
@@ -365,8 +374,10 @@ export default function Planeacion() {
                       .filter((a) => a.nivel_id === nivel.id)
                       .map((a) => a.docente?.nombre_completo)
                       .filter(Boolean)
+                    const devosNivel = devocionalesDelDia.filter((dv) => dv.nivel_id === nivel.id || !dv.nivel_id)
                     const actividad = actividadesDelDia.find((a) => a.nivel_id === nivel.id)
                     const soloUnHorario = horariosDelDia.length <= 1
+                    const tieneContenido = devosNivel.length > 0 || actividad
 
                     return (
                       <div
@@ -386,7 +397,7 @@ export default function Planeacion() {
                               )}
                             </div>
                           </div>
-                          {actividad ? (
+                          {tieneContenido ? (
                             <span className="inline-flex items-center gap-1 rounded-full bg-grass-100 px-2 py-0.5 text-[0.65rem] font-bold text-grass-700">
                               ✅ Planeada
                             </span>
@@ -457,9 +468,42 @@ export default function Planeacion() {
                           </div>
                         </div>
 
-                        {/* Actividad planeada */}
+                        {/* Devocional — contenido principal */}
                         <div className="border-t border-ink/5 px-4 py-3">
-                          <p className="mb-2 text-[0.65rem] font-extrabold uppercase tracking-wide text-ink/30">Actividad</p>
+                          <p className="mb-2 text-[0.65rem] font-extrabold uppercase tracking-wide text-ink/30">🙏 Enseñanza / Devocional</p>
+                          {devosNivel.length > 0 ? (
+                            <div className="flex flex-col gap-2">
+                              {devosNivel.map((dv) => (
+                                <div
+                                  key={dv.id}
+                                  className="flex cursor-pointer items-center justify-between gap-2 rounded-xl bg-sunshine-50/60 px-3 py-2 transition-colors hover:bg-sunshine-100/60"
+                                  onClick={() => navigate(`/devocionales/${dv.id}`)}
+                                >
+                                  <div className="min-w-0 flex-1">
+                                    <p className="truncate font-bold text-sunshine-800">🙏 {dv.titulo}</p>
+                                    {dv.versiculo && <p className="mt-0.5 truncate text-xs italic text-ink/40">📖 {dv.versiculo}</p>}
+                                    {!dv.nivel_id && <span className="text-[0.6rem] font-bold text-ink/30">Para todas las clases</span>}
+                                  </div>
+                                  <span className="shrink-0 text-xs text-sunshine-600">Ver →</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-sm text-ink/30">Sin devocional para este día</p>
+                              <button
+                                className="btn-primary shrink-0 !py-1.5 !px-3 !text-xs"
+                                onClick={() => navigate('/devocionales')}
+                              >
+                                + Crear devocional
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Actividad — complemento */}
+                        <div className="border-t border-ink/5 px-4 py-3">
+                          <p className="mb-2 text-[0.65rem] font-extrabold uppercase tracking-wide text-ink/30">🎨 Actividad complementaria</p>
                           {actividad ? (
                             <div className="flex items-center justify-between gap-2">
                               <div className="min-w-0 flex-1">
@@ -474,12 +518,12 @@ export default function Planeacion() {
                             </div>
                           ) : (
                             <div className="flex items-center justify-between gap-2">
-                              <p className="text-sm text-ink/30">Sin actividad planeada</p>
+                              <p className="text-sm text-ink/30">Sin actividad complementaria</p>
                               <button
-                                className="btn-primary shrink-0 !py-1.5 !px-3 !text-xs"
+                                className="btn-secondary shrink-0 !py-1.5 !px-3 !text-xs"
                                 onClick={() => openActividad(nivel, null)}
                               >
-                                + Planear
+                                + Agregar
                               </button>
                             </div>
                           )}
