@@ -8,7 +8,7 @@
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
-  role text not null check (role in ('admin','coordinador','docente','padre')),
+  role text not null check (role in ('superadmin','admin','coordinador','docente','padre')),
   nombre_completo text not null,
   cedula text unique,
   telefono text,
