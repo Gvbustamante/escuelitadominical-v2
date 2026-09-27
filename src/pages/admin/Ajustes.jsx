@@ -36,6 +36,9 @@ export default function Ajustes() {
   const [revisando, setRevisando] = useState(false)
   const [resultadoRevision, setResultadoRevision] = useState('')
 
+  const [solicitudes, setSolicitudes] = useState([])
+  const [solicitudesBusy, setSolicitudesBusy] = useState(null)
+
   const [diasClase, setDiasClase] = useState(null)
   const [horarios, setHorarios] = useState(null)
   const [nuevoHorario, setNuevoHorario] = useState('')
@@ -44,6 +47,14 @@ export default function Ajustes() {
 
   const loadHorarios = () => supabase.from('horarios').select('*').order('orden').then(({ data }) => setHorarios(data || []))
 
+  const loadSolicitudes = () =>
+    supabase
+      .from('solicitudes_reset')
+      .select('*')
+      .eq('estado', 'pendiente')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => setSolicitudes(data || []))
+
   useEffect(() => {
     supabase
       .from('dias_clase')
@@ -51,6 +62,7 @@ export default function Ajustes() {
       .order('dia_semana')
       .then(({ data }) => setDiasClase(data || []))
     loadHorarios()
+    if (['superadmin', 'admin'].includes(profile.role)) loadSolicitudes()
   }, [])
 
   async function toggleDiaClase(dia_semana) {
@@ -103,6 +115,29 @@ export default function Ajustes() {
     setResultadoRevision(
       `✅ Se pausaron ${fila?.ninos_pausados ?? 0} niño(s) y ${fila?.padres_pausados ?? 0} cuenta(s) de padre/madre por inactividad.`,
     )
+  }
+
+  async function aprobarReset(sol) {
+    setSolicitudesBusy(sol.id)
+    await supabase.auth.resetPasswordForEmail(sol.email, {
+      redirectTo: window.location.origin,
+    })
+    await supabase
+      .from('solicitudes_reset')
+      .update({ estado: 'aprobada', resuelta_en: new Date().toISOString(), resuelta_por: profile.id })
+      .eq('id', sol.id)
+    setSolicitudesBusy(null)
+    loadSolicitudes()
+  }
+
+  async function rechazarReset(sol) {
+    setSolicitudesBusy(sol.id)
+    await supabase
+      .from('solicitudes_reset')
+      .update({ estado: 'rechazada', resuelta_en: new Date().toISOString(), resuelta_por: profile.id })
+      .eq('id', sol.id)
+    setSolicitudesBusy(null)
+    loadSolicitudes()
   }
 
   useEffect(() => {
@@ -313,6 +348,41 @@ export default function Ajustes() {
             </button>
             {resultadoRevision && <p className="mt-3 text-sm font-bold text-ink/70">{resultadoRevision}</p>}
           </div>
+
+          {['superadmin', 'admin'].includes(profile.role) && solicitudes.length > 0 && (
+            <div className="card max-w-xl">
+              <p className="label mb-1">Solicitudes de restablecimiento de contraseña</p>
+              <p className="mb-4 text-sm text-ink/50">
+                Usuarios que pidieron restablecer su contraseña desde la pantalla de inicio de sesión.
+              </p>
+              <div className="flex flex-col gap-2">
+                {solicitudes.map((sol) => (
+                  <div key={sol.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-sunshine-50 px-4 py-3">
+                    <div>
+                      <p className="text-sm font-bold">{sol.nombre || 'Sin nombre'}</p>
+                      <p className="text-xs text-ink/50">{sol.email} — {new Date(sol.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        disabled={solicitudesBusy === sol.id}
+                        onClick={() => aprobarReset(sol)}
+                        className="rounded-lg bg-grass-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-grass-600"
+                      >
+                        {solicitudesBusy === sol.id ? '...' : '✅ Aprobar'}
+                      </button>
+                      <button
+                        disabled={solicitudesBusy === sol.id}
+                        onClick={() => rechazarReset(sol)}
+                        className="rounded-lg bg-coral-100 px-3 py-1.5 text-xs font-bold text-coral-700 hover:bg-coral-200"
+                      >
+                        Rechazar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="card max-w-xl">
             <p className="label mb-1">Días de clase</p>

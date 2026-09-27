@@ -50,6 +50,8 @@ export default function Docentes() {
   const [detallePersona, setDetallePersona] = useState(null)
   const [confirmDesactivar, setConfirmDesactivar] = useState(null)
   const [confirmBusy, setConfirmBusy] = useState(false)
+  const [confirmBorrar, setConfirmBorrar] = useState(null)
+  const [borrarBusy, setBorrarBusy] = useState(false)
 
   const load = useCallback(async () => {
     const [{ data: perfiles }, { data: asignaciones }, { data: vinculos }, { data: n }] = await Promise.all([
@@ -130,7 +132,11 @@ export default function Docentes() {
   }
 
   async function toggleActivo(persona) {
-    await supabase.from('profiles').update({ activo: !persona.activo }).eq('id', persona.id)
+    const nuevoActivo = !persona.activo
+    await supabase.from('profiles').update({
+      activo: nuevoActivo,
+      desactivado_en: nuevoActivo ? null : new Date().toISOString(),
+    }).eq('id', persona.id)
     load()
   }
 
@@ -147,6 +153,23 @@ export default function Docentes() {
     await toggleActivo(confirmDesactivar)
     setConfirmBusy(false)
     setConfirmDesactivar(null)
+  }
+
+  function llevaInactivo3Meses(u) {
+    if (u.activo || !u.desactivado_en) return false
+    const hace3Meses = new Date()
+    hace3Meses.setMonth(hace3Meses.getMonth() - 3)
+    return new Date(u.desactivado_en) <= hace3Meses
+  }
+
+  async function confirmarBorrar() {
+    setBorrarBusy(true)
+    await supabase.from('ninos_padres').delete().eq('padre_id', confirmBorrar.id)
+    await supabase.from('docentes_niveles').delete().eq('docente_id', confirmBorrar.id)
+    await supabase.from('profiles').delete().eq('id', confirmBorrar.id)
+    setBorrarBusy(false)
+    setConfirmBorrar(null)
+    load()
   }
 
   return (
@@ -273,6 +296,14 @@ export default function Docentes() {
                         {['superadmin', 'admin'].includes(profile.role) && u.id !== profile.id && (
                           <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(u)}>
                             {u.activo ? 'Desactivar' : 'Activar'}
+                          </button>
+                        )}
+                        {['superadmin', 'admin'].includes(profile.role) && llevaInactivo3Meses(u) && (
+                          <button
+                            className="rounded-lg bg-coral-100 px-3 py-1 text-xs font-bold text-coral-700 hover:bg-coral-200"
+                            onClick={() => setConfirmBorrar(u)}
+                          >
+                            🗑️ Borrar
                           </button>
                         )}
                       </div>
@@ -446,6 +477,20 @@ export default function Docentes() {
         message={
           confirmDesactivar
             ? `${confirmDesactivar.nombre_completo} ya no va a poder entrar. Puedes reactivarla cuando quieras.`
+            : ''
+        }
+      />
+
+      <ConfirmModal
+        open={!!confirmBorrar}
+        onClose={() => setConfirmBorrar(null)}
+        onConfirm={confirmarBorrar}
+        busy={borrarBusy}
+        title="¿Borrar esta cuenta permanentemente?"
+        confirmLabel="Sí, borrar"
+        message={
+          confirmBorrar
+            ? `${confirmBorrar.nombre_completo} lleva más de 3 meses desactivado/a. Se borrará su perfil y vínculos. Esta acción NO se puede deshacer.`
             : ''
         }
       />

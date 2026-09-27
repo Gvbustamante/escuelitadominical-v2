@@ -48,7 +48,7 @@ export default function Ninos() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ nombre_completo: '', fecha_nacimiento: '', nivel_id: '', alergias: '', notas: '' })
+  const [form, setForm] = useState({ nombre_completo: '', fecha_nacimiento: '', nivel_id: '', sexo: '', alergias: '', notas: '' })
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -121,7 +121,7 @@ export default function Ninos() {
 
   function openNew() {
     setEditing(null)
-    setForm({ nombre_completo: '', fecha_nacimiento: '', nivel_id: '', alergias: '', notas: '' })
+    setForm({ nombre_completo: '', fecha_nacimiento: '', nivel_id: '', sexo: '', alergias: '', notas: '' })
     setError('')
     setModalOpen(true)
   }
@@ -132,6 +132,7 @@ export default function Ninos() {
       nombre_completo: nino.nombre_completo,
       fecha_nacimiento: nino.fecha_nacimiento || '',
       nivel_id: nino.nivel_id || '',
+      sexo: nino.sexo || '',
       alergias: nino.alergias || '',
       notas: nino.notas || '',
     })
@@ -147,6 +148,7 @@ export default function Ninos() {
       nombre_completo: form.nombre_completo,
       fecha_nacimiento: form.fecha_nacimiento || null,
       nivel_id: form.nivel_id || null,
+      sexo: form.sexo || null,
       alergias: form.alergias || null,
       notas: form.notas || null,
     }
@@ -178,6 +180,7 @@ export default function Ninos() {
       const badge = badgeActual(nivelesEstrella, numEstrellas)
       return [
         nino.nombre_completo,
+        nino.sexo === 'M' ? 'Niño' : nino.sexo === 'F' ? 'Niña' : '',
         calcularEdad(nino.fecha_nacimiento) ?? '—',
         nivel?.nombre || '',
         `${badge.emoji} ${badge.nombre}`,
@@ -189,7 +192,7 @@ export default function Ninos() {
         nino.pausado ? 'Sí' : 'No',
       ]
     })
-    exportExcel('ninos', ['Nombre', 'Edad', 'Clase', 'Insignia', 'Estrellas', 'Asist. mes', 'Alergias', 'Padres/encargados', 'Estado', 'Pausado'], filas)
+    exportExcel('ninos', ['Nombre', 'Sexo', 'Edad', 'Clase', 'Insignia', 'Estrellas', 'Asist. mes', 'Alergias', 'Padres/encargados', 'Estado', 'Pausado'], filas)
   }
 
   function handleToggleClick(nino) {
@@ -385,6 +388,7 @@ export default function Ninos() {
 
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                          {nino.sexo && <span className="text-sm">{nino.sexo === 'M' ? '👦' : '👧'}</span>}
                           <span className="truncate text-sm font-bold leading-tight">{nino.nombre_completo}</span>
                           {edad !== null && (
                             <span className="text-[0.65rem] text-ink/40">{edad}a</span>
@@ -469,6 +473,21 @@ export default function Ninos() {
               value={form.nombre_completo}
               onChange={(e) => setForm({ ...form, nombre_completo: e.target.value })}
             />
+          </div>
+          <div>
+            <label className="label">Sexo</label>
+            <div className="flex gap-2">
+              {[['M', '👦 Niño'], ['F', '👧 Niña']].map(([v, label]) => (
+                <button
+                  type="button"
+                  key={v}
+                  onClick={() => setForm({ ...form, sexo: v })}
+                  className={`flex-1 rounded-full px-3 py-2 text-sm font-bold ${form.sexo === v ? (v === 'M' ? 'bg-sky-400 text-white' : 'bg-coral-400 text-white') : 'bg-ink/5'}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
