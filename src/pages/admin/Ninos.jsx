@@ -487,8 +487,8 @@ export default function Ninos() {
                 value={form.nivel_id}
                 onChange={(e) => setForm({ ...form, nivel_id: e.target.value })}
               >
-                <option value="">Sin asignar</option>
-                {niveles.map((n) => (
+                {!esDocente && <option value="">Sin asignar</option>}
+                {(esDocente ? niveles.filter((n) => misNivelIds?.has(n.id)) : niveles).map((n) => (
                   <option key={n.id} value={n.id}>
                     {n.nombre}
                   </option>

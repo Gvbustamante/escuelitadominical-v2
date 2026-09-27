@@ -69,7 +69,7 @@ export default function Planeacion() {
     supabase
       .from('profiles')
       .select('id, nombre_completo')
-      .eq('role', 'docente')
+      .in('role', ['superadmin', 'admin', 'coordinador', 'docente'])
       .eq('activo', true)
       .order('nombre_completo')
       .then(({ data }) => setDocentes(data || []))
