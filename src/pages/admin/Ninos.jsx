@@ -121,7 +121,10 @@ export default function Ninos() {
 
   function openNew() {
     setEditing(null)
-    setForm({ nombre_completo: '', fecha_nacimiento: '', nivel_id: '', sexo: '', alergias: '', notas: '' })
+    const defaultNivel = esDocente
+      ? (niveles.find((n) => misNivelIds?.has(n.id))?.id || '')
+      : ''
+    setForm({ nombre_completo: '', fecha_nacimiento: '', nivel_id: defaultNivel, sexo: '', alergias: '', notas: '' })
     setError('')
     setModalOpen(true)
   }
