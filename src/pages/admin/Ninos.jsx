@@ -157,7 +157,7 @@ export default function Ninos() {
     }
     const { error } = editing
       ? await supabase.from('ninos').update(payload).eq('id', editing.id)
-      : await supabase.from('ninos').insert(payload)
+      : await supabase.from('ninos').insert({ ...payload, creado_por: user.id })
 
     setBusy(false)
     if (error) return setError(error.message)
