@@ -200,13 +200,6 @@ export default function Planeacion() {
     loadMes()
   }
 
-  function reloadHorario() {
-    supabase
-      .from('asignacion_horario')
-      .select('nivel_id, horario_id, docente_id, docente:profiles(nombre_completo)')
-      .then(({ data }) => setAsignacionesHorario(data || []))
-  }
-
   if (diasClase === null) return <Spinner />
 
   const hoy = hoyISO()
@@ -235,7 +228,7 @@ export default function Planeacion() {
           onClick={() => setVista('horario')}
           className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'horario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
         >
-          🗓️ Horario semanal
+          👥 Equipo
         </button>
       </div>
 
@@ -253,15 +246,15 @@ export default function Planeacion() {
           diasClase={diasClase}
           niveles={niveles}
           docentes={docentes}
-          horarios={horarios}
+          asignaciones={asignaciones}
           asignacionesHorario={asignacionesHorario}
+          devocionalesMes={devocionalesMes}
           esDocente={esDocente}
           miId={user?.id}
-          onReload={reloadHorario}
         />
       )}
 
-      {vista === 'calendario' && <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.3fr]">
+      {vista === 'calendario' && <div className="grid grid-cols-1 gap-4 lg:grid-cols-[340px_1fr]">
         {/* Calendario */}
         <div className="flex flex-col gap-4">
           <div className="card">
@@ -342,7 +335,7 @@ export default function Planeacion() {
         {/* Panel de detalle del día */}
         <div className="flex flex-col gap-4">
           {!selectedDay ? (
-            <div className="card flex flex-col items-center gap-3 py-12 text-center">
+            <div className="card flex flex-col items-center gap-3 py-8 text-center">
               <span className="text-4xl">📅</span>
               <p className="font-bold text-ink/40">Elige un día del calendario</p>
               <p className="text-sm text-ink/30">para ver o planear cada clase</p>
@@ -367,7 +360,7 @@ export default function Planeacion() {
                   {esDocente ? 'Todavía no tienes clases asignadas.' : 'Todavía no hay clases creadas.'}
                 </p>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="grid gap-3 xl:grid-cols-2">
                   {nivelesVisibles.map((nivel) => {
                     const color = nivel.color || 'sky'
                     const fijosGenerales = asignaciones
@@ -385,9 +378,9 @@ export default function Planeacion() {
                         className={`card animate-pop-in overflow-hidden border-l-4 !p-0 ${STRIPE_CLASSES[color] || STRIPE_CLASSES.sky}`}
                       >
                         {/* Encabezado de la clase */}
-                        <div className={`flex items-center justify-between gap-3 px-4 py-3 ${BG_LIGHT[color] || BG_LIGHT.sky}`}>
+                        <div className={`flex items-center justify-between gap-2 px-3 py-2 ${BG_LIGHT[color] || BG_LIGHT.sky}`}>
                           <div className="flex items-center gap-2">
-                            <span className={`inline-flex h-8 w-8 items-center justify-center rounded-xl text-sm font-bold text-white ${DOT_CLASSES[color] || DOT_CLASSES.sky}`}>
+                            <span className={`inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold text-white ${DOT_CLASSES[color] || DOT_CLASSES.sky}`}>
                               {nivel.nombre.charAt(0)}
                             </span>
                             <div>
@@ -408,9 +401,9 @@ export default function Planeacion() {
                           )}
                         </div>
 
-                        {/* Docentes y horarios */}
-                        <div className="px-4 py-3">
-                          <p className="mb-2 text-[0.65rem] font-extrabold uppercase tracking-wide text-ink/30">Docentes</p>
+                        {/* Docentes */}
+                        <div className="px-3 py-2">
+                          <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">Docentes</p>
                           <div className="flex flex-col gap-2">
                             {horariosDelDia.map((horario) => {
                               const fijo = asignacionesHorario.find((a) => a.nivel_id === nivel.id && a.horario_id === horario.id)
@@ -419,7 +412,7 @@ export default function Planeacion() {
                               const respaldoGeneral = !nombreFijo && fijosGenerales.length > 0 ? fijosGenerales.join(', ') : null
 
                               return (
-                                <div key={horario.id} className="rounded-xl bg-ink/[0.03] px-3 py-2">
+                                <div key={horario.id} className="rounded-lg bg-ink/[0.03] px-2.5 py-1.5">
                                   <div className="flex flex-wrap items-center gap-2">
                                     {!soloUnHorario && (
                                       <span className="rounded-lg bg-ink/5 px-2 py-0.5 text-[0.65rem] font-bold uppercase text-ink/40">{horario.nombre}</span>
@@ -468,15 +461,15 @@ export default function Planeacion() {
                           </div>
                         </div>
 
-                        {/* Devocional — contenido principal */}
-                        <div className="border-t border-ink/5 px-4 py-3">
-                          <p className="mb-2 text-[0.65rem] font-extrabold uppercase tracking-wide text-ink/30">🙏 Enseñanza / Devocional</p>
+                        {/* Devocional */}
+                        <div className="border-t border-ink/5 px-3 py-2">
+                          <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">🙏 Enseñanza</p>
                           {devosNivel.length > 0 ? (
                             <div className="flex flex-col gap-2">
                               {devosNivel.map((dv) => (
                                 <div
                                   key={dv.id}
-                                  className="flex cursor-pointer items-center justify-between gap-2 rounded-xl bg-sunshine-50/60 px-3 py-2 transition-colors hover:bg-sunshine-100/60"
+                                  className="flex cursor-pointer items-center justify-between gap-2 rounded-lg bg-sunshine-50/60 px-2.5 py-1.5 transition-colors hover:bg-sunshine-100/60"
                                   onClick={() => navigate(`/devocionales/${dv.id}`)}
                                 >
                                   <div className="min-w-0 flex-1">
@@ -501,9 +494,9 @@ export default function Planeacion() {
                           )}
                         </div>
 
-                        {/* Actividad — complemento */}
-                        <div className="border-t border-ink/5 px-4 py-3">
-                          <p className="mb-2 text-[0.65rem] font-extrabold uppercase tracking-wide text-ink/30">🎨 Actividad complementaria</p>
+                        {/* Actividad */}
+                        <div className="border-t border-ink/5 px-3 py-2">
+                          <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">🎨 Actividad</p>
                           {actividad ? (
                             <div className="flex items-center justify-between gap-2">
                               <div className="min-w-0 flex-1">
