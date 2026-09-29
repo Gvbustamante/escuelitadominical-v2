@@ -163,7 +163,7 @@ export default function Foro() {
             </div>
           </div>
           {(esStaff || seleccionado.creado_por === user.id) && (
-            <button onClick={() => borrarForo(seleccionado.id)} className="text-2xl text-ink/65 hover:text-coral-500">
+            <button aria-label="Eliminar foro" title="Eliminar foro" onClick={() => borrarForo(seleccionado.id)} className="text-2xl text-ink/65 hover:text-coral-500">
               🗑️
             </button>
           )}
@@ -182,7 +182,7 @@ export default function Foro() {
                       <p className="text-xs text-ink/65">{new Date(m.created_at).toLocaleString('es')}</p>
                     </div>
                     {(esStaff || m.autor_id === user.id) && (
-                      <button onClick={() => borrarMensaje(m.id)} className="text-lg text-ink/65 hover:text-coral-500">
+                      <button aria-label="Eliminar mensaje" title="Eliminar mensaje" onClick={() => borrarMensaje(m.id)} className="text-lg text-ink/65 hover:text-coral-500">
                         🗑️
                       </button>
                     )}
@@ -329,7 +329,7 @@ export default function Foro() {
                       </button>
                     )}
                     {(esStaff || p.autor_id === user.id) && (
-                      <button onClick={() => borrarPeticion(p.id)} className="text-lg text-ink/65 hover:text-coral-500">
+                      <button aria-label="Eliminar petición" title="Eliminar petición" onClick={() => borrarPeticion(p.id)} className="text-lg text-ink/65 hover:text-coral-500">
                         🗑️
                       </button>
                     )}

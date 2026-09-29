@@ -205,7 +205,7 @@ export default function CitasBiblicasAdmin() {
                     <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(c)}>
                       Editar
                     </button>
-                    <button className="btn-secondary !py-1 !px-3 !text-xs !text-coral-600" onClick={() => setConfirmEliminar(c)}>
+                    <button aria-label="Eliminar cita" title="Eliminar cita" className="btn-secondary !py-1 !px-3 !text-xs !text-coral-600" onClick={() => setConfirmEliminar(c)}>
                       🗑️
                     </button>
                   </div>

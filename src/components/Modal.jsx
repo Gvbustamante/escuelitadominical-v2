@@ -25,7 +25,7 @@ export default function Modal({ open, onClose, title, wide, children }) {
         {/* ═══ Header fijo ═══ */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-ink/5 bg-white px-5 py-4">
           <h3 className="text-lg font-bold">{title}</h3>
-          <button
+          <button aria-label="Cerrar" title="Cerrar"
             onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded-full text-lg leading-none text-ink/65 transition-colors hover:bg-ink/5 hover:text-ink/70"
           >

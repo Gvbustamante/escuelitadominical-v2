@@ -94,7 +94,7 @@ export default function AgendaAdmin() {
                 <p className="text-sm text-ink/70">{ev.fecha}</p>
                 {ev.descripcion && <p className="mt-1 text-sm text-ink/75">{ev.descripcion}</p>}
               </div>
-              <button onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/65 hover:text-coral-500">
+              <button aria-label="Eliminar evento" title="Eliminar evento" onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/65 hover:text-coral-500">
                 🗑️
               </button>
             </div>

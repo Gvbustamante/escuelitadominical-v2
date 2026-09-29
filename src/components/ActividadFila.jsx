@@ -66,17 +66,17 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
             </button>
           )}
           {onDuplicate && (
-            <button onClick={() => onDuplicate(a)} className="text-lg text-ink/65 hover:text-grape-500" title="Duplicar para otra fecha">
+            <button aria-label="Duplicar para otra fecha" onClick={() => onDuplicate(a)} className="text-lg text-ink/65 hover:text-grape-500" title="Duplicar para otra fecha">
               📋
             </button>
           )}
           {onEdit && (
-            <button onClick={() => onEdit(a)} className="text-lg text-ink/65 hover:text-sky-500" title="Editar">
+            <button aria-label="Editar" onClick={() => onEdit(a)} className="text-lg text-ink/65 hover:text-sky-500" title="Editar">
               ✏️
             </button>
           )}
           {onDelete && (
-            <button onClick={() => onDelete(a.id)} className="text-lg text-ink/65 hover:text-coral-500" title="Eliminar">
+            <button aria-label="Eliminar" onClick={() => onDelete(a.id)} className="text-lg text-ink/65 hover:text-coral-500" title="Eliminar">
               🗑️
             </button>
           )}

@@ -551,7 +551,7 @@ function FolderCard({ folder, onClick, onDownload }) {
       <p className="w-full truncate text-center text-sm font-bold text-ink/70">{folder.label}</p>
       <p className="text-xs text-ink/65">{folder.count || 0} archivo{folder.count !== 1 ? 's' : ''}</p>
       {onDownload && (
-        <button
+        <button aria-label="Descargar como ZIP"
           onClick={(e) => { e.stopPropagation(); onDownload() }}
           className="absolute right-2 top-2 rounded-lg bg-ink/5 p-1.5 text-xs text-ink/65 opacity-0 transition-all hover:bg-sky-100 hover:text-sky-600 group-hover:opacity-100"
           title="Descargar como ZIP"
@@ -625,7 +625,7 @@ function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLi
           </p>
           <div className="flex shrink-0 items-center gap-0.5">
             {onRename && !editando && (
-              <button
+              <button aria-label="Renombrar"
                 onClick={() => { setNuevoNombre(archivo.nombre); setEditando(true) }}
                 className="rounded p-1 text-xs text-ink/65 opacity-0 transition-all hover:bg-sky-50 hover:text-sky-600 group-hover:opacity-100"
                 title="Renombrar"
@@ -634,7 +634,7 @@ function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLi
               </button>
             )}
             {onDownload && (
-              <button
+              <button aria-label="Descargar"
                 onClick={onDownload}
                 className="rounded p-1 text-xs text-ink/65 opacity-0 transition-all hover:bg-sky-50 hover:text-sky-600 group-hover:opacity-100"
                 title="Descargar"
@@ -643,7 +643,7 @@ function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLi
               </button>
             )}
             {onOpenLink && (
-              <button
+              <button aria-label="Abrir enlace"
                 onClick={onOpenLink}
                 className="rounded p-1 text-xs text-ink/65 hover:text-sky-600"
                 title="Abrir enlace"

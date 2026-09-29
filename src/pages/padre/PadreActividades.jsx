@@ -283,7 +283,7 @@ export default function PadreActividades() {
                       {/* Reacciones compactas */}
                       <div className="flex items-center gap-1.5 border-t border-ink/5 pt-3">
                         {REACCIONES.map((r) => (
-                          <button
+                          <button aria-label={`Reaccionar ${r}`} aria-pressed={mia?.tipo === r}
                             key={r}
                             onClick={() => reaccionar(a.id, r)}
                             className={`flex h-8 w-8 items-center justify-center rounded-full text-base transition-all duration-150 active:scale-90 ${

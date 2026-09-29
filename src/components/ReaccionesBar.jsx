@@ -24,7 +24,7 @@ export default function ReaccionesBar({ tabla, columnaId, targetId, columnaUsuar
   return (
     <div className="flex items-center gap-2">
       {REACCIONES.map((r) => (
-        <button
+        <button aria-label={`Reaccionar ${r}`} aria-pressed={mia?.tipo === r}
           key={r}
           onClick={() => reaccionar(r)}
           className={`rounded-full px-3 py-2 text-xl transition-transform duration-150 active:scale-90 ${

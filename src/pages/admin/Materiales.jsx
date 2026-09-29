@@ -180,7 +180,7 @@ export default function Materiales() {
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => toggleActivo(m)}>
                         {m.activo ? 'Desactivar' : 'Activar'}
                       </button>
-                      <button className="btn-secondary !py-1 !px-3 !text-xs !text-coral-600" onClick={() => setConfirmEliminar(m)}>
+                      <button aria-label="Eliminar material" title="Eliminar material" className="btn-secondary !py-1 !px-3 !text-xs !text-coral-600" onClick={() => setConfirmEliminar(m)}>
                         🗑️
                       </button>
                     </div>

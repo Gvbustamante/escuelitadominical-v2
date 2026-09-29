@@ -560,7 +560,7 @@ export default function ActividadesAdmin() {
                   {archivosDrive.map((df, i) => (
                     <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
                       📁 {df.nombre}
-                      <button type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500 hover:text-coral-700">×</button>
+                      <button aria-label="Quitar archivo" title="Quitar archivo" type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500 hover:text-coral-700">×</button>
                     </span>
                   ))}
                 </div>

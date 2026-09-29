@@ -272,13 +272,13 @@ export default function Drive() {
         </div>
         {!verPapelera && (
           <div className="flex gap-1.5 sm:hidden">
-            <button
+            <button aria-label="Mis archivos" title="Mis archivos"
               onClick={() => setSeccion('archivos')}
               className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'archivos' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
             >
               📁
             </button>
-            <button
+            <button aria-label="Vista organizada" title="Vista organizada"
               onClick={() => setSeccion('organizado')}
               className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'organizado' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
             >
@@ -386,7 +386,7 @@ export default function Drive() {
         />
         <div className="flex overflow-hidden rounded-xl ring-1 ring-ink/10">
           {[['grid', '▦'], ['lista', '☰']].map(([v, icon]) => (
-            <button
+            <button aria-label={v === 'grid' ? 'Cuadrícula' : 'Lista'}
               key={v}
               onClick={() => setVista(v)}
               className={`px-3 py-2 text-sm font-bold transition-colors ${vista === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/65 hover:bg-sky-50'}`}
@@ -541,8 +541,8 @@ function CarpetaCard({ carpeta, onEntrar, onEditar, onEliminar, onMover, onResta
       <p className="text-xs text-ink/65">{papelera ? formatFecha(carpeta.eliminado_at) : carpeta.creador?.nombre_completo}</p>
       {papelera ? (
         <div className="flex gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
-          <button onClick={() => onRestaurar?.('carpeta', carpeta)} className="rounded-lg bg-grass-50 px-2 py-1.5 text-xs font-bold text-grass-700 hover:bg-grass-100 active:scale-95">♻️</button>
-          {esAdmin && <button onClick={() => onEliminarDefinitivo?.('carpeta', carpeta)} className="rounded-lg bg-coral-50 px-2 py-1.5 text-xs font-bold text-coral-700 hover:bg-coral-100 active:scale-95">🗑️</button>}
+          <button aria-label="Restaurar carpeta" title="Restaurar carpeta" onClick={() => onRestaurar?.('carpeta', carpeta)} className="rounded-lg bg-grass-50 px-2 py-1.5 text-xs font-bold text-grass-700 hover:bg-grass-100 active:scale-95">♻️</button>
+          {esAdmin && <button aria-label="Eliminar carpeta definitivamente" title="Eliminar carpeta definitivamente" onClick={() => onEliminarDefinitivo?.('carpeta', carpeta)} className="rounded-lg bg-coral-50 px-2 py-1.5 text-xs font-bold text-coral-700 hover:bg-coral-100 active:scale-95">🗑️</button>}
         </div>
       ) : (
         <ItemMenu open={menu} setOpen={setMenu}>
@@ -574,8 +574,8 @@ function ArchivoCard({ archivo, onPreview, onEliminar, onRenombrar, onMover, onR
       <p className="text-xs text-ink/65">{papelera ? formatFecha(archivo.eliminado_at) : formatBytes(archivo.tamano)}</p>
       {papelera ? (
         <div className="flex gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
-          <button onClick={() => onRestaurar?.('archivo', archivo)} className="rounded-lg bg-grass-50 px-2 py-1.5 text-xs font-bold text-grass-700 hover:bg-grass-100 active:scale-95">♻️</button>
-          {esAdmin && <button onClick={() => onEliminarDefinitivo?.('archivo', archivo)} className="rounded-lg bg-coral-50 px-2 py-1.5 text-xs font-bold text-coral-700 hover:bg-coral-100 active:scale-95">🗑️</button>}
+          <button aria-label="Restaurar archivo" title="Restaurar archivo" onClick={() => onRestaurar?.('archivo', archivo)} className="rounded-lg bg-grass-50 px-2 py-1.5 text-xs font-bold text-grass-700 hover:bg-grass-100 active:scale-95">♻️</button>
+          {esAdmin && <button aria-label="Eliminar archivo definitivamente" title="Eliminar archivo definitivamente" onClick={() => onEliminarDefinitivo?.('archivo', archivo)} className="rounded-lg bg-coral-50 px-2 py-1.5 text-xs font-bold text-coral-700 hover:bg-coral-100 active:scale-95">🗑️</button>}
         </div>
       ) : (
         <ItemMenu open={menu} setOpen={setMenu}>
@@ -613,7 +613,7 @@ function ListView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, on
               {papelera ? (
                 <>
                   <ActionBtn icon="♻️" onClick={() => onRestaurar?.('carpeta', c)} color="grass" />
-                  {esAdmin && <ActionBtn icon="🗑️" onClick={() => onEliminarDefinitivo?.('carpeta', c)} color="coral" />}
+                  {esAdmin && <ActionBtn icon="🗑️" label="Eliminar definitivamente" onClick={() => onEliminarDefinitivo?.('carpeta', c)} color="coral" />}
                 </>
               ) : (
                 <>
@@ -643,11 +643,11 @@ function ListView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, on
               {papelera ? (
                 <>
                   <ActionBtn icon="♻️" onClick={() => onRestaurar?.('archivo', a)} color="grass" />
-                  {esAdmin && <ActionBtn icon="🗑️" onClick={() => onEliminarDefinitivo?.('archivo', a)} color="coral" />}
+                  {esAdmin && <ActionBtn icon="🗑️" label="Eliminar definitivamente" onClick={() => onEliminarDefinitivo?.('archivo', a)} color="coral" />}
                 </>
               ) : (
                 <>
-                  <ActionBtn icon="✏️" onClick={() => onRenombrar(a)} />
+                  <ActionBtn icon="✏️" label="Renombrar" onClick={() => onRenombrar(a)} />
                   <ActionBtn icon="📦" onClick={() => onMover(a, 'archivo')} />
                   {esAdmin && <ActionBtn icon="🗑️" onClick={() => onEliminar('archivo', a)} color="coral" />}
                 </>
@@ -661,10 +661,13 @@ function ListView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, on
 }
 
 // ─── Shared UI pieces ─────────────────────────────────────────
-function ActionBtn({ icon, onClick, color }) {
+const ACTION_LABELS = { '♻️': 'Restaurar', '🗑️': 'Eliminar', '✏️': 'Editar', '📦': 'Mover' }
+
+function ActionBtn({ icon, onClick, color, label }) {
+  const nombre = label || ACTION_LABELS[icon] || 'Acción'
   const colors = color === 'grass' ? 'text-grass-600 hover:bg-grass-50' : color === 'coral' ? 'text-coral-500 hover:bg-coral-50' : 'text-sky-500 hover:bg-sky-50'
   return (
-    <button onClick={onClick} className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs transition-colors active:scale-90 ${colors}`}>
+    <button onClick={onClick} aria-label={nombre} title={nombre} className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs transition-colors active:scale-90 ${colors}`}>
       {icon}
     </button>
   )

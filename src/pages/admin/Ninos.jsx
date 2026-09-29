@@ -453,25 +453,25 @@ export default function Ninos() {
                       </div>
 
                       <div className="flex shrink-0 items-center gap-0.5">
-                        <button className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => setDetalleNino(nino)} title="Detalle">
+                        <button aria-label="Detalle" className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => setDetalleNino(nino)} title="Detalle">
                           👁️
                         </button>
                         {puedeEditar && (!esDocente || misNivelIds?.has(nino.nivel_id)) && (
-                          <button className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => openEdit(nino)} title="Editar">
+                          <button aria-label="Editar" className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => openEdit(nino)} title="Editar">
                             ✏️
                           </button>
                         )}
                         {puedeVincularPadre && (!esDocente || misNivelIds?.has(nino.nivel_id)) && (
-                          <button className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => openInvite(nino)} title="Vincular padre">
+                          <button aria-label="Vincular padre" className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => openInvite(nino)} title="Vincular padre">
                             👪
                           </button>
                         )}
                         {esStaff && (
                           <>
-                            <button className="rounded-lg p-1.5 text-xs text-ink/65 hover:bg-ink/5" onClick={() => togglePausado(nino)} title={nino.pausado ? 'Reanudar' : 'Pausar'}>
+                            <button aria-label={nino.pausado ? 'Reanudar' : 'Pausar'} className="rounded-lg p-1.5 text-xs text-ink/65 hover:bg-ink/5" onClick={() => togglePausado(nino)} title={nino.pausado ? 'Reanudar' : 'Pausar'}>
                               {nino.pausado ? '▶️' : '⏸️'}
                             </button>
-                            <button className="rounded-lg p-1.5 text-xs text-ink/65 hover:bg-ink/5" onClick={() => handleToggleClick(nino)} title={nino.activo ? 'Desactivar' : 'Activar'}>
+                            <button aria-label={nino.activo ? 'Desactivar' : 'Activar'} className="rounded-lg p-1.5 text-xs text-ink/65 hover:bg-ink/5" onClick={() => handleToggleClick(nino)} title={nino.activo ? 'Desactivar' : 'Activar'}>
                               {nino.activo ? '🚫' : '✅'}
                             </button>
                           </>

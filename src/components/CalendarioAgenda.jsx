@@ -37,7 +37,7 @@ export default function CalendarioAgenda({ eventos, onSelectDay, selectedDay }) 
   return (
     <div className="card">
       <div className="mb-4 flex items-center justify-between">
-        <button
+        <button aria-label="Mes anterior" title="Mes anterior"
           onClick={() => setCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 }))}
           className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5"
         >
@@ -46,7 +46,7 @@ export default function CalendarioAgenda({ eventos, onSelectDay, selectedDay }) 
         <h3 className="text-lg font-bold">
           {MESES[month]} {year}
         </h3>
-        <button
+        <button aria-label="Mes siguiente" title="Mes siguiente"
           onClick={() => setCursor((c) => (c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 }))}
           className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5"
         >

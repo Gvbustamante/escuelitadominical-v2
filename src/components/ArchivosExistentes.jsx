@@ -64,7 +64,7 @@ export default function ArchivosExistentes({ archivos, tabla = 'actividad_archiv
                 loading="lazy"
                 className="h-full w-full object-cover"
               />
-              <button
+              <button aria-label="Eliminar"
                 type="button"
                 onClick={() => eliminar(f)}
                 disabled={eliminando === f.id}

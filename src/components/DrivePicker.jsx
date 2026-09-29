@@ -93,7 +93,7 @@ export default function DrivePicker({ open, onClose, onSelect, multiple = true, 
         {/* Breadcrumb + search */}
         <div className="flex flex-wrap items-center gap-2">
           <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto text-sm">
-            <button
+            <button aria-label="Inicio del Drive" title="Inicio del Drive"
               onClick={() => { setRuta([]); setBusqueda('') }}
               className={`shrink-0 rounded-lg px-2 py-1 font-bold transition-colors ${ruta.length === 0 ? 'bg-sky-100 text-sky-700' : 'text-ink/70 hover:bg-ink/5'}`}
             >

@@ -209,7 +209,7 @@ export default function Clases() {
                   <td data-titulo className="px-3 py-2 sm:px-4 sm:py-3">
                     <div className="flex items-center gap-1">
                       <div className="flex flex-col">
-                        <button
+                        <button aria-label="Subir"
                           type="button"
                           disabled={i === 0}
                           onClick={() => mover(nivel, -1)}
@@ -218,7 +218,7 @@ export default function Clases() {
                         >
                           ▲
                         </button>
-                        <button
+                        <button aria-label="Bajar"
                           type="button"
                           disabled={i === niveles.length - 1}
                           onClick={() => mover(nivel, 1)}

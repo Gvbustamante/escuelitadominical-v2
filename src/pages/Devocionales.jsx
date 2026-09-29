@@ -342,7 +342,7 @@ export default function Devocionales() {
             </button>
             {/* Toggle de vista */}
             <div className="ml-auto flex overflow-hidden rounded-xl border-2 border-ink/10">
-              <button
+              <button aria-label="Vista tarjetas"
                 type="button"
                 onClick={() => setVista('tarjetas')}
                 className={`px-3 py-1.5 text-sm font-bold ${vista === 'tarjetas' ? 'bg-sky-400 text-white' : 'bg-white text-ink/65 hover:bg-ink/5'}`}
@@ -350,7 +350,7 @@ export default function Devocionales() {
               >
                 ▦
               </button>
-              <button
+              <button aria-label="Vista lista"
                 type="button"
                 onClick={() => setVista('lista')}
                 className={`px-3 py-1.5 text-sm font-bold ${vista === 'lista' ? 'bg-sky-400 text-white' : 'bg-white text-ink/65 hover:bg-ink/5'}`}
@@ -427,7 +427,7 @@ export default function Devocionales() {
                       <span className="text-xs font-bold text-coral-500">{d.devocional_reacciones?.length || 0} ❤️</span>
                       <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                         {puedeCrear && (
-                          <button
+                          <button aria-label={d.activo ? 'Quitar activo' : 'Marcar activo'}
                             onClick={() => (d.activo ? quitarActivo(d) : marcarActivo(d))}
                             className="text-sm text-ink/65 hover:text-sunshine-500"
                             title={d.activo ? 'Quitar activo' : 'Marcar activo'}
@@ -436,12 +436,12 @@ export default function Devocionales() {
                           </button>
                         )}
                         {puedeCrear && (
-                          <button onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-sm text-ink/65 hover:text-grape-500" title="Duplicar">
+                          <button aria-label="Duplicar" onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-sm text-ink/65 hover:text-grape-500" title="Duplicar">
                             📋
                           </button>
                         )}
                         {puedeCrear && (
-                          <button onClick={() => openEdit(d)} className="text-sm text-ink/65 hover:text-sky-500" title="Editar">
+                          <button aria-label="Editar" onClick={() => openEdit(d)} className="text-sm text-ink/65 hover:text-sky-500" title="Editar">
                             ✏️
                           </button>
                         )}
@@ -495,12 +495,12 @@ export default function Devocionales() {
                       </button>
                     )}
                     {puedeCrear && (
-                      <button onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-lg text-ink/65 hover:text-grape-500" title="Duplicar">
+                      <button aria-label="Duplicar" onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-lg text-ink/65 hover:text-grape-500" title="Duplicar">
                         📋
                       </button>
                     )}
                     {puedeCrear && (
-                      <button onClick={() => openEdit(d)} className="text-lg text-ink/65 hover:text-sky-500" title="Editar">
+                      <button aria-label="Editar" onClick={() => openEdit(d)} className="text-lg text-ink/65 hover:text-sky-500" title="Editar">
                         ✏️
                       </button>
                     )}
@@ -649,7 +649,7 @@ export default function Devocionales() {
                       {archivosDrive.map((df, i) => (
                         <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
                           📁 {df.nombre}
-                          <button type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500 hover:text-coral-700">×</button>
+                          <button aria-label="Quitar archivo" title="Quitar archivo" type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500 hover:text-coral-700">×</button>
                         </span>
                       ))}
                     </div>

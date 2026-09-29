@@ -142,7 +142,7 @@ export default function MenuTab({ config }) {
                   placeholder="Nombre de la categoría"
                 />
                 <div className="flex items-center gap-1">
-                  <button
+                  <button aria-label="Subir categoría" title="Subir categoría"
                     type="button"
                     onClick={() => moverCategoria(idx, -1)}
                     disabled={idx === 0}
@@ -150,7 +150,7 @@ export default function MenuTab({ config }) {
                   >
                     ▲
                   </button>
-                  <button
+                  <button aria-label="Bajar categoría" title="Bajar categoría"
                     type="button"
                     onClick={() => moverCategoria(idx, 1)}
                     disabled={idx === categorias.length - 1}
@@ -158,7 +158,7 @@ export default function MenuTab({ config }) {
                   >
                     ▼
                   </button>
-                  <button
+                  <button aria-label="Eliminar categoría" title="Eliminar categoría"
                     type="button"
                     onClick={() => eliminarCategoria(idx)}
                     className="rounded-lg px-2 py-1 text-xs font-bold text-coral-500 hover:bg-coral-50"
@@ -179,7 +179,7 @@ export default function MenuTab({ config }) {
                     <div key={ruta} className="flex items-center gap-2 rounded-lg bg-sky-50 px-3 py-1.5">
                       <span>{item.icon}</span>
                       <span className="flex-1 text-sm font-bold text-sky-700">{item.label}</span>
-                      <button
+                      <button aria-label="Quitar de la categoría" title="Quitar de la categoría"
                         type="button"
                         onClick={() => quitarItemDeCat(idx, ruta)}
                         className="text-xs font-bold text-ink/65 hover:text-coral-500"
