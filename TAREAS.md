@@ -21,8 +21,8 @@ Marca `[x]` cuando se complete.
 - [ ] Bumblebee usa el bucket `bumblebee-images` dentro del proyecto de Escuelita → moverlo a su propio proyecto.
 
 ## 🗄️ SQL pendiente en PRODUCCIÓN (lo corre Gisella/Carlos)
-- [ ] `supabase/actualizacion_modulos_activos.sql`
-- [ ] `supabase/actualizacion_planeacion_clase.sql`
+- [x] `supabase/actualizacion_modulos_activos.sql`
+- [x] `supabase/actualizacion_planeacion_clase.sql`
 
 ## 🏗️ Técnico / escalabilidad
 - [ ] Migrar a **multi-tenant**: un solo proyecto Supabase + un solo deploy, columna `iglesia_id` en todas las tablas + RLS por iglesia.
