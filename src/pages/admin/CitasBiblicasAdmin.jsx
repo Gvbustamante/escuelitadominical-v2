@@ -158,7 +158,7 @@ export default function CitasBiblicasAdmin() {
       />
 
       <div className="card overflow-x-auto p-0">
-        <table className="w-full text-left text-sm">
+        <table className="tabla-tarjetas w-full text-left text-sm">
           <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/70">
             <tr>
               <th className="px-3 py-1.5 sm:px-4 sm:py-2">Texto</th>
@@ -171,9 +171,9 @@ export default function CitasBiblicasAdmin() {
           <tbody>
             {citasFiltradas.map((c) => (
               <tr key={c.id} className={`border-t border-ink/5 ${!c.activo ? 'opacity-50' : ''}`}>
-                <td className="max-w-[10rem] truncate px-3 py-1.5 italic text-ink/80 sm:max-w-xs sm:px-4 sm:py-2">"{c.texto}"</td>
-                <td className="px-3 py-1.5 sm:px-4 sm:py-2 font-bold text-ink/75">{c.referencia}</td>
-                <td className="px-3 py-1.5 sm:px-4 sm:py-2">
+                <td data-titulo className="max-w-[10rem] truncate px-3 py-1.5 italic text-ink/80 sm:max-w-xs sm:px-4 sm:py-2">"{c.texto}"</td>
+                <td data-label="Referencia" className="px-3 py-1.5 sm:px-4 sm:py-2 font-bold text-ink/75">{c.referencia}</td>
+                <td data-label="Fecha" className="px-3 py-1.5 sm:px-4 sm:py-2">
                   {c.fecha_mostrar === hoy && <span className="badge bg-grass-100 text-grass-700">Hoy</span>}
                   {c.fecha_mostrar && c.fecha_mostrar !== hoy && (
                     <span className="badge bg-sky-100 text-sky-700">
@@ -182,12 +182,12 @@ export default function CitasBiblicasAdmin() {
                   )}
                   {!c.fecha_mostrar && <span className="badge bg-ink/5 text-ink/65">Sin fecha</span>}
                 </td>
-                <td className="px-3 py-1.5 sm:px-4 sm:py-2">
+                <td data-label="Estado" className="px-3 py-1.5 sm:px-4 sm:py-2">
                   <span className={`badge ${c.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-600'}`}>
                     {c.activo ? 'Activa' : 'Inactiva'}
                   </span>
                 </td>
-                <td className="px-3 py-1.5 sm:px-4 sm:py-2">
+                <td data-acciones className="px-3 py-1.5 sm:px-4 sm:py-2">
                   <div className="flex flex-wrap gap-2">
                     {c.fecha_mostrar !== hoy && (
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => usarHoy(c)}>

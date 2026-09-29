@@ -191,7 +191,7 @@ export default function Clases() {
       </div>
 
       <div className="card overflow-x-auto p-0">
-        <table className="w-full text-left">
+        <table className="tabla-tarjetas w-full text-left">
           <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/70">
             <tr>
               <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
@@ -206,7 +206,7 @@ export default function Clases() {
               const docs = asignaciones.filter((a) => a.nivel_id === nivel.id)
               return (
                 <tr key={nivel.id} className={`border-t border-ink/5 ${!nivel.activo ? 'opacity-50' : ''}`}>
-                  <td className="px-3 py-2 sm:px-4 sm:py-3">
+                  <td data-titulo className="px-3 py-2 sm:px-4 sm:py-3">
                     <div className="flex items-center gap-1">
                       <div className="flex flex-col">
                         <button
@@ -231,10 +231,10 @@ export default function Clases() {
                       <span className="font-bold">{nivel.nombre}</span>
                     </div>
                   </td>
-                  <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
+                  <td data-label="Edades" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
                     {nivel.edad_min ?? '?'} - {nivel.edad_max ?? '?'} años
                   </td>
-                  <td className="px-3 py-2 sm:px-4 sm:py-3">
+                  <td data-label="Docentes" className="px-3 py-2 sm:px-4 sm:py-3">
                     {docs.length === 0 ? (
                       <span className="text-sm text-ink/65">Sin asignar</span>
                     ) : (
@@ -251,12 +251,12 @@ export default function Clases() {
                       </div>
                     )}
                   </td>
-                  <td className="px-3 py-2 sm:px-4 sm:py-3">
+                  <td data-label="Estado" className="px-3 py-2 sm:px-4 sm:py-3">
                     <span className={`badge ${nivel.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
                       {nivel.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
-                  <td className="px-3 py-2 sm:px-4 sm:py-3">
+                  <td data-acciones className="px-3 py-2 sm:px-4 sm:py-3">
                     <div className="flex flex-wrap gap-2">
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => openEdit(nivel)}>
                         Editar

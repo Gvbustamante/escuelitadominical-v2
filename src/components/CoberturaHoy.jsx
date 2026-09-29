@@ -159,7 +159,7 @@ export default function CoberturaHoy() {
       </div>
 
       <div className="mt-4 overflow-x-auto">
-        <table className="w-full text-left">
+        <table className="tabla-tarjetas w-full text-left">
           <thead className="text-xs font-bold uppercase text-ink/65">
             <tr>
               <th className="px-2 py-2">Clase</th>
@@ -171,8 +171,8 @@ export default function CoberturaHoy() {
           <tbody>
             {filas.map((f) => (
               <tr key={f.id} className="border-t border-ink/5">
-                <td className="px-2 py-3 font-bold">{f.nombre}</td>
-                <td className="px-2 py-3 text-sm">
+                <td data-titulo className="px-2 py-3 font-bold">{f.nombre}</td>
+                <td data-label="Docente(s)" className="px-2 py-3 text-sm">
                   {f.soloUnHorario ? (
                     f.porHorario[0]?.docente ? (
                       f.porHorario[0].docente
@@ -190,8 +190,8 @@ export default function CoberturaHoy() {
                     </div>
                   )}
                 </td>
-                <td className="px-2 py-3 text-sm text-ink/70">{f.ninosCount}</td>
-                <td className="px-2 py-3">
+                <td data-label="Niños" className="px-2 py-3 text-sm text-ink/70">{f.ninosCount}</td>
+                <td data-label="Asistencia hoy" className="px-2 py-3">
                   {f.asistenciaTomada ? (
                     <span className="badge bg-grass-100 text-grass-700">✅ Tomada por {f.asistenciaTomada}</span>
                   ) : f.sinDocente ? (

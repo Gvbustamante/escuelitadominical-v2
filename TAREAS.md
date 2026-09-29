@@ -45,7 +45,7 @@ Marca `[x]` cuando se complete.
 - [x] 43 textos con tamaño < 12px (`text-[0.6rem]` etc.) → mínimo 12px, 16px en inputs (evita zoom en iPhone).
 - [x] ~290 textos gris claro (`text-ink/30`, `/40`) → bajo contraste (WCAG AA); subir a `/60` mínimo.
 - [ ] 310 botones, solo 14 con `aria-label` → botones de solo emoji sin nombre para lectores de pantalla.
-- [ ] 8 tablas con scroll horizontal en celular → mostrar como tarjetas en móvil.
+- [x] Tablas → tarjetas en celular (Equipo, Clases, Materiales, Citas, Progreso, Cobertura). Asistencia mensual y Tomar asistencia quedan como tabla.
 - [ ] Menú admin con 14 opciones → usar menú por categorías por defecto.
 - [ ] Emojis como íconos se ven distinto en Android/iPhone → evaluar set de íconos (ej. Lucide).
 - [ ] Revisión visual real con la app abierta (celular + PC) con usuario de prueba.

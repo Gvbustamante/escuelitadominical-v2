@@ -126,7 +126,7 @@ export default function Progreso() {
         <Spinner />
       ) : vista === 'lista' ? (
         <div className="card overflow-x-auto !p-0">
-          <table className="w-full text-sm">
+          <table className="tabla-tarjetas w-full text-sm">
             <thead>
               <tr className="border-b-2 border-ink/5 text-left text-xs font-extrabold uppercase text-ink/65">
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Niño/a</th>
@@ -144,16 +144,16 @@ export default function Progreso() {
                 const badge = badgeActual(niveles, estrellas.length)
                 return (
                   <tr key={n.id} className={`border-b border-ink/5 ${n.pausado ? 'opacity-50 grayscale' : ''}`}>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
+                    <td data-titulo className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
                       {n.nombre_completo}
                       {n.pausado && <span className="badge ml-2 bg-ink/10 text-ink/70">⏸️ Pausado</span>}
                     </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3">
+                    <td data-label="Insignia" className="px-3 py-2 sm:px-4 sm:py-3">
                       {badge.emoji} <span className="text-ink/70">{badge.nombre}</span>
                     </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold text-sunshine-700">{estrellas.length} ⭐</td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/70">{ultima ? ultima.fecha : 'Sin notas'}</td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-right">
+                    <td data-label="Estrellas" className="px-3 py-2 sm:px-4 sm:py-3 font-bold text-sunshine-700">{estrellas.length} ⭐</td>
+                    <td data-label="Última nota" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/70">{ultima ? ultima.fecha : 'Sin notas'}</td>
+                    <td data-acciones className="px-3 py-2 sm:px-4 sm:py-3 text-right">
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setHistorialNino(n)}>
                         Ver / dar estrella
                       </button>

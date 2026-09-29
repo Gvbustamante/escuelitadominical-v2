@@ -241,7 +241,7 @@ export default function Docentes() {
           </div>
 
           <div className="card overflow-x-auto p-0">
-            <table className="w-full text-left">
+            <table className="tabla-tarjetas w-full text-left">
               <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/70">
                 <tr>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
@@ -255,29 +255,29 @@ export default function Docentes() {
               <tbody>
                 {filtrados.map((u) => (
                   <tr key={u.id} className={`border-t border-ink/5 ${!u.activo ? 'opacity-50' : ''}`}>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
+                    <td data-titulo className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
                       <div className="flex items-center gap-2">
                         <Avatar nombre={u.nombre_completo} size="sm" />
                         <span>{u.nombre_completo}</span>
                       </div>
                     </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3">
+                    <td data-label="Rol" className="px-3 py-2 sm:px-4 sm:py-3">
                       <span className={`badge ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
                     </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">{u.cedula || '—'}</td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
+                    <td data-label="Usuario" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">{u.cedula || '—'}</td>
+                    <td data-label="Nivel" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
                       {['superadmin', 'admin', 'coordinador', 'docente'].includes(u.role)
                         ? clasesPorDocente[u.id]?.join(', ') || (u.role === 'docente' ? 'Sin asignar' : '—')
                         : u.role === 'padre'
                           ? hijosPorPadre[u.id]?.join(', ') || 'Sin vincular'
                           : '—'}
                     </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3">
+                    <td data-label="Estado" className="px-3 py-2 sm:px-4 sm:py-3">
                       <span className={`badge ${u.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
                         {u.activo ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3">
+                    <td data-acciones className="px-3 py-2 sm:px-4 sm:py-3">
                       <div className="flex flex-wrap gap-2">
                         {whatsappLink(u.telefono) && (
                           <a

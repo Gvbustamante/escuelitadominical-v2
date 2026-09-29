@@ -101,3 +101,27 @@
     animation: none !important;
   }
 }
+
+/* Tablas → tarjetas en celular. Cada <td> lleva data-label (etiqueta),
+   data-titulo (primera columna, encabezado de la tarjeta) o data-acciones. */
+@media (max-width: 639px) {
+  .tabla-tarjetas thead { display: none; }
+  .tabla-tarjetas,
+  .tabla-tarjetas tbody,
+  .tabla-tarjetas tr,
+  .tabla-tarjetas td { display: block; width: 100%; }
+  .tabla-tarjetas tr { padding: 0.75rem 0.25rem; }
+  .tabla-tarjetas td { padding: 0.25rem 0.75rem !important; text-align: left !important; }
+  .tabla-tarjetas td[data-titulo] { font-size: 1rem; font-weight: 800; padding-bottom: 0.5rem !important; }
+  .tabla-tarjetas td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgb(21 32 46 / 0.65);
+  }
+  .tabla-tarjetas td[data-acciones] { padding-top: 0.5rem !important; }
+  .tabla-tarjetas td[data-acciones] > * { justify-content: flex-start; }
+}
