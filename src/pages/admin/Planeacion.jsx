@@ -5,6 +5,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import HorarioSemanal from '../../components/HorarioSemanal'
+import PlaneacionClaseModal, { urlPdfPlaneacion } from '../../components/PlaneacionClaseModal'
+import RichTextView from '../../components/RichTextView'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 
 const MESES = [
@@ -54,6 +56,8 @@ export default function Planeacion() {
   const [actividadesMes, setActividadesMes] = useState([])
   const [devocionalesMes, setDevocionalesMes] = useState([])
   const [coberturaMes, setCoberturaMes] = useState([])
+  const [planeacionesMes, setPlaneacionesMes] = useState([])
+  const [modalPlaneacion, setModalPlaneacion] = useState(null)
   const [selectedDay, setSelectedDay] = useState(null)
 
   const [vista, setVista] = useState('calendario')
@@ -89,7 +93,7 @@ export default function Planeacion() {
   const finMes = toISO(year, month, new Date(year, month + 1, 0).getDate())
 
   const loadMes = useCallback(async () => {
-    const [{ data: acts }, { data: devos }, { data: cob }] = await Promise.all([
+    const [{ data: acts }, { data: devos }, { data: cob }, { data: plans }] = await Promise.all([
       supabase.from('actividades').select('id, nivel_id, fecha, titulo').gte('fecha', inicioMes).lte('fecha', finMes),
       supabase.from('devocionales_ninos').select('id, nivel_id, fecha, titulo, versiculo').gte('fecha', inicioMes).lte('fecha', finMes),
       supabase
@@ -97,7 +101,13 @@ export default function Planeacion() {
         .select('*, docente:profiles(nombre_completo)')
         .gte('fecha', inicioMes)
         .lte('fecha', finMes),
+      supabase
+        .from('planeacion_clase')
+        .select('id, nivel_id, fecha, contenido, pdf_path, pdf_nombre, updated_at, autor:profiles(nombre_completo)')
+        .gte('fecha', inicioMes)
+        .lte('fecha', finMes),
     ])
+    setPlaneacionesMes(plans || [])
     setActividadesMes(acts || [])
     setDevocionalesMes(devos || [])
     setCoberturaMes(cob || [])
@@ -128,12 +138,15 @@ export default function Planeacion() {
       const iso = toISO(year, month, d)
       const diaSem = new Date(year, month, d).getDay()
       if (!diasClaseSet.has(diaSem)) continue
-      const tieneContenido = actividadesMes.some((a) => a.fecha === iso) || devocionalesMes.some((dv) => dv.fecha === iso)
+      const tieneContenido =
+        actividadesMes.some((a) => a.fecha === iso) ||
+        devocionalesMes.some((dv) => dv.fecha === iso) ||
+        planeacionesMes.some((pl) => pl.fecha === iso)
       if (tieneContenido) planeadas++
       else sinPlanear++
     }
     return { planeadas, sinPlanear }
-  }, [actividadesMes, devocionalesMes, diasClaseSet, diasEnMes, year, month])
+  }, [actividadesMes, devocionalesMes, planeacionesMes, diasClaseSet, diasEnMes, year, month])
 
   function openActividad(nivel, actividadExistente) {
     setModalActividad({ nivel, actividad: actividadExistente })
@@ -206,6 +219,7 @@ export default function Planeacion() {
   const coberturaDelDia = coberturaMes.filter((c) => c.fecha === selectedDay)
   const devocionalesDelDia = devocionalesMes.filter((dv) => dv.fecha === selectedDay)
   const actividadesDelDia = actividadesMes.filter((a) => a.fecha === selectedDay)
+  const planeacionesDelDia = planeacionesMes.filter((pl) => pl.fecha === selectedDay)
   const diaSemanaSeleccionado = selectedDay ? new Date(selectedDay + 'T00:00:00').getDay() : null
   const horariosDelDia = horarios.filter((h) => h.dia_semana === null || h.dia_semana === diaSemanaSeleccionado)
   const esDiaClase = diaSemanaSeleccionado !== null && diasClaseSet.has(diaSemanaSeleccionado)
@@ -292,6 +306,7 @@ export default function Planeacion() {
                 const tieneDevocional = devocionalesMes.some((dv) => dv.fecha === iso)
                 const tieneActividad = actividadesMes.some((a) => a.fecha === iso)
                 const tieneCobertura = coberturaMes.some((c) => c.fecha === iso)
+                const tienePlaneacion = planeacionesMes.some((pl) => pl.fecha === iso)
                 return (
                   <button
                     key={i}
@@ -305,6 +320,7 @@ export default function Planeacion() {
                       {esClase && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white' : 'bg-sky-400'}`} />}
                       {tieneDevocional && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-sunshine-400'}`} />}
                       {tieneActividad && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-grass-400'}`} />}
+                      {tienePlaneacion && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-coral-400'}`} />}
                       {tieneCobertura && !tieneActividad && !tieneDevocional && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-grape-400'}`} />}
                     </div>
                   </button>
@@ -315,6 +331,7 @@ export default function Planeacion() {
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-sky-400" /> Día de clase</span>
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-sunshine-400" /> Devocional</span>
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grass-400" /> Actividad</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-coral-400" /> Planeación</span>
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grape-400" /> Cobertura</span>
             </div>
           </div>
@@ -369,8 +386,9 @@ export default function Planeacion() {
                       .filter(Boolean)
                     const devosNivel = devocionalesDelDia.filter((dv) => dv.nivel_id === nivel.id || !dv.nivel_id)
                     const actividad = actividadesDelDia.find((a) => a.nivel_id === nivel.id)
+                    const planeacion = planeacionesDelDia.find((pl) => pl.nivel_id === nivel.id)
                     const soloUnHorario = horariosDelDia.length <= 1
-                    const tieneContenido = devosNivel.length > 0 || actividad
+                    const tieneContenido = devosNivel.length > 0 || actividad || planeacion
 
                     return (
                       <div
@@ -461,6 +479,51 @@ export default function Planeacion() {
                           </div>
                         </div>
 
+                        {/* Planeación de la clase */}
+                        <div className="border-t border-ink/5 px-3 py-2">
+                          <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">📝 Planeación de la clase</p>
+                          {planeacion ? (
+                            <div className="flex flex-col gap-2">
+                              {planeacion.contenido && (
+                                <div className="max-h-24 overflow-hidden text-sm text-ink/70 [mask-image:linear-gradient(to_bottom,black_60%,transparent)]">
+                                  <RichTextView html={planeacion.contenido} />
+                                </div>
+                              )}
+                              {planeacion.pdf_path && (
+                                <a
+                                  href={urlPdfPlaneacion(planeacion.pdf_path)}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex max-w-full items-center gap-1 self-start truncate rounded-full bg-coral-50 px-2.5 py-1 text-xs font-bold text-coral-700 hover:bg-coral-100"
+                                >
+                                  📄 {planeacion.pdf_nombre || 'Ver PDF'}
+                                </a>
+                              )}
+                              <div className="flex items-center justify-between gap-2">
+                                {planeacion.autor?.nombre_completo && (
+                                  <span className="truncate text-xs text-ink/50">Por {planeacion.autor.nombre_completo}</span>
+                                )}
+                                <button
+                                  className="btn-secondary ml-auto shrink-0 !py-1 !px-3 !text-xs"
+                                  onClick={() => setModalPlaneacion({ nivel, planeacion })}
+                                >
+                                  Ver / editar
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-sm text-ink/40">Sin planeación</p>
+                              <button
+                                className="btn-primary shrink-0 !py-1.5 !px-3 !text-xs"
+                                onClick={() => setModalPlaneacion({ nivel, planeacion: null })}
+                              >
+                                + Escribir o subir PDF
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
                         {/* Devocional */}
                         <div className="border-t border-ink/5 px-3 py-2">
                           <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">🙏 Enseñanza</p>
@@ -530,6 +593,16 @@ export default function Planeacion() {
           )}
         </div>
       </div>}
+
+      <PlaneacionClaseModal
+        open={!!modalPlaneacion}
+        onClose={() => setModalPlaneacion(null)}
+        nivel={modalPlaneacion?.nivel}
+        planeacion={modalPlaneacion?.planeacion || null}
+        fecha={selectedDay}
+        userId={user?.id}
+        onSaved={loadMes}
+      />
 
       <Modal
         open={!!modalActividad}

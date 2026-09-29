@@ -13,7 +13,8 @@ Marca `[x]` cuando se complete.
 - [x] **"Vínculo" → "Nivel"** en tabla de Equipo (Docentes.jsx). Padres: mostrar "Hijo (Nivel)".
 - [x] **Materiales: permitir PDF** — selector acepta fotos y PDF; columna "Archivos".
 - [x] **Edad en vez de fecha de nacimiento** — pedir solo edad, guardar año aproximado para que la edad suba sola cada año. Fecha exacta opcional.
-- [ ] **Planeación de clase** — por clase/fecha: escribir la planeación (editor de texto) o subir PDF; vista ordenada para docentes y coordinación.
+- [x] **Planeación de clase** — en Planeación, cada clase/día: escribir (con guía) y/o subir PDF con vista previa. Tabla `planeacion_clase`.
+- [ ] **Planeación con IA (plan Pro)** — subir PDF y que la IA llene título, versículo, historia, objetivos y materiales. Calcular costo por PDF antes.
 
 ## 🔧 Pendiente inmediato
 - [x] Proyecto "Escuelita Dominical - v2" ya tiene `modulos_activos` (text[]). Correr la migración solo en proyectos de iglesias nuevas/otras.
