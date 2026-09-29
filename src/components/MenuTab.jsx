@@ -99,7 +99,7 @@ export default function MenuTab({ config }) {
     <div className="flex flex-col gap-4 max-w-xl">
       <div className="card">
         <p className="label mb-1">Estructura del menú</p>
-        <p className="mb-4 text-sm text-ink/50">
+        <p className="mb-4 text-sm text-ink/70">
           Elige si el menú lateral se muestra plano (todos los items sueltos) o categorizado (agrupados en secciones con submenús).
         </p>
 
@@ -107,14 +107,14 @@ export default function MenuTab({ config }) {
           <button
             type="button"
             onClick={() => { setModo('plano'); setOk('') }}
-            className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${modo === 'plano' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/50'}`}
+            className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${modo === 'plano' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
           >
             📋 Solo menús
           </button>
           <button
             type="button"
             onClick={() => { setModo('categorizado'); setOk('') }}
-            className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${modo === 'categorizado' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/50'}`}
+            className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${modo === 'categorizado' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
           >
             📂 Menús y submenús
           </button>
@@ -146,7 +146,7 @@ export default function MenuTab({ config }) {
                     type="button"
                     onClick={() => moverCategoria(idx, -1)}
                     disabled={idx === 0}
-                    className="rounded-lg px-2 py-1 text-xs font-bold text-ink/30 hover:bg-ink/10 disabled:opacity-30"
+                    className="rounded-lg px-2 py-1 text-xs font-bold text-ink/65 hover:bg-ink/10 disabled:opacity-30"
                   >
                     ▲
                   </button>
@@ -154,7 +154,7 @@ export default function MenuTab({ config }) {
                     type="button"
                     onClick={() => moverCategoria(idx, 1)}
                     disabled={idx === categorias.length - 1}
-                    className="rounded-lg px-2 py-1 text-xs font-bold text-ink/30 hover:bg-ink/10 disabled:opacity-30"
+                    className="rounded-lg px-2 py-1 text-xs font-bold text-ink/65 hover:bg-ink/10 disabled:opacity-30"
                   >
                     ▼
                   </button>
@@ -170,7 +170,7 @@ export default function MenuTab({ config }) {
 
               <div className="flex flex-col gap-1 px-4 py-3">
                 {(cat.items || []).length === 0 && (
-                  <p className="text-xs text-ink/30">Sin items — agrega uno abajo</p>
+                  <p className="text-xs text-ink/65">Sin items — agrega uno abajo</p>
                 )}
                 {(cat.items || []).map((ruta) => {
                   const item = itemPorRuta(ruta)
@@ -182,7 +182,7 @@ export default function MenuTab({ config }) {
                       <button
                         type="button"
                         onClick={() => quitarItemDeCat(idx, ruta)}
-                        className="text-xs font-bold text-ink/30 hover:text-coral-500"
+                        className="text-xs font-bold text-ink/65 hover:text-coral-500"
                       >
                         ✕
                       </button>
@@ -223,7 +223,7 @@ export default function MenuTab({ config }) {
               <p className="text-xs font-bold text-sunshine-700 mb-2">Items sin categoría (se mostrarán sueltos):</p>
               <div className="flex flex-wrap gap-1.5">
                 {itemsLibres.map((item) => (
-                  <span key={item.to} className="badge bg-white text-ink/50">
+                  <span key={item.to} className="badge bg-white text-ink/70">
                     {item.icon} {item.label}
                   </span>
                 ))}

@@ -86,7 +86,7 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
           <span className={`badge ${persona.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
             {persona.activo ? 'Activo' : 'Inactivo'}
           </span>
-          {persona.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Sin entrar hace tiempo</span>}
+          {persona.pausado && <span className="badge bg-ink/10 text-ink/70">⏸️ Sin entrar hace tiempo</span>}
         </div>
 
         <div>
@@ -141,7 +141,7 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-ink/40">Cambiar el rol cambia qué puede ver y hacer esta cuenta de inmediato.</p>
+            <p className="mt-1 text-xs text-ink/65">Cambiar el rol cambia qué puede ver y hacer esta cuenta de inmediato.</p>
           </div>
         )}
 
@@ -153,7 +153,7 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
 
         {puedeResetear && (
           <div className="rounded-xl bg-ink/5 p-3">
-            <p className="mb-2 text-xs font-extrabold uppercase text-ink/40">Contraseña</p>
+            <p className="mb-2 text-xs font-extrabold uppercase text-ink/65">Contraseña</p>
             {nuevaPassword ? (
               <p className="text-sm">
                 Nueva contraseña: <span className="font-extrabold text-grass-700">{nuevaPassword}</span> — comunícasela.
@@ -168,9 +168,9 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
 
         {['superadmin', 'admin', 'coordinador', 'docente'].includes(persona.role) && (
           <div>
-            <p className="mb-2 text-xs font-extrabold uppercase text-ink/40">Clases asignadas</p>
+            <p className="mb-2 text-xs font-extrabold uppercase text-ink/65">Clases asignadas</p>
             {clases.length === 0 ? (
-              <p className="text-sm text-ink/40">Aún sin clases asignadas.</p>
+              <p className="text-sm text-ink/65">Aún sin clases asignadas.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {clases.map((nombre, i) => (
@@ -185,9 +185,9 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
 
         {persona.role === 'padre' && (
           <div>
-            <p className="mb-2 text-xs font-extrabold uppercase text-ink/40">Hijos/as vinculados</p>
+            <p className="mb-2 text-xs font-extrabold uppercase text-ink/65">Hijos/as vinculados</p>
             {hijos.length === 0 ? (
-              <p className="text-sm text-ink/40">Sin niños vinculados.</p>
+              <p className="text-sm text-ink/65">Sin niños vinculados.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {hijos.map((nombre, i) => (

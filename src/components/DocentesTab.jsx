@@ -92,7 +92,7 @@ export default function DocentesTab({ usuarios, clasesPorDocente, onReload, miRo
   return (
     <>
       {staff.length === 0 ? (
-        <p className="text-center text-ink/40">No hay docentes registrados aún.</p>
+        <p className="text-center text-ink/65">No hay docentes registrados aún.</p>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {staff.map((u) => {
@@ -107,20 +107,20 @@ export default function DocentesTab({ usuarios, clasesPorDocente, onReload, miRo
                   <Avatar nombre={u.nombre_completo} size="lg" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-bold">{u.nombre_completo}</p>
-                    <span className={`badge text-[11px] ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
+                    <span className={`badge text-xs ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
                   </div>
-                  {!u.activo && <span className="badge bg-coral-100 text-coral-700 text-[10px]">Inactivo</span>}
+                  {!u.activo && <span className="badge bg-coral-100 text-coral-700 text-xs">Inactivo</span>}
                 </div>
 
                 <div className="flex flex-col gap-1.5 text-sm">
                   {u.email && (
-                    <div className="flex items-center gap-2 text-ink/60">
+                    <div className="flex items-center gap-2 text-ink/75">
                       <span className="shrink-0">📧</span>
                       <a href={`mailto:${u.email}`} className="truncate hover:text-sky-500">{u.email}</a>
                     </div>
                   )}
                   {(u.whatsapp || u.telefono) && (
-                    <div className="flex items-center gap-2 text-ink/60">
+                    <div className="flex items-center gap-2 text-ink/75">
                       <span className="shrink-0">📱</span>
                       <span className="truncate">{u.whatsapp || u.telefono}</span>
                       {wa && (
@@ -131,14 +131,14 @@ export default function DocentesTab({ usuarios, clasesPorDocente, onReload, miRo
                     </div>
                   )}
                   {!u.email && !u.whatsapp && !u.telefono && (
-                    <p className="text-ink/30 italic">Sin datos de contacto</p>
+                    <p className="text-ink/65 italic">Sin datos de contacto</p>
                   )}
                 </div>
 
                 {clases.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {clases.map((c, i) => (
-                      <span key={i} className="badge bg-sky-100 text-sky-700 text-[11px]">{c}</span>
+                      <span key={i} className="badge bg-sky-100 text-sky-700 text-xs">{c}</span>
                     ))}
                   </div>
                 )}
@@ -191,7 +191,7 @@ export default function DocentesTab({ usuarios, clasesPorDocente, onReload, miRo
                 onChange={(e) => setEditForm({ ...editForm, whatsapp: e.target.value })}
                 placeholder="Ej. 18091234567"
               />
-              <p className="mt-1 text-xs text-ink/40">Opcional — si lo dejan vacío, el docente puede agregarlo después.</p>
+              <p className="mt-1 text-xs text-ink/65">Opcional — si lo dejan vacío, el docente puede agregarlo después.</p>
             </div>
             <div>
               <label className="label">Teléfono</label>
@@ -229,7 +229,7 @@ export default function DocentesTab({ usuarios, clasesPorDocente, onReload, miRo
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 className="text-sm"
               />
-              <p className="mt-1 text-xs text-ink/40">PDF, Word o imagen. Se guarda en la carpeta de hojas de vida.</p>
+              <p className="mt-1 text-xs text-ink/65">PDF, Word o imagen. Se guarda en la carpeta de hojas de vida.</p>
             </div>
 
             {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}

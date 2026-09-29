@@ -51,7 +51,7 @@ export default function PadreProgreso() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Progreso 🌱</h1>
-        <p className="text-ink/50">Cómo le fue a tu hijo/a en cada clase</p>
+        <p className="text-ink/70">Cómo le fue a tu hijo/a en cada clase</p>
       </div>
 
       <HijoSelector hijos={hijos} selectedId={selectedId} onChange={setSelectedId} />
@@ -63,7 +63,7 @@ export default function PadreProgreso() {
           <div className="mt-4 flex flex-col gap-3">
             {(notasPorHijo[h.id] || []).map((nota) => (
               <div key={nota.id} className="card">
-                <p className="text-sm font-bold text-ink/40">{nota.fecha}</p>
+                <p className="text-sm font-bold text-ink/65">{nota.fecha}</p>
                 {nota.emocion && <p className="mt-1 text-lg">{nota.emocion}</p>}
                 {nota.comportamiento && (
                   <p className="mt-1 text-sm font-bold text-sky-600">Comportamiento: {nota.comportamiento}</p>
@@ -72,12 +72,12 @@ export default function PadreProgreso() {
               </div>
             ))}
             {(notasPorHijo[h.id] || []).length === 0 && (
-              <p className="card text-ink/40">Aún no hay notas de progreso para {h.nombre_completo.split(' ')[0]}.</p>
+              <p className="card text-ink/65">Aún no hay notas de progreso para {h.nombre_completo.split(' ')[0]}.</p>
             )}
           </div>
         </div>
       ))}
-      {hijos.length === 0 && <p className="card text-ink/50">Aún no tienes niños vinculados.</p>}
+      {hijos.length === 0 && <p className="card text-ink/70">Aún no tienes niños vinculados.</p>}
     </div>
   )
 }

@@ -144,7 +144,7 @@ export default function CitasBiblicasAdmin() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-ink/50">Arma la lista de citas y programa cuál se muestra cada día.</p>
+        <p className="text-ink/70">Arma la lista de citas y programa cuál se muestra cada día.</p>
         <button className="btn-primary" onClick={openNew}>
           + Nueva cita
         </button>
@@ -159,7 +159,7 @@ export default function CitasBiblicasAdmin() {
 
       <div className="card overflow-x-auto p-0">
         <table className="w-full text-left text-sm">
-          <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/50">
+          <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/70">
             <tr>
               <th className="px-3 py-1.5 sm:px-4 sm:py-2">Texto</th>
               <th className="px-3 py-1.5 sm:px-4 sm:py-2">Referencia</th>
@@ -172,7 +172,7 @@ export default function CitasBiblicasAdmin() {
             {citasFiltradas.map((c) => (
               <tr key={c.id} className={`border-t border-ink/5 ${!c.activo ? 'opacity-50' : ''}`}>
                 <td className="max-w-[10rem] truncate px-3 py-1.5 italic text-ink/80 sm:max-w-xs sm:px-4 sm:py-2">"{c.texto}"</td>
-                <td className="px-3 py-1.5 sm:px-4 sm:py-2 font-bold text-ink/60">{c.referencia}</td>
+                <td className="px-3 py-1.5 sm:px-4 sm:py-2 font-bold text-ink/75">{c.referencia}</td>
                 <td className="px-3 py-1.5 sm:px-4 sm:py-2">
                   {c.fecha_mostrar === hoy && <span className="badge bg-grass-100 text-grass-700">Hoy</span>}
                   {c.fecha_mostrar && c.fecha_mostrar !== hoy && (
@@ -180,7 +180,7 @@ export default function CitasBiblicasAdmin() {
                       {new Date(c.fecha_mostrar + 'T00:00:00').toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                   )}
-                  {!c.fecha_mostrar && <span className="badge bg-ink/5 text-ink/40">Sin fecha</span>}
+                  {!c.fecha_mostrar && <span className="badge bg-ink/5 text-ink/65">Sin fecha</span>}
                 </td>
                 <td className="px-3 py-1.5 sm:px-4 sm:py-2">
                   <span className={`badge ${c.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-600'}`}>
@@ -214,14 +214,14 @@ export default function CitasBiblicasAdmin() {
             ))}
             {citas.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-ink/40">
+                <td colSpan={5} className="px-4 py-6 text-center text-ink/65">
                   Aún no hay citas. ¡Agrega la primera!
                 </td>
               </tr>
             )}
             {citas.length > 0 && citasFiltradas.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-ink/40">
+                <td colSpan={5} className="px-4 py-6 text-center text-ink/65">
                   No hay versículos que coincidan con "{busqueda}".
                 </td>
               </tr>
@@ -261,7 +261,7 @@ export default function CitasBiblicasAdmin() {
               value={form.fecha_mostrar}
               onChange={(e) => setForm({ ...form, fecha_mostrar: e.target.value })}
             />
-            <p className="mt-1 text-xs text-ink/40">Déjalo vacío para que quede disponible sin fecha fija.</p>
+            <p className="mt-1 text-xs text-ink/65">Déjalo vacío para que quede disponible sin fecha fija.</p>
           </div>
           <label className="flex items-center gap-2 text-sm font-bold">
             <input

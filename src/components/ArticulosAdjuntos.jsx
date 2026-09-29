@@ -25,7 +25,7 @@ export default function ArticulosAdjuntos({ archivos, bucket = 'actividades', ti
 
   return (
     <div>
-      <p className="mb-2 text-sm font-extrabold uppercase tracking-wide text-ink/40">{titulo}</p>
+      <p className="mb-2 text-sm font-extrabold uppercase tracking-wide text-ink/65">{titulo}</p>
       <div className="flex flex-col gap-2">
         {archivos.map((f) => (
           <a

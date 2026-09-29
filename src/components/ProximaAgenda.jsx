@@ -110,7 +110,7 @@ export default function ProximaAgenda({ nivelIds, soloTareasPendientes = false, 
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold">{it.titulo}</p>
-              <p className="text-xs text-ink/40">
+              <p className="text-xs text-ink/65">
                 {it.fecha}
                 {it.nivel ? ` · ${it.nivel}` : ''}
                 {it.tipo === 'tarea' && soloTareasPendientes ? ' · pendiente' : ''}

@@ -129,7 +129,7 @@ export default function CoberturaHoy() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-xl font-bold">Cobertura de hoy 🗓️</h2>
-            <p className="text-sm text-ink/50">Hoy no es un día de clase configurado — no hay nada que cubrir.</p>
+            <p className="text-sm text-ink/70">Hoy no es un día de clase configurado — no hay nada que cubrir.</p>
           </div>
         </div>
         <Link to="/ajustes" className="mt-4 inline-block text-sm font-bold text-sky-600 hover:underline">
@@ -147,7 +147,7 @@ export default function CoberturaHoy() {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-xl font-bold">Cobertura de hoy 🗓️</h2>
-          <p className="text-sm text-ink/50">Quién está a cargo de cada clase y si ya se registró asistencia.</p>
+          <p className="text-sm text-ink/70">Quién está a cargo de cada clase y si ya se registró asistencia.</p>
         </div>
         {filas.length === 0 ? null : alertas === 0 ? (
           <span className="badge bg-grass-100 text-grass-700">✅ Todo cubierto</span>
@@ -160,7 +160,7 @@ export default function CoberturaHoy() {
 
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="text-xs font-bold uppercase text-ink/40">
+          <thead className="text-xs font-bold uppercase text-ink/65">
             <tr>
               <th className="px-2 py-2">Clase</th>
               <th className="px-2 py-2">Docente(s)</th>
@@ -183,23 +183,23 @@ export default function CoberturaHoy() {
                     <div className="flex flex-col gap-0.5">
                       {f.porHorario.map((p) => (
                         <span key={p.horario.id}>
-                          <span className="text-ink/40">{p.horario.nombre}:</span>{' '}
+                          <span className="text-ink/65">{p.horario.nombre}:</span>{' '}
                           {p.docente || <span className="font-bold text-coral-600">sin docente</span>}
                         </span>
                       ))}
                     </div>
                   )}
                 </td>
-                <td className="px-2 py-3 text-sm text-ink/50">{f.ninosCount}</td>
+                <td className="px-2 py-3 text-sm text-ink/70">{f.ninosCount}</td>
                 <td className="px-2 py-3">
                   {f.asistenciaTomada ? (
                     <span className="badge bg-grass-100 text-grass-700">✅ Tomada por {f.asistenciaTomada}</span>
                   ) : f.sinDocente ? (
                     <span className="badge bg-coral-100 text-coral-700">🔴 Sin docente</span>
                   ) : f.ninosCount === 0 ? (
-                    <span className="badge bg-ink/5 text-ink/40">— Sin niños</span>
+                    <span className="badge bg-ink/5 text-ink/65">— Sin niños</span>
                   ) : !f.algunoPaso ? (
-                    <span className="badge bg-ink/5 text-ink/40">⏳ Aún no empieza</span>
+                    <span className="badge bg-ink/5 text-ink/65">⏳ Aún no empieza</span>
                   ) : (
                     <span className="badge bg-sunshine-100 text-sunshine-700">⏳ Pendiente</span>
                   )}
@@ -208,7 +208,7 @@ export default function CoberturaHoy() {
             ))}
             {filas.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-2 py-6 text-center text-ink/40">
+                <td colSpan={4} className="px-2 py-6 text-center text-ink/65">
                   Aún no hay clases activas.
                 </td>
               </tr>

@@ -39,7 +39,7 @@ export default function PadreAgenda() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Agenda 📅</h1>
-        <p className="text-ink/50">Próximos eventos de la escuelita</p>
+        <p className="text-ink/70">Próximos eventos de la escuelita</p>
       </div>
 
       <HijoSelector hijos={hijos} selectedId={selectedHijoId} onChange={setSelectedHijoId} />
@@ -62,11 +62,11 @@ export default function PadreAgenda() {
               <div>
                 <p className="font-bold">{ev.titulo}</p>
                 {ev.nivel?.nombre && <p className="text-xs font-bold uppercase text-sky-500">{ev.nivel.nombre}</p>}
-                {ev.descripcion && <p className="text-sm text-ink/50">{ev.descripcion}</p>}
+                {ev.descripcion && <p className="text-sm text-ink/70">{ev.descripcion}</p>}
               </div>
             </div>
           ))}
-          {eventosDelDia.length === 0 && <p className="card text-ink/50">No hay eventos programados.</p>}
+          {eventosDelDia.length === 0 && <p className="card text-ink/70">No hay eventos programados.</p>}
         </div>
       </div>
     </div>

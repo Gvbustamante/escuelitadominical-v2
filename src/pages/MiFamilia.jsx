@@ -115,7 +115,7 @@ export default function MiFamilia() {
     return (
       <div className="flex flex-col gap-6">
         <h1 className="text-3xl font-bold">Mi familia 👪</h1>
-        <p className="card text-ink/50">
+        <p className="card text-ink/70">
 No hay niños registrados todavía.
         </p>
       </div>
@@ -130,7 +130,7 @@ No hay niños registrados todavía.
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Mi familia 👪</h1>
-        <p className="text-ink/50">
+        <p className="text-ink/70">
           {hijos.length === 1
             ? 'La información de tu hijo/a en la escuelita'
             : `${hijos.length} hijos/as registrados`}
@@ -156,7 +156,7 @@ No hay niños registrados todavía.
                     </div>
                     <div className="min-w-0 flex-1">
                       <h2 className="text-xl font-bold">{hijo.nombre_completo}</h2>
-                      <p className="text-sm text-ink/50">
+                      <p className="text-sm text-ink/70">
                         {edad !== null ? `${edad} años` : ''}
                         {hijo.parentesco && ` · ${hijo.parentesco}`}
                       </p>
@@ -195,10 +195,10 @@ No hay niños registrados todavía.
                       <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-600">⭐ Devocional de hoy</p>
                       <h3 className="truncate text-base font-bold">{devocionalActivo.titulo}</h3>
                       {devocionalActivo.versiculo && (
-                        <p className="truncate text-xs italic text-ink/50">📖 &ldquo;{devocionalActivo.versiculo}&rdquo;</p>
+                        <p className="truncate text-xs italic text-ink/70">📖 &ldquo;{devocionalActivo.versiculo}&rdquo;</p>
                       )}
                     </div>
-                    <span className="shrink-0 text-lg text-ink/30">→</span>
+                    <span className="shrink-0 text-lg text-ink/65">→</span>
                   </div>
                 )}
 
@@ -219,15 +219,15 @@ No hay niños registrados todavía.
                           >
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-sm font-bold">{a.titulo}</p>
-                              <p className="text-xs text-ink/40">{formatFecha(a.fecha)}</p>
+                              <p className="text-xs text-ink/65">{formatFecha(a.fecha)}</p>
                             </div>
                             {a.actividad_archivos?.length > 0 && (
-                              <span className="shrink-0 text-xs text-ink/30">📎 {a.actividad_archivos.length}</span>
+                              <span className="shrink-0 text-xs text-ink/65">📎 {a.actividad_archivos.length}</span>
                             )}
                           </div>
                         ))
                       ) : (
-                        <p className="text-sm text-ink/40">Sin actividades todavía.</p>
+                        <p className="text-sm text-ink/65">Sin actividades todavía.</p>
                       )}
                     </div>
                   </div>
@@ -243,14 +243,14 @@ No hay niños registrados todavía.
                           <div key={n.id} className="rounded-xl bg-ink/[0.03] px-3 py-2">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-bold">{n.emocion || formatFecha(n.fecha)}</p>
-                              {n.emocion && <span className="text-xs text-ink/30">{formatFecha(n.fecha)}</span>}
+                              {n.emocion && <span className="text-xs text-ink/65">{formatFecha(n.fecha)}</span>}
                             </div>
-                            {n.logros && <p className="mt-0.5 text-xs text-ink/60">🌟 {n.logros}</p>}
-                            {n.notas && <p className="mt-0.5 text-xs text-ink/40">{n.notas}</p>}
+                            {n.logros && <p className="mt-0.5 text-xs text-ink/75">🌟 {n.logros}</p>}
+                            {n.notas && <p className="mt-0.5 text-xs text-ink/65">{n.notas}</p>}
                           </div>
                         ))
                       ) : (
-                        <p className="text-sm text-ink/40">Sin notas todavía.</p>
+                        <p className="text-sm text-ink/65">Sin notas todavía.</p>
                       )}
                     </div>
                   </div>
@@ -265,7 +265,7 @@ No hay niños registrados todavía.
                         datos.eventos.map((e) => (
                           <div key={e.id} className="flex items-center gap-2 rounded-xl bg-ink/[0.03] px-3 py-2">
                             <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-xl bg-sky-100 text-sky-700">
-                              <span className="text-[10px] font-bold leading-none">
+                              <span className="text-xs font-bold leading-none">
                                 {new Date(e.fecha + 'T12:00:00').toLocaleDateString('es', { month: 'short' }).toUpperCase()}
                               </span>
                               <span className="text-sm font-extrabold leading-none">
@@ -274,12 +274,12 @@ No hay niños registrados todavía.
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-sm font-bold">{e.titulo}</p>
-                              {e.descripcion && <p className="truncate text-xs text-ink/40">{e.descripcion}</p>}
+                              {e.descripcion && <p className="truncate text-xs text-ink/65">{e.descripcion}</p>}
                             </div>
                           </div>
                         ))
                       ) : (
-                        <p className="text-sm text-ink/40">No hay eventos próximos.</p>
+                        <p className="text-sm text-ink/65">No hay eventos próximos.</p>
                       )}
                     </div>
                   </div>

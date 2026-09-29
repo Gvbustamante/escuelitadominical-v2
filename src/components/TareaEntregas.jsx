@@ -5,7 +5,7 @@ import RichTextView from './RichTextView'
 import ArticulosAdjuntos from './ArticulosAdjuntos'
 
 const ESTADO_BADGE = {
-  pendiente: 'bg-ink/10 text-ink/50',
+  pendiente: 'bg-ink/10 text-ink/70',
   pausada: 'bg-sunshine-100 text-sunshine-700',
   entregada: 'bg-grass-100 text-grass-700',
 }
@@ -93,7 +93,7 @@ export default function TareaEntregas({ actividad, open, onClose }) {
     <Modal open={open} onClose={onClose} title={`Entregas — ${actividad.titulo}`}>
       <div className="flex flex-col gap-3">
         {personas && (
-          <p className="text-sm font-bold text-ink/50">
+          <p className="text-sm font-bold text-ink/70">
             {entregadas} de {total} {esDocentes ? 'ya la marcaron como hecha' : 'entregaron'}
           </p>
         )}
@@ -108,7 +108,7 @@ export default function TareaEntregas({ actividad, open, onClose }) {
           </a>
         )}
         {!personas ? (
-          <p className="text-ink/40">Cargando...</p>
+          <p className="text-ink/65">Cargando...</p>
         ) : (
           personas.map((persona) => {
             const entrega = entregas[persona.id]
@@ -119,7 +119,7 @@ export default function TareaEntregas({ actividad, open, onClose }) {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-bold">{persona.nombre_completo}</p>
                   {pausadaPorNino ? (
-                    <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado (niño)</span>
+                    <span className="badge bg-ink/10 text-ink/70">⏸️ Pausado (niño)</span>
                   ) : (
                     <span className={`badge ${ESTADO_BADGE[estado]}`}>{ESTADO_LABEL[estado]}</span>
                   )}
@@ -140,7 +140,7 @@ export default function TareaEntregas({ actividad, open, onClose }) {
                     <ArticulosAdjuntos archivos={entrega.tarea_entrega_archivos} titulo="📎 Evidencia entregada" />
                   </div>
                 )}
-                {!pausadaPorNino && entrega?.comentario_padre && <RichTextView html={entrega.comentario_padre} className="mt-1 text-sm text-ink/60" />}
+                {!pausadaPorNino && entrega?.comentario_padre && <RichTextView html={entrega.comentario_padre} className="mt-1 text-sm text-ink/75" />}
 
                 {!pausadaPorNino && !esDocentes && estado !== 'entregada' && (
                   <button
@@ -174,7 +174,7 @@ export default function TareaEntregas({ actividad, open, onClose }) {
           })
         )}
         {personas && personas.length === 0 && (
-          <p className="text-ink/40">{esDocentes ? 'No hay docentes activos.' : 'No hay niños activos en este nivel.'}</p>
+          <p className="text-ink/65">{esDocentes ? 'No hay docentes activos.' : 'No hay niños activos en este nivel.'}</p>
         )}
       </div>
     </Modal>

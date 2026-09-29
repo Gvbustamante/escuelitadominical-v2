@@ -21,7 +21,7 @@ export default function StatCard({ icon, label, value, color = 'sky', delay = 0 
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-2xl font-bold leading-none tabular-nums sm:text-3xl">{shown}</p>
-        <p className="mt-1 text-xs font-bold leading-tight text-ink/50 sm:text-sm">{label}</p>
+        <p className="mt-1 text-xs font-bold leading-tight text-ink/70 sm:text-sm">{label}</p>
       </div>
     </div>
   )

@@ -70,7 +70,7 @@ export default function AgendaAdmin() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Agenda 📅</h1>
-          <p className="text-ink/50">Eventos para toda la escuelita o por clase</p>
+          <p className="text-ink/70">Eventos para toda la escuelita o por clase</p>
         </div>
         <button className="btn-primary" onClick={openNew}>
           + Nuevo evento
@@ -91,15 +91,15 @@ export default function AgendaAdmin() {
               <div>
                 <p className="font-bold">{ev.titulo}</p>
                 <p className="text-xs font-bold uppercase text-sky-500">{ev.nivel?.nombre || 'Toda la escuelita'}</p>
-                <p className="text-sm text-ink/50">{ev.fecha}</p>
-                {ev.descripcion && <p className="mt-1 text-sm text-ink/60">{ev.descripcion}</p>}
+                <p className="text-sm text-ink/70">{ev.fecha}</p>
+                {ev.descripcion && <p className="mt-1 text-sm text-ink/75">{ev.descripcion}</p>}
               </div>
-              <button onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/30 hover:text-coral-500">
+              <button onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/65 hover:text-coral-500">
                 🗑️
               </button>
             </div>
           ))}
-          {eventosDelDia.length === 0 && <p className="card text-ink/50">No hay eventos.</p>}
+          {eventosDelDia.length === 0 && <p className="card text-ink/70">No hay eventos.</p>}
         </div>
       </div>
 

@@ -51,7 +51,7 @@ export default function PermisosTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="max-w-2xl text-sm text-ink/50">
+      <p className="max-w-2xl text-sm text-ink/70">
         Interruptores extra para lo que un rol puede hacer, además de lo normal de la plataforma. Se aplican al
         instante — no hace falta guardar.
       </p>
@@ -76,14 +76,14 @@ export default function PermisosTab() {
                 <span className={`badge ${ROLE_BADGE[p.rol]}`}>{ROLE_LABEL[p.rol]}</span>
                 <p className="font-bold">{p.label}</p>
               </div>
-              <p className="mt-1 text-sm text-ink/50">{p.detalle}</p>
+              <p className="mt-1 text-sm text-ink/70">{p.detalle}</p>
             </div>
             <button
               type="button"
               onClick={() => toggle(p.rol, p.permiso)}
               disabled={busyKey === key}
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold transition-colors ${
-                activo ? 'bg-grass-400 text-white' : 'bg-ink/10 text-ink/50'
+                activo ? 'bg-grass-400 text-white' : 'bg-ink/10 text-ink/70'
               }`}
             >
               {busyKey === key ? '...' : activo ? '✅ Activado' : 'Desactivado'}

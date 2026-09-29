@@ -50,7 +50,7 @@ export default function AsistenciaAdmin() {
     )
   }
 
-  if (niveles.length === 0) return <p className="card text-ink/50">Todavía no hay clases creadas.</p>
+  if (niveles.length === 0) return <p className="card text-ink/70">Todavía no hay clases creadas.</p>
 
   const nivelActual = niveles.find((n) => n.id === nivelId)
 
@@ -63,7 +63,7 @@ export default function AsistenciaAdmin() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Asistencia ✅</h1>
-        <p className="text-ink/50">Toma asistencia y revisa la tabla mensual por clase</p>
+        <p className="text-ink/70">Toma asistencia y revisa la tabla mensual por clase</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -71,7 +71,7 @@ export default function AsistenciaAdmin() {
           <button
             key={v}
             onClick={() => setTab(v)}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
           >
             {label}
           </button>

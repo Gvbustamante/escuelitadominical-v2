@@ -113,7 +113,7 @@ export default function Landing() {
           <div className="grid items-center gap-8 lg:grid-cols-[.86fr_1.14fr] lg:gap-4">
             {/* Copy */}
             <div className="lp-in relative z-20 max-w-2xl lg:pb-7">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-[11px] font-black uppercase tracking-[.13em] text-sky-700 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-black uppercase tracking-[.13em] text-sky-700 shadow-sm">
                 <span>☀️</span>
                 Plataforma digital para ministerios infantiles
               </div>
@@ -127,7 +127,7 @@ export default function Landing() {
                 </span>
               </h1>
 
-              <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-ink/60 sm:mt-6 sm:text-base lg:text-lg">
+              <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-ink/75 sm:mt-6 sm:text-base lg:text-lg">
                 KidsMin conecta a niños, familias, docentes y líderes para organizar clases, asistencia, actividades y acompañamiento espiritual desde una sola aplicación.
               </p>
 
@@ -146,7 +146,7 @@ export default function Landing() {
                 </Link>
               </div>
 
-              <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs font-extrabold text-ink/45">
+              <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs font-extrabold text-ink/65">
                 <span>💗 Fortalece tu ministerio</span>
                 <span>👨‍👩‍👧 Conecta a las familias</span>
                 <span>🛡️ Simple y organizado</span>
@@ -198,7 +198,7 @@ export default function Landing() {
               </div>
 
               <div className="absolute right-[28%] top-[24%] z-30 hidden rounded-2xl bg-white/95 px-4 py-3 shadow-card backdrop-blur-sm sm:block">
-                <p className="text-[10px] font-black uppercase tracking-wide text-sky-600">KidsMin</p>
+                <p className="text-xs font-black uppercase tracking-wide text-sky-600">KidsMin</p>
                 <p className="text-sm font-black text-ink">Organiza · conecta · acompaña</p>
               </div>
 
@@ -217,7 +217,7 @@ export default function Landing() {
         <div className="mx-auto max-w-3xl text-center">
           <span className="rounded-full bg-sky-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sky-700">¿Qué es KidsMin?</span>
           <h2 className="mt-4 text-2xl font-black tracking-tight text-ink sm:text-4xl md:text-5xl">Una app para acompañar mejor a toda la comunidad infantil.</h2>
-          <p className="mt-4 text-base leading-relaxed text-ink/60 sm:mt-5 sm:text-lg">
+          <p className="mt-4 text-base leading-relaxed text-ink/75 sm:mt-5 sm:text-lg">
             No es solo una agenda de clases. Es un punto de encuentro digital para las personas que hacen posible el ministerio infantil.
           </p>
         </div>
@@ -227,7 +227,7 @@ export default function Landing() {
             <article key={role.title} className="rounded-[1.75rem] border border-ink/5 bg-white p-5 shadow-card transition duration-300 hover:-translate-y-1 sm:p-7">
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-sky-50 text-2xl sm:h-14 sm:w-14 sm:text-3xl">{role.icon}</span>
               <h3 className="mt-4 text-xl font-black text-ink sm:mt-5 sm:text-2xl">{role.title}</h3>
-              <p className="mt-2 leading-relaxed text-ink/60">{role.text}</p>
+              <p className="mt-2 leading-relaxed text-ink/75">{role.text}</p>
             </article>
           ))}
         </div>
@@ -238,15 +238,15 @@ export default function Landing() {
         <div className="grid gap-3 rounded-[1.5rem] bg-white/80 p-4 shadow-sm sm:grid-cols-3">
           <div className="flex items-center gap-3 rounded-2xl px-4 py-3">
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-coral-100 text-xl">💗</span>
-            <div><p className="font-black">Fortalece tu ministerio</p><p className="text-xs text-ink/50">Más orden y seguimiento</p></div>
+            <div><p className="font-black">Fortalece tu ministerio</p><p className="text-xs text-ink/70">Más orden y seguimiento</p></div>
           </div>
           <div className="flex items-center gap-3 rounded-2xl px-4 py-3">
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-sky-100 text-xl">👨‍👩‍👧</span>
-            <div><p className="font-black">Conecta a las familias</p><p className="text-xs text-ink/50">Más cerca de lo que viven</p></div>
+            <div><p className="font-black">Conecta a las familias</p><p className="text-xs text-ink/70">Más cerca de lo que viven</p></div>
           </div>
           <div className="flex items-center gap-3 rounded-2xl px-4 py-3">
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-sunshine-100 text-xl">🛡️</span>
-            <div><p className="font-black">Simple y organizado</p><p className="text-xs text-ink/50">Pensado para tu equipo</p></div>
+            <div><p className="font-black">Simple y organizado</p><p className="text-xs text-ink/70">Pensado para tu equipo</p></div>
           </div>
         </div>
       </section>
@@ -264,7 +264,7 @@ export default function Landing() {
               <article key={f.title} className="group rounded-[1.5rem] border border-ink/5 bg-[#fffaf0] p-5 transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-card sm:p-6">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-white text-xl shadow-sm transition group-hover:scale-105 sm:h-12 sm:w-12 sm:text-2xl">{f.icon}</span>
                 <h3 className="mt-3 text-lg font-black text-ink sm:mt-4 sm:text-xl">{f.title}</h3>
-                <p className="mt-2 leading-relaxed text-ink/60">{f.text}</p>
+                <p className="mt-2 leading-relaxed text-ink/75">{f.text}</p>
               </article>
             ))}
           </div>
@@ -277,7 +277,7 @@ export default function Landing() {
           <div>
             <span className="rounded-full bg-sunshine-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sunshine-700">Así funciona</span>
             <h2 className="mt-4 text-2xl font-black tracking-tight text-ink sm:text-4xl md:text-5xl">De la idea a tu iglesia, paso a paso.</h2>
-            <p className="mt-5 leading-relaxed text-ink/60">
+            <p className="mt-5 leading-relaxed text-ink/75">
               Queremos que la tecnología quite trabajo, no que agregue más. Por eso el camino para comenzar debe ser sencillo.
             </p>
           </div>
@@ -288,7 +288,7 @@ export default function Landing() {
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-sky-100 text-sm font-black text-sky-700 sm:h-12 sm:w-12 sm:text-base">{step.number}</span>
                 <div>
                   <h3 className="text-lg font-black sm:text-xl">{step.title}</h3>
-                  <p className="mt-1 leading-relaxed text-ink/60">{step.text}</p>
+                  <p className="mt-1 leading-relaxed text-ink/75">{step.text}</p>
                 </div>
               </div>
             ))}
@@ -324,7 +324,7 @@ export default function Landing() {
             <div className="absolute -right-5 -top-5 text-6xl opacity-20 sm:text-7xl">⛪</div>
             <span className="text-2xl sm:text-3xl">🏠</span>
             <h3 className="mt-2 text-xl font-black sm:mt-3 sm:text-2xl">¿Quieres llevar KidsMin a tu iglesia?</h3>
-            <p className="mt-2 max-w-md text-sm text-ink/60 sm:text-base">Cuéntanos sobre tu ministerio y te explicaremos cómo comenzar.</p>
+            <p className="mt-2 max-w-md text-sm text-ink/75 sm:text-base">Cuéntanos sobre tu ministerio y te explicaremos cómo comenzar.</p>
             <a href="#iglesias" className="mt-4 inline-flex rounded-full bg-coral-500 px-5 py-3 text-sm font-extrabold text-white shadow-sm transition hover:-translate-y-0.5 sm:mt-5 sm:px-6 sm:py-3.5 sm:text-base">
               Quiero KidsMin en mi iglesia →
             </a>
@@ -334,7 +334,7 @@ export default function Landing() {
             <div className="absolute -right-5 -top-5 text-6xl opacity-20 sm:text-7xl">💻</div>
             <span className="text-2xl sm:text-3xl">👋</span>
             <h3 className="mt-2 text-xl font-black sm:mt-3 sm:text-2xl">¿Tu iglesia ya usa KidsMin?</h3>
-            <p className="mt-2 max-w-md text-sm text-ink/60 sm:text-base">Entonces ya puedes entrar directamente a tu cuenta.</p>
+            <p className="mt-2 max-w-md text-sm text-ink/75 sm:text-base">Entonces ya puedes entrar directamente a tu cuenta.</p>
             <Link to="/login" className="mt-4 inline-flex rounded-full bg-white px-5 py-3 text-sm font-extrabold text-sky-700 shadow-card transition hover:-translate-y-0.5 sm:mt-5 sm:px-6 sm:py-3.5 sm:text-base">
               Acceder a KidsMin →
             </Link>
@@ -347,7 +347,7 @@ export default function Landing() {
         <div className="mx-auto max-w-3xl text-center">
           <span className="rounded-full bg-coral-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-coral-600">Para tu iglesia</span>
           <h2 className="mt-4 text-2xl font-black tracking-tight text-ink sm:text-4xl md:text-5xl">¿Quieres tener KidsMin en tu iglesia?</h2>
-          <p className="mt-3 text-base leading-relaxed text-ink/60 sm:mt-4 sm:text-lg">
+          <p className="mt-3 text-base leading-relaxed text-ink/75 sm:mt-4 sm:text-lg">
             Cuéntanos un poco sobre tu ministerio y te explicaremos cómo empezar.
           </p>
         </div>
@@ -411,7 +411,7 @@ function ContactoForm() {
       <div className="flex flex-col items-center gap-2 py-6 text-center">
         <span className="text-4xl">💌</span>
         <p className="text-lg font-extrabold text-sky-600">¡Mensaje enviado!</p>
-        <p className="text-ink/60">Gracias por escribir. Te responderé pronto.</p>
+        <p className="text-ink/75">Gracias por escribir. Te responderé pronto.</p>
       </div>
     )
   }

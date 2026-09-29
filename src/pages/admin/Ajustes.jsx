@@ -213,38 +213,38 @@ export default function Ajustes() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Ajustes ⚙️</h1>
-        <p className="text-ink/50">Personaliza tu escuelita, tu cuenta, y consulta la ayuda</p>
+        <p className="text-ink/70">Personaliza tu escuelita, tu cuenta, y consulta la ayuda</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setTab('general')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'general' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'general' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           General
         </button>
         <button
           onClick={() => setTab('cuenta')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'cuenta' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'cuenta' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           Mi cuenta
         </button>
         <button
           onClick={() => setTab('ayuda')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'ayuda' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'ayuda' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           Ayuda
         </button>
         <button
           onClick={() => setTab('estrellas')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'estrellas' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'estrellas' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           🌟 Estrellas
         </button>
         {profile.role === 'superadmin' && (
           <button
             onClick={() => setTab('modulos')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'modulos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'modulos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
           >
             📦 Módulos
           </button>
@@ -252,7 +252,7 @@ export default function Ajustes() {
         {profile.role === 'superadmin' && (
           <button
             onClick={() => setTab('menu')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'menu' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'menu' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
           >
             📋 Menú
           </button>
@@ -260,7 +260,7 @@ export default function Ajustes() {
         {['superadmin', 'admin'].includes(profile.role) && (
           <button
             onClick={() => setTab('permisos')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'permisos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'permisos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
           >
             Roles y permisos
           </button>
@@ -270,7 +270,7 @@ export default function Ajustes() {
       {tab === 'cuenta' && (
         <div className="card max-w-xl">
           <p className="label mb-1">Contraseña</p>
-          <p className="mb-4 text-sm text-ink/50">Cambia la contraseña con la que entras a tu propia cuenta.</p>
+          <p className="mb-4 text-sm text-ink/70">Cambia la contraseña con la que entras a tu propia cuenta.</p>
           <button type="button" onClick={() => setPwOpen(true)} className="btn-secondary">
             🔑 Cambiar mi contraseña
           </button>
@@ -314,7 +314,7 @@ export default function Ajustes() {
                 <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
               </div>
             </div>
-            <p className="mt-3 text-sm text-ink/50">
+            <p className="mt-3 text-sm text-ink/70">
               Usa una imagen cuadrada de fondo transparente si puedes (PNG). Se verá en el menú, la pantalla de
               ingreso y la página pública.
             </p>
@@ -339,7 +339,7 @@ export default function Ajustes() {
 
           <div className="card max-w-xl">
             <p className="label mb-1">Revisar inactividad</p>
-            <p className="mb-4 text-sm text-ink/50">
+            <p className="mb-4 text-sm text-ink/70">
               Pausa automáticamente a los niños sin asistencia hace más de 3 meses, y a los padres/madres que no han
               entrado en más de 2 meses. No borra nada — es reversible, y un padre se reactiva solo la próxima vez
               que entra. Tócalo cuando quieras (ej. cada domingo).
@@ -353,7 +353,7 @@ export default function Ajustes() {
           {['superadmin', 'admin'].includes(profile.role) && solicitudes.length > 0 && (
             <div className="card max-w-xl">
               <p className="label mb-1">Solicitudes de restablecimiento de contraseña</p>
-              <p className="mb-4 text-sm text-ink/50">
+              <p className="mb-4 text-sm text-ink/70">
                 Usuarios que pidieron restablecer su contraseña desde la pantalla de inicio de sesión.
               </p>
               <div className="flex flex-col gap-2">
@@ -361,7 +361,7 @@ export default function Ajustes() {
                   <div key={sol.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-sunshine-50 px-4 py-3">
                     <div>
                       <p className="text-sm font-bold">{sol.nombre || 'Sin nombre'}</p>
-                      <p className="text-xs text-ink/50">{sol.email} — {new Date(sol.created_at).toLocaleDateString()}</p>
+                      <p className="text-xs text-ink/70">{sol.email} — {new Date(sol.created_at).toLocaleDateString()}</p>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -387,12 +387,12 @@ export default function Ajustes() {
 
           <div className="card max-w-xl">
             <p className="label mb-1">Días de clase</p>
-            <p className="mb-4 text-sm text-ink/50">
+            <p className="mb-4 text-sm text-ink/70">
               Qué días de la semana hay escuelita. Se usa en <strong>Planeación</strong> para saber qué días marcar
               en el calendario y pedirte cubrir cada clase.
             </p>
             {!diasClase ? (
-              <p className="text-sm text-ink/40">Cargando...</p>
+              <p className="text-sm text-ink/65">Cargando...</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {DIAS_SEMANA.map((d) => {
@@ -403,7 +403,7 @@ export default function Ajustes() {
                       type="button"
                       onClick={() => toggleDiaClase(d.dia_semana)}
                       className={`rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${
-                        activo ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/50'
+                        activo ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'
                       }`}
                     >
                       {d.label}
@@ -416,14 +416,14 @@ export default function Ajustes() {
 
           <div className="card max-w-xl">
             <p className="label mb-1">Horarios</p>
-            <p className="mb-4 text-sm text-ink/50">
+            <p className="mb-4 text-sm text-ink/70">
               Si el mismo día de clase hay más de un servicio (ej. 9:00 am y 11:00 am), agrégalos aquí. Con uno solo
               no necesitas tocar nada — ya viene creado por defecto. Si un horario es solo de un día (ej. los 3
               servicios son del domingo, pero el sábado solo hay uno), dile a cuál día pertenece para que Planeación
               y "Cobertura de hoy" no lo mezclen con los demás días.
             </p>
             {!horarios ? (
-              <p className="text-sm text-ink/40">Cargando...</p>
+              <p className="text-sm text-ink/65">Cargando...</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {horarios.map((h) => (
@@ -448,13 +448,13 @@ export default function Ajustes() {
                     <button
                       type="button"
                       onClick={() => toggleHorarioActivo(h)}
-                      className={`badge shrink-0 ${h.activo ? 'bg-grass-100 text-grass-700' : 'bg-ink/10 text-ink/40'}`}
+                      className={`badge shrink-0 ${h.activo ? 'bg-grass-100 text-grass-700' : 'bg-ink/10 text-ink/65'}`}
                     >
                       {h.activo ? 'Activo' : 'Inactivo'}
                     </button>
                   </div>
                 ))}
-                {horarios.length === 0 && <p className="text-sm text-ink/40">Aún no hay horarios.</p>}
+                {horarios.length === 0 && <p className="text-sm text-ink/65">Aún no hay horarios.</p>}
               </div>
             )}
             <form onSubmit={agregarHorario} className="mt-3 flex flex-col gap-2 sm:flex-row">
@@ -541,7 +541,7 @@ function ModulosTab({ config }) {
   return (
     <div className="card max-w-xl">
       <p className="label mb-1">Módulos activos</p>
-      <p className="mb-4 text-sm text-ink/50">
+      <p className="mb-4 text-sm text-ink/70">
         Activa o desactiva las secciones que usa tu iglesia. Los módulos desactivados se ocultan del menú para todos los usuarios.
       </p>
       <div className="flex flex-col gap-2">
@@ -556,8 +556,8 @@ function ModulosTab({ config }) {
             >
               <span className="text-2xl">{m.icon}</span>
               <div className="min-w-0 flex-1">
-                <p className={`text-sm font-bold ${on ? 'text-sky-700' : 'text-ink/40'}`}>{m.label}</p>
-                <p className="text-xs text-ink/40">{m.desc}</p>
+                <p className={`text-sm font-bold ${on ? 'text-sky-700' : 'text-ink/65'}`}>{m.label}</p>
+                <p className="text-xs text-ink/65">{m.desc}</p>
               </div>
               <div className={`flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors ${on ? 'bg-sky-400' : 'bg-ink/20'}`}>
                 <div className={`h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${on ? 'translate-x-5' : 'translate-x-0'}`} />

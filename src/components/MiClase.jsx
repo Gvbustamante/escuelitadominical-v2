@@ -44,7 +44,7 @@ export default function MiClase({ onChange }) {
   return (
     <div className="card">
       <p className="font-bold">🎒 Elige tu clase</p>
-      <p className="mt-1 text-sm text-ink/50">Únete o sal de la clase que vayas a llevar — puedes estar en más de una.</p>
+      <p className="mt-1 text-sm text-ink/70">Únete o sal de la clase que vayas a llevar — puedes estar en más de una.</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {niveles.map((n) => {
           const dentro = misNivelIds.has(n.id)
@@ -55,7 +55,7 @@ export default function MiClase({ onChange }) {
               onClick={() => toggle(n.id)}
               disabled={busyId === n.id}
               className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
-                dentro ? `${BADGE_CLASSES[n.color] || BADGE_CLASSES.sky}` : 'bg-ink/5 text-ink/50'
+                dentro ? `${BADGE_CLASSES[n.color] || BADGE_CLASSES.sky}` : 'bg-ink/5 text-ink/70'
               }`}
             >
               {busyId === n.id ? '...' : dentro ? `✅ ${n.nombre}` : `+ ${n.nombre}`}

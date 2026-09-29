@@ -113,7 +113,7 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
             </a>
             <button
               onClick={onClose}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-ink/5 text-xl leading-none text-ink/60 transition-colors hover:bg-ink/10"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-ink/5 text-xl leading-none text-ink/75 transition-colors hover:bg-ink/10"
               aria-label="Cerrar"
             >
               ×
@@ -164,7 +164,7 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
             <div className="flex flex-col items-center gap-4 p-8 sm:p-12">
               <span className="text-7xl">{iconoGrande(tipo)}</span>
               <p className="text-center text-lg font-bold text-ink/70">{nombre || 'Archivo'}</p>
-              <p className="text-center text-sm text-ink/40">
+              <p className="text-center text-sm text-ink/65">
                 Este tipo de archivo no se puede previsualizar en el navegador.
               </p>
               <a

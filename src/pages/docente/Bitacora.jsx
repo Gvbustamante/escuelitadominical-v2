@@ -36,13 +36,13 @@ export default function Bitacora() {
   }, [loadAmbos])
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Bitácora 📋</h1>
-        <p className="text-ink/50">Deja constancia del salón antes y después de cada clase</p>
+        <p className="text-ink/70">Deja constancia del salón antes y después de cada clase</p>
       </div>
 
       <div className="flex flex-wrap gap-3">

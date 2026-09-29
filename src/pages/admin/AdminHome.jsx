@@ -72,7 +72,7 @@ export default function AdminHome() {
           🎒
         </span>
         <h1 className="text-3xl font-bold">¡Hola, {profile.nombre_completo.split(' ')[0]}! 👋</h1>
-        <p className="text-ink/50">Este es el resumen de tu escuelita hoy.</p>
+        <p className="text-ink/70">Este es el resumen de tu escuelita hoy.</p>
       </div>
 
       <CitaDelDia />
@@ -89,12 +89,12 @@ export default function AdminHome() {
           <StatCard icon="✅" label="Asistencia hoy" value={stats.asistenciaHoy} color="grape" delay={240} />
         ) : (
           <div className="card animate-pop-in flex items-center gap-3 !p-4 sm:gap-4 sm:!p-6" style={{ animationDelay: '240ms' }}>
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ink/5 text-xl text-ink/30 ring-4 ring-ink/5 sm:h-16 sm:w-16 sm:text-3xl">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ink/5 text-xl text-ink/65 ring-4 ring-ink/5 sm:h-16 sm:w-16 sm:text-3xl">
               💤
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-lg font-bold leading-none text-ink/40 sm:text-xl">Sin clase</p>
-              <p className="mt-1 text-xs font-bold leading-tight text-ink/50 sm:text-sm">Hoy no toca escuelita</p>
+              <p className="text-lg font-bold leading-none text-ink/65 sm:text-xl">Sin clase</p>
+              <p className="mt-1 text-xs font-bold leading-tight text-ink/70 sm:text-sm">Hoy no toca escuelita</p>
             </div>
           </div>
         )}
@@ -111,25 +111,25 @@ export default function AdminHome() {
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-2xl">🧒</span>
           <div className="min-w-0 flex-1">
             <p className="font-bold">Gestionar niños</p>
-            <p className="text-sm text-ink/50">Agregar, editar, desactivar</p>
+            <p className="text-sm text-ink/70">Agregar, editar, desactivar</p>
           </div>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
         <Link to="/clases" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '160ms' }}>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grass-100 text-2xl">🎒</span>
           <div className="min-w-0 flex-1">
             <p className="font-bold">Gestionar clases</p>
-            <p className="text-sm text-ink/50">Niveles y edades</p>
+            <p className="text-sm text-ink/70">Niveles y edades</p>
           </div>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
         <Link to="/docentes" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '240ms' }}>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sunshine-100 text-2xl">🍎</span>
           <div className="min-w-0 flex-1">
             <p className="font-bold">Invitar docentes</p>
-            <p className="text-sm text-ink/50">Gestionar el equipo</p>
+            <p className="text-sm text-ink/70">Gestionar el equipo</p>
           </div>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
       </div>
     </div>

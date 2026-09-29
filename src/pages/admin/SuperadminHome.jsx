@@ -132,14 +132,14 @@ export default function SuperadminHome() {
           🛡️
         </span>
         <h1 className="text-3xl font-bold">Panel de control 🛡️</h1>
-        <p className="text-ink/50">Vista panorámica de toda la plataforma</p>
+        <p className="text-ink/70">Vista panorámica de toda la plataforma</p>
       </div>
 
       <CitaDelDia />
 
       {/* Personas */}
       <div>
-        <p className="mb-3 text-xs font-extrabold uppercase tracking-wide text-ink/40">👥 Personas</p>
+        <p className="mb-3 text-xs font-extrabold uppercase tracking-wide text-ink/65">👥 Personas</p>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard icon="🧒" label="Niños activos" value={stats.ninos} color="sky" delay={0} />
           <StatCard icon="💤" label="Niños inactivos" value={stats.ninosInactivos} color="coral" delay={80} />
@@ -150,19 +150,19 @@ export default function SuperadminHome() {
 
       {/* Plataforma */}
       <div>
-        <p className="mb-3 text-xs font-extrabold uppercase tracking-wide text-ink/40">📊 Plataforma</p>
+        <p className="mb-3 text-xs font-extrabold uppercase tracking-wide text-ink/65">📊 Plataforma</p>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard icon="🎒" label="Clases activas" value={stats.clases} color="grass" delay={0} />
           {stats.esDiaClase ? (
             <StatCard icon="✅" label="Asistencia hoy" value={stats.asistenciaHoy} color="grape" delay={80} />
           ) : (
             <div className="card animate-pop-in flex items-center gap-3 !p-4 sm:gap-4 sm:!p-6" style={{ animationDelay: '80ms' }}>
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ink/5 text-xl text-ink/30 ring-4 ring-ink/5 sm:h-16 sm:w-16 sm:text-3xl">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ink/5 text-xl text-ink/65 ring-4 ring-ink/5 sm:h-16 sm:w-16 sm:text-3xl">
                 💤
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-lg font-bold leading-none text-ink/40 sm:text-xl">Sin clase</p>
-                <p className="mt-1 text-xs font-bold leading-tight text-ink/50 sm:text-sm">Hoy no toca</p>
+                <p className="text-lg font-bold leading-none text-ink/65 sm:text-xl">Sin clase</p>
+                <p className="mt-1 text-xs font-bold leading-tight text-ink/70 sm:text-sm">Hoy no toca</p>
               </div>
             </div>
           )}
@@ -181,7 +181,7 @@ export default function SuperadminHome() {
       <div className="card">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <p className="font-bold">🍎 Equipo de la plataforma</p>
-          <div className="flex gap-2 text-xs font-bold text-ink/40">
+          <div className="flex gap-2 text-xs font-bold text-ink/65">
             <span className="badge bg-grape-100 text-grape-700">{stats.admins} admin</span>
             <span className="badge bg-sunshine-100 text-sunshine-700">{stats.coordinadores} coord</span>
             <span className="badge bg-sky-100 text-sky-700">{stats.docentes} docentes</span>
@@ -190,14 +190,14 @@ export default function SuperadminHome() {
         {!equipo ? (
           <Skeleton className="h-32 w-full" />
         ) : equipo.length === 0 ? (
-          <p className="text-sm text-ink/40">No hay cuentas de equipo aún.</p>
+          <p className="text-sm text-ink/65">No hay cuentas de equipo aún.</p>
         ) : (
           <div className="flex flex-col gap-1.5">
             {equipo.map((u) => (
               <div key={u.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-ink/[0.03] px-3 py-2">
-                <span className={`badge text-[10px] ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
+                <span className={`badge text-xs ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
                 <span className="flex-1 truncate text-sm font-bold">{u.nombre_completo}</span>
-                {!u.activo && <span className="badge bg-coral-100 text-coral-700 text-[10px]">Inactivo</span>}
+                {!u.activo && <span className="badge bg-coral-100 text-coral-700 text-xs">Inactivo</span>}
               </div>
             ))}
           </div>
@@ -222,7 +222,7 @@ export default function SuperadminHome() {
             ))}
           </div>
           {modulosActivos.length === 0 && (
-            <p className="text-sm text-ink/40">Todos los módulos están activos (no se ha configurado ningún filtro).</p>
+            <p className="text-sm text-ink/65">Todos los módulos están activos (no se ha configurado ningún filtro).</p>
           )}
         </div>
       )}
@@ -233,33 +233,33 @@ export default function SuperadminHome() {
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-2xl">🧒</span>
           <div className="min-w-0 flex-1">
             <p className="font-bold">Niños</p>
-            <p className="text-sm text-ink/50">Gestionar niños</p>
+            <p className="text-sm text-ink/70">Gestionar niños</p>
           </div>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
         <Link to="/clases" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '160ms' }}>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grass-100 text-2xl">🎒</span>
           <div className="min-w-0 flex-1">
             <p className="font-bold">Clases</p>
-            <p className="text-sm text-ink/50">Niveles y edades</p>
+            <p className="text-sm text-ink/70">Niveles y edades</p>
           </div>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
         <Link to="/docentes" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '240ms' }}>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sunshine-100 text-2xl">🍎</span>
           <div className="min-w-0 flex-1">
             <p className="font-bold">Equipo</p>
-            <p className="text-sm text-ink/50">Invitar y gestionar</p>
+            <p className="text-sm text-ink/70">Invitar y gestionar</p>
           </div>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
         <Link to="/ajustes" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '320ms' }}>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grape-100 text-2xl">⚙️</span>
           <div className="min-w-0 flex-1">
             <p className="font-bold">Ajustes</p>
-            <p className="text-sm text-ink/50">Módulos y config</p>
+            <p className="text-sm text-ink/70">Módulos y config</p>
           </div>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
       </div>
     </div>

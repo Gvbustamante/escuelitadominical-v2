@@ -112,8 +112,8 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
     return (
       <div className="card flex flex-col items-center gap-3 py-12 text-center">
         <span className="text-4xl">📅</span>
-        <p className="font-bold text-ink/40">Hoy no es día de clase</p>
-        <p className="text-sm text-ink/30">Solo puedes tomar asistencia los días de clase</p>
+        <p className="font-bold text-ink/65">Hoy no es día de clase</p>
+        <p className="text-sm text-ink/65">Solo puedes tomar asistencia los días de clase</p>
       </div>
     )
   }
@@ -129,26 +129,26 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
             {!esStaff && yaGuardado ? (
               <p className="text-sm font-bold text-grass-600">✅ Asistencia registrada — no se puede modificar</p>
             ) : !esStaff ? (
-              <p className="text-sm text-ink/50">Marca quién vino hoy</p>
+              <p className="text-sm text-ink/70">Marca quién vino hoy</p>
             ) : (
-              <p className="text-sm text-ink/50">Marca quién vino hoy</p>
+              <p className="text-sm text-ink/70">Marca quién vino hoy</p>
             )}
           </div>
           {esStaff ? (
             <input type="date" className="input !w-auto" value={fecha} onChange={(e) => setFecha(e.target.value)} />
           ) : (
-            <span className="text-sm font-bold text-ink/40">{new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+            <span className="text-sm font-bold text-ink/65">{new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
           )}
         </div>
 
         {cargando ? (
           <div className="flex items-center justify-center py-12">
-            <p className="text-sm text-ink/40">Cargando...</p>
+            <p className="text-sm text-ink/65">Cargando...</p>
           </div>
         ) : !ninos || total === 0 ? (
           <div className="py-12 text-center">
             <p className="text-3xl">📭</p>
-            <p className="mt-2 text-sm font-bold text-ink/40">No hay niños activos en esta clase.</p>
+            <p className="mt-2 text-sm font-bold text-ink/65">No hay niños activos en esta clase.</p>
           </div>
         ) : (
           <>
@@ -156,7 +156,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
               <div className="flex items-center gap-3">
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-2xl font-extrabold text-grass-600">{presentes}</span>
-                  <span className="text-sm font-bold text-ink/40">/ {total}</span>
+                  <span className="text-sm font-bold text-ink/65">/ {total}</span>
                 </div>
                 <div className="h-2.5 w-24 overflow-hidden rounded-full bg-ink/10 sm:w-32">
                   <div
@@ -164,14 +164,14 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="text-xs font-bold text-ink/40">{pct}%</span>
+                <span className="text-xs font-bold text-ink/65">{pct}%</span>
               </div>
               {!bloqueado && (
                 <div className="flex gap-2">
                   <button type="button" onClick={marcarTodos} className="rounded-xl px-3 py-1.5 text-xs font-bold text-sky-600 hover:bg-sky-50">
                     ✅ Todos
                   </button>
-                  <button type="button" onClick={desmarcarTodos} className="rounded-xl px-3 py-1.5 text-xs font-bold text-ink/40 hover:bg-ink/5">
+                  <button type="button" onClick={desmarcarTodos} className="rounded-xl px-3 py-1.5 text-xs font-bold text-ink/65 hover:bg-ink/5">
                     Limpiar
                   </button>
                 </div>
@@ -198,7 +198,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg shadow-pop transition-all active:translate-y-0.5 active:shadow-none ${
                         presente
                           ? 'bg-grass-400 text-white ring-2 ring-grass-200'
-                          : 'bg-white text-ink/20 ring-2 ring-ink/10 hover:ring-ink/20'
+                          : 'bg-white text-ink/65 ring-2 ring-ink/10 hover:ring-ink/20'
                       } ${bloqueado ? 'cursor-not-allowed opacity-60' : ''}`}
                     >
                       {presente ? '✓' : ''}
@@ -212,7 +212,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
                       </p>
                       <div className="flex items-center gap-1.5">
                         <span className="text-sm">{badge.emoji}</span>
-                        <span className="text-[0.65rem] text-ink/40">{badge.nombre} · {stars} ⭐</span>
+                        <span className="text-xs text-ink/65">{badge.nombre} · {stars} ⭐</span>
                       </div>
                     </div>
 

@@ -266,7 +266,7 @@ export default function Drive() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">{verPapelera ? '🗑️ Papelera' : '📁 Drive'}</h1>
-          <p className="text-sm text-ink/50">
+          <p className="text-sm text-ink/70">
             {verPapelera ? 'Archivos eliminados' : 'Archivos compartidos del equipo'}
           </p>
         </div>
@@ -274,13 +274,13 @@ export default function Drive() {
           <div className="flex gap-1.5 sm:hidden">
             <button
               onClick={() => setSeccion('archivos')}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'archivos' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/50'}`}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'archivos' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
             >
               📁
             </button>
             <button
               onClick={() => setSeccion('organizado')}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'organizado' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/50'}`}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'organizado' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
             >
               🗂️
             </button>
@@ -298,7 +298,7 @@ export default function Drive() {
                 <span className="hidden sm:inline text-sm font-bold">📁 Nueva carpeta</span>
               </button>
               <button
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-ink/60 shadow-pop ring-1 ring-ink/10 transition-transform hover:scale-105 active:scale-95 sm:h-auto sm:w-auto sm:rounded-full sm:px-4 sm:py-2"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-ink/75 shadow-pop ring-1 ring-ink/10 transition-transform hover:scale-105 active:scale-95 sm:h-auto sm:w-auto sm:rounded-full sm:px-4 sm:py-2"
                 disabled={subiendo}
                 onClick={() => fileInputRef.current?.click()}
                 title="Subir archivos"
@@ -317,14 +317,14 @@ export default function Drive() {
           <button
             onClick={() => { setVerPapelera(!verPapelera); setBusqueda(''); setRuta([]) }}
             className={`relative flex h-9 w-9 items-center justify-center rounded-xl transition-colors sm:h-auto sm:w-auto sm:rounded-full sm:px-4 sm:py-2 ${
-              verPapelera ? 'bg-coral-400 text-white' : 'bg-white text-ink/50 ring-1 ring-ink/10'
+              verPapelera ? 'bg-coral-400 text-white' : 'bg-white text-ink/70 ring-1 ring-ink/10'
             }`}
             title="Papelera"
           >
             <span className="sm:hidden text-lg">🗑️</span>
             <span className="hidden sm:inline text-sm font-bold">🗑️ Papelera</span>
             {!verPapelera && enPapelera > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-coral-500 text-[9px] font-bold text-white sm:h-5 sm:w-5 sm:text-[10px]">
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-coral-500 text-xs font-bold text-white sm:h-5 sm:w-5 sm:text-xs">
                 {enPapelera}
               </span>
             )}
@@ -337,13 +337,13 @@ export default function Drive() {
         <div className="hidden gap-2 sm:flex">
           <button
             onClick={() => setSeccion('archivos')}
-            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'archivos' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'archivos' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
           >
             📁 Mis archivos
           </button>
           <button
             onClick={() => setSeccion('organizado')}
-            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'organizado' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'organizado' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
           >
             🗂️ Auto-organizado
           </button>
@@ -357,16 +357,16 @@ export default function Drive() {
         <nav className="flex items-center gap-1 overflow-x-auto text-sm">
           <button
             onClick={irARaiz}
-            className={`shrink-0 rounded-lg px-2.5 py-1.5 font-bold transition-colors ${ruta.length === 0 ? 'bg-sky-100 text-sky-700' : 'text-ink/50 hover:bg-ink/5'}`}
+            className={`shrink-0 rounded-lg px-2.5 py-1.5 font-bold transition-colors ${ruta.length === 0 ? 'bg-sky-100 text-sky-700' : 'text-ink/70 hover:bg-ink/5'}`}
           >
             🏠 Inicio
           </button>
           {ruta.map((r, i) => (
             <span key={r.id} className="flex items-center gap-1">
-              <span className="text-ink/20">/</span>
+              <span className="text-ink/65">/</span>
               <button
                 onClick={() => irA(i)}
-                className={`shrink-0 rounded-lg px-2.5 py-1.5 font-bold transition-colors ${i === ruta.length - 1 ? 'bg-sky-100 text-sky-700' : 'text-ink/50 hover:bg-ink/5'}`}
+                className={`shrink-0 rounded-lg px-2.5 py-1.5 font-bold transition-colors ${i === ruta.length - 1 ? 'bg-sky-100 text-sky-700' : 'text-ink/70 hover:bg-ink/5'}`}
               >
                 {r.nombre}
               </button>
@@ -389,7 +389,7 @@ export default function Drive() {
             <button
               key={v}
               onClick={() => setVista(v)}
-              className={`px-3 py-2 text-sm font-bold transition-colors ${vista === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/40 hover:bg-sky-50'}`}
+              className={`px-3 py-2 text-sm font-bold transition-colors ${vista === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/65 hover:bg-sky-50'}`}
               title={v === 'grid' ? 'Cuadrícula' : 'Lista'}
             >
               {icon}
@@ -415,7 +415,7 @@ export default function Drive() {
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-ink/10">
             <div className="h-full w-1/2 animate-pulse rounded-full bg-sky-400" />
           </div>
-          <span className="text-xs font-bold text-ink/40">Subiendo...</span>
+          <span className="text-xs font-bold text-ink/65">Subiendo...</span>
         </div>
       )}
 
@@ -428,11 +428,11 @@ export default function Drive() {
           onClick={!verPapelera ? () => fileInputRef.current?.click() : undefined}
         >
           <span className="text-5xl">{verPapelera ? '🗑️' : '📂'}</span>
-          <p className="font-bold text-ink/40">
+          <p className="font-bold text-ink/65">
             {busqueda ? 'No hay resultados.' : verPapelera ? 'La papelera está vacía.' : 'Esta carpeta está vacía'}
           </p>
           {!verPapelera && !busqueda && (
-            <p className="text-sm text-ink/30">Arrastra archivos aquí o toca para subir</p>
+            <p className="text-sm text-ink/65">Arrastra archivos aquí o toca para subir</p>
           )}
         </div>
       ) : vista === 'grid' ? (
@@ -491,10 +491,10 @@ export default function Drive() {
 
       <Modal open={!!moverModal} onClose={() => setMoverModal(null)} title={`Mover: ${moverModal?.item.nombre}`}>
         <div className="flex flex-col gap-2">
-          <p className="text-sm text-ink/50 mb-1">Selecciona la carpeta destino:</p>
+          <p className="text-sm text-ink/70 mb-1">Selecciona la carpeta destino:</p>
           <button
             onClick={() => setMoverDestino(null)}
-            className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-left font-bold transition-colors ${moverDestino === null ? 'bg-sky-100 text-sky-700 ring-2 ring-sky-400' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+            className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-left font-bold transition-colors ${moverDestino === null ? 'bg-sky-100 text-sky-700 ring-2 ring-sky-400' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
           >
             🏠 Inicio (raíz)
           </button>
@@ -504,7 +504,7 @@ export default function Drive() {
               <button
                 key={c.id}
                 onClick={() => setMoverDestino(c.id)}
-                className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-left font-bold transition-colors ${moverDestino === c.id ? 'bg-sky-100 text-sky-700 ring-2 ring-sky-400' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+                className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-left font-bold transition-colors ${moverDestino === c.id ? 'bg-sky-100 text-sky-700 ring-2 ring-sky-400' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
               >
                 📁 {c.nombre}
               </button>
@@ -538,7 +538,7 @@ function CarpetaCard({ carpeta, onEntrar, onEditar, onEliminar, onMover, onResta
     <div className={`card-link relative flex flex-col items-center gap-1.5 !p-3 text-center sm:gap-2 sm:!p-4 ${papelera ? 'opacity-60' : ''}`} onClick={() => onEntrar?.(carpeta)}>
       <span className="text-4xl sm:text-5xl">📁</span>
       <p className="w-full truncate text-xs font-bold sm:text-sm">{carpeta.nombre}</p>
-      <p className="text-[10px] text-ink/30">{papelera ? formatFecha(carpeta.eliminado_at) : carpeta.creador?.nombre_completo}</p>
+      <p className="text-xs text-ink/65">{papelera ? formatFecha(carpeta.eliminado_at) : carpeta.creador?.nombre_completo}</p>
       {papelera ? (
         <div className="flex gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
           <button onClick={() => onRestaurar?.('carpeta', carpeta)} className="rounded-lg bg-grass-50 px-2 py-1.5 text-xs font-bold text-grass-700 hover:bg-grass-100 active:scale-95">♻️</button>
@@ -570,8 +570,8 @@ function ArchivoCard({ archivo, onPreview, onEliminar, onRenombrar, onMover, onR
       ) : (
         <span className="py-2 text-4xl sm:py-3 sm:text-5xl">{getFileIcon(archivo.nombre, archivo.tipo)}</span>
       )}
-      <p className="w-full truncate text-[11px] font-bold sm:text-xs">{archivo.nombre}</p>
-      <p className="text-[10px] text-ink/30">{papelera ? formatFecha(archivo.eliminado_at) : formatBytes(archivo.tamano)}</p>
+      <p className="w-full truncate text-xs font-bold sm:text-xs">{archivo.nombre}</p>
+      <p className="text-xs text-ink/65">{papelera ? formatFecha(archivo.eliminado_at) : formatBytes(archivo.tamano)}</p>
       {papelera ? (
         <div className="flex gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
           <button onClick={() => onRestaurar?.('archivo', archivo)} className="rounded-lg bg-grass-50 px-2 py-1.5 text-xs font-bold text-grass-700 hover:bg-grass-100 active:scale-95">♻️</button>
@@ -604,11 +604,11 @@ function ListView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, on
             <span className="text-2xl shrink-0">📁</span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold">{c.nombre}</p>
-              <p className="text-[0.65rem] text-ink/30">
+              <p className="text-xs text-ink/65">
                 {papelera ? `Eliminado ${formatFecha(c.eliminado_at)}` : c.creador?.nombre_completo || 'Carpeta'}
               </p>
             </div>
-            <span className="hidden text-xs text-ink/30 sm:block">{formatFecha(c.created_at)}</span>
+            <span className="hidden text-xs text-ink/65 sm:block">{formatFecha(c.created_at)}</span>
             <div className="flex shrink-0 gap-1" onClick={(e) => e.stopPropagation()}>
               {papelera ? (
                 <>
@@ -634,11 +634,11 @@ function ListView({ carpetas, archivos, onEntrar, onPreview, onEditarCarpeta, on
             <span className="text-2xl shrink-0">{getFileIcon(a.nombre, a.tipo)}</span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold">{a.nombre}</p>
-              <p className="text-[0.65rem] text-ink/30">
+              <p className="text-xs text-ink/65">
                 {papelera ? `Eliminado ${formatFecha(a.eliminado_at)}` : `${formatBytes(a.tamano)} · ${a.subidor?.nombre_completo || ''}`}
               </p>
             </div>
-            <span className="hidden text-xs text-ink/30 sm:block">{formatFecha(a.created_at)}</span>
+            <span className="hidden text-xs text-ink/65 sm:block">{formatFecha(a.created_at)}</span>
             <div className="flex shrink-0 gap-1" onClick={(e) => e.stopPropagation()}>
               {papelera ? (
                 <>
@@ -684,7 +684,7 @@ function ItemMenu({ open, setOpen, children }) {
     <div ref={ref} className="absolute right-1.5 top-1.5 sm:right-2 sm:top-2" onClick={(e) => e.stopPropagation()}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-ink/30 shadow-sm hover:bg-white hover:text-ink/60"
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-ink/65 shadow-sm hover:bg-white hover:text-ink/75"
         aria-label="Opciones"
       >
         ⋮

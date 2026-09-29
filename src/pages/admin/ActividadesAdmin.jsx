@@ -275,7 +275,7 @@ export default function ActividadesAdmin() {
   }
 
   if (!niveles) return <Spinner />
-  if (niveles.length === 0) return <p className="card text-ink/50">Todavía no hay clases creadas.</p>
+  if (niveles.length === 0) return <p className="card text-ink/70">Todavía no hay clases creadas.</p>
 
   // Filtrado por búsqueda + mes
   const actividadesFiltradas = (actividades || []).filter((a) =>
@@ -303,7 +303,7 @@ export default function ActividadesAdmin() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Actividades 🎨</h1>
-          <p className="text-ink/50">Lo que se hace en cada clase — fotos, versículo e historia bíblica</p>
+          <p className="text-ink/70">Lo que se hace en cada clase — fotos, versículo e historia bíblica</p>
         </div>
         <button className="btn-primary" onClick={openNew}>
           + Nueva actividad
@@ -315,14 +315,14 @@ export default function ActividadesAdmin() {
           <button
             type="button"
             onClick={() => cambiarAudiencia('ninos')}
-            className={`rounded-full px-4 py-2 text-sm font-bold ${audiencia === 'ninos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50 border-2 border-ink/10'}`}
+            className={`rounded-full px-4 py-2 text-sm font-bold ${audiencia === 'ninos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70 border-2 border-ink/10'}`}
           >
             🧒 Niños
           </button>
           <button
             type="button"
             onClick={() => cambiarAudiencia('docentes')}
-            className={`rounded-full px-4 py-2 text-sm font-bold ${audiencia === 'docentes' ? 'bg-grape-400 text-white' : 'bg-white text-ink/50 border-2 border-ink/10'}`}
+            className={`rounded-full px-4 py-2 text-sm font-bold ${audiencia === 'docentes' ? 'bg-grape-400 text-white' : 'bg-white text-ink/70 border-2 border-ink/10'}`}
           >
             🍎 Equipo docente
           </button>
@@ -339,11 +339,11 @@ export default function ActividadesAdmin() {
         )}
       </div>
       {audiencia === 'docentes' && (
-        <p className="-mt-3 text-sm text-ink/50">Comunicados, capacitaciones o tareas dirigidas a todo el equipo docente, no a una clase en particular.</p>
+        <p className="-mt-3 text-sm text-ink/70">Comunicados, capacitaciones o tareas dirigidas a todo el equipo docente, no a una clase en particular.</p>
       )}
 
       <div className="relative">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">🔍</span>
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/65">🔍</span>
         <input
           className="input max-w-xs !pl-9"
           placeholder="Buscar actividad..."
@@ -357,13 +357,13 @@ export default function ActividadesAdmin() {
       ) : actividades.length === 0 ? (
         <div className="card flex flex-col items-center gap-3 py-12 text-center">
           <span className="text-5xl">🎨</span>
-          <p className="text-ink/50">Aún no hay actividades para esta clase.</p>
+          <p className="text-ink/70">Aún no hay actividades para esta clase.</p>
           <button className="btn-primary mt-1" onClick={openNew}>+ Nueva actividad</button>
         </div>
       ) : mesesOrdenados.length === 0 ? (
         <div className="card flex flex-col items-center gap-2 py-8 text-center">
           <span className="text-4xl">🔍</span>
-          <p className="text-ink/50">No hay actividades que coincidan con &ldquo;{busqueda}&rdquo;.</p>
+          <p className="text-ink/70">No hay actividades que coincidan con &ldquo;{busqueda}&rdquo;.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -378,8 +378,8 @@ export default function ActividadesAdmin() {
                 >
                   <span className={`font-bold ${isOpen ? 'text-sky-700' : ''}`}>📅 {mesLabel(mes)}</span>
                   <span className="flex items-center gap-2">
-                    <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-bold text-ink/40">{acts.length}</span>
-                    <span className={`text-ink/30 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+                    <span className="rounded-full bg-ink/5 px-2 py-0.5 text-xs font-bold text-ink/65">{acts.length}</span>
+                    <span className={`text-ink/65 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
                   </span>
                 </button>
                 {isOpen && (
@@ -404,7 +404,7 @@ export default function ActividadesAdmin() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* ═══ Sección: Información básica ═══ */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
               📋 Información básica
             </legend>
             <div>
@@ -445,7 +445,7 @@ export default function ActividadesAdmin() {
 
           {/* ═══ Sección: Configuración ═══ */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
               ⚙️ Configuración
             </legend>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -456,14 +456,14 @@ export default function ActividadesAdmin() {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, visible_padres: true })}
-                      className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.visible_padres ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                      className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.visible_padres ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                     >
                       👀 Padres ven
                     </button>
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, visible_padres: false })}
-                      className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.visible_padres ? 'bg-grape-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                      className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.visible_padres ? 'bg-grape-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                     >
                       🙈 Solo equipo
                     </button>
@@ -476,14 +476,14 @@ export default function ActividadesAdmin() {
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, es_tarea: false })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.es_tarea ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.es_tarea ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     📢 Informativa
                   </button>
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, es_tarea: true })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.es_tarea ? 'bg-sunshine-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.es_tarea ? 'bg-sunshine-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     📝 Tarea
                   </button>
@@ -503,7 +503,7 @@ export default function ActividadesAdmin() {
 
           {/* ═══ Sección: Multimedia ═══ */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
               🎬 Multimedia
             </legend>
             <div>
@@ -514,7 +514,7 @@ export default function ActividadesAdmin() {
                 ) : (
                   <>
                     <span className="text-3xl">📷</span>
-                    <span className="text-sm font-bold text-ink/40 group-hover:text-sky-600">Toca para seleccionar una imagen</span>
+                    <span className="text-sm font-bold text-ink/65 group-hover:text-sky-600">Toca para seleccionar una imagen</span>
                   </>
                 )}
                 <input type="file" accept="image/*" className="hidden" onChange={handleImagen} />
@@ -544,7 +544,7 @@ export default function ActividadesAdmin() {
                 </div>
               )}
               {!form.enlace_externo && (
-                <p className="mt-1 text-xs text-ink/40">YouTube y Vimeo se muestran como video embebido.</p>
+                <p className="mt-1 text-xs text-ink/65">YouTube y Vimeo se muestran como video embebido.</p>
               )}
             </div>
             <div>
@@ -600,7 +600,7 @@ export default function ActividadesAdmin() {
       <Modal open={!!duplicando} onClose={() => setDuplicando(null)} title="Duplicar actividad">
         {duplicando && (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-ink/60">
+            <p className="text-sm text-ink/75">
               Se creará una copia de <strong>{duplicando.titulo}</strong> con todos sus archivos adjuntos.
             </p>
             <div>

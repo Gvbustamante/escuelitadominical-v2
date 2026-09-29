@@ -43,9 +43,9 @@ export default function AlertasAusencia({ nivelId, ninos }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-ink/50">Niños que no vienen hace {UMBRAL_DIAS} días o más (o que nunca han asistido).</p>
+      <p className="text-sm text-ink/70">Niños que no vienen hace {UMBRAL_DIAS} días o más (o que nunca han asistido).</p>
       {alertas.length === 0 ? (
-        <p className="card text-ink/50">🎉 Todos tus niños han venido recientemente.</p>
+        <p className="card text-ink/70">🎉 Todos tus niños han venido recientemente.</p>
       ) : (
         alertas.map(({ nino, ultima, dias }, i) => (
           <div
@@ -55,7 +55,7 @@ export default function AlertasAusencia({ nivelId, ninos }) {
           >
             <div>
               <p className="font-bold">{nino.nombre_completo}</p>
-              <p className="text-sm text-ink/50">{ultima ? `Última vez: ${ultima}` : 'Nunca ha asistido'}</p>
+              <p className="text-sm text-ink/70">{ultima ? `Última vez: ${ultima}` : 'Nunca ha asistido'}</p>
             </div>
             <span className="badge bg-coral-100 text-coral-700">{dias === null ? 'Sin registro' : `${dias} días`}</span>
           </div>

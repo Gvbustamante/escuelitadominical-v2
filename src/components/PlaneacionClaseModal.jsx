@@ -126,7 +126,7 @@ export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, plan
   return (
     <Modal open={open} onClose={onClose} wide title={`Planeación — ${nivel?.nombre || ''}`}>
       <div className="flex flex-col gap-5">
-        <p className="-mt-2 text-sm font-bold capitalize text-ink/60">{fechaLarga}</p>
+        <p className="-mt-2 text-sm font-bold capitalize text-ink/75">{fechaLarga}</p>
 
         {/* Escrita */}
         <div>
@@ -187,7 +187,7 @@ export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, plan
             </button>
           )}
           {quitarPdf && <p className="mt-1 text-sm text-coral-600">El PDF se quitará al guardar.</p>}
-          <p className="mt-1 text-sm text-ink/60">Máximo {MAX_MB} MB. Puedes escribir, subir PDF o ambos.</p>
+          <p className="mt-1 text-sm text-ink/75">Máximo {MAX_MB} MB. Puedes escribir, subir PDF o ambos.</p>
         </div>
 
         {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}

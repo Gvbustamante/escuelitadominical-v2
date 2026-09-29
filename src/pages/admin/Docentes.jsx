@@ -176,19 +176,19 @@ export default function Docentes() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Equipo 🍎</h1>
-        <p className="text-ink/50">Docentes, coordinadores, administradores y padres — todas las cuentas de tu escuelita</p>
+        <p className="text-ink/70">Docentes, coordinadores, administradores y padres — todas las cuentas de tu escuelita</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setVista('todos')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'todos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'todos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           📋 Todas las cuentas
         </button>
         <button
           onClick={() => setVista('docentes')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'docentes' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'docentes' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           🍎 Docentes
         </button>
@@ -227,7 +227,7 @@ export default function Docentes() {
                     key={v}
                     onClick={() => setFiltroRol(v)}
                     className={`rounded-full px-3 py-1.5 text-xs font-bold sm:px-4 sm:text-sm ${
-                      filtroRol === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'
+                      filtroRol === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'
                     }`}
                   >
                     {label}
@@ -242,7 +242,7 @@ export default function Docentes() {
 
           <div className="card overflow-x-auto p-0">
             <table className="w-full text-left">
-              <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
+              <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/70">
                 <tr>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Rol</th>
@@ -264,8 +264,8 @@ export default function Docentes() {
                     <td className="px-3 py-2 sm:px-4 sm:py-3">
                       <span className={`badge ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
                     </td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">{u.cedula || '—'}</td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">{u.cedula || '—'}</td>
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
                       {['superadmin', 'admin', 'coordinador', 'docente'].includes(u.role)
                         ? clasesPorDocente[u.id]?.join(', ') || (u.role === 'docente' ? 'Sin asignar' : '—')
                         : u.role === 'padre'
@@ -312,7 +312,7 @@ export default function Docentes() {
                 ))}
                 {filtrados.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-6 text-center text-ink/40">
+                    <td colSpan={6} className="px-4 py-6 text-center text-ink/65">
                       No hay cuentas que coincidan.
                     </td>
                   </tr>
@@ -329,12 +329,12 @@ export default function Docentes() {
             <span className="text-4xl">✅</span>
             <p className="font-bold">Cuenta creada para {creado.nombre}</p>
             <div className="rounded-chunky bg-grass-50 p-4">
-              <p className="text-xs font-extrabold uppercase text-ink/40">Usuario</p>
+              <p className="text-xs font-extrabold uppercase text-ink/65">Usuario</p>
               <p className="text-xl font-extrabold text-grass-700">{creado.cedula}</p>
-              <p className="mt-2 text-xs font-extrabold uppercase text-ink/40">Contraseña</p>
+              <p className="mt-2 text-xs font-extrabold uppercase text-ink/65">Contraseña</p>
               <p className="text-xl font-extrabold text-grass-700">{creado.password}</p>
             </div>
-            <p className="text-sm text-ink/50">Comunícale estos datos para que pueda entrar.</p>
+            <p className="text-sm text-ink/70">Comunícale estos datos para que pueda entrar.</p>
             <button className="btn-primary justify-center" onClick={() => setModalOpen(false)}>
               Listo
             </button>
@@ -368,7 +368,7 @@ export default function Docentes() {
                   🎲 Generar
                 </button>
               </div>
-              <p className="mt-1 text-xs text-ink/40">Con esto va a entrar, y también es parte de su contraseña.</p>
+              <p className="mt-1 text-xs text-ink/65">Con esto va a entrar, y también es parte de su contraseña.</p>
             </div>
             <div>
               <label className="label">Rol</label>
@@ -399,7 +399,7 @@ export default function Docentes() {
                 onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
                 placeholder="Ej. 18091234567"
               />
-              <p className="mt-1 text-xs text-ink/40">Si no lo saben ahora, el docente puede agregarlo después.</p>
+              <p className="mt-1 text-xs text-ink/65">Si no lo saben ahora, el docente puede agregarlo después.</p>
             </div>
 
             {form.role === 'padre' && (
@@ -430,7 +430,7 @@ export default function Docentes() {
                           {n.nombre_completo}
                         </button>
                       ))}
-                      {ninosFiltrados.length === 0 && <p className="px-3 py-2 text-sm text-ink/40">Sin resultados.</p>}
+                      {ninosFiltrados.length === 0 && <p className="px-3 py-2 text-sm text-ink/65">Sin resultados.</p>}
                     </div>
                   )}
                 </div>

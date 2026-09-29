@@ -60,7 +60,7 @@ export default function CompleteProfile() {
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
           <span className="text-6xl">🎉</span>
           <h1 className="text-2xl font-bold text-grape-600">¡Bienvenido/a{profile?.nombre_completo ? `, ${profile.nombre_completo.split(' ')[0]}` : ''}!</h1>
-          <p className="text-ink/50">Crea tu contraseña para entrar a la escuelita</p>
+          <p className="text-ink/70">Crea tu contraseña para entrar a la escuelita</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -87,7 +87,7 @@ export default function CompleteProfile() {
           <button type="submit" disabled={busy} className="btn-primary mt-2 justify-center">
             {busy ? 'Guardando...' : 'Empezar a usar la app'}
           </button>
-          <button type="button" onClick={signOut} className="text-sm text-ink/40 underline">
+          <button type="button" onClick={signOut} className="text-sm text-ink/65 underline">
             Cancelar y salir
           </button>
         </form>

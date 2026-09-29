@@ -89,7 +89,7 @@ export default function BitacoraAdmin() {
       </div>
     )
   }
-  if (niveles.length === 0) return <p className="card text-ink/50">Todavía no hay clases creadas.</p>
+  if (niveles.length === 0) return <p className="card text-ink/70">Todavía no hay clases creadas.</p>
 
   const porFecha = agruparPorFecha(registros)
 
@@ -98,7 +98,7 @@ export default function BitacoraAdmin() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Bitácora 📋</h1>
-          <p className="text-ink/50">Constancia de salón antes/después de clase, refrigerio, y materiales</p>
+          <p className="text-ink/70">Constancia de salón antes/después de clase, refrigerio, y materiales</p>
         </div>
         {tab === 'bitacora' && (
           <div className="flex gap-2">
@@ -116,14 +116,14 @@ export default function BitacoraAdmin() {
         <button
           type="button"
           onClick={() => setTab('bitacora')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'bitacora' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'bitacora' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           📋 Bitácora
         </button>
         <button
           type="button"
           onClick={() => setTab('materiales')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'materiales' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'materiales' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           🧰 Materiales
         </button>
@@ -147,7 +147,7 @@ export default function BitacoraAdmin() {
           {!registros ? (
             <Skeleton className="h-64 w-full" />
           ) : porFecha.length === 0 ? (
-            <p className="card text-ink/50">Sin registros este mes para esta clase.</p>
+            <p className="card text-ink/70">Sin registros este mes para esta clase.</p>
           ) : (
             <div className="flex flex-col gap-4">
               {porFecha.map(({ fecha, antes, despues }) => (
@@ -179,24 +179,24 @@ export default function BitacoraAdmin() {
                         <div key={m.value} className="rounded-2xl border-2 border-ink/5 p-3">
                           <p className="text-sm font-bold">{m.label}</p>
                           {!r ? (
-                            <p className="mt-1 text-sm text-ink/40">Todavía no se ha registrado.</p>
+                            <p className="mt-1 text-sm text-ink/65">Todavía no se ha registrado.</p>
                           ) : (
                             <>
                               <span className={`badge mt-1 ${r.salon_ok ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
                                 {r.salon_ok ? '✅ Salón en buen estado' : '⚠️ Hubo daños'}
                               </span>
-                              <p className="mt-1 text-xs text-ink/50">Registrado por {r.docente?.nombre_completo || '—'}</p>
+                              <p className="mt-1 text-xs text-ink/70">Registrado por {r.docente?.nombre_completo || '—'}</p>
                               {r.refrigerio_detalle && <p className="mt-2 text-sm text-ink/70">🥤 Refrigerio: {r.refrigerio_detalle}</p>}
-                              {r.notas && <p className="mt-1 text-sm text-ink/60">{r.notas}</p>}
+                              {r.notas && <p className="mt-1 text-sm text-ink/75">{r.notas}</p>}
                               {fotosSalon.length > 0 && (
                                 <div className="mt-2">
-                                  <p className="mb-1 text-xs font-bold uppercase text-ink/40">Salón</p>
+                                  <p className="mb-1 text-xs font-bold uppercase text-ink/65">Salón</p>
                                   <FotosGaleria fotos={fotosSalon} size="h-16 w-16" />
                                 </div>
                               )}
                               {fotosRefrigerio.length > 0 && (
                                 <div className="mt-2">
-                                  <p className="mb-1 text-xs font-bold uppercase text-ink/40">Refrigerio</p>
+                                  <p className="mb-1 text-xs font-bold uppercase text-ink/65">Refrigerio</p>
                                   <FotosGaleria fotos={fotosRefrigerio} size="h-16 w-16" />
                                 </div>
                               )}

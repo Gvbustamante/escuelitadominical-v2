@@ -56,7 +56,7 @@ export default function Agenda() {
   }
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
 
   const hoy = hoyISO()
   const eventosDelDia = eventos ? (selectedDay ? eventos.filter((e) => e.fecha === selectedDay) : eventos) : []
@@ -66,7 +66,7 @@ export default function Agenda() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Agenda 📅</h1>
-          <p className="text-ink/50">Próximos eventos y actividades especiales</p>
+          <p className="text-ink/70">Próximos eventos y actividades especiales</p>
         </div>
         <button className="btn-primary" onClick={openNew}>
           + Nuevo evento
@@ -97,15 +97,15 @@ export default function Agenda() {
               <div key={ev.id} className={`card flex items-center justify-between gap-4 ${ev.fecha < hoy ? 'opacity-50' : ''}`}>
                 <div>
                   <p className="font-bold">{ev.titulo}</p>
-                  <p className="text-sm text-ink/50">{ev.fecha}</p>
-                  {ev.descripcion && <p className="text-sm text-ink/50">{ev.descripcion}</p>}
+                  <p className="text-sm text-ink/70">{ev.fecha}</p>
+                  {ev.descripcion && <p className="text-sm text-ink/70">{ev.descripcion}</p>}
                 </div>
-                <button onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/30 hover:text-coral-500">
+                <button onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/65 hover:text-coral-500">
                   🗑️
                 </button>
               </div>
             ))}
-            {eventosDelDia.length === 0 && <p className="card text-ink/50">No hay eventos programados.</p>}
+            {eventosDelDia.length === 0 && <p className="card text-ink/70">No hay eventos programados.</p>}
           </div>
         </div>
       )}

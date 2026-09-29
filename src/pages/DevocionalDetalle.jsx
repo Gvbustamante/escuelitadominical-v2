@@ -56,7 +56,7 @@ export default function DevocionalDetalle() {
     return (
       <div className="flex flex-col gap-4">
         <Breadcrumb navigate={navigate} />
-        <p className="card text-ink/50">No se encontró este devocional.</p>
+        <p className="card text-ink/70">No se encontró este devocional.</p>
       </div>
     )
   }
@@ -75,7 +75,7 @@ export default function DevocionalDetalle() {
         <Breadcrumb navigate={navigate} titulo={devocional.titulo} />
         <button
           onClick={compartir}
-          className="flex items-center gap-1.5 rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/50 transition-colors hover:bg-sky-50 hover:text-sky-600"
+          className="flex items-center gap-1.5 rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/70 transition-colors hover:bg-sky-50 hover:text-sky-600"
         >
           {copiado ? '✅ Copiado' : '🔗 Compartir'}
         </button>
@@ -117,7 +117,7 @@ export default function DevocionalDetalle() {
                 <p className="mt-1 text-sm font-bold uppercase text-sky-500">{devocional.nivel.nombre}</p>
               )}
             </div>
-            <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/50">{devocional.fecha}</span>
+            <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/70">{devocional.fecha}</span>
           </div>
         </div>
       )}
@@ -165,7 +165,7 @@ export default function DevocionalDetalle() {
           {/* Galería de fotos */}
           {fotos.length > 0 && (
             <div className="card">
-              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📸 Galería de fotos</p>
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/65">📸 Galería de fotos</p>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {fotos.map((f) => (
                   <button
@@ -193,7 +193,7 @@ export default function DevocionalDetalle() {
           {/* Otros materiales con preview */}
           {otrosArchivos.length > 0 && (
             <div className="card">
-              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📎 Materiales</p>
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/65">📎 Materiales</p>
               <div className="flex flex-col gap-2">
                 {otrosArchivos.map((f) => (
                   <button
@@ -231,7 +231,7 @@ export default function DevocionalDetalle() {
         {/* ═══ Sidebar: otros devocionales ═══ */}
         <aside className="w-full shrink-0 lg:w-72 xl:w-80">
           <div className="card sticky top-4">
-            <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">🙏 Otros devocionales</p>
+            <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/65">🙏 Otros devocionales</p>
             {sugeridos === null ? (
               <div className="flex flex-col gap-2">
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -239,7 +239,7 @@ export default function DevocionalDetalle() {
                 ))}
               </div>
             ) : sugeridos.length === 0 ? (
-              <p className="text-sm text-ink/40">No hay otros devocionales aún.</p>
+              <p className="text-sm text-ink/65">No hay otros devocionales aún.</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {sugeridos.map((d) => (
@@ -255,7 +255,7 @@ export default function DevocionalDetalle() {
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold">{d.titulo}</p>
-                      {d.versiculo && <p className="truncate text-xs italic text-ink/50">&ldquo;{d.versiculo}&rdquo;</p>}
+                      {d.versiculo && <p className="truncate text-xs italic text-ink/70">&ldquo;{d.versiculo}&rdquo;</p>}
                       <p className="mt-0.5 text-xs font-bold text-coral-500">{d.devocional_reacciones?.length || 0} ❤️</p>
                     </div>
                   </button>
@@ -286,8 +286,8 @@ function Breadcrumb({ navigate, titulo }) {
       </button>
       {titulo && (
         <>
-          <span className="text-ink/30">›</span>
-          <span className="truncate text-ink/50">{titulo}</span>
+          <span className="text-ink/65">›</span>
+          <span className="truncate text-ink/70">{titulo}</span>
         </>
       )}
     </nav>

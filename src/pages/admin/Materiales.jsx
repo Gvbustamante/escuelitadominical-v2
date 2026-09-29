@@ -129,7 +129,7 @@ export default function Materiales() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-ink/50">Qué hay disponible para los niños y para cada clase</p>
+        <p className="text-ink/70">Qué hay disponible para los niños y para cada clase</p>
         <div className="flex gap-2">
           <button className="btn-secondary" onClick={exportar}>
             📊 Exportar
@@ -142,7 +142,7 @@ export default function Materiales() {
 
       <div className="card overflow-x-auto p-0">
           <table className="w-full text-left text-sm">
-            <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/50">
+            <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/70">
               <tr>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Nombre</th>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Categoría/Clase</th>
@@ -156,7 +156,7 @@ export default function Materiales() {
               {materiales.map((m) => (
                 <tr key={m.id} className={`border-t border-ink/5 ${!m.activo ? 'opacity-50' : ''}`}>
                   <td className="px-3 py-1.5 sm:px-4 sm:py-2 font-bold">{m.nombre}</td>
-                  <td className="px-3 py-1.5 sm:px-4 sm:py-2 text-ink/60">
+                  <td className="px-3 py-1.5 sm:px-4 sm:py-2 text-ink/75">
                     {m.categoria === 'clase' ? m.nivel?.nombre || 'Para una clase' : CATEGORIA_LABEL[m.categoria]}
                   </td>
                   <td className="px-3 py-1.5 sm:px-4 sm:py-2">
@@ -189,7 +189,7 @@ export default function Materiales() {
               ))}
               {materiales.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-ink/40">
+                  <td colSpan={6} className="px-4 py-6 text-center text-ink/65">
                     Aún no hay materiales registrados.
                   </td>
                 </tr>

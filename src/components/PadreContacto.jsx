@@ -27,7 +27,7 @@ export default function PadreContacto({ padre, parentesco, onSaved, onDesvincula
       <p className="flex flex-wrap items-center justify-between gap-2 font-bold">
         <span className="flex flex-wrap items-center gap-2">
           {padre?.nombre_completo} {parentesco && `(${parentesco})`}
-          {padre?.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Sin entrar hace tiempo</span>}
+          {padre?.pausado && <span className="badge bg-ink/10 text-ink/70">⏸️ Sin entrar hace tiempo</span>}
         </span>
         {onDesvincular && (
           <button

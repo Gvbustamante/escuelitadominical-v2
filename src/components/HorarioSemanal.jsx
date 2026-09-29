@@ -46,13 +46,13 @@ export default function HorarioSemanal({
     return (
       <div className="card border-2 border-sunshine-200 bg-sunshine-50">
         <p className="font-bold text-sunshine-800">No hay días de clase configurados.</p>
-        <p className="mt-1 text-sm text-ink/60">Ve a Ajustes → Días de clase para activarlos.</p>
+        <p className="mt-1 text-sm text-ink/75">Ve a Ajustes → Días de clase para activarlos.</p>
       </div>
     )
   }
 
   if (equipoData.length === 0) {
-    return <p className="text-center text-ink/40">No hay miembros del equipo registrados.</p>
+    return <p className="text-center text-ink/65">No hay miembros del equipo registrados.</p>
   }
 
   const diasLabel = diasActivos.map((d) => DIAS_NOMBRE[d]).join(', ')
@@ -62,17 +62,17 @@ export default function HorarioSemanal({
       <div className="flex flex-wrap items-center gap-3">
         <div className="card flex items-center gap-2 !px-3 !py-2">
           <span className="text-lg font-extrabold text-sky-600">{equipoData.filter((e) => e.clases.length > 0).length}</span>
-          <span className="text-[0.65rem] font-bold text-ink/40">Docentes activos</span>
+          <span className="text-xs font-bold text-ink/65">Docentes activos</span>
         </div>
         <div className="card flex items-center gap-2 !px-3 !py-2">
           <span className="text-lg font-extrabold text-grass-600">{(niveles || []).length}</span>
-          <span className="text-[0.65rem] font-bold text-ink/40">Clases</span>
+          <span className="text-xs font-bold text-ink/65">Clases</span>
         </div>
         <div className="card flex items-center gap-2 !px-3 !py-2">
           <span className="text-lg font-extrabold text-sunshine-600">{(devocionalesMes || []).length}</span>
-          <span className="text-[0.65rem] font-bold text-ink/40">Devocionales</span>
+          <span className="text-xs font-bold text-ink/65">Devocionales</span>
         </div>
-        <span className="text-xs text-ink/30">Días de clase: {diasLabel}</span>
+        <span className="text-xs text-ink/65">Días de clase: {diasLabel}</span>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -94,20 +94,20 @@ export default function HorarioSemanal({
                   {clases.length > 0 ? (
                     <div className="mt-0.5 flex flex-wrap gap-1">
                       {clases.map((c) => (
-                        <span key={c.id} className={`inline-block rounded-full px-1.5 py-0 text-[0.6rem] font-bold ${BADGE_CLASSES[c.color || 'sky'] || BADGE_CLASSES.sky}`}>
+                        <span key={c.id} className={`inline-block rounded-full px-1.5 py-0 text-xs font-bold ${BADGE_CLASSES[c.color || 'sky'] || BADGE_CLASSES.sky}`}>
                           {c.nombre}
                         </span>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-[0.6rem] text-ink/30">Sin clases asignadas</p>
+                    <p className="text-xs text-ink/65">Sin clases asignadas</p>
                   )}
                 </div>
               </div>
 
               {clases.length > 0 && (
                 <div className="border-t border-ink/5 px-3 py-2">
-                  <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">Devocionales del mes</p>
+                  <p className="mb-1 text-xs font-extrabold uppercase tracking-wide text-ink/65">Devocionales del mes</p>
                   {devos.length > 0 ? (
                     <div className="flex flex-col gap-0.5">
                       {devos.slice(0, 4).map((d) => {
@@ -120,16 +120,16 @@ export default function HorarioSemanal({
                             onClick={() => navigate(`/devocionales/${d.id}`)}
                           >
                             <p className="min-w-0 flex-1 truncate text-xs font-medium text-sunshine-800">{d.titulo}</p>
-                            <span className="shrink-0 text-[0.6rem] text-ink/30">{fechaStr}</span>
+                            <span className="shrink-0 text-xs text-ink/65">{fechaStr}</span>
                           </div>
                         )
                       })}
                       {devos.length > 4 && (
-                        <p className="px-1.5 text-[0.6rem] text-ink/30">+{devos.length - 4} más</p>
+                        <p className="px-1.5 text-xs text-ink/65">+{devos.length - 4} más</p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-xs text-ink/30">Sin devocionales este mes</p>
+                    <p className="text-xs text-ink/65">Sin devocionales este mes</p>
                   )}
                 </div>
               )}
@@ -139,7 +139,7 @@ export default function HorarioSemanal({
       </div>
 
       {!esDocente && (
-        <p className="text-center text-xs text-ink/30">
+        <p className="text-center text-xs text-ink/65">
           Para cambiar las asignaciones de docentes, ve a <strong>Clases</strong>.
         </p>
       )}

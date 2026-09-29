@@ -33,7 +33,7 @@ export default function TareaHijoWidget({ actividad, hijo, entrega, onSaved }) {
 
   if (hijo.pausado) {
     return (
-      <div className="rounded-2xl bg-ink/5 px-3 py-2 text-sm text-ink/40">
+      <div className="rounded-2xl bg-ink/5 px-3 py-2 text-sm text-ink/65">
         ⏸️ Esta tarea está en pausa para {hijo.nombre_completo.split(' ')[0]}.
       </div>
     )

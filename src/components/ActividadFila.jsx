@@ -23,7 +23,7 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
       {/* Mini calendar date */}
       {fechaObj && (
         <div className="hidden h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-sky-50 text-sky-700 sm:flex">
-          <span className="text-[10px] font-bold leading-none">
+          <span className="text-xs font-bold leading-none">
             {fechaObj.toLocaleDateString('es', { month: 'short' }).toUpperCase()}
           </span>
           <span className="text-base font-extrabold leading-tight">{fechaObj.getDate()}</span>
@@ -49,7 +49,7 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
           {a.visible_padres === false && <span className="badge bg-grape-100 text-grape-700">🙈</span>}
           {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
         </div>
-        <div className="flex items-center gap-2 text-xs text-ink/40">
+        <div className="flex items-center gap-2 text-xs text-ink/65">
           <span className="sm:hidden">{a.fecha}</span>
           {fotos.length > 0 && <span>📸 {fotos.length}</span>}
           {otros.length > 0 && <span>📎 {otros.length}</span>}
@@ -66,17 +66,17 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
             </button>
           )}
           {onDuplicate && (
-            <button onClick={() => onDuplicate(a)} className="text-lg text-ink/30 hover:text-grape-500" title="Duplicar para otra fecha">
+            <button onClick={() => onDuplicate(a)} className="text-lg text-ink/65 hover:text-grape-500" title="Duplicar para otra fecha">
               📋
             </button>
           )}
           {onEdit && (
-            <button onClick={() => onEdit(a)} className="text-lg text-ink/30 hover:text-sky-500" title="Editar">
+            <button onClick={() => onEdit(a)} className="text-lg text-ink/65 hover:text-sky-500" title="Editar">
               ✏️
             </button>
           )}
           {onDelete && (
-            <button onClick={() => onDelete(a.id)} className="text-lg text-ink/30 hover:text-coral-500" title="Eliminar">
+            <button onClick={() => onDelete(a.id)} className="text-lg text-ink/65 hover:text-coral-500" title="Eliminar">
               🗑️
             </button>
           )}

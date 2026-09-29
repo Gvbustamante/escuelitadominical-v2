@@ -39,7 +39,7 @@ export default function CalendarioAgenda({ eventos, onSelectDay, selectedDay }) 
       <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => setCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 }))}
-          className="rounded-full px-3 py-1 text-xl font-bold text-ink/40 hover:bg-ink/5"
+          className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5"
         >
           ‹
         </button>
@@ -48,7 +48,7 @@ export default function CalendarioAgenda({ eventos, onSelectDay, selectedDay }) 
         </h3>
         <button
           onClick={() => setCursor((c) => (c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 }))}
-          className="rounded-full px-3 py-1 text-xl font-bold text-ink/40 hover:bg-ink/5"
+          className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5"
         >
           ›
         </button>
@@ -56,7 +56,7 @@ export default function CalendarioAgenda({ eventos, onSelectDay, selectedDay }) 
 
       <div className="grid grid-cols-7 gap-1 text-center">
         {DIAS.map((d, i) => (
-          <div key={i} className="pb-2 text-xs font-extrabold uppercase text-ink/40">
+          <div key={i} className="pb-2 text-xs font-extrabold uppercase text-ink/65">
             {d}
           </div>
         ))}

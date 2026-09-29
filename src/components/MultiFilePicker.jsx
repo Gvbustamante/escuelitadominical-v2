@@ -30,7 +30,7 @@ export default function MultiFilePicker({ archivos, onChange, label = '📎 Agre
           {label}
         </button>
         {archivos.length > 0 && (
-          <span className="text-sm text-ink/50">
+          <span className="text-sm text-ink/70">
             {archivos.length} archivo{archivos.length === 1 ? '' : 's'} listo{archivos.length === 1 ? '' : 's'} para subir
           </span>
         )}
@@ -55,7 +55,7 @@ export default function MultiFilePicker({ archivos, onChange, label = '📎 Agre
               ) : (
                 <div className="flex h-16 w-16 flex-col items-center justify-center gap-0.5 rounded-xl bg-ink/5 p-1 text-center">
                   <span className="text-lg leading-none">📄</span>
-                  <span className="w-full truncate text-[9px] font-bold text-ink/50">{f.name}</span>
+                  <span className="w-full truncate text-xs font-bold text-ink/70">{f.name}</span>
                 </div>
               )}
               <button

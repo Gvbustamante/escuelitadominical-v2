@@ -24,7 +24,7 @@ function Step({ number, icon, title, children, color = 'sky' }) {
           <span className="text-2xl">{icon}</span>
           <h3 className="text-lg font-bold">{title}</h3>
         </div>
-        <div className="text-ink/60">{children}</div>
+        <div className="text-ink/75">{children}</div>
       </div>
     </div>
   )
@@ -248,7 +248,7 @@ function RolesTab({ role }) {
             <span className={`flex h-11 w-11 items-center justify-center rounded-full text-2xl ${badge[r.color]}`}>{r.icon}</span>
             <h3 className="text-lg font-bold">{r.nombre}</h3>
           </div>
-          <p className="mt-2 text-ink/60">{r.texto}</p>
+          <p className="mt-2 text-ink/75">{r.texto}</p>
         </div>
       ))}
     </div>
@@ -271,13 +271,13 @@ export function AyudaContenido() {
       <div className="flex gap-2">
         <button
           onClick={() => setTab('guia')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'guia' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'guia' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           Guía paso a paso
         </button>
         <button
           onClick={() => setTab('roles')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'roles' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'roles' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           ¿Qué hace cada rol?
         </button>
@@ -290,7 +290,7 @@ export function AyudaContenido() {
           </div>
           <div className="card max-w-2xl bg-sky-50">
             <p className="font-bold">¿Tienes dudas?</p>
-            <p className="text-ink/60">Pídele ayuda al administrador de tu escuelita, o vuelve a esta página cuando la necesites.</p>
+            <p className="text-ink/75">Pídele ayuda al administrador de tu escuelita, o vuelve a esta página cuando la necesites.</p>
           </div>
         </>
       ) : (
@@ -312,7 +312,7 @@ export function AyudaContenido() {
             >
               Gobe App Technology
             </a>
-            <p className="text-sm text-ink/60">
+            <p className="text-sm text-ink/75">
               Creado por{' '}
               <a href="https://gobeapp.com/gise/" target="_blank" rel="noreferrer" className="font-bold text-coral-500 hover:underline">
                 Gisella Bustamante
@@ -333,7 +333,7 @@ export default function Tutorial() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Ayuda 🎓</h1>
-        <p className="text-ink/50">{title}</p>
+        <p className="text-ink/70">{title}</p>
       </div>
       <AyudaContenido />
     </div>

@@ -268,7 +268,7 @@ export default function Devocionales() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Devocionales 🙏</h1>
-          <p className="text-ink/50">Reflexiones para niños, y el versículo que se muestra cada día</p>
+          <p className="text-ink/70">Reflexiones para niños, y el versículo que se muestra cada día</p>
         </div>
         {tab === 'devocionales' && puedeCrear && (
           <button className="btn-primary" onClick={openNew}>
@@ -282,14 +282,14 @@ export default function Devocionales() {
           <button
             type="button"
             onClick={() => setTab('devocionales')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'devocionales' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'devocionales' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
           >
             🙏 Devocionales
           </button>
           <button
             type="button"
             onClick={() => setTab('versiculos')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'versiculos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'versiculos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
           >
             📖 Versículos
           </button>
@@ -315,7 +315,7 @@ export default function Devocionales() {
           {/* ═══ Filtros ═══ */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">🔍</span>
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/65">🔍</span>
               <input
                 className="input max-w-xs !pl-9"
                 placeholder="Buscar devocional..."
@@ -336,7 +336,7 @@ export default function Devocionales() {
             )}
             <button
               onClick={() => setVerTodos((v) => !v)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${verTodos ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+              className={`rounded-full px-4 py-2 text-sm font-bold ${verTodos ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
             >
               {verTodos ? 'Ver por mes' : 'Ver todos'}
             </button>
@@ -345,7 +345,7 @@ export default function Devocionales() {
               <button
                 type="button"
                 onClick={() => setVista('tarjetas')}
-                className={`px-3 py-1.5 text-sm font-bold ${vista === 'tarjetas' ? 'bg-sky-400 text-white' : 'bg-white text-ink/40 hover:bg-ink/5'}`}
+                className={`px-3 py-1.5 text-sm font-bold ${vista === 'tarjetas' ? 'bg-sky-400 text-white' : 'bg-white text-ink/65 hover:bg-ink/5'}`}
                 title="Vista tarjetas"
               >
                 ▦
@@ -353,7 +353,7 @@ export default function Devocionales() {
               <button
                 type="button"
                 onClick={() => setVista('lista')}
-                className={`px-3 py-1.5 text-sm font-bold ${vista === 'lista' ? 'bg-sky-400 text-white' : 'bg-white text-ink/40 hover:bg-ink/5'}`}
+                className={`px-3 py-1.5 text-sm font-bold ${vista === 'lista' ? 'bg-sky-400 text-white' : 'bg-white text-ink/65 hover:bg-ink/5'}`}
                 title="Vista lista"
               >
                 ☰
@@ -401,7 +401,7 @@ export default function Devocionales() {
                     {!d.imagen_url && (
                       <>
                         <h3 className="text-base font-bold">{d.titulo}</h3>
-                        <p className="text-xs text-ink/40">{formatFecha(d.fecha)}</p>
+                        <p className="text-xs text-ink/65">{formatFecha(d.fecha)}</p>
                       </>
                     )}
 
@@ -412,12 +412,12 @@ export default function Devocionales() {
 
                     {/* Versículo */}
                     {d.versiculo && (
-                      <p className="truncate text-xs italic text-ink/50">📖 &ldquo;{d.versiculo}&rdquo;</p>
+                      <p className="truncate text-xs italic text-ink/70">📖 &ldquo;{d.versiculo}&rdquo;</p>
                     )}
 
                     {/* Preview del contenido */}
                     {d.contenido && (
-                      <p className="text-xs leading-relaxed text-ink/40" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <p className="text-xs leading-relaxed text-ink/65" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {previewTexto(d.contenido, 120)}
                       </p>
                     )}
@@ -429,19 +429,19 @@ export default function Devocionales() {
                         {puedeCrear && (
                           <button
                             onClick={() => (d.activo ? quitarActivo(d) : marcarActivo(d))}
-                            className="text-sm text-ink/30 hover:text-sunshine-500"
+                            className="text-sm text-ink/65 hover:text-sunshine-500"
                             title={d.activo ? 'Quitar activo' : 'Marcar activo'}
                           >
                             {d.activo ? '⭐' : '☆'}
                           </button>
                         )}
                         {puedeCrear && (
-                          <button onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-sm text-ink/30 hover:text-grape-500" title="Duplicar">
+                          <button onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-sm text-ink/65 hover:text-grape-500" title="Duplicar">
                             📋
                           </button>
                         )}
                         {puedeCrear && (
-                          <button onClick={() => openEdit(d)} className="text-sm text-ink/30 hover:text-sky-500" title="Editar">
+                          <button onClick={() => openEdit(d)} className="text-sm text-ink/65 hover:text-sky-500" title="Editar">
                             ✏️
                           </button>
                         )}
@@ -476,10 +476,10 @@ export default function Devocionales() {
                       {d.activo && <span className="badge bg-sunshine-200 text-sunshine-800">⭐ Activo</span>}
                       {d.nivel?.nombre && <span className="badge bg-sky-100 text-sky-700">{d.nivel.nombre}</span>}
                     </div>
-                    <p className="mt-0.5 text-xs text-ink/40">{formatFecha(d.fecha)}</p>
-                    {d.versiculo && <p className="mt-1 truncate text-xs italic text-ink/50">📖 &ldquo;{d.versiculo}&rdquo;</p>}
+                    <p className="mt-0.5 text-xs text-ink/65">{formatFecha(d.fecha)}</p>
+                    {d.versiculo && <p className="mt-1 truncate text-xs italic text-ink/70">📖 &ldquo;{d.versiculo}&rdquo;</p>}
                     {d.contenido && (
-                      <p className="mt-0.5 truncate text-xs text-ink/40">{previewTexto(d.contenido, 80)}</p>
+                      <p className="mt-0.5 truncate text-xs text-ink/65">{previewTexto(d.contenido, 80)}</p>
                     )}
                   </div>
 
@@ -495,12 +495,12 @@ export default function Devocionales() {
                       </button>
                     )}
                     {puedeCrear && (
-                      <button onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-lg text-ink/30 hover:text-grape-500" title="Duplicar">
+                      <button onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-lg text-ink/65 hover:text-grape-500" title="Duplicar">
                         📋
                       </button>
                     )}
                     {puedeCrear && (
-                      <button onClick={() => openEdit(d)} className="text-lg text-ink/30 hover:text-sky-500" title="Editar">
+                      <button onClick={() => openEdit(d)} className="text-lg text-ink/65 hover:text-sky-500" title="Editar">
                         ✏️
                       </button>
                     )}
@@ -514,10 +514,10 @@ export default function Devocionales() {
           {devocionales.length === 0 && (
             <div className="card flex flex-col items-center gap-3 py-12 text-center">
               <span className="text-6xl">🙏</span>
-              <p className="text-lg font-bold text-ink/50">
+              <p className="text-lg font-bold text-ink/70">
                 {verTodos ? 'Todavía no hay devocionales publicados' : 'No hay devocionales este mes'}
               </p>
-              <p className="text-sm text-ink/30">
+              <p className="text-sm text-ink/65">
                 {puedeCrear ? 'Crea el primer devocional para los niños' : 'Pronto se publicarán nuevos devocionales'}
               </p>
               {puedeCrear && (
@@ -528,7 +528,7 @@ export default function Devocionales() {
           {devocionales.length > 0 && devocionalesFiltrados.length === 0 && (
             <div className="card flex flex-col items-center gap-2 py-8 text-center">
               <span className="text-4xl">🔍</span>
-              <p className="text-ink/50">No hay devocionales que coincidan con &ldquo;{busqueda}&rdquo;</p>
+              <p className="text-ink/70">No hay devocionales que coincidan con &ldquo;{busqueda}&rdquo;</p>
             </div>
           )}
 
@@ -537,7 +537,7 @@ export default function Devocionales() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               {/* ═══ Sección: Contenido ═══ */}
               <fieldset className="flex flex-col gap-4">
-                <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+                <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
                   🙏 Contenido
                 </legend>
                 <div>
@@ -567,7 +567,7 @@ export default function Devocionales() {
 
               {/* ═══ Sección: Detalles ═══ */}
               <fieldset className="flex flex-col gap-4">
-                <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+                <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
                   📋 Detalles
                 </legend>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -593,7 +593,7 @@ export default function Devocionales() {
 
               {/* ═══ Sección: Multimedia ═══ */}
               <fieldset className="flex flex-col gap-4">
-                <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+                <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
                   🎬 Multimedia
                 </legend>
                 <div>
@@ -604,7 +604,7 @@ export default function Devocionales() {
                     ) : (
                       <>
                         <span className="text-3xl">📷</span>
-                        <span className="text-sm font-bold text-ink/40 group-hover:text-sky-600">Toca para seleccionar una imagen</span>
+                        <span className="text-sm font-bold text-ink/65 group-hover:text-sky-600">Toca para seleccionar una imagen</span>
                       </>
                     )}
                     <input type="file" accept="image/*" className="hidden" onChange={handleImagen} />
@@ -633,7 +633,7 @@ export default function Devocionales() {
                     </div>
                   )}
                   {!form.enlace_externo && (
-                    <p className="mt-1 text-xs text-ink/40">YouTube y Vimeo se muestran como video embebido.</p>
+                    <p className="mt-1 text-xs text-ink/65">YouTube y Vimeo se muestran como video embebido.</p>
                   )}
                 </div>
                 <div>
@@ -687,7 +687,7 @@ export default function Devocionales() {
           <Modal open={!!duplicando} onClose={() => setDuplicando(null)} title="Duplicar devocional">
             {duplicando && (
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-ink/60">
+                <p className="text-sm text-ink/75">
                   Se creará una copia de <strong>{duplicando.titulo}</strong> con todos sus archivos adjuntos.
                 </p>
                 <div>

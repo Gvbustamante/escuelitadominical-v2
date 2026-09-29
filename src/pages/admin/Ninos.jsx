@@ -332,7 +332,7 @@ export default function Ninos() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Niños 🧒</h1>
-          <p className="text-ink/50">
+          <p className="text-ink/70">
             {filtrados.length} de {ninosVisibles.length} en total
           </p>
         </div>
@@ -373,7 +373,7 @@ export default function Ninos() {
                 <button
                   key={v}
                   onClick={() => setFiltro(v)}
-                  className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+                  className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
                 >
                   {label}
                 </button>
@@ -384,7 +384,7 @@ export default function Ninos() {
           {filtrados.length === 0 ? (
             <div className="card py-12 text-center">
               <p className="text-4xl">🔍</p>
-              <p className="mt-2 font-bold text-ink/40">No hay niños que coincidan.</p>
+              <p className="mt-2 font-bold text-ink/65">No hay niños que coincidan.</p>
             </div>
           ) : (
             <div className="card overflow-hidden !p-0">
@@ -412,27 +412,27 @@ export default function Ninos() {
                           {nino.sexo && <span className="text-sm">{nino.sexo === 'M' ? '👦' : '👧'}</span>}
                           <span className="truncate text-sm font-bold leading-tight">{nino.nombre_completo}</span>
                           {edad !== null && (
-                            <span className="text-[0.65rem] text-ink/40">{edad}a</span>
+                            <span className="text-xs text-ink/65">{edad}a</span>
                           )}
                           {nivel && (
-                            <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[0.6rem] font-bold leading-none ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
+                            <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-bold leading-none ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
                               {nivel.nombre}
                             </span>
                           )}
                           {nino.alergias && (
-                            <span className="text-[0.6rem] text-coral-500" title={nino.alergias}>⚠️</span>
+                            <span className="text-xs text-coral-500" title={nino.alergias}>⚠️</span>
                           )}
                           {!nino.activo && (
-                            <span className="rounded-full bg-coral-100 px-1.5 py-0.5 text-[0.6rem] font-bold leading-none text-coral-700">Inactivo</span>
+                            <span className="rounded-full bg-coral-100 px-1.5 py-0.5 text-xs font-bold leading-none text-coral-700">Inactivo</span>
                           )}
                           {nino.pausado && (
-                            <span className="text-[0.6rem] text-ink/40">⏸️</span>
+                            <span className="text-xs text-ink/65">⏸️</span>
                           )}
                         </div>
                         {padres.length > 0 && (
                           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0">
                             {padres.map((p, j) => (
-                              <span key={j} className="inline-flex items-center gap-0.5 text-[0.65rem] text-ink/40">
+                              <span key={j} className="inline-flex items-center gap-0.5 text-xs text-ink/65">
                                 {p.padre?.nombre_completo}
                                 {whatsappLink(p.padre?.telefono) && (
                                   <a href={whatsappLink(p.padre.telefono)} target="_blank" rel="noreferrer" className="text-grass-500 hover:text-grass-700">💬</a>
@@ -445,8 +445,8 @@ export default function Ninos() {
 
                       <div className="hidden shrink-0 items-center gap-3 sm:flex">
                         <span className="text-base leading-none" title={`${badge.nombre} · ${numEstrellas} estrellas`}>{badge.emoji}</span>
-                        <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[0.6rem] font-bold leading-none ${
-                          asistMes > 0 ? 'bg-grass-100 text-grass-700' : 'bg-ink/5 text-ink/40'
+                        <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-bold leading-none ${
+                          asistMes > 0 ? 'bg-grass-100 text-grass-700' : 'bg-ink/5 text-ink/65'
                         }`}>
                           ✅{asistMes}
                         </span>
@@ -468,10 +468,10 @@ export default function Ninos() {
                         )}
                         {esStaff && (
                           <>
-                            <button className="rounded-lg p-1.5 text-xs text-ink/30 hover:bg-ink/5" onClick={() => togglePausado(nino)} title={nino.pausado ? 'Reanudar' : 'Pausar'}>
+                            <button className="rounded-lg p-1.5 text-xs text-ink/65 hover:bg-ink/5" onClick={() => togglePausado(nino)} title={nino.pausado ? 'Reanudar' : 'Pausar'}>
                               {nino.pausado ? '▶️' : '⏸️'}
                             </button>
-                            <button className="rounded-lg p-1.5 text-xs text-ink/30 hover:bg-ink/5" onClick={() => handleToggleClick(nino)} title={nino.activo ? 'Desactivar' : 'Activar'}>
+                            <button className="rounded-lg p-1.5 text-xs text-ink/65 hover:bg-ink/5" onClick={() => handleToggleClick(nino)} title={nino.activo ? 'Desactivar' : 'Activar'}>
                               {nino.activo ? '🚫' : '✅'}
                             </button>
                           </>
@@ -572,12 +572,12 @@ export default function Ninos() {
             <span className="text-4xl">✅</span>
             <p className="font-bold">Cuenta creada para {creado.nombre}</p>
             <div className="rounded-chunky bg-grass-50 p-4">
-              <p className="text-xs font-extrabold uppercase text-ink/40">Cédula (usuario)</p>
+              <p className="text-xs font-extrabold uppercase text-ink/65">Cédula (usuario)</p>
               <p className="text-xl font-extrabold text-grass-700">{creado.cedula}</p>
-              <p className="mt-2 text-xs font-extrabold uppercase text-ink/40">Contraseña</p>
+              <p className="mt-2 text-xs font-extrabold uppercase text-ink/65">Contraseña</p>
               <p className="text-xl font-extrabold text-grass-700">{creado.password}</p>
             </div>
-            <p className="text-sm text-ink/50">Comunícale estos datos para que pueda entrar.</p>
+            <p className="text-sm text-ink/70">Comunícale estos datos para que pueda entrar.</p>
             <button className="btn-primary justify-center" onClick={() => setInviteModal(null)}>
               Listo
             </button>
@@ -630,7 +630,7 @@ export default function Ninos() {
                       🎲 Generar
                     </button>
                   </div>
-                  <p className="mt-1 text-xs text-ink/40">
+                  <p className="mt-1 text-xs text-ink/65">
                     No siempre es la mamá o el papá quien recoge al niño/a. Si no sabes su cédula, genera un código
                     fácil y úsalo como usuario — funciona igual.
                   </p>
@@ -651,7 +651,7 @@ export default function Ninos() {
               </form>
             ) : (
               <form onSubmit={handleVincularExistente} className="flex flex-col gap-4">
-                <p className="text-sm text-ink/50">
+                <p className="text-sm text-ink/70">
                   Para cuando el padre/madre ya es docente, coordinador/a, o ya tiene cuenta con otro hijo/a.
                 </p>
                 <div>
@@ -679,11 +679,11 @@ export default function Ninos() {
                         className="flex items-center justify-between px-3 py-2 text-left text-sm font-bold hover:bg-sky-50"
                       >
                         <span>{p.nombre_completo}</span>
-                        <span className="text-xs font-normal text-ink/40">{p.role}</span>
+                        <span className="text-xs font-normal text-ink/65">{p.role}</span>
                       </button>
                     ))}
                     {perfilesFiltrados.length === 0 && (
-                      <p className="px-3 py-2 text-sm text-ink/40">Sin resultados.</p>
+                      <p className="px-3 py-2 text-sm text-ink/65">Sin resultados.</p>
                     )}
                   </div>
                 )}

@@ -163,7 +163,7 @@ export default function Foro() {
             </div>
           </div>
           {(esStaff || seleccionado.creado_por === user.id) && (
-            <button onClick={() => borrarForo(seleccionado.id)} className="text-2xl text-ink/30 hover:text-coral-500">
+            <button onClick={() => borrarForo(seleccionado.id)} className="text-2xl text-ink/65 hover:text-coral-500">
               🗑️
             </button>
           )}
@@ -179,10 +179,10 @@ export default function Foro() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="font-bold">{m.autor?.nombre_completo}</p>
-                      <p className="text-xs text-ink/40">{new Date(m.created_at).toLocaleString('es')}</p>
+                      <p className="text-xs text-ink/65">{new Date(m.created_at).toLocaleString('es')}</p>
                     </div>
                     {(esStaff || m.autor_id === user.id) && (
-                      <button onClick={() => borrarMensaje(m.id)} className="text-lg text-ink/30 hover:text-coral-500">
+                      <button onClick={() => borrarMensaje(m.id)} className="text-lg text-ink/65 hover:text-coral-500">
                         🗑️
                       </button>
                     )}
@@ -190,7 +190,7 @@ export default function Foro() {
                   <p className="mt-2 whitespace-pre-line text-ink/70">{m.mensaje}</p>
                 </div>
               ))}
-              {mensajes.length === 0 && <p className="card text-ink/50">Sé el primero en escribir en este tema.</p>}
+              {mensajes.length === 0 && <p className="card text-ink/70">Sé el primero en escribir en este tema.</p>}
             </>
           )}
         </div>
@@ -213,7 +213,7 @@ export default function Foro() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Nuestra comunidad 🤝</h1>
-        <p className="text-ink/50">Conversemos y oremos los unos por los otros</p>
+        <p className="text-ink/70">Conversemos y oremos los unos por los otros</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -222,7 +222,7 @@ export default function Foro() {
             setTabPrincipal('foro')
             setBusqueda('')
           }}
-          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'foro' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'foro' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           💬 Foro
         </button>
@@ -231,7 +231,7 @@ export default function Foro() {
             setTabPrincipal('oracion')
             setBusqueda('')
           }}
-          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'oracion' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'oracion' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
         >
           🙏 Peticiones de oración
         </button>
@@ -262,7 +262,7 @@ export default function Foro() {
                     {f.categoria === 'evento' && <span className="badge bg-sunshine-100 text-sunshine-700">📅 Evento</span>}
                     {f.privado && <span className="badge bg-grape-100 text-grape-700">🔒 Privado</span>}
                   </div>
-                  <p className="text-sm text-ink/50">
+                  <p className="text-sm text-ink/70">
                     {f.creador?.nombre_completo} {f.evento?.titulo && `· ${f.evento.titulo}`}
                   </p>
                 </div>
@@ -270,11 +270,11 @@ export default function Foro() {
               </button>
             ))}
             {foros.length === 0 && (
-              <p className="card text-ink/50">
+              <p className="card text-ink/70">
                 {esStaffAmplio ? 'Todavía no hay temas. ¡Crea el primero!' : 'Todavía no hay temas visibles para ti.'}
               </p>
             )}
-            {foros.length > 0 && forosFiltrados.length === 0 && <p className="card text-ink/50">No hay temas que coincidan con "{busqueda}".</p>}
+            {foros.length > 0 && forosFiltrados.length === 0 && <p className="card text-ink/70">No hay temas que coincidan con "{busqueda}".</p>}
           </div>
         </>
       ) : (
@@ -317,7 +317,7 @@ export default function Foro() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-bold">{p.autor?.nombre_completo}</p>
-                    <p className="text-xs text-ink/40">{new Date(p.created_at).toLocaleString('es')}</p>
+                    <p className="text-xs text-ink/65">{new Date(p.created_at).toLocaleString('es')}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`badge ${p.privado ? 'bg-grape-100 text-grape-700' : 'bg-grass-100 text-grass-700'}`}>
@@ -329,7 +329,7 @@ export default function Foro() {
                       </button>
                     )}
                     {(esStaff || p.autor_id === user.id) && (
-                      <button onClick={() => borrarPeticion(p.id)} className="text-lg text-ink/30 hover:text-coral-500">
+                      <button onClick={() => borrarPeticion(p.id)} className="text-lg text-ink/65 hover:text-coral-500">
                         🗑️
                       </button>
                     )}
@@ -339,12 +339,12 @@ export default function Foro() {
               </div>
             ))}
             {peticiones.length === 0 && (
-              <p className="card text-ink/50">
+              <p className="card text-ink/70">
                 {esStaffAmplio ? 'Todavía no hay peticiones de oración.' : 'Todavía no hay peticiones de oración públicas.'}
               </p>
             )}
             {peticiones.length > 0 && peticionesFiltradas.length === 0 && (
-              <p className="card text-ink/50">No hay peticiones que coincidan con "{busqueda}".</p>
+              <p className="card text-ink/70">No hay peticiones que coincidan con "{busqueda}".</p>
             )}
           </div>
         </>

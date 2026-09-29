@@ -12,7 +12,7 @@ export default function ConfirmModal({
   return (
     <Modal open={open} onClose={onClose} title={title}>
       <div className="flex flex-col gap-5">
-        {message && <p className="text-ink/60">{message}</p>}
+        {message && <p className="text-ink/75">{message}</p>}
         <div className="flex gap-3">
           <button type="button" className="btn-secondary flex-1 justify-center" onClick={onClose} disabled={busy}>
             Cancelar

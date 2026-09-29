@@ -228,19 +228,19 @@ export default function Planeacion() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Planeación 📆</h1>
-        <p className="text-ink/50">Organiza las clases: quién enseña, qué se enseña y cuándo</p>
+        <p className="text-ink/70">Organiza las clases: quién enseña, qué se enseña y cuándo</p>
       </div>
 
       <div className="flex gap-2">
         <button
           onClick={() => setVista('calendario')}
-          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'calendario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'calendario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
         >
           📅 Calendario
         </button>
         <button
           onClick={() => setVista('horario')}
-          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'horario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/60 hover:bg-ink/10'}`}
+          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'horario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
         >
           👥 Equipo
         </button>
@@ -249,7 +249,7 @@ export default function Planeacion() {
       {diasClaseSet.size === 0 && (
         <div className="card border-2 border-sunshine-200 bg-sunshine-50">
           <p className="font-bold text-sunshine-800">Todavía no configuraste los días de clase.</p>
-          <p className="mt-1 text-sm text-ink/60">
+          <p className="mt-1 text-sm text-ink/75">
             Ve a <strong>Ajustes → Días de clase</strong> y activa los días que corresponda (ej. Domingo).
           </p>
         </div>
@@ -275,7 +275,7 @@ export default function Planeacion() {
             <div className="mb-4 flex items-center justify-between">
               <button
                 onClick={() => setCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 }))}
-                className="rounded-full px-3 py-1 text-xl font-bold text-ink/40 hover:bg-ink/5"
+                className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5"
               >
                 ‹
               </button>
@@ -284,7 +284,7 @@ export default function Planeacion() {
               </h3>
               <button
                 onClick={() => setCursor((c) => (c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 }))}
-                className="rounded-full px-3 py-1 text-xl font-bold text-ink/40 hover:bg-ink/5"
+                className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5"
               >
                 ›
               </button>
@@ -292,7 +292,7 @@ export default function Planeacion() {
 
             <div className="grid grid-cols-7 gap-1 text-center">
               {DIAS.map((d, i) => (
-                <div key={i} className="pb-2 text-xs font-extrabold uppercase text-ink/40">
+                <div key={i} className="pb-2 text-xs font-extrabold uppercase text-ink/65">
                   {d}
                 </div>
               ))}
@@ -327,7 +327,7 @@ export default function Planeacion() {
                 )
               })}
             </div>
-            <div className="mt-3 flex flex-wrap gap-3 text-[0.65rem] font-bold text-ink/40">
+            <div className="mt-3 flex flex-wrap gap-3 text-xs font-bold text-ink/65">
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-sky-400" /> Día de clase</span>
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-sunshine-400" /> Devocional</span>
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grass-400" /> Actividad</span>
@@ -340,11 +340,11 @@ export default function Planeacion() {
           <div className="grid grid-cols-2 gap-3">
             <div className="card flex flex-col items-center gap-1 !p-3 text-center">
               <span className="text-lg font-extrabold text-grass-600">{resumenMes.planeadas}</span>
-              <span className="text-[0.65rem] font-bold text-ink/40">Días con contenido</span>
+              <span className="text-xs font-bold text-ink/65">Días con contenido</span>
             </div>
             <div className="card flex flex-col items-center gap-1 !p-3 text-center">
               <span className={`text-lg font-extrabold ${resumenMes.sinPlanear > 0 ? 'text-coral-600' : 'text-grass-600'}`}>{resumenMes.sinPlanear}</span>
-              <span className="text-[0.65rem] font-bold text-ink/40">Sin planear</span>
+              <span className="text-xs font-bold text-ink/65">Sin planear</span>
             </div>
           </div>
         </div>
@@ -354,8 +354,8 @@ export default function Planeacion() {
           {!selectedDay ? (
             <div className="card flex flex-col items-center gap-3 py-8 text-center">
               <span className="text-4xl">📅</span>
-              <p className="font-bold text-ink/40">Elige un día del calendario</p>
-              <p className="text-sm text-ink/30">para ver o planear cada clase</p>
+              <p className="font-bold text-ink/65">Elige un día del calendario</p>
+              <p className="text-sm text-ink/65">para ver o planear cada clase</p>
             </div>
           ) : (
             <>
@@ -367,13 +367,13 @@ export default function Planeacion() {
                   {esDiaClase ? (
                     <p className="text-sm font-bold text-sky-500">Día de clase</p>
                   ) : (
-                    <p className="text-sm text-ink/40">No es día de clase</p>
+                    <p className="text-sm text-ink/65">No es día de clase</p>
                   )}
                 </div>
               </div>
 
               {nivelesVisibles.length === 0 ? (
-                <p className="card text-ink/50">
+                <p className="card text-ink/70">
                   {esDocente ? 'Todavía no tienes clases asignadas.' : 'Todavía no hay clases creadas.'}
                 </p>
               ) : (
@@ -404,16 +404,16 @@ export default function Planeacion() {
                             <div>
                               <h3 className="font-bold leading-tight">{nivel.nombre}</h3>
                               {nivel.edad_min != null && (
-                                <p className="text-[0.65rem] text-ink/40">{nivel.edad_min}–{nivel.edad_max ?? '?'} años</p>
+                                <p className="text-xs text-ink/65">{nivel.edad_min}–{nivel.edad_max ?? '?'} años</p>
                               )}
                             </div>
                           </div>
                           {tieneContenido ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-grass-100 px-2 py-0.5 text-[0.65rem] font-bold text-grass-700">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-grass-100 px-2 py-0.5 text-xs font-bold text-grass-700">
                               ✅ Planeada
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-ink/5 px-2 py-0.5 text-[0.65rem] font-bold text-ink/40">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-ink/5 px-2 py-0.5 text-xs font-bold text-ink/65">
                               Sin planear
                             </span>
                           )}
@@ -421,7 +421,7 @@ export default function Planeacion() {
 
                         {/* Docentes */}
                         <div className="px-3 py-2">
-                          <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">Docentes</p>
+                          <p className="mb-1 text-xs font-extrabold uppercase tracking-wide text-ink/65">Docentes</p>
                           <div className="flex flex-col gap-2">
                             {horariosDelDia.map((horario) => {
                               const fijo = asignacionesHorario.find((a) => a.nivel_id === nivel.id && a.horario_id === horario.id)
@@ -433,7 +433,7 @@ export default function Planeacion() {
                                 <div key={horario.id} className="rounded-lg bg-ink/[0.03] px-2.5 py-1.5">
                                   <div className="flex flex-wrap items-center gap-2">
                                     {!soloUnHorario && (
-                                      <span className="rounded-lg bg-ink/5 px-2 py-0.5 text-[0.65rem] font-bold uppercase text-ink/40">{horario.nombre}</span>
+                                      <span className="rounded-lg bg-ink/5 px-2 py-0.5 text-xs font-bold uppercase text-ink/65">{horario.nombre}</span>
                                     )}
                                     {override ? (
                                       <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold ${BADGE_CLASSES.grape}`}>
@@ -455,7 +455,7 @@ export default function Planeacion() {
                                   </div>
                                   {!esDocente && (
                                     <div className="mt-1.5 flex items-center gap-2">
-                                      <label className="text-[0.65rem] font-bold text-ink/30">Cubre hoy:</label>
+                                      <label className="text-xs font-bold text-ink/65">Cubre hoy:</label>
                                       <select
                                         className="input !w-auto !py-1 !text-xs"
                                         value={override?.docente_id || ''}
@@ -474,14 +474,14 @@ export default function Planeacion() {
                               )
                             })}
                             {horariosDelDia.length === 0 && (
-                              <p className="text-xs text-ink/30">No hay horarios configurados para este día.</p>
+                              <p className="text-xs text-ink/65">No hay horarios configurados para este día.</p>
                             )}
                           </div>
                         </div>
 
                         {/* Planeación de la clase */}
                         <div className="border-t border-ink/5 px-3 py-2">
-                          <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">📝 Planeación de la clase</p>
+                          <p className="mb-1 text-xs font-extrabold uppercase tracking-wide text-ink/65">📝 Planeación de la clase</p>
                           {planeacion ? (
                             <div className="flex flex-col gap-2">
                               {planeacion.contenido && (
@@ -501,7 +501,7 @@ export default function Planeacion() {
                               )}
                               <div className="flex items-center justify-between gap-2">
                                 {planeacion.autor?.nombre_completo && (
-                                  <span className="truncate text-xs text-ink/50">Por {planeacion.autor.nombre_completo}</span>
+                                  <span className="truncate text-xs text-ink/70">Por {planeacion.autor.nombre_completo}</span>
                                 )}
                                 <button
                                   className="btn-secondary ml-auto shrink-0 !py-1 !px-3 !text-xs"
@@ -513,7 +513,7 @@ export default function Planeacion() {
                             </div>
                           ) : (
                             <div className="flex items-center justify-between gap-2">
-                              <p className="text-sm text-ink/40">Sin planeación</p>
+                              <p className="text-sm text-ink/65">Sin planeación</p>
                               <button
                                 className="btn-primary shrink-0 !py-1.5 !px-3 !text-xs"
                                 onClick={() => setModalPlaneacion({ nivel, planeacion: null })}
@@ -526,7 +526,7 @@ export default function Planeacion() {
 
                         {/* Devocional */}
                         <div className="border-t border-ink/5 px-3 py-2">
-                          <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">🙏 Enseñanza</p>
+                          <p className="mb-1 text-xs font-extrabold uppercase tracking-wide text-ink/65">🙏 Enseñanza</p>
                           {devosNivel.length > 0 ? (
                             <div className="flex flex-col gap-2">
                               {devosNivel.map((dv) => (
@@ -537,8 +537,8 @@ export default function Planeacion() {
                                 >
                                   <div className="min-w-0 flex-1">
                                     <p className="truncate font-bold text-sunshine-800">🙏 {dv.titulo}</p>
-                                    {dv.versiculo && <p className="mt-0.5 truncate text-xs italic text-ink/40">📖 {dv.versiculo}</p>}
-                                    {!dv.nivel_id && <span className="text-[0.6rem] font-bold text-ink/30">Para todas las clases</span>}
+                                    {dv.versiculo && <p className="mt-0.5 truncate text-xs italic text-ink/65">📖 {dv.versiculo}</p>}
+                                    {!dv.nivel_id && <span className="text-xs font-bold text-ink/65">Para todas las clases</span>}
                                   </div>
                                   <span className="shrink-0 text-xs text-sunshine-600">Ver →</span>
                                 </div>
@@ -546,7 +546,7 @@ export default function Planeacion() {
                             </div>
                           ) : (
                             <div className="flex items-center justify-between gap-2">
-                              <p className="text-sm text-ink/30">Sin devocional para este día</p>
+                              <p className="text-sm text-ink/65">Sin devocional para este día</p>
                               <button
                                 className="btn-primary shrink-0 !py-1.5 !px-3 !text-xs"
                                 onClick={() => navigate('/devocionales')}
@@ -559,7 +559,7 @@ export default function Planeacion() {
 
                         {/* Actividad */}
                         <div className="border-t border-ink/5 px-3 py-2">
-                          <p className="mb-1 text-[0.6rem] font-extrabold uppercase tracking-wide text-ink/30">🎨 Actividad</p>
+                          <p className="mb-1 text-xs font-extrabold uppercase tracking-wide text-ink/65">🎨 Actividad</p>
                           {actividad ? (
                             <div className="flex items-center justify-between gap-2">
                               <div className="min-w-0 flex-1">
@@ -574,7 +574,7 @@ export default function Planeacion() {
                             </div>
                           ) : (
                             <div className="flex items-center justify-between gap-2">
-                              <p className="text-sm text-ink/30">Sin actividad complementaria</p>
+                              <p className="text-sm text-ink/65">Sin actividad complementaria</p>
                               <button
                                 className="btn-secondary shrink-0 !py-1.5 !px-3 !text-xs"
                                 onClick={() => openActividad(nivel, null)}
@@ -658,7 +658,7 @@ export default function Planeacion() {
               </button>
             </div>
           </div>
-          <p className="text-xs text-ink/40">
+          <p className="text-xs text-ink/65">
             Para agregar fotos u otros archivos, edítala después desde la pantalla de Actividades.
           </p>
           <button disabled={busy} className="btn-primary justify-center">

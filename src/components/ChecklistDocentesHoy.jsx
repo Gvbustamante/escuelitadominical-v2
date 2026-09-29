@@ -103,7 +103,7 @@ export default function ChecklistDocentesHoy() {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-xl font-bold">Actividad del equipo hoy 👀</h2>
-          <p className="text-sm text-ink/50">
+          <p className="text-sm text-ink/70">
             {docentes.length > 0
               ? `${docentes.length} de ${totalEquipo} docentes con actividad hoy`
               : 'Ningún docente ha registrado actividad hoy'}
@@ -120,7 +120,7 @@ export default function ChecklistDocentesHoy() {
       {docentes.length === 0 ? (
         <div className="mt-4 flex flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-ink/10 py-8 text-center">
           <span className="text-4xl">😴</span>
-          <p className="text-sm font-bold text-ink/30">Sin actividad registrada aún</p>
+          <p className="text-sm font-bold text-ink/65">Sin actividad registrada aún</p>
         </div>
       ) : (
         <div className="mt-4 flex flex-col gap-2">
@@ -133,7 +133,7 @@ export default function ChecklistDocentesHoy() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold">{doc.nombre}</p>
                 {doc.clases.length > 0 && (
-                  <p className="truncate text-xs text-ink/40">{doc.clases.join(', ')}</p>
+                  <p className="truncate text-xs text-ink/65">{doc.clases.join(', ')}</p>
                 )}
               </div>
 

@@ -415,7 +415,7 @@ export default function DriveOrganizado() {
       <div className="flex flex-wrap items-center gap-1.5 text-sm">
         {crumbs.map((c, i) => (
           <span key={i} className="flex items-center gap-1.5">
-            {i > 0 && <span className="text-ink/20">/</span>}
+            {i > 0 && <span className="text-ink/65">/</span>}
             {i < crumbs.length - 1 ? (
               <button onClick={() => irA(i)} className="font-bold text-sky-600 hover:text-sky-700 hover:underline">
                 {c.icon && <span className="mr-0.5">{c.icon}</span>}{c.label}
@@ -438,7 +438,7 @@ export default function DriveOrganizado() {
                 if (seleccion.size === archivosDescargables.length) setSeleccion(new Set())
                 else setSeleccion(new Set(archivosDescargables.map((_, i) => i)))
               }}
-              className="rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/50 hover:bg-ink/10"
+              className="rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/70 hover:bg-ink/10"
             >
               {seleccion.size === archivosDescargables.length && seleccion.size > 0 ? '☑ Deseleccionar' : '☐ Seleccionar todos'}
             </button>
@@ -451,12 +451,12 @@ export default function DriveOrganizado() {
           {archivosDescargables.length > 1 && seleccion.size === 0 && (
             <button
               onClick={() => descargarZip(archivosDescargables, crumbs[crumbs.length - 1]?.label || 'archivos')}
-              className="rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/50 hover:bg-ink/10"
+              className="rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/70 hover:bg-ink/10"
             >
               📥 Descargar todo ({archivosDescargables.length})
             </button>
           )}
-          <span className="text-xs text-ink/30">{archivos.length} archivo{archivos.length !== 1 ? 's' : ''}</span>
+          <span className="text-xs text-ink/65">{archivos.length} archivo{archivos.length !== 1 ? 's' : ''}</span>
         </div>
       )}
 
@@ -500,9 +500,9 @@ export default function DriveOrganizado() {
       {carpetas.length === 0 && archivos.length === 0 && (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <span className="text-6xl opacity-30">📂</span>
-          <p className="font-bold text-ink/30">Esta carpeta está vacía</p>
+          <p className="font-bold text-ink/65">Esta carpeta está vacía</p>
           {ruta.length > 0 && (
-            <button onClick={() => irA(ruta.length - 1)} className="rounded-xl bg-ink/5 px-4 py-2 text-sm font-bold text-ink/50 hover:bg-ink/10">
+            <button onClick={() => irA(ruta.length - 1)} className="rounded-xl bg-ink/5 px-4 py-2 text-sm font-bold text-ink/70 hover:bg-ink/10">
               ← Volver
             </button>
           )}
@@ -514,7 +514,7 @@ export default function DriveOrganizado() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="card flex flex-col items-center gap-4 px-12 py-8">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-sky-400 border-t-transparent" />
-            <p className="text-sm font-bold text-ink/60">{progresoDesc}</p>
+            <p className="text-sm font-bold text-ink/75">{progresoDesc}</p>
           </div>
         </div>
       )}
@@ -543,17 +543,17 @@ function FolderCard({ folder, onClick, onDownload }) {
       <div className="relative">
         <FolderIcon color={colors.fill} />
         {folder.count > 0 && (
-          <span className="absolute -right-2 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-sky-400 px-1 text-[10px] font-extrabold text-white">
+          <span className="absolute -right-2 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-sky-400 px-1 text-xs font-extrabold text-white">
             {folder.count}
           </span>
         )}
       </div>
       <p className="w-full truncate text-center text-sm font-bold text-ink/70">{folder.label}</p>
-      <p className="text-[10px] text-ink/30">{folder.count || 0} archivo{folder.count !== 1 ? 's' : ''}</p>
+      <p className="text-xs text-ink/65">{folder.count || 0} archivo{folder.count !== 1 ? 's' : ''}</p>
       {onDownload && (
         <button
           onClick={(e) => { e.stopPropagation(); onDownload() }}
-          className="absolute right-2 top-2 rounded-lg bg-ink/5 p-1.5 text-xs text-ink/30 opacity-0 transition-all hover:bg-sky-100 hover:text-sky-600 group-hover:opacity-100"
+          className="absolute right-2 top-2 rounded-lg bg-ink/5 p-1.5 text-xs text-ink/65 opacity-0 transition-all hover:bg-sky-100 hover:text-sky-600 group-hover:opacity-100"
           title="Descargar como ZIP"
         >
           📥
@@ -620,14 +620,14 @@ function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLi
           </p>
         )}
         <div className="flex items-center justify-between">
-          <p className="truncate text-[10px] text-ink/30">
+          <p className="truncate text-xs text-ink/65">
             {archivo.tipoArchivo || 'Archivo'}{archivo.fecha ? ` · ${fechaCorta(archivo.fecha)}` : ''}
           </p>
           <div className="flex shrink-0 items-center gap-0.5">
             {onRename && !editando && (
               <button
                 onClick={() => { setNuevoNombre(archivo.nombre); setEditando(true) }}
-                className="rounded p-1 text-[10px] text-ink/20 opacity-0 transition-all hover:bg-sky-50 hover:text-sky-600 group-hover:opacity-100"
+                className="rounded p-1 text-xs text-ink/65 opacity-0 transition-all hover:bg-sky-50 hover:text-sky-600 group-hover:opacity-100"
                 title="Renombrar"
               >
                 ✏️
@@ -636,7 +636,7 @@ function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLi
             {onDownload && (
               <button
                 onClick={onDownload}
-                className="rounded p-1 text-[10px] text-ink/20 opacity-0 transition-all hover:bg-sky-50 hover:text-sky-600 group-hover:opacity-100"
+                className="rounded p-1 text-xs text-ink/65 opacity-0 transition-all hover:bg-sky-50 hover:text-sky-600 group-hover:opacity-100"
                 title="Descargar"
               >
                 ⬇️
@@ -645,7 +645,7 @@ function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLi
             {onOpenLink && (
               <button
                 onClick={onOpenLink}
-                className="rounded p-1 text-[10px] text-ink/30 hover:text-sky-600"
+                className="rounded p-1 text-xs text-ink/65 hover:text-sky-600"
                 title="Abrir enlace"
               >
                 ↗️

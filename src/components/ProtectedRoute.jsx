@@ -14,7 +14,7 @@ export default function ProtectedRoute({ roles, children }) {
       <div className="flex h-screen flex-col items-center justify-center gap-3 p-6 text-center">
         <span className="text-5xl">🚫</span>
         <h2 className="text-2xl font-bold">Tu cuenta está desactivada</h2>
-        <p className="text-ink/60">Habla con el administrador de tu escuelita.</p>
+        <p className="text-ink/75">Habla con el administrador de tu escuelita.</p>
       </div>
     )
   }

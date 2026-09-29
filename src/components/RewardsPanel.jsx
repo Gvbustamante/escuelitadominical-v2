@@ -44,7 +44,7 @@ export default function RewardsPanel({ estrellas, recientes = [], onAward, busy 
               style={{ width: `${pct}%` }}
             />
           </div>
-          <p className="mt-1 text-xs font-bold text-ink/50">
+          <p className="mt-1 text-xs font-bold text-ink/70">
             {estrellas} ⭐
             {siguiente
               ? ` · faltan ${siguiente.min_estrellas - estrellas} para ${siguiente.emoji} ${siguiente.nombre}`
@@ -61,7 +61,7 @@ export default function RewardsPanel({ estrellas, recientes = [], onAward, busy 
 
       {onAward && pickerOpen && (
         <div className="mt-4 flex flex-col gap-3 rounded-2xl bg-white p-3">
-          <p className="text-xs font-extrabold uppercase tracking-wide text-ink/40">¿Por qué se la ganó?</p>
+          <p className="text-xs font-extrabold uppercase tracking-wide text-ink/65">¿Por qué se la ganó?</p>
           <div className="flex flex-wrap gap-2">
             {motivos.map((m) => (
               <button
@@ -110,10 +110,10 @@ export default function RewardsPanel({ estrellas, recientes = [], onAward, busy 
 
       {recientes.length > 0 && (
         <div className="mt-4 flex flex-col gap-2 border-t-2 border-sunshine-100 pt-3">
-          <p className="text-xs font-extrabold uppercase tracking-wide text-ink/40">Últimas estrellas</p>
+          <p className="text-xs font-extrabold uppercase tracking-wide text-ink/65">Últimas estrellas</p>
           {recientes.slice(0, 4).map((r) => (
             <p key={r.id} className="text-sm text-ink/70">
-              ⭐ {r.motivo || 'Reconocimiento'} <span className="text-ink/40">— {r.created_at?.slice(0, 10)}</span>
+              ⭐ {r.motivo || 'Reconocimiento'} <span className="text-ink/65">— {r.created_at?.slice(0, 10)}</span>
             </p>
           ))}
         </div>

@@ -107,7 +107,7 @@ export default function ActividadDetalle() {
     return (
       <div className="flex flex-col gap-4">
         <Breadcrumb navigate={navigate} />
-        <p className="card text-ink/50">No se encontró esta actividad, o no tienes acceso a ella.</p>
+        <p className="card text-ink/70">No se encontró esta actividad, o no tienes acceso a ella.</p>
       </div>
     )
   }
@@ -172,7 +172,7 @@ export default function ActividadDetalle() {
                   <p className="mt-1 text-sm font-bold uppercase text-sky-500">{actividad.nivel.nombre}</p>
                 )}
               </div>
-              <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/50">{actividad.fecha}</span>
+              <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/70">{actividad.fecha}</span>
             </div>
 
             {/* Contenido */}
@@ -220,7 +220,7 @@ export default function ActividadDetalle() {
           {/* Galería de fotos */}
           {restoFotos.length > 0 && (
             <div className="card">
-              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📸 Galería de fotos</p>
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/65">📸 Galería de fotos</p>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {restoFotos.map((f) => (
                   <button
@@ -248,7 +248,7 @@ export default function ActividadDetalle() {
           {/* Archivos adjuntos */}
           {adjuntos.length > 0 && (
             <div className="card">
-              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📎 Materiales</p>
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/65">📎 Materiales</p>
               <div className="flex flex-col gap-2">
                 {adjuntos.map((f) => (
                   <button
@@ -273,7 +273,7 @@ export default function ActividadDetalle() {
           {/* Tarea */}
           {actividad.es_tarea && (
             <div className="card">
-              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">📝 Tarea</p>
+              <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/65">📝 Tarea</p>
               <TareaSeccion actividad={actividad} onVerEntregas={() => setTareaModalOpen(true)} onSaved={load} />
             </div>
           )}
@@ -302,9 +302,9 @@ export default function ActividadDetalle() {
                   onClick={() => navigate(`/actividades/${prevNext.prev.id}`)}
                   className="card flex min-w-0 flex-1 items-center gap-2 text-left transition-colors hover:bg-sky-50"
                 >
-                  <span className="text-lg text-ink/30">←</span>
+                  <span className="text-lg text-ink/65">←</span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-bold uppercase text-ink/30">Anterior</p>
+                    <p className="text-xs font-bold uppercase text-ink/65">Anterior</p>
                     <p className="truncate text-sm font-bold">{prevNext.prev.titulo}</p>
                   </div>
                 </button>
@@ -317,10 +317,10 @@ export default function ActividadDetalle() {
                   className="card flex min-w-0 flex-1 items-center gap-2 text-right transition-colors hover:bg-sky-50"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-bold uppercase text-ink/30">Siguiente</p>
+                    <p className="text-xs font-bold uppercase text-ink/65">Siguiente</p>
                     <p className="truncate text-sm font-bold">{prevNext.next.titulo}</p>
                   </div>
-                  <span className="text-lg text-ink/30">→</span>
+                  <span className="text-lg text-ink/65">→</span>
                 </button>
               ) : (
                 <div className="flex-1" />
@@ -332,7 +332,7 @@ export default function ActividadDetalle() {
         {/* ═══ Sidebar: otras actividades del mes ═══ */}
         <aside className="w-full shrink-0 lg:w-72 xl:w-80">
           <div className="card sticky top-4">
-            <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/40">
+            <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/65">
               📅 Más de {formatMes(actividad.fecha)}
             </p>
             {otrasDelMes === null ? (
@@ -342,7 +342,7 @@ export default function ActividadDetalle() {
                 ))}
               </div>
             ) : otrasDelMes.length === 0 ? (
-              <p className="text-sm text-ink/40">No hay otras actividades este mes.</p>
+              <p className="text-sm text-ink/65">No hay otras actividades este mes.</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {otrasDelMes.map((a) => {
@@ -367,7 +367,7 @@ export default function ActividadDetalle() {
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-bold">{a.titulo}</p>
-                        <p className="text-xs text-ink/40">{a.fecha}</p>
+                        <p className="text-xs text-ink/65">{a.fecha}</p>
                       </div>
                     </button>
                   )
@@ -400,8 +400,8 @@ function Breadcrumb({ navigate, titulo }) {
       </button>
       {titulo && (
         <>
-          <span className="text-ink/30">›</span>
-          <span className="truncate text-ink/50">{titulo}</span>
+          <span className="text-ink/65">›</span>
+          <span className="truncate text-ink/70">{titulo}</span>
         </>
       )}
     </nav>

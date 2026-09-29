@@ -29,7 +29,7 @@ export default function PadreHome() {
           💛
         </span>
         <h1 className="text-3xl font-bold">¡Hola, {profile.nombre_completo.split(' ')[0]}! 💛</h1>
-        <p className="text-ink/50">Así está tu familia en la escuelita</p>
+        <p className="text-ink/70">Así está tu familia en la escuelita</p>
       </div>
 
       <CitaDelDia />
@@ -37,7 +37,7 @@ export default function PadreHome() {
       <ResumenHoy nivelIds={[...new Set(hijos.map((h) => h.nivel_id).filter(Boolean))]} />
 
       {hijos.length === 0 && (
-        <p className="card text-ink/50">Aún no tienes niños vinculados. Habla con la docente de tu hijo/a.</p>
+        <p className="card text-ink/70">Aún no tienes niños vinculados. Habla con la docente de tu hijo/a.</p>
       )}
 
       {hijos.length > 0 && (
@@ -54,7 +54,7 @@ export default function PadreHome() {
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-xl font-bold">{h.nombre_completo}</h3>
-                <p className="text-sm text-ink/50">{calcularEdad(h.fecha_nacimiento)} años · {h.parentesco}</p>
+                <p className="text-sm text-ink/70">{calcularEdad(h.fecha_nacimiento)} años · {h.parentesco}</p>
               </div>
               {h.nivel && <span className={`badge ${BADGE_CLASSES[h.nivel.color] || BADGE_CLASSES.sky}`}>{h.nivel.nombre}</span>}
             </div>

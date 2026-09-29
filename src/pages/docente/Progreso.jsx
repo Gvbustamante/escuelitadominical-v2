@@ -100,7 +100,7 @@ export default function Progreso() {
   }
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
 
   return (
     <div className="flex flex-col gap-6">
@@ -109,7 +109,7 @@ export default function Progreso() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Progreso 🌱</h1>
-          <p className="text-ink/50">Comportamiento, emociones y logros de cada niño/a</p>
+          <p className="text-ink/70">Comportamiento, emociones y logros de cada niño/a</p>
         </div>
         <VistaToggle vista={vista} onChange={setVista} />
       </div>
@@ -128,7 +128,7 @@ export default function Progreso() {
         <div className="card overflow-x-auto !p-0">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b-2 border-ink/5 text-left text-xs font-extrabold uppercase text-ink/40">
+              <tr className="border-b-2 border-ink/5 text-left text-xs font-extrabold uppercase text-ink/65">
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Niño/a</th>
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Insignia</th>
                 <th className="px-3 py-2 sm:px-4 sm:py-3">Estrellas</th>
@@ -146,13 +146,13 @@ export default function Progreso() {
                   <tr key={n.id} className={`border-b border-ink/5 ${n.pausado ? 'opacity-50 grayscale' : ''}`}>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
                       {n.nombre_completo}
-                      {n.pausado && <span className="badge ml-2 bg-ink/10 text-ink/50">⏸️ Pausado</span>}
+                      {n.pausado && <span className="badge ml-2 bg-ink/10 text-ink/70">⏸️ Pausado</span>}
                     </td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3">
-                      {badge.emoji} <span className="text-ink/50">{badge.nombre}</span>
+                      {badge.emoji} <span className="text-ink/70">{badge.nombre}</span>
                     </td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 font-bold text-sunshine-700">{estrellas.length} ⭐</td>
-                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/50">{ultima ? ultima.fecha : 'Sin notas'}</td>
+                    <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/70">{ultima ? ultima.fecha : 'Sin notas'}</td>
                     <td className="px-3 py-2 sm:px-4 sm:py-3 text-right">
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setHistorialNino(n)}>
                         Ver / dar estrella
@@ -163,7 +163,7 @@ export default function Progreso() {
               })}
               {ninos.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-ink/40">
+                  <td colSpan={5} className="px-4 py-6 text-center text-ink/65">
                     No hay niños activos en esta clase.
                   </td>
                 </tr>
@@ -182,16 +182,16 @@ export default function Progreso() {
               <div key={n.id} className={`card ${n.pausado ? 'opacity-50 grayscale' : ''}`}>
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-bold">{n.nombre_completo}</h3>
-                  {n.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado</span>}
+                  {n.pausado && <span className="badge bg-ink/10 text-ink/70">⏸️ Pausado</span>}
                 </div>
                 {ultima ? (
-                  <div className="mt-2 text-sm text-ink/60">
+                  <div className="mt-2 text-sm text-ink/75">
                     <p>Última nota: {ultima.fecha}</p>
                     {ultima.emocion && <p>{ultima.emocion}</p>}
                     {ultima.comportamiento && <p>Comportamiento: {ultima.comportamiento}</p>}
                   </div>
                 ) : (
-                  <p className="mt-2 text-sm text-ink/40">Sin notas todavía</p>
+                  <p className="mt-2 text-sm text-ink/65">Sin notas todavía</p>
                 )}
 
                 <div className="mt-3 flex items-center justify-between gap-2 rounded-full bg-sunshine-50 px-3 py-2">
@@ -217,7 +217,7 @@ export default function Progreso() {
               </div>
             )
           })}
-          {ninos.length === 0 && <p className="text-ink/40">No hay niños activos en esta clase.</p>}
+          {ninos.length === 0 && <p className="text-ink/65">No hay niños activos en esta clase.</p>}
         </div>
       )}
 
@@ -285,13 +285,13 @@ export default function Progreso() {
           )}
           {(notasPorNino[historialNino?.id] || []).map((nota) => (
             <div key={nota.id} className="rounded-2xl bg-ink/5 p-3">
-              <p className="text-sm font-bold text-ink/50">{nota.fecha}</p>
+              <p className="text-sm font-bold text-ink/70">{nota.fecha}</p>
               {nota.emocion && <p>{nota.emocion}</p>}
               {nota.comportamiento && <p className="text-sm">Comportamiento: {nota.comportamiento}</p>}
               {nota.logros && <p className="mt-1 text-sm text-ink/70">{nota.logros}</p>}
             </div>
           ))}
-          {(notasPorNino[historialNino?.id] || []).length === 0 && <p className="text-ink/40">Sin notas todavía.</p>}
+          {(notasPorNino[historialNino?.id] || []).length === 0 && <p className="text-ink/65">Sin notas todavía.</p>}
         </div>
       </Modal>
     </div>

@@ -74,7 +74,7 @@ export default function ResumenHoy({ nivelIds }) {
           <div className="min-w-0 flex-1">
             <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-600">Devocional destacado</p>
             <p className="truncate font-bold">{devocional.titulo}</p>
-            {devocional.versiculo && <p className="truncate text-sm italic text-ink/60">📖 "{devocional.versiculo}"</p>}
+            {devocional.versiculo && <p className="truncate text-sm italic text-ink/75">📖 "{devocional.versiculo}"</p>}
           </div>
         </Link>
       )}
@@ -86,7 +86,7 @@ export default function ResumenHoy({ nivelIds }) {
             {eventos.map((e) => (
               <div key={e.id} className="rounded-xl bg-grape-50 px-3 py-2 text-sm">
                 <span className="font-bold">{e.titulo}</span>
-                {e.nivel && <span className="text-ink/40"> · {e.nivel.nombre}</span>}
+                {e.nivel && <span className="text-ink/65"> · {e.nivel.nombre}</span>}
               </div>
             ))}
           </div>
@@ -100,7 +100,7 @@ export default function ResumenHoy({ nivelIds }) {
             {actividades.map((a) => (
               <Link key={a.id} to={`/actividades/${a.id}`} className="block rounded-xl bg-sky-50 px-3 py-2 text-sm transition-colors hover:bg-sky-100">
                 <span aria-hidden="true">{a.es_tarea ? '📝' : '🎨'}</span> <span className="font-bold">{a.titulo}</span>
-                {a.nivel && <span className="text-ink/40"> · {a.nivel.nombre}</span>}
+                {a.nivel && <span className="text-ink/65"> · {a.nivel.nombre}</span>}
                 {a.es_tarea && <span className="badge ml-2 bg-coral-100 text-coral-700">Tarea</span>}
               </Link>
             ))}

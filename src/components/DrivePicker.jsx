@@ -95,16 +95,16 @@ export default function DrivePicker({ open, onClose, onSelect, multiple = true, 
           <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto text-sm">
             <button
               onClick={() => { setRuta([]); setBusqueda('') }}
-              className={`shrink-0 rounded-lg px-2 py-1 font-bold transition-colors ${ruta.length === 0 ? 'bg-sky-100 text-sky-700' : 'text-ink/50 hover:bg-ink/5'}`}
+              className={`shrink-0 rounded-lg px-2 py-1 font-bold transition-colors ${ruta.length === 0 ? 'bg-sky-100 text-sky-700' : 'text-ink/70 hover:bg-ink/5'}`}
             >
               🏠
             </button>
             {ruta.map((r, i) => (
               <span key={r.id} className="flex items-center gap-1">
-                <span className="text-ink/30">/</span>
+                <span className="text-ink/65">/</span>
                 <button
                   onClick={() => { setRuta(ruta.slice(0, i + 1)); setBusqueda('') }}
-                  className={`shrink-0 rounded-lg px-2 py-1 font-bold transition-colors ${i === ruta.length - 1 ? 'bg-sky-100 text-sky-700' : 'text-ink/50 hover:bg-ink/5'}`}
+                  className={`shrink-0 rounded-lg px-2 py-1 font-bold transition-colors ${i === ruta.length - 1 ? 'bg-sky-100 text-sky-700' : 'text-ink/70 hover:bg-ink/5'}`}
                 >
                   {r.nombre}
                 </button>
@@ -122,10 +122,10 @@ export default function DrivePicker({ open, onClose, onSelect, multiple = true, 
 
         {/* Content */}
         <div className="max-h-[50vh] overflow-y-auto rounded-xl border-2 border-ink/10 divide-y divide-ink/5">
-          {loading && <p className="px-4 py-8 text-center text-ink/40 text-sm">Cargando...</p>}
+          {loading && <p className="px-4 py-8 text-center text-ink/65 text-sm">Cargando...</p>}
 
           {!loading && carpetasAqui.length === 0 && archivosAqui.length === 0 && (
-            <p className="px-4 py-8 text-center text-ink/40 text-sm">
+            <p className="px-4 py-8 text-center text-ink/65 text-sm">
               {busqueda ? 'Sin resultados.' : 'Carpeta vacía.'}
             </p>
           )}
@@ -138,7 +138,7 @@ export default function DrivePicker({ open, onClose, onSelect, multiple = true, 
             >
               <span className="text-xl">📁</span>
               <span className="flex-1 truncate text-sm font-bold">{c.nombre}</span>
-              <span className="text-ink/30 text-xs">→</span>
+              <span className="text-ink/65 text-xs">→</span>
             </button>
           ))}
 
@@ -167,7 +167,7 @@ export default function DrivePicker({ open, onClose, onSelect, multiple = true, 
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm text-ink/40">
+          <p className="text-sm text-ink/65">
             {seleccionados.length} archivo{seleccionados.length === 1 ? '' : 's'} seleccionado{seleccionados.length === 1 ? '' : 's'}
           </p>
           <button

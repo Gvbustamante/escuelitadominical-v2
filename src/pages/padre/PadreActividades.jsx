@@ -129,14 +129,14 @@ export default function PadreActividades() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Actividades 🎨</h1>
-        <p className="text-ink/50">Lo que hicieron en la escuelita</p>
+        <p className="text-ink/70">Lo que hicieron en la escuelita</p>
       </div>
 
       <HijoSelector hijos={hijos} selectedId={selectedId} onChange={setSelectedId} />
 
       {/* Búsqueda con ícono */}
       <div className="relative max-w-xs">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">🔍</span>
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/65">🔍</span>
         <input
           className="input w-full !pl-9"
           placeholder="Buscar actividad..."
@@ -151,11 +151,11 @@ export default function PadreActividades() {
           <div key={mesKey}>
             {/* Separador de mes */}
             <div className="mb-3 flex items-center gap-3">
-              <span className="text-sm font-extrabold uppercase tracking-wide text-ink/30">
+              <span className="text-sm font-extrabold uppercase tracking-wide text-ink/65">
                 📅 {nombreMes(mesKey)}
               </span>
               <div className="h-px flex-1 bg-ink/10" />
-              <span className="text-xs text-ink/30">{acts.length}</span>
+              <span className="text-xs text-ink/65">{acts.length}</span>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -221,12 +221,12 @@ export default function PadreActividades() {
                           </div>
                           <p className="text-xs font-bold uppercase text-sky-500">{a.nivel?.nombre}</p>
                         </div>
-                        <span className="shrink-0 text-xs text-ink/40">{formatFecha(a.fecha)}</span>
+                        <span className="shrink-0 text-xs text-ink/65">{formatFecha(a.fecha)}</span>
                       </div>
 
                       {/* Descripción truncada */}
                       {desc && (
-                        <p className="text-sm text-ink/60" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <p className="text-sm text-ink/75" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                           {desc}
                         </p>
                       )}
@@ -265,7 +265,7 @@ export default function PadreActividades() {
 
                       {/* Contadores de archivos (solo si no hay hero, ya que si hay hero se muestran ahí) */}
                       {!heroFoto && (fotos.length > 0 || otros.length > 0) && (
-                        <div className="flex gap-2 text-xs text-ink/40">
+                        <div className="flex gap-2 text-xs text-ink/65">
                           {fotos.length > 0 && <span>📸 {fotos.length} foto{fotos.length !== 1 ? 's' : ''}</span>}
                           {otros.length > 0 && <span>📎 {otros.length} archivo{otros.length !== 1 ? 's' : ''}</span>}
                         </div>
@@ -295,7 +295,7 @@ export default function PadreActividades() {
                         ))}
                         <button
                           onClick={() => navigate(`/actividades/${a.id}`)}
-                          className="ml-auto text-xs font-bold text-ink/40 hover:text-sky-600"
+                          className="ml-auto text-xs font-bold text-ink/65 hover:text-sky-600"
                         >
                           {a.actividad_reacciones.length} reacciones · Ver →
                         </button>
@@ -312,14 +312,14 @@ export default function PadreActividades() {
         {actividades.length === 0 && (
           <div className="card flex flex-col items-center gap-3 py-12 text-center">
             <span className="text-6xl">🎨</span>
-            <p className="text-lg font-bold text-ink/50">Aún no hay actividades publicadas</p>
-            <p className="text-sm text-ink/30">Cuando el equipo publique actividades, las verás aquí</p>
+            <p className="text-lg font-bold text-ink/70">Aún no hay actividades publicadas</p>
+            <p className="text-sm text-ink/65">Cuando el equipo publique actividades, las verás aquí</p>
           </div>
         )}
         {actividades.length > 0 && actividadesFiltradas.length === 0 && (
           <div className="card flex flex-col items-center gap-2 py-8 text-center">
             <span className="text-4xl">🔍</span>
-            <p className="text-ink/50">No hay actividades que coincidan con &ldquo;{busqueda}&rdquo;</p>
+            <p className="text-ink/70">No hay actividades que coincidan con &ldquo;{busqueda}&rdquo;</p>
           </div>
         )}
       </div>

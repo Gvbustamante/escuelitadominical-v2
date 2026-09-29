@@ -182,7 +182,7 @@ export default function Clases() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Clases 🎒</h1>
-        <p className="text-ink/50">Niveles por edad de tu escuelita — usa ▲▼ para ordenarlas como quieras verlas</p>
+        <p className="text-ink/70">Niveles por edad de tu escuelita — usa ▲▼ para ordenarlas como quieras verlas</p>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <button className="btn-primary" onClick={openNew}>
@@ -192,7 +192,7 @@ export default function Clases() {
 
       <div className="card overflow-x-auto p-0">
         <table className="w-full text-left">
-          <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/50">
+          <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/70">
             <tr>
               <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
               <th className="px-3 py-2 sm:px-4 sm:py-3">Edades</th>
@@ -213,7 +213,7 @@ export default function Clases() {
                           type="button"
                           disabled={i === 0}
                           onClick={() => mover(nivel, -1)}
-                          className="leading-none text-ink/30 hover:text-sky-500 disabled:opacity-20 disabled:hover:text-ink/30"
+                          className="leading-none text-ink/65 hover:text-sky-500 disabled:opacity-20 disabled:hover:text-ink/65"
                           title="Subir"
                         >
                           ▲
@@ -222,7 +222,7 @@ export default function Clases() {
                           type="button"
                           disabled={i === niveles.length - 1}
                           onClick={() => mover(nivel, 1)}
-                          className="leading-none text-ink/30 hover:text-sky-500 disabled:opacity-20 disabled:hover:text-ink/30"
+                          className="leading-none text-ink/65 hover:text-sky-500 disabled:opacity-20 disabled:hover:text-ink/65"
                           title="Bajar"
                         >
                           ▼
@@ -231,19 +231,19 @@ export default function Clases() {
                       <span className="font-bold">{nivel.nombre}</span>
                     </div>
                   </td>
-                  <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/60">
+                  <td className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
                     {nivel.edad_min ?? '?'} - {nivel.edad_max ?? '?'} años
                   </td>
                   <td className="px-3 py-2 sm:px-4 sm:py-3">
                     {docs.length === 0 ? (
-                      <span className="text-sm text-ink/30">Sin asignar</span>
+                      <span className="text-sm text-ink/65">Sin asignar</span>
                     ) : (
                       <div className="flex flex-wrap gap-1">
                         {docs.map((a) => {
                           const doc = docentes.find((d) => d.id === a.docente_id)
                           if (!doc) return null
                           return (
-                            <span key={a.docente_id} className={`badge text-[11px] ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
+                            <span key={a.docente_id} className={`badge text-xs ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
                               {doc.nombre_completo.split(' ').slice(0, 2).join(' ')}
                             </span>
                           )
@@ -273,7 +273,7 @@ export default function Clases() {
             })}
             {niveles.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-ink/40">
+                <td colSpan={5} className="px-4 py-6 text-center text-ink/65">
                   Aún no hay clases. ¡Crea la primera!
                 </td>
               </tr>
@@ -329,9 +329,9 @@ export default function Clases() {
           </div>
           <div>
             <label className="label">Personas asignadas a esta clase</label>
-            <p className="mb-2 text-xs text-ink/40">Marca a quienes enseñan o ayudan en esta clase — pueden ser docentes, coordinadores o admins.</p>
+            <p className="mb-2 text-xs text-ink/65">Marca a quienes enseñan o ayudan en esta clase — pueden ser docentes, coordinadores o admins.</p>
             <div className="flex flex-col gap-2 rounded-2xl border-2 border-ink/10 p-3 max-h-40 overflow-y-auto">
-              {docentes.length === 0 && <p className="text-sm text-ink/40">Aún no hay cuentas de equipo.</p>}
+              {docentes.length === 0 && <p className="text-sm text-ink/65">Aún no hay cuentas de equipo.</p>}
               {docentes.map((d) => (
                 <label key={d.id} className="flex items-center gap-2 text-sm font-bold">
                   <input
@@ -342,7 +342,7 @@ export default function Clases() {
                   />
                   {d.nombre_completo}
                   {d.role !== 'docente' && (
-                    <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${['superadmin', 'admin'].includes(d.role) ? 'bg-grape-100 text-grape-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
+                    <span className={`ml-1 rounded-full px-2 py-0.5 text-xs font-bold ${['superadmin', 'admin'].includes(d.role) ? 'bg-grape-100 text-grape-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
                       {['superadmin', 'admin'].includes(d.role) ? 'Admin' : 'Coord'}
                     </span>
                   )}
@@ -353,15 +353,15 @@ export default function Clases() {
           {horarios.length > 1 && (
             <div>
               <label className="label">Docente fijo por horario (opcional)</label>
-              <p className="mb-2 text-xs text-ink/40">
+              <p className="mb-2 text-xs text-ink/65">
                 Si hay más de un servicio el mismo día, di quién cubre cada uno. Se vincula automáticamente arriba.
               </p>
               <div className="flex flex-col gap-2">
                 {horarios.map((h) => (
                   <div key={h.id} className="flex items-center gap-2">
-                    <span className="w-32 shrink-0 text-sm font-bold text-ink/60">
+                    <span className="w-32 shrink-0 text-sm font-bold text-ink/75">
                       {h.nombre}
-                      {h.dia_semana != null && <span className="font-normal text-ink/40"> · {DIA_LABEL[h.dia_semana]}</span>}
+                      {h.dia_semana != null && <span className="font-normal text-ink/65"> · {DIA_LABEL[h.dia_semana]}</span>}
                     </span>
                     <select
                       className="input !w-auto flex-1 !py-1.5 !text-sm"

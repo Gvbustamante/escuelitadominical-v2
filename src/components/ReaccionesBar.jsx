@@ -34,7 +34,7 @@ export default function ReaccionesBar({ tabla, columnaId, targetId, columnaUsuar
           {r}
         </button>
       ))}
-      <span className="ml-auto text-sm font-bold text-ink/40">{reacciones.length} reacciones</span>
+      <span className="ml-auto text-sm font-bold text-ink/65">{reacciones.length} reacciones</span>
     </div>
   )
 }

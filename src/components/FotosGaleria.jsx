@@ -34,7 +34,7 @@ export default function FotosGaleria({ fotos, size = 'h-24 w-24' }) {
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-1 p-1 text-center">
               <span className="text-2xl leading-none">📄</span>
-              <span className="w-full truncate text-[9px] font-bold text-ink/50">{nombreCorto(f)}</span>
+              <span className="w-full truncate text-xs font-bold text-ink/70">{nombreCorto(f)}</span>
             </div>
           )}
         </a>

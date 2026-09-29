@@ -288,7 +288,7 @@ export default function Actividades() {
   }
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
 
   // Filtrado por búsqueda + mes
   const actividadesFiltradas = (actividades || []).filter((a) =>
@@ -328,7 +328,7 @@ export default function Actividades() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Actividades 🎨</h1>
-          <p className="text-ink/50">Comparte lo que hicieron en clase</p>
+          <p className="text-ink/70">Comparte lo que hicieron en clase</p>
         </div>
         {seccion === 'clase' && (
           <button className="btn-primary" onClick={openNew}>
@@ -341,14 +341,14 @@ export default function Actividades() {
         <button
           type="button"
           onClick={() => setSeccion('clase')}
-          className={`rounded-full px-4 py-2 text-sm font-bold ${seccion === 'clase' ? 'bg-sky-400 text-white' : 'bg-white text-ink/50 border-2 border-ink/10'}`}
+          className={`rounded-full px-4 py-2 text-sm font-bold ${seccion === 'clase' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70 border-2 border-ink/10'}`}
         >
           🧒 Mi clase
         </button>
         <button
           type="button"
           onClick={() => setSeccion('equipo')}
-          className={`relative rounded-full px-4 py-2 text-sm font-bold ${seccion === 'equipo' ? 'bg-grape-400 text-white' : 'bg-white text-ink/50 border-2 border-ink/10'}`}
+          className={`relative rounded-full px-4 py-2 text-sm font-bold ${seccion === 'equipo' ? 'bg-grape-400 text-white' : 'bg-white text-ink/70 border-2 border-ink/10'}`}
         >
           🍎 Para el equipo
           {paraEquipo && paraEquipo.some((a) => a.es_tarea && (misEntregas[a.id]?.estado || 'pendiente') !== 'entregada') && (
@@ -358,7 +358,7 @@ export default function Actividades() {
       </div>
 
       <div className="relative">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">🔍</span>
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/65">🔍</span>
         <input
           className="input max-w-xs !pl-9"
           placeholder="Buscar actividad..."
@@ -382,13 +382,13 @@ export default function Actividades() {
           ) : actividades.length === 0 ? (
             <div className="card flex flex-col items-center gap-3 py-12 text-center">
               <span className="text-5xl">🎨</span>
-              <p className="text-ink/50">Aún no hay actividades para esta clase.</p>
+              <p className="text-ink/70">Aún no hay actividades para esta clase.</p>
               <button className="btn-primary mt-1" onClick={openNew}>+ Nueva actividad</button>
             </div>
           ) : mesesOrdenados.length === 0 ? (
             <div className="card flex flex-col items-center gap-2 py-8 text-center">
               <span className="text-4xl">🔍</span>
-              <p className="text-ink/50">No hay actividades que coincidan con &ldquo;{busqueda}&rdquo;.</p>
+              <p className="text-ink/70">No hay actividades que coincidan con &ldquo;{busqueda}&rdquo;.</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
@@ -403,8 +403,8 @@ export default function Actividades() {
                     >
                       <span className={`font-bold ${isOpen ? 'text-sky-700' : ''}`}>📅 {mesLabel(mes)}</span>
                       <span className="flex items-center gap-2">
-                        <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-bold text-ink/40">{acts.length}</span>
-                        <span className={`text-ink/30 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+                        <span className="rounded-full bg-ink/5 px-2 py-0.5 text-xs font-bold text-ink/65">{acts.length}</span>
+                        <span className={`text-ink/65 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
                       </span>
                     </button>
                     {isOpen && (
@@ -427,12 +427,12 @@ export default function Actividades() {
           ) : paraEquipo.length === 0 ? (
             <div className="card flex flex-col items-center gap-3 py-12 text-center">
               <span className="text-5xl">🍎</span>
-              <p className="text-ink/50">Todavía no hay comunicados para el equipo docente.</p>
+              <p className="text-ink/70">Todavía no hay comunicados para el equipo docente.</p>
             </div>
           ) : mesesEquipo.length === 0 ? (
             <div className="card flex flex-col items-center gap-2 py-8 text-center">
               <span className="text-4xl">🔍</span>
-              <p className="text-ink/50">No hay comunicados que coincidan con &ldquo;{busqueda}&rdquo;.</p>
+              <p className="text-ink/70">No hay comunicados que coincidan con &ldquo;{busqueda}&rdquo;.</p>
             </div>
           ) : (
             mesesEquipo.map(mes => {
@@ -446,8 +446,8 @@ export default function Actividades() {
                   >
                     <span className={`font-bold ${isOpen ? 'text-grape-700' : ''}`}>📅 {mesLabel(mes)}</span>
                     <span className="flex items-center gap-2">
-                      <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-bold text-ink/40">{acts.length}</span>
-                      <span className={`text-ink/30 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+                      <span className="rounded-full bg-ink/5 px-2 py-0.5 text-xs font-bold text-ink/65">{acts.length}</span>
+                      <span className={`text-ink/65 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
                     </span>
                   </button>
                   {isOpen && (
@@ -463,7 +463,7 @@ export default function Actividades() {
                               <h3 className="text-lg font-bold hover:text-sky-600">{a.titulo}</h3>
                               {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
                             </div>
-                            <span className="shrink-0 text-xs text-ink/40">{formatFecha(a.fecha)}</span>
+                            <span className="shrink-0 text-xs text-ink/65">{formatFecha(a.fecha)}</span>
                           </div>
                           <RichTextView html={a.descripcion} className="mt-1" />
                           {(a.versiculo_clave || a.historia_biblica) && (
@@ -511,7 +511,7 @@ export default function Actividades() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* ═══ Sección: Información básica ═══ */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
               📋 Información básica
             </legend>
             <div>
@@ -552,7 +552,7 @@ export default function Actividades() {
 
           {/* ═══ Sección: Configuración ═══ */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
               ⚙️ Configuración
             </legend>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -562,14 +562,14 @@ export default function Actividades() {
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, visible_padres: true })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.visible_padres ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.visible_padres ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     👀 Padres ven
                   </button>
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, visible_padres: false })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.visible_padres ? 'bg-grape-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.visible_padres ? 'bg-grape-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     🙈 Solo equipo
                   </button>
@@ -581,14 +581,14 @@ export default function Actividades() {
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, es_tarea: false })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.es_tarea ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.es_tarea ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     📢 Informativa
                   </button>
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, es_tarea: true })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.es_tarea ? 'bg-sunshine-400 text-white shadow-sm' : 'bg-ink/5 text-ink/50 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.es_tarea ? 'bg-sunshine-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     📝 Tarea
                   </button>
@@ -606,7 +606,7 @@ export default function Actividades() {
 
           {/* ═══ Sección: Multimedia ═══ */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/30">
+            <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
               🎬 Multimedia
             </legend>
             <div>
@@ -617,7 +617,7 @@ export default function Actividades() {
                 ) : (
                   <>
                     <span className="text-3xl">📷</span>
-                    <span className="text-sm font-bold text-ink/40 group-hover:text-sky-600">Toca para seleccionar una imagen</span>
+                    <span className="text-sm font-bold text-ink/65 group-hover:text-sky-600">Toca para seleccionar una imagen</span>
                   </>
                 )}
                 <input type="file" accept="image/*" className="hidden" onChange={handleImagen} />
@@ -647,7 +647,7 @@ export default function Actividades() {
                 </div>
               )}
               {!form.enlace_externo && (
-                <p className="mt-1 text-xs text-ink/40">YouTube y Vimeo se muestran como video embebido.</p>
+                <p className="mt-1 text-xs text-ink/65">YouTube y Vimeo se muestran como video embebido.</p>
               )}
             </div>
             <div>
@@ -713,7 +713,7 @@ export default function Actividades() {
       <Modal open={!!duplicando} onClose={() => setDuplicando(null)} title="Duplicar actividad">
         {duplicando && (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-ink/60">
+            <p className="text-sm text-ink/75">
               Se creará una copia de <strong>{duplicando.titulo}</strong> con todos sus archivos adjuntos.
             </p>
             <div>

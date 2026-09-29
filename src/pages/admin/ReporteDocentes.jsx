@@ -283,7 +283,7 @@ export default function ReporteDocentes() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Reporte docentes 📊</h1>
-          <p className="text-ink/50">
+          <p className="text-ink/70">
             Resumen mensual de participación — {totalDiasClase} día{totalDiasClase !== 1 ? 's' : ''} de clase en{' '}
             {new Date(mes + '-01').toLocaleDateString('es', { month: 'long', year: 'numeric' })}
           </p>
@@ -300,34 +300,34 @@ export default function ReporteDocentes() {
         <div className="card flex flex-col items-center gap-1 !p-4 text-center">
           <span className="text-2xl">👥</span>
           <p className="text-2xl font-extrabold text-sky-600">{reporte.length}</p>
-          <p className="text-xs font-bold text-ink/40">Equipo activo</p>
+          <p className="text-xs font-bold text-ink/65">Equipo activo</p>
         </div>
         <div className="card flex flex-col items-center gap-1 !p-4 text-center">
           <span className="text-2xl">📅</span>
           <p className="text-2xl font-extrabold text-grape-600">{totalDiasClase}</p>
-          <p className="text-xs font-bold text-ink/40">Días de clase</p>
+          <p className="text-xs font-bold text-ink/65">Días de clase</p>
         </div>
         <div className="card flex flex-col items-center gap-1 !p-4 text-center">
           <span className="text-2xl">✅</span>
           <p className="text-2xl font-extrabold text-grass-600">
             {reporte.filter((x) => x.pct >= 80).length}
           </p>
-          <p className="text-xs font-bold text-ink/40">Cumplimiento ≥ 80%</p>
+          <p className="text-xs font-bold text-ink/65">Cumplimiento ≥ 80%</p>
         </div>
         <div className="card flex flex-col items-center gap-1 !p-4 text-center">
           <span className="text-2xl">⚠️</span>
           <p className="text-2xl font-extrabold text-coral-600">
             {reporte.filter((x) => x.pct < 50).length}
           </p>
-          <p className="text-xs font-bold text-ink/40">Por debajo del 50%</p>
+          <p className="text-xs font-bold text-ink/65">Por debajo del 50%</p>
         </div>
       </div>
 
       {reporte.length === 0 ? (
-        <p className="card text-center text-ink/40">No hay docentes activos.</p>
+        <p className="card text-center text-ink/65">No hay docentes activos.</p>
       ) : (
         <>
-          <p className="text-sm font-bold text-ink/40">Toca un docente para ver su reporte detallado e historial</p>
+          <p className="text-sm font-bold text-ink/65">Toca un docente para ver su reporte detallado e historial</p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {reporte.map((item, i) => (
               <button
@@ -341,7 +341,7 @@ export default function ReporteDocentes() {
                   <Avatar nombre={item.nombre} size="lg" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-base font-bold leading-tight">{item.nombre}</p>
-                    <p className="mt-0.5 text-xs text-ink/40">{item.clases.join(', ') || 'Sin clases'}</p>
+                    <p className="mt-0.5 text-xs text-ink/65">{item.clases.join(', ') || 'Sin clases'}</p>
                     <div className="mt-2 flex items-center gap-2">
                       <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-ink/10">
                         <div
@@ -353,29 +353,29 @@ export default function ReporteDocentes() {
                         {item.pct}%
                       </span>
                     </div>
-                    <p className="mt-1 text-[0.65rem] text-ink/40">{item.diasActivo} de {totalDiasClase} días activo</p>
+                    <p className="mt-1 text-xs text-ink/65">{item.diasActivo} de {totalDiasClase} días activo</p>
                   </div>
                 </div>
                 <div className="flex border-t border-ink/5">
                   <div className="flex flex-1 flex-col items-center border-r border-ink/5 py-2">
                     <span className="text-sm font-extrabold text-grass-600">{item.diasAsistencia}</span>
-                    <span className="text-[0.6rem] font-bold text-ink/40">Asist.</span>
+                    <span className="text-xs font-bold text-ink/65">Asist.</span>
                   </div>
                   <div className="flex flex-1 flex-col items-center border-r border-ink/5 py-2">
                     <span className="text-sm font-extrabold text-grape-600">{item.bitacorasTotal}</span>
-                    <span className="text-[0.6rem] font-bold text-ink/40">Bitácoras</span>
+                    <span className="text-xs font-bold text-ink/65">Bitácoras</span>
                   </div>
                   <div className="flex flex-1 flex-col items-center border-r border-ink/5 py-2">
                     <span className="text-sm font-extrabold text-sky-600">{item.actividades}</span>
-                    <span className="text-[0.6rem] font-bold text-ink/40">Activid.</span>
+                    <span className="text-xs font-bold text-ink/65">Activid.</span>
                   </div>
                   <div className="flex flex-1 flex-col items-center border-r border-ink/5 py-2">
                     <span className="text-sm font-extrabold text-sunshine-600">{item.progresos}</span>
-                    <span className="text-[0.6rem] font-bold text-ink/40">Notas</span>
+                    <span className="text-xs font-bold text-ink/65">Notas</span>
                   </div>
                   <div className="flex flex-1 flex-col items-center py-2">
                     <span className="text-sm font-extrabold text-coral-600">{item.ninosAgregados}</span>
-                    <span className="text-[0.6rem] font-bold text-ink/40">Niños</span>
+                    <span className="text-xs font-bold text-ink/65">Niños</span>
                   </div>
                 </div>
               </button>
@@ -395,7 +395,7 @@ export default function ReporteDocentes() {
               <Avatar nombre={r.nombre} size="md" />
               <div className="min-w-0 flex-1">
                 <p className="font-bold">{r.nombre}</p>
-                {r.clases.length > 0 && <p className="text-sm text-ink/50">{r.clases.join(', ')}</p>}
+                {r.clases.length > 0 && <p className="text-sm text-ink/70">{r.clases.join(', ')}</p>}
               </div>
               <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-bold ${pctBadge(r.pct)}`}>
                 {r.pct}%
@@ -405,27 +405,27 @@ export default function ReporteDocentes() {
             <div className="grid grid-cols-3 gap-2 text-center sm:grid-cols-5">
               <div className="rounded-xl bg-grass-50 p-2">
                 <p className="text-lg font-extrabold text-grass-600">{r.diasAsistencia}</p>
-                <p className="text-[0.6rem] font-bold text-ink/40">Asistencia</p>
+                <p className="text-xs font-bold text-ink/65">Asistencia</p>
               </div>
               <div className="rounded-xl bg-grape-50 p-2">
                 <p className="text-lg font-extrabold text-grape-600">{r.bitacorasTotal}</p>
-                <p className="text-[0.6rem] font-bold text-ink/40">Bitácoras</p>
+                <p className="text-xs font-bold text-ink/65">Bitácoras</p>
               </div>
               <div className="rounded-xl bg-sky-50 p-2">
                 <p className="text-lg font-extrabold text-sky-600">{r.actividades}</p>
-                <p className="text-[0.6rem] font-bold text-ink/40">Actividades</p>
+                <p className="text-xs font-bold text-ink/65">Actividades</p>
               </div>
               <div className="rounded-xl bg-sunshine-50 p-2">
                 <p className="text-lg font-extrabold text-sunshine-600">{r.progresos}</p>
-                <p className="text-[0.6rem] font-bold text-ink/40">Notas</p>
+                <p className="text-xs font-bold text-ink/65">Notas</p>
               </div>
               <div className="rounded-xl bg-coral-50 p-2">
                 <p className="text-lg font-extrabold text-coral-600">{r.ninosAgregados}</p>
-                <p className="text-[0.6rem] font-bold text-ink/40">Niños</p>
+                <p className="text-xs font-bold text-ink/65">Niños</p>
               </div>
             </div>
 
-            <p className="text-xs font-extrabold uppercase tracking-wide text-ink/40">Historial — últimas 2 semanas</p>
+            <p className="text-xs font-extrabold uppercase tracking-wide text-ink/65">Historial — últimas 2 semanas</p>
 
             {!historial ? (
               <div className="flex flex-col gap-2">
@@ -434,18 +434,18 @@ export default function ReporteDocentes() {
                 <Skeleton className="h-10 w-full" />
               </div>
             ) : Object.keys(historial).length === 0 ? (
-              <p className="text-sm text-ink/40">Sin actividad en las últimas 2 semanas.</p>
+              <p className="text-sm text-ink/65">Sin actividad en las últimas 2 semanas.</p>
             ) : (
               Object.entries(historial).map(([fecha, eventos]) => (
                 <div key={fecha}>
-                  <p className="mb-1.5 text-sm font-bold text-ink/50">{fechaCorta(fecha)}</p>
+                  <p className="mb-1.5 text-sm font-bold text-ink/70">{fechaCorta(fecha)}</p>
                   <div className="flex flex-col gap-1">
                     {eventos.map((e, i) => (
                       <div key={i} className="flex items-center gap-2 rounded-xl bg-ink/5 px-3 py-2 text-sm">
                         <span>{e.icon}</span>
                         <span className="font-bold">{e.tipo}</span>
-                        {e.detalle && <span className="text-ink/50">· {e.detalle}</span>}
-                        {e.hora && <span className="ml-auto shrink-0 text-xs text-ink/30">{e.hora}</span>}
+                        {e.detalle && <span className="text-ink/70">· {e.detalle}</span>}
+                        {e.hora && <span className="ml-auto shrink-0 text-xs text-ink/65">{e.hora}</span>}
                       </div>
                     ))}
                   </div>
@@ -456,7 +456,7 @@ export default function ReporteDocentes() {
         )}
       </Modal>
 
-      <p className="text-center text-xs text-ink/30">
+      <p className="text-center text-xs text-ink/65">
         El cumplimiento mide los días que el docente tuvo alguna actividad registrada (asistencia, bitácora o cobertura) vs. los {totalDiasClase} días de clase del mes.
       </p>
     </div>

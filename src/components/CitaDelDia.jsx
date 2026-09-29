@@ -98,7 +98,7 @@ export default function CitaDelDia() {
     return (
       <div className="card border-4 border-sky-200 bg-sky-50">
         <p className="text-lg font-extrabold text-sky-700">📖 Aún no elegiste la cita de hoy</p>
-        <p className="mt-1 text-sm text-ink/60">
+        <p className="mt-1 text-sm text-ink/75">
           ¿Cuál será la cita del día para todos? Elige una de tu lista o crea una nueva.
         </p>
         {pool.length > 0 ? (
@@ -116,7 +116,7 @@ export default function CitaDelDia() {
             </button>
           </div>
         ) : (
-          <p className="mt-3 text-sm text-ink/50">Todavía no hay ninguna cita cargada.</p>
+          <p className="mt-3 text-sm text-ink/70">Todavía no hay ninguna cita cargada.</p>
         )}
         <Link to="/citas-biblicas" className="mt-3 inline-block text-sm font-bold text-sky-600 hover:underline">
           Ir a Versículos para crear una nueva →
@@ -161,7 +161,7 @@ export default function CitaDelDia() {
             <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: theme.label }}>
               Versículo del día
             </p>
-            <p className="mt-1 text-sm font-bold text-ink/50">{intro(primerNombre)}:</p>
+            <p className="mt-1 text-sm font-bold text-ink/70">{intro(primerNombre)}:</p>
             <p className="mt-1 text-lg font-extrabold italic leading-snug text-ink sm:text-xl">"{cita.texto}"</p>
             <p className="mt-2 text-sm font-bold" style={{ color: theme.label }}>
               — {cita.referencia}

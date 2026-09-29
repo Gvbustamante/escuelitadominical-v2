@@ -80,18 +80,18 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
         <input type="date" className="input max-w-xs" value={fecha} onChange={(e) => setFecha(e.target.value)} />
 
         {cargando ? (
-          <p className="text-sm text-ink/40">Cargando...</p>
+          <p className="text-sm text-ink/65">Cargando...</p>
         ) : !ninos || ninos.length === 0 ? (
-          <p className="text-sm text-ink/40">No hay niños activos en esta clase.</p>
+          <p className="text-sm text-ink/65">No hay niños activos en esta clase.</p>
         ) : (
           <>
-            <p className="font-bold text-ink/60">
+            <p className="font-bold text-ink/75">
               {presentes} de {ninos.length} presentes
             </p>
             {ninos.length > 10 ? (
               <div className="max-h-80 overflow-y-auto rounded-2xl border-2 border-ink/10">
                 <table className="w-full text-left">
-                  <thead className="sticky top-0 bg-sky-50 text-xs font-bold uppercase text-ink/50">
+                  <thead className="sticky top-0 bg-sky-50 text-xs font-bold uppercase text-ink/70">
                     <tr>
                       <th className="px-3 py-2">Niño/a</th>
                       <th className="px-3 py-2 text-center">Insignia</th>
@@ -116,7 +116,7 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
                               onClick={() => toggle(n.id)}
                               aria-label={`Marcar presente a ${n.nombre_completo}`}
                               className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full text-base shadow-pop transition-transform active:translate-y-0.5 active:shadow-none ${
-                                presente ? 'bg-grass-400 text-white' : 'bg-white text-ink/20 ring-2 ring-ink/10'
+                                presente ? 'bg-grass-400 text-white' : 'bg-white text-ink/65 ring-2 ring-ink/10'
                               }`}
                             >
                               {presente ? '✅' : ''}
@@ -160,7 +160,7 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
                       >
                         <span className="text-2xl">{presente ? '✅' : badge.emoji}</span>
                         <span className="text-sm font-bold leading-tight">{n.nombre_completo}</span>
-                        <span className={`text-[0.6rem] font-bold leading-tight ${presente ? 'text-white/70' : 'text-ink/40'}`}>
+                        <span className={`text-xs font-bold leading-tight ${presente ? 'text-white/70' : 'text-ink/65'}`}>
                           {badge.nombre} · {stars} ⭐
                         </span>
                       </button>

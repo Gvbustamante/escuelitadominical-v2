@@ -45,7 +45,7 @@ export default function DocenteHome() {
           🌟
         </span>
         <h1 className="text-3xl font-bold">¡Hola, miss {profile.nombre_completo.split(' ')[0]}! 🌟</h1>
-        <p className="text-ink/50">Tus clases asignadas</p>
+        <p className="text-ink/70">Tus clases asignadas</p>
       </div>
 
       <CitaDelDia />
@@ -56,7 +56,7 @@ export default function DocenteHome() {
         <MiClase onChange={load} />
       ) : (
         clases.length === 0 && (
-          <p className="card text-ink/50">
+          <p className="card text-ink/70">
             Aún no tienes clases asignadas. Pide al administrador que te asigne una en la sección de Clases.
           </p>
         )
@@ -69,7 +69,7 @@ export default function DocenteHome() {
           <div key={c.id} className="card animate-pop-in transition-transform duration-200 hover:-translate-y-1" style={{ animationDelay: `${i * 80}ms` }}>
             <span className={`badge ${BADGE_CLASSES[c.color] || BADGE_CLASSES.sky}`}>{c.edad_min}-{c.edad_max} años</span>
             <h3 className="mt-2 text-xl font-bold">{c.nombre}</h3>
-            <p className="text-ink/50">{c.count} niños activos</p>
+            <p className="text-ink/70">{c.count} niños activos</p>
           </div>
         ))}
       </div>
@@ -78,17 +78,17 @@ export default function DocenteHome() {
         <Link to="/asistencia" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '80ms' }}>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grass-100 text-2xl">✅</span>
           <p className="flex-1 font-bold">Tomar asistencia</p>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
         <Link to="/actividades" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '160ms' }}>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sunshine-100 text-2xl">🎨</span>
           <p className="flex-1 font-bold">Subir actividad</p>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
         <Link to="/agenda" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '240ms' }}>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grape-100 text-2xl">📅</span>
           <p className="flex-1 font-bold">Agendar evento</p>
-          <span className="text-ink/20 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/40">→</span>
+          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
         </Link>
       </div>
     </div>

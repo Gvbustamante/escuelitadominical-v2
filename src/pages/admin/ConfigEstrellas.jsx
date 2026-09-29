@@ -88,16 +88,16 @@ export default function ConfigEstrellas() {
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-ink/50">Configura los motivos rápidos y las insignias que ganan los niños</p>
+      <p className="text-ink/70">Configura los motivos rápidos y las insignias que ganan los niños</p>
 
       <div className="card max-w-2xl">
         <p className="label mb-1">Motivos de reconocimiento</p>
-        <p className="mb-3 text-sm text-ink/50">Los botones rápidos que ve el docente al dar una estrella.</p>
+        <p className="mb-3 text-sm text-ink/70">Los botones rápidos que ve el docente al dar una estrella.</p>
 
         <div className="flex flex-col gap-2">
           {motivos.map((m) => (
             <div key={m.id} className="flex items-center justify-between gap-3 rounded-xl bg-ink/5 px-3 py-2">
-              <span className={`font-bold ${!m.activo ? 'text-ink/30 line-through' : ''}`}>
+              <span className={`font-bold ${!m.activo ? 'text-ink/65 line-through' : ''}`}>
                 {m.emoji} {m.texto}
               </span>
               <div className="flex gap-2">
@@ -113,7 +113,7 @@ export default function ConfigEstrellas() {
               </div>
             </div>
           ))}
-          {motivos.length === 0 && <p className="text-sm text-ink/40">Sin motivos todavía.</p>}
+          {motivos.length === 0 && <p className="text-sm text-ink/65">Sin motivos todavía.</p>}
         </div>
 
         <form onSubmit={agregarMotivo} className="mt-4 flex gap-2">
@@ -137,7 +137,7 @@ export default function ConfigEstrellas() {
 
       <div className="card max-w-2xl">
         <p className="label mb-1">Insignias / niveles de estrella</p>
-        <p className="mb-3 text-sm text-ink/50">A partir de cuántas estrellas un niño alcanza cada insignia.</p>
+        <p className="mb-3 text-sm text-ink/70">A partir de cuántas estrellas un niño alcanza cada insignia.</p>
 
         <div className="flex flex-col gap-2">
           {niveles.map((n) => (
@@ -155,7 +155,7 @@ export default function ConfigEstrellas() {
                 />
               </div>
               <div className="flex items-center justify-between gap-2 sm:justify-end">
-                <div className="flex items-center gap-1 text-sm text-ink/50">
+                <div className="flex items-center gap-1 text-sm text-ink/70">
                   <span>desde</span>
                   <input
                     type="number"
@@ -178,7 +178,7 @@ export default function ConfigEstrellas() {
               </div>
             </div>
           ))}
-          {niveles.length === 0 && <p className="text-sm text-ink/40">Sin niveles todavía.</p>}
+          {niveles.length === 0 && <p className="text-sm text-ink/65">Sin niveles todavía.</p>}
         </div>
 
         <form onSubmit={agregarNivel} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -197,7 +197,7 @@ export default function ConfigEstrellas() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex flex-1 items-center gap-1 text-sm text-ink/50 sm:flex-none">
+            <div className="flex flex-1 items-center gap-1 text-sm text-ink/70 sm:flex-none">
               <span>desde</span>
               <input
                 type="number"

@@ -43,23 +43,23 @@ export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClo
     <Modal open={open} onClose={onClose} title={`Detalle — ${nino.nombre_completo}`}>
       <div className="flex flex-col gap-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="badge bg-ink/5 text-ink/60">{calcularEdad(nino.fecha_nacimiento)} años</span>
+          <span className="badge bg-ink/5 text-ink/75">{calcularEdad(nino.fecha_nacimiento)} años</span>
           {nivel && <span className={`badge ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>{nivel.nombre}</span>}
           <span className={`badge ${nino.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
             {nino.activo ? 'Activo' : 'Inactivo'}
           </span>
-          {nino.pausado && <span className="badge bg-ink/10 text-ink/50">⏸️ Pausado</span>}
+          {nino.pausado && <span className="badge bg-ink/10 text-ink/70">⏸️ Pausado</span>}
         </div>
 
         {nino.alergias && (
           <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">⚠️ Alergias: {nino.alergias}</p>
         )}
-        {nino.notas && <p className="text-sm text-ink/60">📝 {nino.notas}</p>}
+        {nino.notas && <p className="text-sm text-ink/75">📝 {nino.notas}</p>}
 
         <div>
-          <p className="mb-2 text-xs font-extrabold uppercase text-ink/40">Padres/encargados</p>
+          <p className="mb-2 text-xs font-extrabold uppercase text-ink/65">Padres/encargados</p>
           {padres.length === 0 ? (
-            <p className="text-sm text-ink/40">Sin vincular</p>
+            <p className="text-sm text-ink/65">Sin vincular</p>
           ) : (
             <div className="flex flex-col gap-2">
               {padres.map((p, i) => (
@@ -76,21 +76,21 @@ export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClo
         </div>
 
         {!historial ? (
-          <p className="text-sm text-ink/40">Cargando historial...</p>
+          <p className="text-sm text-ink/65">Cargando historial...</p>
         ) : (
           <>
             <div className="flex items-center gap-3 rounded-2xl bg-sunshine-50 p-3">
               <span className="text-3xl">{badge.emoji}</span>
               <div>
                 <p className="font-bold">{badge.nombre}</p>
-                <p className="text-sm text-ink/50">{historial.estrellas.length} estrella(s) en total</p>
+                <p className="text-sm text-ink/70">{historial.estrellas.length} estrella(s) en total</p>
               </div>
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-extrabold uppercase text-ink/40">Últimas asistencias</p>
+              <p className="mb-2 text-xs font-extrabold uppercase text-ink/65">Últimas asistencias</p>
               {historial.asistencia.length === 0 ? (
-                <p className="text-sm text-ink/40">Sin registros todavía.</p>
+                <p className="text-sm text-ink/65">Sin registros todavía.</p>
               ) : (
                 <ul className="flex flex-col gap-1 text-sm">
                   {historial.asistencia.map((a, i) => (
@@ -106,9 +106,9 @@ export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClo
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-extrabold uppercase text-ink/40">Notas de progreso</p>
+              <p className="mb-2 text-xs font-extrabold uppercase text-ink/65">Notas de progreso</p>
               {historial.notas.length === 0 ? (
-                <p className="text-sm text-ink/40">Sin notas todavía.</p>
+                <p className="text-sm text-ink/65">Sin notas todavía.</p>
               ) : (
                 <ul className="flex flex-col gap-2 text-sm">
                   {historial.notas.map((n, i) => (
@@ -116,7 +116,7 @@ export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClo
                       <p className="font-bold">
                         {n.fecha} {n.comportamiento && `· ${n.comportamiento}`} {n.emocion && `· ${n.emocion}`}
                       </p>
-                      {n.logros && <p className="text-ink/60">{n.logros}</p>}
+                      {n.logros && <p className="text-ink/75">{n.logros}</p>}
                     </li>
                   ))}
                 </ul>

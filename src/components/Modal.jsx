@@ -27,7 +27,7 @@ export default function Modal({ open, onClose, title, wide, children }) {
           <h3 className="text-lg font-bold">{title}</h3>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-lg leading-none text-ink/40 transition-colors hover:bg-ink/5 hover:text-ink/70"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-lg leading-none text-ink/65 transition-colors hover:bg-ink/5 hover:text-ink/70"
           >
             ✕
           </button>

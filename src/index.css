@@ -45,7 +45,7 @@
            sm:px-4 sm:py-3 sm:text-lg;
   }
   .label {
-    @apply block text-xs font-extrabold text-ink/50 mb-1.5 uppercase tracking-wider;
+    @apply block text-xs font-extrabold text-ink/70 mb-1.5 uppercase tracking-wider;
   }
   .badge {
     @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold sm:px-3 sm:text-sm;
@@ -74,7 +74,7 @@
     float: left;
     height: 0;
     pointer-events: none;
-    @apply text-ink/30;
+    @apply text-ink/50;
   }
 }
 

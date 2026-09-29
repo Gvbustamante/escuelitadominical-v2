@@ -27,7 +27,7 @@ export default function Asistencia() {
   }, [load])
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/50">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
 
   const nivelActual = clases.find((c) => c.id === nivelId)
 
@@ -41,7 +41,7 @@ export default function Asistencia() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Asistencia ✅</h1>
-        <p className="text-ink/50">Toma asistencia, revisa el mes y las ausencias</p>
+        <p className="text-ink/70">Toma asistencia, revisa el mes y las ausencias</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -49,7 +49,7 @@ export default function Asistencia() {
           <button
             key={v}
             onClick={() => setTab(v)}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/50'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
           >
             {label}
           </button>

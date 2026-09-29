@@ -83,7 +83,7 @@ function NavItem({ item }) {
       end={item.end}
       className={({ isActive }) =>
         `flex items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold transition-colors sm:py-3 sm:text-lg ${
-          isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/60 hover:bg-sky-50'
+          isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/75 hover:bg-sky-50'
         }`
       }
     >
@@ -100,7 +100,7 @@ function NavSubItem({ item }) {
       end={item.end}
       className={({ isActive }) =>
         `flex items-center gap-2 rounded-xl px-3 py-2 pl-9 text-sm font-bold transition-colors sm:text-base ${
-          isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/50 hover:bg-sky-50'
+          isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/70 hover:bg-sky-50'
         }`
       }
     >
@@ -157,11 +157,11 @@ function SidebarNav({ items, menuEstructura, pathname }) {
             <button
               type="button"
               onClick={() => toggleCat(idx)}
-              className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold text-ink/60 transition-colors hover:bg-sky-50 sm:py-3 sm:text-lg"
+              className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold text-ink/75 transition-colors hover:bg-sky-50 sm:py-3 sm:text-lg"
             >
               <span className="text-xl sm:text-2xl">{cat.icon}</span>
               <span className="flex-1 text-left">{cat.nombre}</span>
-              <span className={`text-xs text-ink/30 transition-transform ${open ? 'rotate-90' : ''}`}>▶</span>
+              <span className={`text-xs text-ink/65 transition-transform ${open ? 'rotate-90' : ''}`}>▶</span>
             </button>
             {open && (
               <div className="flex flex-col gap-0.5">
@@ -249,7 +249,7 @@ export default function Layout() {
           </div>
           <button
             onClick={() => setMenuOpen(false)}
-            className="shrink-0 rounded-full p-1.5 text-2xl leading-none text-ink/40 hover:bg-ink/5 md:hidden"
+            className="shrink-0 rounded-full p-1.5 text-2xl leading-none text-ink/65 hover:bg-ink/5 md:hidden"
             aria-label="Cerrar menú"
           >
             ×
@@ -261,7 +261,7 @@ export default function Layout() {
         <div className="mt-2 flex flex-col gap-2 border-t-2 border-ink/5 pt-3 sm:mt-4 sm:pt-4">
           <div className="text-center">
             <p className="truncate text-sm font-bold">{profile?.nombre_completo}</p>
-            <p className="text-xs text-ink/50">{ROLE_LABEL[profile?.role]}</p>
+            <p className="text-xs text-ink/70">{ROLE_LABEL[profile?.role]}</p>
           </div>
           {!['superadmin', 'admin', 'coordinador'].includes(profile?.role) && (
             <button onClick={() => setPwOpen(true)} className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
@@ -277,7 +277,7 @@ export default function Layout() {
             href="https://gobeapp.com"
             target="_blank"
             rel="noreferrer"
-            className="mt-1 text-center text-[10px] font-bold uppercase tracking-wide text-ink/30 hover:text-sky-500"
+            className="mt-1 text-center text-xs font-bold uppercase tracking-wide text-ink/65 hover:text-sky-500"
           >
             Gobe App Technology
           </a>
@@ -288,7 +288,7 @@ export default function Layout() {
         <header className="sticky top-0 z-30 flex items-center justify-between border-b-4 border-sky-100 bg-white px-3 py-2.5 md:hidden">
           <button
             onClick={() => setMenuOpen(true)}
-            className="rounded-full p-2 text-2xl leading-none text-ink/60 hover:bg-sky-50"
+            className="rounded-full p-2 text-2xl leading-none text-ink/75 hover:bg-sky-50"
             aria-label="Abrir menú"
           >
             ☰

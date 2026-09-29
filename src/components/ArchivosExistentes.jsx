@@ -52,7 +52,7 @@ export default function ArchivosExistentes({ archivos, tabla = 'actividad_archiv
 
   return (
     <div className="mt-3">
-      <p className="mb-2 text-xs font-extrabold uppercase tracking-wide text-ink/40">Archivos subidos</p>
+      <p className="mb-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">Archivos subidos</p>
 
       {fotos.length > 0 && (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
@@ -84,7 +84,7 @@ export default function ArchivosExistentes({ archivos, tabla = 'actividad_archiv
             <div key={f.id} className="flex items-center gap-2 rounded-xl bg-ink/[0.03] px-3 py-2">
               <span className="text-lg">{iconoPorTipo(f.nombre_archivo)}</span>
               <span className="min-w-0 flex-1 truncate text-sm font-bold text-ink/70">{f.nombre_archivo || 'Archivo'}</span>
-              {f.bucket === 'drive' && <span className="text-[10px] font-bold text-sky-500">Drive</span>}
+              {f.bucket === 'drive' && <span className="text-xs font-bold text-sky-500">Drive</span>}
               <button
                 type="button"
                 onClick={() => eliminar(f)}
