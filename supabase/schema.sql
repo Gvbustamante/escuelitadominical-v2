@@ -786,7 +786,7 @@ create table public.config_iglesia (
   nombre_iglesia text,
   logo_url text,
   menu_estructura jsonb,
-  modulos_activos jsonb,
+  modulos_activos text[],
   updated_at timestamptz not null default now()
 );
 comment on table public.config_iglesia is 'Configuracion general de la iglesia/escuelita (una sola fila). Logo personalizable por el admin.';

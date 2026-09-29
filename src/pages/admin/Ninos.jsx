@@ -26,6 +26,19 @@ function calcularEdad(fecha) {
   return edad
 }
 
+// Se registra solo la edad; se guarda una fecha aproximada (hoy - edad) para que la edad suba sola cada año.
+// Si la edad no cambió, se conserva la fecha que ya existía (puede ser la exacta).
+function fechaDesdeEdad(edad, fechaActual) {
+  if (edad === '' || edad === null || edad === undefined) return null
+  const n = Number(edad)
+  if (!Number.isFinite(n) || n < 0) return null
+  if (fechaActual && calcularEdad(fechaActual) === n) return fechaActual
+  const hoy = new Date()
+  const mm = String(hoy.getMonth() + 1).padStart(2, '0')
+  const dd = String(hoy.getDate()).padStart(2, '0')
+  return `${hoy.getFullYear() - n}-${mm}-${dd}`
+}
+
 export default function Ninos() {
   const { profile, user } = useAuth()
   const esStaff = STAFF.includes(profile.role)
@@ -48,7 +61,7 @@ export default function Ninos() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ nombre_completo: '', fecha_nacimiento: '', nivel_id: '', sexo: '', alergias: '', notas: '' })
+  const [form, setForm] = useState({ nombre_completo: '', edad: '', nivel_id: '', sexo: '', alergias: '', notas: '' })
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -128,7 +141,7 @@ export default function Ninos() {
     const defaultNivel = esDocente
       ? (niveles.find((n) => misNivelIds?.has(n.id))?.id || '')
       : ''
-    setForm({ nombre_completo: '', fecha_nacimiento: '', nivel_id: defaultNivel, sexo: '', alergias: '', notas: '' })
+    setForm({ nombre_completo: '', edad: '', nivel_id: defaultNivel, sexo: '', alergias: '', notas: '' })
     setError('')
     setModalOpen(true)
   }
@@ -137,7 +150,7 @@ export default function Ninos() {
     setEditing(nino)
     setForm({
       nombre_completo: nino.nombre_completo,
-      fecha_nacimiento: nino.fecha_nacimiento || '',
+      edad: calcularEdad(nino.fecha_nacimiento) ?? '',
       nivel_id: nino.nivel_id || '',
       sexo: nino.sexo || '',
       alergias: nino.alergias || '',
@@ -153,7 +166,7 @@ export default function Ninos() {
     setError('')
     const payload = {
       nombre_completo: form.nombre_completo,
-      fecha_nacimiento: form.fecha_nacimiento || null,
+      fecha_nacimiento: fechaDesdeEdad(form.edad, editing?.fecha_nacimiento),
       nivel_id: form.nivel_id || null,
       sexo: form.sexo || null,
       alergias: form.alergias || null,
@@ -499,12 +512,17 @@ export default function Ninos() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label">Fecha de nacimiento</label>
+              <label className="label">Edad (años)</label>
               <input
-                type="date"
+                type="number"
+                inputMode="numeric"
+                min="0"
+                max="99"
+                step="1"
                 className="input"
-                value={form.fecha_nacimiento}
-                onChange={(e) => setForm({ ...form, fecha_nacimiento: e.target.value })}
+                placeholder="Ej. 7"
+                value={form.edad}
+                onChange={(e) => setForm({ ...form, edad: e.target.value })}
               />
             </div>
             <div>

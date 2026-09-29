@@ -146,7 +146,7 @@ export default function Materiales() {
               <tr>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Nombre</th>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Categoría/Clase</th>
-                <th className="px-3 py-1.5 sm:px-4 sm:py-2">Fotos</th>
+                <th className="px-3 py-1.5 sm:px-4 sm:py-2">Archivos</th>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Cantidad</th>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Estado</th>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Acciones</th>
@@ -242,8 +242,8 @@ export default function Materiales() {
             <textarea className="input" rows={2} value={form.notas} onChange={(e) => setForm({ ...form, notas: e.target.value })} />
           </div>
           <div>
-            <label className="label">{editing ? 'Agregar más archivos (opcional)' : 'Archivos (opcional)'}</label>
-            <MultiFilePicker archivos={fotos} onChange={setFotos} label="📎 Agregar archivo(s)" />
+            <label className="label">{editing ? 'Agregar más fotos o PDF (opcional)' : 'Fotos o PDF (opcional)'}</label>
+            <MultiFilePicker archivos={fotos} onChange={setFotos} accept="image/*,application/pdf,.pdf" label="📎 Agregar fotos o PDF" />
             {editing && <FotosGaleria fotos={fotosDe(editing)} />}
           </div>
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}

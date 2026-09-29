@@ -57,7 +57,7 @@ export default function Docentes() {
     const [{ data: perfiles }, { data: asignaciones }, { data: vinculos }, { data: n }] = await Promise.all([
       supabase.from('profiles').select('*').order('role').order('nombre_completo'),
       supabase.from('docentes_niveles').select('docente_id, nivel:niveles(nombre)'),
-      supabase.from('ninos_padres').select('padre_id, nino:ninos(nombre_completo)'),
+      supabase.from('ninos_padres').select('padre_id, nino:ninos(nombre_completo, nivel:niveles(nombre))'),
       supabase.from('ninos').select('id, nombre_completo, activo').eq('activo', true).order('nombre_completo'),
     ])
     setUsuarios(perfiles || [])
@@ -75,7 +75,7 @@ export default function Docentes() {
     ;(vinculos || []).forEach((v) => {
       if (!v.nino?.nombre_completo) return
       hijos[v.padre_id] = hijos[v.padre_id] || []
-      hijos[v.padre_id].push(v.nino.nombre_completo)
+      hijos[v.padre_id].push(v.nino.nivel?.nombre ? `${v.nino.nombre_completo} (${v.nino.nivel.nombre})` : v.nino.nombre_completo)
     })
     setHijosPorPadre(hijos)
   }, [])
@@ -247,7 +247,7 @@ export default function Docentes() {
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Rol</th>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Usuario</th>
-                  <th className="px-3 py-2 sm:px-4 sm:py-3">Vínculo</th>
+                  <th className="px-3 py-2 sm:px-4 sm:py-3">Nivel</th>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Estado</th>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Acciones</th>
                 </tr>

@@ -9,14 +9,15 @@ Marca `[x]` cuando se complete.
 - [x] Ajustes → Módulos: mostrar error si falla al guardar.
 
 ## 🙋 Pedidos de la iglesia (prioridad 1)
-- [ ] **Nivel Tweens** — se puede crear hoy desde Clases (sin código). Confirmar con la iglesia.
-- [ ] **"Vínculo" → "Nivel"** en tabla de Equipo (Docentes.jsx). Padres: mostrar "Hijo (Nivel)".
-- [ ] **Materiales: permitir PDF** — hoy la galería solo muestra fotos; mostrar ícono/visor PDF y limitar a imagen+PDF.
-- [ ] **Edad en vez de fecha de nacimiento** — pedir solo edad, guardar año aproximado para que la edad suba sola cada año. Fecha exacta opcional.
+- [x] **Nivel Tweens** — creado en la base (🎧 Tweens, 10–12 años). Ajustar edades en Clases si hace falta.
+- [x] **"Vínculo" → "Nivel"** en tabla de Equipo (Docentes.jsx). Padres: mostrar "Hijo (Nivel)".
+- [x] **Materiales: permitir PDF** — selector acepta fotos y PDF; columna "Archivos".
+- [x] **Edad en vez de fecha de nacimiento** — pedir solo edad, guardar año aproximado para que la edad suba sola cada año. Fecha exacta opcional.
 - [ ] **Planeación de clase** — por clase/fecha: escribir la planeación (editor de texto) o subir PDF; vista ordenada para docentes y coordinación.
 
 ## 🔧 Pendiente inmediato
-- [ ] Correr `supabase/actualizacion_modulos_activos.sql` en cada proyecto Supabase de iglesia existente.
+- [x] Proyecto "Escuelita Dominical - v2" ya tiene `modulos_activos` (text[]). Correr la migración solo en proyectos de iglesias nuevas/otras.
+- [ ] Bumblebee usa el bucket `bumblebee-images` dentro del proyecto de Escuelita → moverlo a su propio proyecto.
 
 ## 🏗️ Técnico / escalabilidad
 - [ ] Migrar a **multi-tenant**: un solo proyecto Supabase + un solo deploy, columna `iglesia_id` en todas las tablas + RLS por iglesia.
