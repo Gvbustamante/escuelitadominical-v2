@@ -27,4 +27,8 @@ mejora/xxx  ──►  pruebas  ──►  main
 ## Vercel (configurar una vez)
 1. Vercel → Add New Project → importar `escuelitadominical-v2`.
 2. Settings → Git → **Production Branch: `pruebas`** (así Vercel nunca publica `main`).
-3. Settings → Environment Variables: `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` (de la base de **pruebas**).
+3. Settings → Environment Variables: `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` del proyecto Supabase **"Escuelita Dominical - v2"** (los mismos valores de `netlify.toml`).
+
+## Bases de datos
+- **Escuelita Dominical - v2**: base del SaaS. Aquí se construye y se prueba.
+- Otras iglesias: cada una con su propio proyecto Supabase hasta migrar a multi-tenant. Sus SQL se corren a mano (ver `TAREAS.md`).
