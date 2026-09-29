@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
+import { useConfigIglesia } from '../lib/configIglesia'
+import { moduloActivo } from '../lib/modulos'
 import { coincide } from '../lib/busqueda'
 import Spinner from '../components/Spinner'
 import Modal from '../components/Modal'
@@ -46,6 +48,10 @@ export default function Devocionales() {
   const navigate = useNavigate()
   const puedeCrear = ['superadmin', 'admin', 'coordinador', 'docente'].includes(profile.role)
   const puedeVerVersiculos = ['superadmin', 'admin', 'coordinador'].includes(profile.role)
+  const config = useConfigIglesia()
+  const verActividad = moduloActivo(config, 'actividades')
+  const verPlaneacion = moduloActivo(config, 'planeacion')
+  const [contenidoDia, setContenidoDia] = useState({ actividades: [], planeaciones: [] })
   const [tab, setTab] = useState('devocionales')
   const [vista, setVista] = useState('tarjetas')
   const [nivelFiltro, setNivelFiltro] = useState('')
@@ -84,7 +90,40 @@ export default function Devocionales() {
     }
     const { data } = await query
     setDevocionales(data || [])
+
+    // Para el equipo: saber qué devocionales ya tienen actividad y planeación ese día.
+    const fechas = [...new Set((data || []).map((d) => d.fecha))]
+    if (puedeCrear && fechas.length > 0) {
+      const [{ data: acts }, { data: plans }] = await Promise.all([
+        supabase.from('actividades').select('nivel_id, fecha').in('fecha', fechas),
+        supabase.from('planeacion_clase').select('nivel_id, fecha').in('fecha', fechas),
+      ])
+      setContenidoDia({ actividades: acts || [], planeaciones: plans || [] })
+    }
   }, [mes, verTodos, puedeCrear])
+
+  // Coincide por fecha y, si el devocional es de una clase, también por clase.
+  const tiene = (lista, d) => lista.some((x) => x.fecha === d.fecha && (!d.nivel_id || x.nivel_id === d.nivel_id))
+
+  function badgesContenido(d) {
+    if (!puedeCrear) return null
+    return (
+      <>
+        {verActividad &&
+          (tiene(contenidoDia.actividades, d) ? (
+            <span className="badge bg-grass-100 text-grass-700">🎨 Con actividad</span>
+          ) : (
+            <span className="badge bg-ink/5 text-ink/65">Sin actividad</span>
+          ))}
+        {verPlaneacion &&
+          (tiene(contenidoDia.planeaciones, d) ? (
+            <span className="badge bg-coral-100 text-coral-700">📝 Con planeación</span>
+          ) : (
+            <span className="badge bg-ink/5 text-ink/65">Sin planeación</span>
+          ))}
+      </>
+    )
+  }
 
   useEffect(() => {
     load()
@@ -408,6 +447,7 @@ export default function Devocionales() {
                     {/* Badges */}
                     <div className="flex flex-wrap gap-1.5">
                       {d.nivel?.nombre && <span className="badge bg-sky-100 text-sky-700">{d.nivel.nombre}</span>}
+                      {badgesContenido(d)}
                     </div>
 
                     {/* Versículo */}
@@ -475,6 +515,7 @@ export default function Devocionales() {
                       <p className="text-sm font-bold hover:text-sky-600 sm:text-base">{d.titulo}</p>
                       {d.activo && <span className="badge bg-sunshine-200 text-sunshine-800">⭐ Activo</span>}
                       {d.nivel?.nombre && <span className="badge bg-sky-100 text-sky-700">{d.nivel.nombre}</span>}
+                      {badgesContenido(d)}
                     </div>
                     <p className="mt-0.5 text-xs text-ink/65">{formatFecha(d.fecha)}</p>
                     {d.versiculo && <p className="mt-1 truncate text-xs italic text-ink/70">📖 &ldquo;{d.versiculo}&rdquo;</p>}
