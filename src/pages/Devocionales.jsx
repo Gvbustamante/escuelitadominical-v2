@@ -33,6 +33,12 @@ function formatFecha(iso) {
   return d.toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+function formatFechaLarga(iso) {
+  if (!iso) return ''
+  const d = new Date(iso + 'T12:00:00')
+  return d.toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' })
+}
+
 function stripHtml(html) {
   if (!html) return ''
   return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
@@ -406,86 +412,89 @@ export default function Devocionales() {
               {devocionalesFiltrados.map((d) => (
                 <div
                   key={d.id}
-                  className="card group cursor-pointer overflow-hidden !p-0 transition-all duration-200 hover:-translate-y-1 hover:shadow-soft"
+                  className="card group flex cursor-pointer flex-col overflow-hidden !p-0 transition-all duration-200 hover:-translate-y-1 hover:shadow-soft"
                   onClick={() => navigate(`/devocionales/${d.id}`)}
                 >
-                  {/* Imagen o header con color */}
-                  {d.imagen_url ? (
-                    <div className="relative h-40 overflow-hidden">
+                  {/* Imagen (sin texto encima para que se lea bien) */}
+                  <div className="relative h-28 overflow-hidden bg-gradient-to-br from-sky-50 to-grape-50">
+                    {d.imagen_url ? (
                       <img
                         src={d.imagen_url}
-                        alt={d.titulo}
+                        alt=""
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-3">
-                        <h3 className="text-base font-bold text-white drop-shadow">{d.titulo}</h3>
-                        <p className="text-xs font-bold text-white/70">{formatFecha(d.fecha)}</p>
-                      </div>
-                      {d.activo && (
-                        <span className="badge absolute left-2 top-2 bg-sunshine-200/90 text-sunshine-800 shadow-sm">⭐ Activo</span>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="relative flex h-32 flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-grape-50">
-                      <span className="text-5xl">🙏</span>
-                      {d.activo && (
-                        <span className="badge absolute left-2 top-2 bg-sunshine-200/90 text-sunshine-800 shadow-sm">⭐ Activo</span>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="flex flex-col gap-2 p-4">
-                    {/* Título (si no hay imagen) */}
-                    {!d.imagen_url && (
-                      <>
-                        <h3 className="text-base font-bold">{d.titulo}</h3>
-                        <p className="text-xs text-ink/65">{formatFecha(d.fecha)}</p>
-                      </>
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-4xl">🙏</div>
                     )}
+                    {d.activo && (
+                      <span className="badge absolute left-2 top-2 bg-sunshine-200 text-sunshine-800 shadow-sm">⭐ Devocional activo</span>
+                    )}
+                  </div>
 
-                    {/* Badges */}
-                    <div className="flex flex-wrap gap-1.5">
-                      {d.nivel?.nombre && <span className="badge bg-sky-100 text-sky-700">{d.nivel.nombre}</span>}
-                      {badgesContenido(d)}
+                  <div className="flex flex-1 flex-col gap-3 p-4">
+                    {/* 1. Fecha y clase */}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-sm font-extrabold capitalize text-sky-700">📅 {formatFechaLarga(d.fecha)}</span>
+                      <span className="badge bg-sky-100 text-sky-700">{d.nivel?.nombre || 'Todas las clases'}</span>
                     </div>
 
-                    {/* Versículo */}
+                    {/* 2. Título */}
+                    <h3 className="text-lg font-bold leading-snug">{d.titulo}</h3>
+
+                    {/* 3. Versículo */}
                     {d.versiculo && (
-                      <p className="truncate text-xs italic text-ink/70">📖 &ldquo;{d.versiculo}&rdquo;</p>
+                      <p className="line-clamp-2 text-sm italic text-ink/75">📖 {d.versiculo}</p>
                     )}
 
-                    {/* Preview del contenido */}
-                    {d.contenido && (
-                      <p className="text-xs leading-relaxed text-ink/65" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {previewTexto(d.contenido, 120)}
-                      </p>
+                    {/* 4. Preparación (solo equipo) */}
+                    {puedeCrear && (verActividad || verPlaneacion) && (
+                      <div className="rounded-xl bg-ink/[0.03] px-3 py-2">
+                        <p className="mb-1 text-xs font-extrabold uppercase tracking-wide text-ink/65">Preparación</p>
+                        <ul className="flex flex-col gap-1 text-sm">
+                          <li className="flex items-center gap-2"><span aria-hidden>✅</span> Devocional</li>
+                          {verActividad && (
+                            <li className={`flex items-center gap-2 ${tiene(contenidoDia.actividades, d) ? '' : 'text-ink/65'}`}>
+                              <span aria-hidden>{tiene(contenidoDia.actividades, d) ? '✅' : '⬜'}</span>
+                              Actividad{!tiene(contenidoDia.actividades, d) && <span className="text-xs">(falta)</span>}
+                            </li>
+                          )}
+                          {verPlaneacion && (
+                            <li className={`flex items-center gap-2 ${tiene(contenidoDia.planeaciones, d) ? '' : 'text-ink/65'}`}>
+                              <span aria-hidden>{tiene(contenidoDia.planeaciones, d) ? '✅' : '⬜'}</span>
+                              Planeación{!tiene(contenidoDia.planeaciones, d) && <span className="text-xs">(falta)</span>}
+                            </li>
+                          )}
+                        </ul>
+                      </div>
                     )}
 
-                    {/* Footer */}
-                    <div className="mt-1 flex items-center justify-between border-t border-ink/5 pt-2">
-                      <span className="text-xs font-bold text-coral-500">{d.devocional_reacciones?.length || 0} ❤️</span>
-                      <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                        {puedeCrear && (
-                          <button aria-label={d.activo ? 'Quitar activo' : 'Marcar activo'}
-                            onClick={() => (d.activo ? quitarActivo(d) : marcarActivo(d))}
-                            className="text-sm text-ink/65 hover:text-sunshine-500"
+                    {/* 5. Pie: reacciones y acciones */}
+                    <div className="mt-auto flex items-center justify-between gap-2 border-t border-ink/5 pt-3">
+                      <span className="text-sm font-bold text-coral-500">❤️ {d.devocional_reacciones?.length || 0}</span>
+                      {puedeCrear && (
+                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            aria-label={d.activo ? 'Quitar activo' : 'Marcar activo'}
                             title={d.activo ? 'Quitar activo' : 'Marcar activo'}
+                            onClick={() => (d.activo ? quitarActivo(d) : marcarActivo(d))}
+                            className="rounded-full px-2 py-1 text-base hover:bg-sunshine-50"
                           >
                             {d.activo ? '⭐' : '☆'}
                           </button>
-                        )}
-                        {puedeCrear && (
-                          <button aria-label="Duplicar" onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }} className="text-sm text-ink/65 hover:text-grape-500" title="Duplicar">
-                            📋
+                          <button
+                            onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }}
+                            className="rounded-full bg-ink/5 px-3 py-1 text-xs font-bold text-ink/75 hover:bg-grape-50 hover:text-grape-600"
+                          >
+                            📋 Duplicar
                           </button>
-                        )}
-                        {puedeCrear && (
-                          <button aria-label="Editar" onClick={() => openEdit(d)} className="text-sm text-ink/65 hover:text-sky-500" title="Editar">
-                            ✏️
+                          <button
+                            onClick={() => openEdit(d)}
+                            className="rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-sky-700 hover:bg-sky-100"
+                          >
+                            ✏️ Editar
                           </button>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
