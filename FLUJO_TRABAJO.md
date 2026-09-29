@@ -1,32 +1,33 @@
 # Flujo de trabajo (ramas)
 
 ```
-mejora/xxx  ──►  pruebas  ──►  main
-(se programa)   (Vercel, se prueba)   (lo que usan las iglesias)
+mejora/xxx ──► pruebas ──► kidsmin ──► BostonKids        main (congelada)
 ```
 
 ## Ramas
-| Rama | Para qué | Deploy |
-|---|---|---|
-| `main` | Producción. Lo que usan las iglesias. Nunca se trabaja directo aquí. | Netlify |
-| `pruebas` | Se prueba todo antes de producción. | Vercel |
-| `mejora/nombre` · `arreglo/nombre` | Un cambio concreto. Se crea desde `pruebas`. | Vercel (preview automático) |
+| Rama | Para qué |
+|---|---|
+| `pruebas` | Todo se programa y prueba aquí primero (Vercel: pruebas-escuelita.vercel.app). |
+| `kidsmin` | Producto KidsMin estable, ya probado. |
+| `BostonKids` | Versión que usa la iglesia Boston Kids (en funcionamiento). |
+| `main` | **Congelada.** No se sube nada hasta que Gisella lo autorice. |
+| `mejora/…` · `arreglo/…` | Cambios grandes, opcional. Salen de `pruebas` y vuelven a `pruebas`. |
 
 ## Pasos para cada cambio
-1. Crear rama desde `pruebas`: `mejora/planeacion-ia`, `arreglo/fecha-ninos`, etc.
-2. Programar y subir la rama.
-3. Unir la rama a `pruebas` → probar en la URL de Vercel (celular y PC).
-4. Si funciona → unir `pruebas` a `main` → llega a las iglesias.
-5. Borrar la rama `mejora/...` o `arreglo/...`.
+1. Programar en `pruebas` (o en `mejora/…` y unir a `pruebas`).
+2. Probar en pruebas-escuelita.vercel.app (celular y PC).
+3. OK → pasar `pruebas` a `kidsmin`.
+4. OK → pasar `kidsmin` a `BostonKids` (+ correr su SQL en la base de Boston Kids).
+5. Nada a `main` sin autorización de Gisella.
 
 ## Base de datos
-- Si el cambio necesita SQL: correrlo primero en la base de pruebas, y en la real **solo** al subir a `main`.
-- Guardar cada SQL nuevo en `supabase/actualizacion_*.sql` (y en `schema.sql`).
-- Anotar en `TAREAS.md` en qué iglesias ya se corrió.
+- Cada SQL nuevo va en `supabase/actualizacion_*.sql` (y en `schema.sql`).
+- Se corre primero en la base de pruebas; en la de Boston Kids solo al pasar a `BostonKids`.
+- Anotar en `TAREAS.md` dónde ya se corrió.
 
 ## Vercel (un solo proyecto)
-- **Production Branch = `main`** → link principal, lo usan las iglesias.
-- Rama `pruebas` → link fijo de Preview: `NOMBREPROYECTO-git-pruebas-....vercel.app`.
+- **Production Branch = `BostonKids`** → link principal, lo usa Boston Kids.
+- Rama `pruebas` → pruebas-escuelita.vercel.app (Preview). Rama `kidsmin` → su link de Preview.
 - Settings → Environment Variables (`VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`), **separadas por entorno**:
   - **Production** → base de **producción** (otra cuenta de Supabase).
   - **Preview** y **Development** → base de **pruebas** ("Escuelita Dominical - v2").
