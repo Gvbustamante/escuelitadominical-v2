@@ -9,6 +9,7 @@ import ConfigEstrellas from './ConfigEstrellas'
 import MenuTab from '../../components/MenuTab'
 import { AyudaContenido } from '../Tutorial'
 import { useConfigIglesia, refreshConfigIglesia } from '../../lib/configIglesia'
+import { MODULOS_KEYS } from '../../lib/modulos'
 
 const DIAS_SEMANA = [
   { dia_semana: 0, label: 'Domingo' },
@@ -510,12 +511,13 @@ const MODULOS_DISPONIBLES = [
 ]
 
 function ModulosTab({ config }) {
-  const [activos, setActivos] = useState(config?.modulos_activos || [])
+  // null = nunca configurado = todos activos (igual que el menú)
+  const [activos, setActivos] = useState(Array.isArray(config?.modulos_activos) ? config.modulos_activos : MODULOS_KEYS)
   const [saving, setSaving] = useState(false)
   const [ok, setOk] = useState('')
 
   useEffect(() => {
-    setActivos(config?.modulos_activos || [])
+    setActivos(Array.isArray(config?.modulos_activos) ? config.modulos_activos : MODULOS_KEYS)
   }, [config?.modulos_activos])
 
   function toggle(key) {
@@ -526,8 +528,12 @@ function ModulosTab({ config }) {
   async function guardar() {
     if (!config?.id) return
     setSaving(true)
-    await supabase.from('config_iglesia').update({ modulos_activos: activos, updated_at: new Date().toISOString() }).eq('id', config.id)
+    const { error } = await supabase.from('config_iglesia').update({ modulos_activos: activos, updated_at: new Date().toISOString() }).eq('id', config.id)
     setSaving(false)
+    if (error) {
+      setOk('No se pudo guardar: ' + error.message)
+      return
+    }
     setOk('¡Módulos actualizados! El menú se ajusta automáticamente.')
     await refreshConfigIglesia()
   }

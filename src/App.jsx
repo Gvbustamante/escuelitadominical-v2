@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import Spinner from './components/Spinner'
 import ProtectedRoute from './components/ProtectedRoute'
+import ModuloRoute from './components/ModuloRoute'
 import Layout from './components/Layout'
 import Login from './pages/Login'
 import Landing from './pages/Landing'
@@ -60,9 +61,9 @@ export default function App() {
       >
         <Route path="/" element={<RoleSwitchHome />} />
         <Route path="/ayuda" element={<Tutorial />} />
-        <Route path="/devocionales" element={<Devocionales />} />
-        <Route path="/devocionales/:id" element={<DevocionalDetalle />} />
-        <Route path="/foro" element={<Foro />} />
+        <Route path="/devocionales" element={<ModuloRoute modulo="devocionales"><Devocionales /></ModuloRoute>} />
+        <Route path="/devocionales/:id" element={<ModuloRoute modulo="devocionales"><DevocionalDetalle /></ModuloRoute>} />
+        <Route path="/foro" element={<ModuloRoute modulo="foro"><Foro /></ModuloRoute>} />
         <Route
           path="/mi-familia"
           element={
@@ -75,7 +76,7 @@ export default function App() {
           path="/drive"
           element={
             <ProtectedRoute roles={[...STAFF, 'docente']}>
-              <Drive />
+              <ModuloRoute modulo="drive"><Drive /></ModuloRoute>
             </ProtectedRoute>
           }
         />
@@ -118,7 +119,7 @@ export default function App() {
           path="/asistencia"
           element={
             <ProtectedRoute roles={[...STAFF, 'docente']}>
-              <RoleSwitchAsistencia />
+              <ModuloRoute modulo="asistencia"><RoleSwitchAsistencia /></ModuloRoute>
             </ProtectedRoute>
           }
         />
@@ -137,7 +138,7 @@ export default function App() {
           path="/planeacion"
           element={
             <ProtectedRoute roles={[...STAFF, 'docente']}>
-              <Planeacion />
+              <ModuloRoute modulo="planeacion"><Planeacion /></ModuloRoute>
             </ProtectedRoute>
           }
         />
@@ -145,7 +146,7 @@ export default function App() {
           path="/bitacora"
           element={
             <ProtectedRoute roles={[...STAFF, 'docente']}>
-              <RoleSwitchBitacora />
+              <ModuloRoute modulo="bitacora"><RoleSwitchBitacora /></ModuloRoute>
             </ProtectedRoute>
           }
         />
@@ -155,7 +156,7 @@ export default function App() {
           path="/actividades"
           element={
             <ProtectedRoute roles={[...STAFF, 'docente', 'padre']}>
-              <RoleSwitchActividades />
+              <ModuloRoute modulo="actividades"><RoleSwitchActividades /></ModuloRoute>
             </ProtectedRoute>
           }
         />
@@ -163,7 +164,7 @@ export default function App() {
           path="/actividades/:id"
           element={
             <ProtectedRoute roles={[...STAFF, 'docente', 'padre']}>
-              <ActividadDetalle />
+              <ModuloRoute modulo="actividades"><ActividadDetalle /></ModuloRoute>
             </ProtectedRoute>
           }
         />
@@ -171,7 +172,7 @@ export default function App() {
           path="/agenda"
           element={
             <ProtectedRoute roles={[...STAFF, 'docente', 'padre']}>
-              <RoleSwitchAgenda />
+              <ModuloRoute modulo="agenda"><RoleSwitchAgenda /></ModuloRoute>
             </ProtectedRoute>
           }
         />
@@ -179,7 +180,7 @@ export default function App() {
           path="/progreso"
           element={
             <ProtectedRoute roles={['docente', 'padre']}>
-              <RoleSwitchProgreso />
+              <ModuloRoute modulo="progreso"><RoleSwitchProgreso /></ModuloRoute>
             </ProtectedRoute>
           }
         />
