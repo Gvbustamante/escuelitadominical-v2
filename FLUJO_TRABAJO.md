@@ -24,11 +24,15 @@ mejora/xxx  ──►  pruebas  ──►  main
 - Guardar cada SQL nuevo en `supabase/actualizacion_*.sql` (y en `schema.sql`).
 - Anotar en `TAREAS.md` en qué iglesias ya se corrió.
 
-## Vercel (configurar una vez)
-1. Vercel → Add New Project → importar `escuelitadominical-v2`.
-2. Settings → Git → **Production Branch: `pruebas`** (así Vercel nunca publica `main`).
-3. Settings → Environment Variables: `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` del proyecto Supabase **"Escuelita Dominical - v2"** (los mismos valores de `netlify.toml`).
+## Vercel (un solo proyecto)
+- **Production Branch = `main`** → link principal, lo usan las iglesias.
+- Rama `pruebas` → link fijo de Preview: `NOMBREPROYECTO-git-pruebas-....vercel.app`.
+- Settings → Environment Variables (`VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`), **separadas por entorno**:
+  - **Production** → base de **producción** (otra cuenta de Supabase).
+  - **Preview** y **Development** → base de **pruebas** ("Escuelita Dominical - v2").
+- Las llaves nunca van en el código (`netlify.toml`, etc.), solo en el panel.
 
 ## Bases de datos
-- **Escuelita Dominical - v2**: base del SaaS. Aquí se construye y se prueba.
-- Otras iglesias: cada una con su propio proyecto Supabase hasta migrar a multi-tenant. Sus SQL se corren a mano (ver `TAREAS.md`).
+- **Escuelita Dominical - v2** → pruebas. Conectada con Claude.
+- **Producción** → otra cuenta de Supabase. Claude no tiene acceso: cada SQL nuevo lo corre Gisella/Carlos al pasar a `main`.
+- Otras iglesias: cada una con su propio proyecto hasta migrar a multi-tenant.

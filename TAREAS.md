@@ -20,6 +20,10 @@ Marca `[x]` cuando se complete.
 - [x] Proyecto "Escuelita Dominical - v2" ya tiene `modulos_activos` (text[]). Correr la migración solo en proyectos de iglesias nuevas/otras.
 - [ ] Bumblebee usa el bucket `bumblebee-images` dentro del proyecto de Escuelita → moverlo a su propio proyecto.
 
+## 🗄️ SQL pendiente en PRODUCCIÓN (lo corre Gisella/Carlos)
+- [ ] `supabase/actualizacion_modulos_activos.sql`
+- [ ] `supabase/actualizacion_planeacion_clase.sql`
+
 ## 🏗️ Técnico / escalabilidad
 - [ ] Migrar a **multi-tenant**: un solo proyecto Supabase + un solo deploy, columna `iglesia_id` en todas las tablas + RLS por iglesia.
 - [ ] Plan para mover las iglesias existentes (una base por iglesia) al proyecto único.
