@@ -1,9 +1,10 @@
+import PdfViewer from './PdfViewer'
 import { useState } from 'react'
 
 /**
  * Modal de previsualización de archivos. Soporta:
  * - Imágenes: se muestran en grande
- * - PDF: se embebe con <iframe>
+ * - PDF: se dibuja con <PdfViewer> (pdf.js), con el estilo de la plataforma
  * - Video: reproductor nativo
  * - Audio: reproductor nativo
  * - Otros: icono grande + botón de descarga
@@ -132,11 +133,7 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
           )}
 
           {tipo === 'pdf' && (
-            <iframe
-              src={url}
-              title={nombre || 'PDF'}
-              className="h-[78vh] w-full min-w-[320px] sm:min-w-[600px]"
-            />
+            <PdfViewer src={url} alto="h-[78vh]" className="w-[92vw] !rounded-none sm:w-[720px]" />
           )}
 
           {tipo === 'video' && (

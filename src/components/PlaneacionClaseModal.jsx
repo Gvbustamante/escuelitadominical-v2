@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import Modal from './Modal'
 import RichTextEditor from './RichTextEditor'
+import PdfViewer from './PdfViewer'
 
 const BUCKET = 'actividades'
 const MAX_MB = 20
@@ -154,11 +155,14 @@ export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, plan
           <input ref={inputRef} type="file" accept="application/pdf,.pdf" className="hidden" onChange={elegirPdf} />
 
           {pdfNuevo ? (
-            <div className="flex items-center justify-between gap-2 rounded-xl bg-sky-50 px-3 py-2">
-              <span className="min-w-0 truncate text-sm font-bold text-sky-700">📄 {pdfNuevo.name}</span>
-              <button type="button" onClick={() => setPdfNuevo(null)} className="shrink-0 text-sm font-bold text-coral-600">
-                Quitar
-              </button>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-2 rounded-xl bg-sky-50 px-3 py-2">
+                <span className="min-w-0 truncate text-sm font-bold text-sky-700">📄 {pdfNuevo.name}</span>
+                <button type="button" onClick={() => setPdfNuevo(null)} className="shrink-0 text-sm font-bold text-coral-600">
+                  Quitar
+                </button>
+              </div>
+              <PdfViewer src={pdfNuevo} />
             </div>
           ) : pdfActualUrl ? (
             <div className="flex flex-col gap-2">
@@ -175,11 +179,7 @@ export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, plan
                   </button>
                 </div>
               </div>
-              <iframe
-                src={pdfActualUrl}
-                title="Vista previa del PDF"
-                className="hidden h-[60vh] w-full rounded-xl border border-ink/10 sm:block"
-              />
+              <PdfViewer src={pdfActualUrl} />
             </div>
           ) : (
             <button type="button" onClick={() => inputRef.current?.click()} className="btn-secondary !py-2 !text-sm">
