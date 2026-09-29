@@ -6,6 +6,12 @@ import RichTextView from '../components/RichTextView'
 import ReaccionesBar from '../components/ReaccionesBar'
 import FilePreview, { getFileIcon } from '../components/FilePreview'
 import { getVideoEmbedUrl } from '../lib/videoEmbed'
+import { useAuth } from '../contexts/AuthContext'
+import { useConfigIglesia } from '../lib/configIglesia'
+import { moduloActivo } from '../lib/modulos'
+import { urlPdfPlaneacion } from '../components/PlaneacionClaseModal'
+
+const ROLES_PLANEACION = ['superadmin', 'admin', 'coordinador', 'docente']
 
 function fileUrl(bucket, path) {
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
@@ -19,6 +25,10 @@ export default function DevocionalDetalle() {
   const [sugeridos, setSugeridos] = useState(null)
   const [preview, setPreview] = useState(null)
   const [copiado, setCopiado] = useState(false)
+  const [planeaciones, setPlaneaciones] = useState(null)
+  const { user, profile } = useAuth()
+  const config = useConfigIglesia()
+  const verPlaneacion = ROLES_PLANEACION.includes(profile?.role) && moduloActivo(config, 'planeacion')
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
@@ -34,6 +44,29 @@ export default function DevocionalDetalle() {
   }, [id])
 
   useEffect(() => { load() }, [load])
+
+  // Planeación de la clase para la fecha (y clase) del devocional. Solo staff y docentes.
+  useEffect(() => {
+    if (!devocional || !verPlaneacion) return
+    let cancelado = false
+    ;(async () => {
+      let q = supabase
+        .from('planeacion_clase')
+        .select('id, nivel_id, contenido, pdf_path, pdf_nombre, nivel:niveles(nombre, orden), autor:profiles(nombre_completo)')
+        .eq('fecha', devocional.fecha)
+      if (devocional.nivel_id) q = q.eq('nivel_id', devocional.nivel_id)
+      const { data } = await q
+      let lista = data || []
+      if (profile.role === 'docente' && !devocional.nivel_id) {
+        const { data: mias } = await supabase.from('docentes_niveles').select('nivel_id').eq('docente_id', user.id)
+        const ids = new Set((mias || []).map((m) => m.nivel_id))
+        lista = lista.filter((pl) => ids.has(pl.nivel_id))
+      }
+      lista.sort((a, b) => (a.nivel?.orden ?? 0) - (b.nivel?.orden ?? 0))
+      if (!cancelado) setPlaneaciones(lista)
+    })()
+    return () => { cancelado = true }
+  }, [devocional, verPlaneacion, profile?.role, user?.id])
 
   useEffect(() => {
     setSugeridos(null)
@@ -187,6 +220,44 @@ export default function DevocionalDetalle() {
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Planeación de la clase (solo staff y docentes) */}
+          {verPlaneacion && planeaciones !== null && (
+            <div className="card">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <p className="text-sm font-extrabold uppercase tracking-wide text-ink/65">📝 Planeación de la clase</p>
+                <button type="button" onClick={() => navigate('/planeacion')} className="shrink-0 text-sm font-bold text-sky-600 hover:underline">
+                  {planeaciones.length > 0 ? 'Editar en Planeación' : 'Crear en Planeación'}
+                </button>
+              </div>
+              {planeaciones.length === 0 ? (
+                <p className="text-sm text-ink/70">Todavía no hay planeación para esta clase en esta fecha.</p>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {planeaciones.map((pl) => (
+                    <div key={pl.id} className="rounded-2xl bg-sky-50/60 p-4">
+                      {(!devocional.nivel_id || planeaciones.length > 1) && pl.nivel?.nombre && (
+                        <p className="mb-2 text-sm font-extrabold text-sky-700">{pl.nivel.nombre}</p>
+                      )}
+                      {pl.contenido && <RichTextView html={pl.contenido} className="text-ink/80" />}
+                      {pl.pdf_path && (
+                        <button
+                          type="button"
+                          onClick={() => setPreview({ url: urlPdfPlaneacion(pl.pdf_path), nombre: pl.pdf_nombre || 'Planeación.pdf', mime: 'application/pdf' })}
+                          className="mt-3 flex w-full items-center gap-3 rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 text-left transition-colors hover:border-sky-300 hover:bg-sky-50"
+                        >
+                          <span className="text-2xl">📄</span>
+                          <span className="min-w-0 flex-1 truncate font-bold text-ink">{pl.pdf_nombre || 'Planeación.pdf'}</span>
+                          <span className="shrink-0 text-sm font-bold text-sky-600">👁️ Ver</span>
+                        </button>
+                      )}
+                      {pl.autor?.nombre_completo && <p className="mt-2 text-xs text-ink/65">Por {pl.autor.nombre_completo}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
