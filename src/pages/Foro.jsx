@@ -29,12 +29,22 @@ export default function Foro() {
   const [formPeticion, setFormPeticion] = useState({ texto: '', privado: true })
   const [busyPeticion, setBusyPeticion] = useState(false)
 
+  const [recientes, setRecientes] = useState({})
   const load = useCallback(async () => {
     const { data } = await supabase
       .from('foros')
       .select('*, creador:profiles(nombre_completo), evento:agenda(titulo), mensajes:foro_mensajes(count)')
       .order('created_at', { ascending: false })
     setForos(data || [])
+    // Último mensaje de cada tema (para la vista previa y los "nuevos").
+    const { data: ult } = await supabase
+      .from('foro_mensajes')
+      .select('foro_id, mensaje, created_at, autor_id, autor:profiles(nombre_completo)')
+      .order('created_at', { ascending: false })
+      .limit(300)
+    const porForo = {}
+    for (const m of ult || []) (porForo[m.foro_id] ||= []).push(m)
+    setRecientes(porForo)
   }, [])
 
   const cargarPeticiones = useCallback(async () => {
@@ -52,6 +62,7 @@ export default function Foro() {
   }, [load, cargarPeticiones])
 
   async function abrirForo(foro) {
+    try { localStorage.setItem(`foro-visto-${foro.id}`, new Date().toISOString()) } catch { /* sin almacenamiento */ }
     setSeleccionado(foro)
     setMensajes(null)
     const { data } = await supabase
@@ -256,21 +267,37 @@ export default function Foro() {
       {tabPrincipal === 'foro' ? (
         <>
           <div className="flex flex-col gap-3">
-            {forosFiltrados.map((f) => (
+            {forosFiltrados.map((f) => {
+              const msgs = recientes[f.id] || []
+              const ultimo = msgs[0]
+              let visto = null
+              try { visto = localStorage.getItem(`foro-visto-${f.id}`) } catch { /* sin almacenamiento */ }
+              const nuevos = msgs.filter((m) => m.autor_id !== user?.id && (!visto || m.created_at > visto)).length
+              return (
               <button key={f.id} onClick={() => abrirForo(f)} className="card-link flex items-center justify-between gap-3 text-left">
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-bold">{f.titulo}</h3>
                     {f.categoria === 'evento' && <span className="badge bg-sunshine-100 text-sunshine-800">📅 Evento</span>}
                     {f.privado && <span className="badge bg-grape-100 text-grape-700">🔒 Privado</span>}
                   </div>
-                  <p className="text-sm text-ink/70">
-                    {f.creador?.nombre_completo} {f.evento?.titulo && `· ${f.evento.titulo}`}
-                  </p>
+                  {ultimo ? (
+                    <p className="truncate text-sm text-ink/75">
+                      <span className="font-bold">{ultimo.autor?.nombre_completo?.split(' ')[0]}:</span> {ultimo.mensaje}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-ink/70">
+                      {f.creador?.nombre_completo} {f.evento?.titulo && `· ${f.evento.titulo}`}
+                    </p>
+                  )}
                 </div>
-                <span className="badge bg-sky-100 text-sky-700">{f.mensajes?.[0]?.count ?? 0} 💬</span>
+                <span className="flex shrink-0 flex-col items-end gap-1">
+                  {nuevos > 0 && <span className="badge bg-coral-600 text-white">{nuevos} {nuevos === 1 ? 'nuevo' : 'nuevos'}</span>}
+                  <span className="badge bg-sky-100 text-sky-700">{f.mensajes?.[0]?.count ?? 0} 💬</span>
+                </span>
               </button>
-            ))}
+              )
+            })}
             {foros.length === 0 && (
               <p className="card text-ink/70">
                 {esStaffAmplio ? 'Todavía no hay temas. ¡Crea el primero!' : 'Todavía no hay temas visibles para ti.'}
