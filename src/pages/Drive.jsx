@@ -10,6 +10,7 @@ import DriveOrganizado from '../components/DriveOrganizado'
 import { coincide } from '../lib/busqueda'
 import TituloPagina from '../components/ui/TituloPagina'
 import ActionMenu from '../components/ui/ActionMenu'
+import Emo from '../components/ui/Emo'
 
 function fileUrl(path) {
   return urlArchivo('drive', path)
@@ -279,7 +280,7 @@ export default function Drive() {
             <>
               {enPapelera > 0 && esAdmin && (
                 <button className="rounded-full bg-coral-50 px-3 py-2 text-sm font-bold text-coral-700 hover:bg-coral-100" onClick={() => setConfirmVaciar(true)}>
-                  🗑️ Vaciar
+                  <Emo e="🗑️" /> Vaciar
                 </button>
               )}
               <button className="btn-secondary !py-2 !text-sm" onClick={() => { setVerPapelera(false); setBusqueda(''); setRuta([]) }}>

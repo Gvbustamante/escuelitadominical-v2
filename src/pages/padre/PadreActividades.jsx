@@ -11,6 +11,7 @@ import TareaHijoWidget from '../../components/TareaHijoWidget'
 import { getVideoEmbedUrl } from '../../lib/videoEmbed'
 import { hoyLocal } from '../../lib/fechas'
 import TituloPagina from '../../components/ui/TituloPagina'
+import Emo from '../../components/ui/Emo'
 
 const REACCIONES = ['❤️', '👏', '🙌', '😍']
 const TRES_DIAS = 3 * 24 * 60 * 60 * 1000
@@ -262,7 +263,7 @@ export default function PadreActividades() {
                             rel="noreferrer"
                             className="inline-block w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
                           >
-                            🔗 Abrir enlace
+                            <Emo e="🔗" /> Abrir enlace
                           </a>
                         )
                       )}

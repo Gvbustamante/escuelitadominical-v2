@@ -16,6 +16,7 @@ import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import TituloPagina from '../../components/ui/TituloPagina'
 import NivelChips from '../../components/ui/NivelChips'
+import Emo from '../../components/ui/Emo'
 
 function hoyISO() {
   return hoyLocal()
@@ -403,7 +404,7 @@ export default function ActividadesAdmin() {
           {/* ═══ Sección: Información básica ═══ */}
           <fieldset className="flex flex-col gap-4">
             <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
-              📋 Información básica
+              <Emo e="📋" /> Información básica
             </legend>
             <div>
               <label className="label">Título</label>
@@ -444,7 +445,7 @@ export default function ActividadesAdmin() {
           {/* ═══ Sección: Configuración ═══ */}
           <fieldset className="flex flex-col gap-4">
             <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
-              ⚙️ Configuración
+              <Emo e="⚙️" /> Configuración
             </legend>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {audiencia === 'ninos' && (
@@ -483,7 +484,7 @@ export default function ActividadesAdmin() {
                     onClick={() => setForm({ ...form, es_tarea: true })}
                     className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.es_tarea ? 'bg-sunshine-400 text-ink shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
-                    📝 Tarea
+                    <Emo e="📝" /> Tarea
                   </button>
                 </div>
                 {form.es_tarea && (

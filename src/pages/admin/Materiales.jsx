@@ -6,6 +6,7 @@ import ConfirmModal from '../../components/ConfirmModal'
 import MultiFilePicker from '../../components/MultiFilePicker'
 import FotosGaleria from '../../components/FotosGaleria'
 import { exportExcel } from '../../lib/exportExcel'
+import Emo from '../../components/ui/Emo'
 
 const CATEGORIA_LABEL = { general: 'General', ninos: 'Para niños', clase: 'Para un nivel' }
 
@@ -132,7 +133,7 @@ export default function Materiales() {
         <p className="text-ink/70">Qué hay disponible para los niños y para cada nivel</p>
         <div className="flex gap-2">
           <button className="btn-secondary" onClick={exportar}>
-            📊 Exportar
+            <Emo e="📊" /> Exportar
           </button>
           <button className="btn-primary fab-movil" onClick={openNew}>
             + Agregar material

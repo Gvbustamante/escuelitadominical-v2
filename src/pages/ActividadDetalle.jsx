@@ -14,6 +14,7 @@ import MiEntregaEquipoWidget from '../components/MiEntregaEquipoWidget'
 import FilePreview, { getFileIcon } from '../components/FilePreview'
 import { getVideoEmbedUrl } from '../lib/videoEmbed'
 import { fechaCorta, fechaLarga } from '../lib/fechas'
+import Emo from '../components/ui/Emo'
 
 const STAFF = ['superadmin', 'admin', 'coordinador']
 
@@ -214,7 +215,7 @@ export default function ActividadDetalle() {
                   rel="noreferrer"
                   className="mt-4 inline-block w-fit rounded-xl bg-sky-50 px-4 py-2.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
                 >
-                  🔗 Abrir enlace externo
+                  <Emo e="🔗" /> Abrir enlace externo
                 </a>
               )
             )}
@@ -336,7 +337,7 @@ export default function ActividadDetalle() {
         <aside className="w-full shrink-0 lg:w-72 xl:w-80">
           <div className="card sticky top-4">
             <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-ink/65">
-              📅 Más de {formatMes(actividad.fecha)}
+              <Emo e="📅" /> Más de {formatMes(actividad.fecha)}
             </p>
             {otrasDelMes === null ? (
               <div className="flex flex-col gap-2">
@@ -451,7 +452,7 @@ function TareaSeccion({ actividad, onVerEntregas, onSaved }) {
   if (esStaff || esDocenteDeLaClase) {
     return (
       <button className="btn-secondary self-start !py-2 !px-4 !text-sm" onClick={onVerEntregas}>
-        📋 Ver entregas
+        <Emo e="📋" /> Ver entregas
       </button>
     )
   }

@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import Modal from './Modal'
 import RichTextView from './RichTextView'
 import ArticulosAdjuntos from './ArticulosAdjuntos'
+import Emo from './ui/Emo'
 
 const ESTADO_BADGE = {
   pendiente: 'bg-ink/10 text-ink/70',
@@ -104,7 +105,7 @@ export default function TareaEntregas({ actividad, open, onClose }) {
             rel="noreferrer"
             className="w-fit rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-600 hover:bg-sky-100"
           >
-            🔗 Abrir enlace de la tarea
+            <Emo e="🔗" /> Abrir enlace de la tarea
           </a>
         )}
         {!personas ? (
@@ -132,7 +133,7 @@ export default function TareaEntregas({ actividad, open, onClose }) {
                     rel="noreferrer"
                     className="mt-1 inline-block text-sm font-bold text-sky-600 hover:underline"
                   >
-                    📎 Ver evidencia
+                    <Emo e="📎" /> Ver evidencia
                   </a>
                 )}
                 {!pausadaPorNino && entrega?.tarea_entrega_archivos?.length > 0 && (

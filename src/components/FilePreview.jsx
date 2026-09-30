@@ -1,4 +1,5 @@
 import PdfViewer from './PdfViewer'
+import Emo from './ui/Emo'
 
 /**
  * Modal de previsualización de archivos. Soporta:
@@ -101,7 +102,7 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
                 onClick={() => imprimir(url, tipo)}
                 className="rounded-xl bg-sky-50 px-3 py-1.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
               >
-                🖨️ Imprimir
+                <Emo e="🖨️" /> Imprimir
               </button>
             )}
             {tipo !== 'pdf' && (
@@ -111,7 +112,7 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
                 rel="noreferrer"
                 className="rounded-xl bg-sky-50 px-3 py-1.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
               >
-                ⬇️ Descargar
+                <Emo e="⬇️" /> Descargar
               </a>
             )}
             <button
@@ -172,7 +173,7 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
                 rel="noreferrer"
                 className="btn-primary !text-base"
               >
-                ⬇️ Descargar archivo
+                <Emo e="⬇️" /> Descargar archivo
               </a>
             </div>
           )}

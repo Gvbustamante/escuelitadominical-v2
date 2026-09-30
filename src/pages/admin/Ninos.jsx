@@ -17,6 +17,7 @@ import EmptyState from '../../components/EmptyState'
 import { hoyLocal } from '../../lib/fechas'
 import TituloPagina from '../../components/ui/TituloPagina'
 import ActionMenu from '../../components/ui/ActionMenu'
+import Emo from '../../components/ui/Emo'
 
 const STAFF = ['superadmin', 'admin', 'coordinador']
 
@@ -361,7 +362,7 @@ export default function Ninos() {
         <div className="flex flex-wrap gap-2">
           {esStaff && (
             <button className="btn-secondary" onClick={exportar}>
-              📊 Exportar
+              <Emo e="📊" /> Exportar
             </button>
           )}
           {puedeAgregar && (

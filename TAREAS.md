@@ -69,9 +69,9 @@ Marca `[x]` cuando se complete.
 - [x] Base común: título de página, barra de filtros, ‹ Mes › en español, menú ⋯, botón flotante en celular (aplicado: títulos, fechas, botón flotante; filtros en Devocionales)
 - [x] Navegación: barra inferior en celular, menú de íconos en tablet, menú PC compacto
 - [x] Inicio por rol: admin/coordinador/superadmin (pendientes + Próxima clase + números), docente (sus niveles + alergias), padre (tarjeta por hijo)
-- [ ] Niños y Equipo (filas con ⋯, Familias aparte)
-- [ ] Asistencia, Devocionales, Actividades, Bitácora con barra común
-- [ ] Ajustes, Agenda, Drive, Comunidad
+- [x] Niños y Equipo (filas con ⋯, Familias aparte)
+- [x] Asistencia, Devocionales, Actividades, Bitácora con barra común (niveles como chips)
+- [x] Ajustes (submenú lateral), Agenda (próximos primero), Drive (+ Nuevo), Comunidad (último mensaje y nuevos)
 
 ## 🎨 UI/UX — hallazgos en el código
 - [x] 43 textos con tamaño < 12px (`text-[0.6rem]` etc.) → mínimo 12px, 16px en inputs (evita zoom en iPhone).
@@ -84,8 +84,8 @@ Marca `[x]` cuando se complete.
 - [ ] Pedir a Henry 3–5 momentos exactos donde se perdió.
 - [x] Menú por secciones (Enseñanza, Día de clase, Personas, Comunidad, Gestión) cuando la iglesia no armó uno propio.
 - [x] Menú con íconos Lucide (iguales en Android/iPhone/PC) y color por sección.
-- [ ] Íconos Lucide en el resto de la app (botones, títulos) — hoy siguen emojis.
-- [ ] Revisión visual real con la app abierta (celular + PC) con usuario de prueba.
+- [x] Íconos Lucide en la interfaz (menús ⋯, botones, encabezados) vía `components/ui/Emo.jsx`. Los emojis de contenido (niveles, reacciones, insignias) se quedan.
+- [x] Revisión por rol (admin, docente, padre) en celular y PC con datos simulados: fechas en español correcto, selector de fecha compacto, sin errores. (La base real no es accesible desde el entorno de Claude: probar en pruebas-escuelita.vercel.app).
 
 ## 📚 UI/UX — formación
 - [ ] Leer *Don't Make Me Think* (Steve Krug).

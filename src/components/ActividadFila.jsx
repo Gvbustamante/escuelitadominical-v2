@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
 import ActionMenu from './ui/ActionMenu'
 import { fechaCorta } from '../lib/fechas'
+import Emo from './ui/Emo'
 
 function fileUrl(path, bucket = 'actividades') {
   return urlArchivo(bucket, path)
@@ -64,7 +65,7 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
         <span className="text-xs font-bold text-coral-600">{a.actividad_reacciones?.length || 0} ❤️</span>
         {a.es_tarea && onVerEntregas && (
           <button className="btn-secondary hidden !py-1 !px-2 !text-xs sm:inline-flex" onClick={() => onVerEntregas(a)}>
-            📋 Entregas
+            <Emo e="📋" /> Entregas
           </button>
         )}
         <ActionMenu

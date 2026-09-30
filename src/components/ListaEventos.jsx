@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { hoyLocal, fechaLarga } from '../lib/fechas'
 import ActionMenu from './ui/ActionMenu'
+import Emo from './ui/Emo'
 
 /**
  * Lista de la Agenda: próximos eventos (o los del día elegido en el calendario).
@@ -16,8 +17,9 @@ export default function ListaEventos({ eventos, selectedDay, onClearDay, onElimi
   return (
     <section className={`flex flex-col gap-3 ${className}`} aria-labelledby="lista-eventos">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="lista-eventos" className="text-lg font-bold">
-          {selectedDay ? `📅 ${fechaLarga(selectedDay)}` : '📅 Próximos eventos'}
+        <h2 id="lista-eventos" className="flex items-center gap-2 text-lg font-bold">
+          <Emo e="📅" className="text-grape-700" />
+          {selectedDay ? fechaLarga(selectedDay) : 'Próximos eventos'}
         </h2>
         {selectedDay && (
           <button type="button" onClick={onClearDay} className="text-sm font-bold text-sky-700 hover:underline">

@@ -13,6 +13,7 @@ import FechaCampo from '../../components/ui/FechaCampo'
 import MesSelector from '../../components/ui/MesSelector'
 import TituloPagina from '../../components/ui/TituloPagina'
 import NivelChips from '../../components/ui/NivelChips'
+import Emo from '../../components/ui/Emo'
 
 function hoyYYYYMM() {
   return hoyLocal().slice(0, 7)
@@ -109,11 +110,11 @@ export default function BitacoraAdmin() {
         {tab === 'bitacora' && (
           <div className="flex gap-2">
             <button className="btn-primary fab-movil" onClick={() => setModalOpen(true)}>
-              📝 Registrar bitácora
+              <Emo e="📝" /> Registrar bitácora
             </button>
             {registros?.length > 0 && (
               <button className="btn-secondary" onClick={exportar}>
-                📊 Exportar
+                <Emo e="📊" /> Exportar
               </button>
             )}
           </div>
@@ -126,14 +127,14 @@ export default function BitacoraAdmin() {
           onClick={() => setTab('bitacora')}
           className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'bitacora' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
-          📋 Bitácora
+          <Emo e="📋" /> Bitácora
         </button>
         <button
           type="button"
           onClick={() => setTab('materiales')}
           className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'materiales' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
-          🧰 Materiales
+          <Emo e="🧰" /> Materiales
         </button>
       </div>
 

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import RichTextEditor from './RichTextEditor'
 import MultiFilePicker from './MultiFilePicker'
 import ArticulosAdjuntos from './ArticulosAdjuntos'
+import Emo from './ui/Emo'
 
 /**
  * Tarjeta para que un padre/madre suba la evidencia de una tarea de su
@@ -53,7 +54,7 @@ export default function TareaHijoWidget({ actividad, hijo, entrega, onSaved }) {
         <p className="text-sm font-bold text-grass-700">✅ {hijo.nombre_completo.split(' ')[0]} ya entregó esta tarea</p>
         {entrega.archivo_url && (
           <a href={entrega.archivo_url} target="_blank" rel="noreferrer" className="text-sm font-bold text-sky-600 hover:underline">
-            📎 Ver lo que subiste
+            <Emo e="📎" /> Ver lo que subiste
           </a>
         )}
         {archivosExistentes.length > 0 && (

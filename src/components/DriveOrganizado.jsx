@@ -4,6 +4,7 @@ import { urlArchivo, firmarArchivos, refHojaVida } from '../lib/archivos'
 import Skeleton from './Skeleton'
 import FilePreview from './FilePreview'
 import { getFileIcon } from './FilePreview'
+import Emo from './ui/Emo'
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
@@ -447,7 +448,7 @@ export default function DriveOrganizado() {
           )}
           {seleccion.size > 0 && (
             <button onClick={descargarSeleccionados} className="rounded-xl bg-sky-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-700">
-              📥 Descargar {seleccion.size} como ZIP
+              <Emo e="📥" /> Descargar {seleccion.size} como ZIP
             </button>
           )}
           {archivosDescargables.length > 1 && seleccion.size === 0 && (
@@ -455,7 +456,7 @@ export default function DriveOrganizado() {
               onClick={() => descargarZip(archivosDescargables, crumbs[crumbs.length - 1]?.label || 'archivos')}
               className="rounded-xl bg-ink/5 px-3 py-1.5 text-xs font-bold text-ink/70 hover:bg-ink/10"
             >
-              📥 Descargar todo ({archivosDescargables.length})
+              <Emo e="📥" /> Descargar todo ({archivosDescargables.length})
             </button>
           )}
           <span className="text-xs text-ink/65">{archivos.length} archivo{archivos.length !== 1 ? 's' : ''}</span>

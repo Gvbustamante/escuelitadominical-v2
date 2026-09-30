@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { refreshConfigIglesia } from '../lib/configIglesia'
+import Emo from './ui/Emo'
 
 const ITEMS_MENU = [
   { to: '/devocionales', label: 'Devocionales', icon: '🙏' },
@@ -109,7 +110,7 @@ export default function MenuTab({ config }) {
             onClick={() => { setModo('plano'); setOk('') }}
             className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${modo === 'plano' ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/70'}`}
           >
-            📋 Solo menús
+            <Emo e="📋" /> Solo menús
           </button>
           <button
             type="button"

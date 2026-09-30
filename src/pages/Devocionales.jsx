@@ -18,6 +18,7 @@ import FechaCampo from '../components/ui/FechaCampo'
 import MesSelector from '../components/ui/MesSelector'
 import FilterBar from '../components/ui/FilterBar'
 import TituloPagina from '../components/ui/TituloPagina'
+import Emo from '../components/ui/Emo'
 
 function hoyISO() {
   return hoyLocal()
@@ -489,13 +490,13 @@ export default function Devocionales() {
                             onClick={() => { setDuplicando(d); setDupFecha(hoyISO()) }}
                             className="rounded-full bg-ink/5 px-3 py-1 text-xs font-bold text-ink/75 hover:bg-grape-50 hover:text-grape-600"
                           >
-                            📋 Duplicar
+                            <Emo e="📋" /> Duplicar
                           </button>
                           <button
                             onClick={() => openEdit(d)}
                             className="rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-sky-700 hover:bg-sky-100"
                           >
-                            ✏️ Editar
+                            <Emo e="✏️" /> Editar
                           </button>
                         </div>
                       )}
@@ -622,7 +623,7 @@ export default function Devocionales() {
               {/* ═══ Sección: Detalles ═══ */}
               <fieldset className="flex flex-col gap-4">
                 <legend className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink/65">
-                  📋 Detalles
+                  <Emo e="📋" /> Detalles
                 </legend>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>

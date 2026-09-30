@@ -12,6 +12,7 @@ import { useConfigIglesia } from '../lib/configIglesia'
 import { moduloActivo } from '../lib/modulos'
 import { urlArchivoPlaneacion, archivoPlaneacion } from '../components/PlaneacionClaseModal'
 import { fechaLarga } from '../lib/fechas'
+import Emo from '../components/ui/Emo'
 
 const ROLES_PLANEACION = ['superadmin', 'admin', 'coordinador', 'docente']
 
@@ -189,7 +190,7 @@ export default function DevocionalDetalle() {
               rel="noreferrer"
               className="inline-block w-fit rounded-xl bg-sky-50 px-4 py-2.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
             >
-              🔗 Abrir enlace externo
+              <Emo e="🔗" /> Abrir enlace externo
             </a>
           )}
 

@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 import Avatar from './Avatar'
 import Skeleton from './Skeleton'
 import { hoyLocal } from '../lib/fechas'
+import Emo from './ui/Emo'
 
 function hoyISO() {
   return hoyLocal()
@@ -110,7 +111,7 @@ export default function ChecklistDocentesHoy() {
           to="/reporte-docentes"
           className="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1.5 text-xs font-bold text-sky-700 transition-colors hover:bg-sky-200"
         >
-          📊 Ver reporte completo →
+          <Emo e="📊" /> Ver reporte completo →
         </Link>
       </div>
 
@@ -143,7 +144,7 @@ export default function ChecklistDocentesHoy() {
                 )}
                 {doc.bita.length > 0 && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-grape-100 px-2 py-1 text-xs font-bold text-grape-700">
-                    📋 Bitácora x{doc.bita.length}
+                    <Emo e="📋" /> Bitácora x{doc.bita.length}
                   </span>
                 )}
                 {doc.acts.length > 0 && (

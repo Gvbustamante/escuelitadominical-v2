@@ -4,6 +4,7 @@ import Spinner from './Spinner'
 import { exportExcel } from '../lib/exportExcel'
 import MesSelector from './ui/MesSelector'
 import { hoyLocal } from '../lib/fechas'
+import Emo from './ui/Emo'
 
 function hoyYYYYMM() {
   return hoyLocal().slice(0, 7)
@@ -62,7 +63,7 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
         <div className="flex items-center gap-2">
           <MesSelector value={mes} onChange={(v) => setMes(v)} />
           <button className="btn-secondary !py-2 !text-sm" onClick={exportar} disabled={fechas.length === 0}>
-            📊 Exportar
+            <Emo e="📊" /> Exportar
           </button>
         </div>
       </div>

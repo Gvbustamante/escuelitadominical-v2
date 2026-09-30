@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { hoyLocal, fechaLocal, fechaCorta } from '../lib/fechas'
+import Emo from './ui/Emo'
 
 function hoyISO() {
   return hoyLocal()
@@ -98,7 +99,7 @@ export default function ProximaAgenda({ nivelIds, soloTareasPendientes = false, 
   return (
     <div className="card">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-bold">📅 Agenda y tareas</p>
+        <p className="flex items-center gap-2 font-bold"><Emo e="📅" className="text-grape-700" /> Agenda y tareas</p>
         <Link to="/agenda" className="text-sm font-bold text-sky-600 hover:underline">
           Ver agenda →
         </Link>

@@ -10,6 +10,7 @@ import { BADGE_CLASSES } from '../../lib/colors'
 import CitaDelDia from '../../components/CitaDelDia'
 import ProximaAgenda from '../../components/ProximaAgenda'
 import { proximoDiaClase } from '../../components/inicio/ProximaClase'
+import Emo from '../../components/ui/Emo'
 
 function calcularEdad(fecha) {
   if (!fecha) return null
@@ -78,7 +79,7 @@ function HijoCard({ hijo, proximaClase }) {
 
       {proximaClase && (
         <p className="text-sm text-ink/80">
-          📅 Próxima clase: <span className="font-bold">{fechaLarga(proximaClase)}</span>
+          <Emo e="📅" /> Próxima clase: <span className="font-bold">{fechaLarga(proximaClase)}</span>
         </p>
       )}
 

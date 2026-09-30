@@ -7,6 +7,7 @@ import { exportExcel } from '../../lib/exportExcel'
 import { hoyLocal, fechaLocal } from '../../lib/fechas'
 import MesSelector from '../../components/ui/MesSelector'
 import TituloPagina from '../../components/ui/TituloPagina'
+import Emo from '../../components/ui/Emo'
 
 function hoyYYYYMM() {
   return hoyLocal().slice(0, 7)
@@ -294,7 +295,7 @@ export default function ReporteDocentes() {
         <div className="flex items-center gap-2">
           <MesSelector value={mes} onChange={(v) => setMes(v)} />
           <button className="btn-secondary" onClick={exportar} disabled={reporte.length === 0}>
-            📊 Exportar
+            <Emo e="📊" /> Exportar
           </button>
         </div>
       </div>

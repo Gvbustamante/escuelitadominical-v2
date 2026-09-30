@@ -11,6 +11,8 @@ import { AyudaContenido } from '../Tutorial'
 import { useConfigIglesia, refreshConfigIglesia } from '../../lib/configIglesia'
 import { MODULOS_KEYS } from '../../lib/modulos'
 import TituloPagina from '../../components/ui/TituloPagina'
+import Emo from '../../components/ui/Emo'
+import { School, Star, Users, Package, ListTree, KeyRound, LifeBuoy } from 'lucide-react'
 
 const DIAS_SEMANA = [
   { dia_semana: 0, label: 'Domingo' },
@@ -220,14 +222,14 @@ export default function Ajustes() {
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[13rem_1fr] lg:items-start">
       <nav aria-label="Secciones de ajustes" className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 lg:sticky lg:top-4 lg:flex-col lg:flex-nowrap lg:gap-1 lg:overflow-visible">
         {[
-          ['general', '🏫', 'Escuelita', true],
-          ['estrellas', '🌟', 'Estrellas', true],
-          ['permisos', '👥', 'Roles y permisos', ['superadmin', 'admin'].includes(profile.role)],
-          ['modulos', '📦', 'Módulos', profile.role === 'superadmin'],
-          ['menu', '📋', 'Menú', profile.role === 'superadmin'],
-          ['cuenta', '🔑', 'Mi cuenta', true],
-          ['ayuda', '❓', 'Ayuda', true],
-        ].filter(([, , , ver]) => ver).map(([v, icon, texto]) => (
+          ['general', School, 'Escuelita', true],
+          ['estrellas', Star, 'Estrellas', true],
+          ['permisos', Users, 'Roles y permisos', ['superadmin', 'admin'].includes(profile.role)],
+          ['modulos', Package, 'Módulos', profile.role === 'superadmin'],
+          ['menu', ListTree, 'Menú', profile.role === 'superadmin'],
+          ['cuenta', KeyRound, 'Mi cuenta', true],
+          ['ayuda', LifeBuoy, 'Ayuda', true],
+        ].filter(([, , , ver]) => ver).map(([v, Icon, texto]) => (
           <button
             key={v}
             type="button"
@@ -237,7 +239,7 @@ export default function Ajustes() {
               tab === v ? 'bg-sky-600 text-white' : 'bg-white text-ink/75 ring-1 ring-ink/10 hover:bg-sky-50 lg:bg-transparent lg:ring-0'
             }`}
           >
-            <span aria-hidden="true">{icon}</span>
+            <Icon aria-hidden="true" size={16} strokeWidth={2.2} />
             {texto}
           </button>
         ))}
@@ -249,7 +251,7 @@ export default function Ajustes() {
           <p className="label mb-1">Contraseña</p>
           <p className="mb-4 text-sm text-ink/70">Cambia la contraseña con la que entras a tu propia cuenta.</p>
           <button type="button" onClick={() => setPwOpen(true)} className="btn-secondary">
-            🔑 Cambiar mi contraseña
+            <Emo e="🔑" /> Cambiar mi contraseña
           </button>
         </div>
       )}
@@ -276,7 +278,7 @@ export default function Ajustes() {
 
               <div className="flex flex-col gap-2">
                 <button type="button" onClick={() => inputRef.current?.click()} className="btn-secondary">
-                  📷 Elegir imagen
+                  <Emo e="📷" /> Elegir imagen
                 </button>
                 {config?.logo_url && !preview && (
                   <button

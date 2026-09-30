@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import Emo from './Emo'
 
 /**
  * Menú ⋯ con acciones con texto. acciones: [{ label, icon, onClick, peligro, oculto }]
@@ -74,7 +75,7 @@ export default function ActionMenu({ acciones, label = 'Más acciones', boton, b
               onClick={() => { setAbierto(false); a.onClick() }}
               className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-bold hover:bg-sky-50 focus:bg-sky-50 focus:outline-none ${a.peligro ? 'text-coral-600' : 'text-ink/85'}`}
             >
-              {a.icon && <span aria-hidden="true">{a.icon}</span>}
+              {a.icon && <Emo e={a.icon} className="text-ink/60" />}
               {a.label}
             </button>
           ))}
