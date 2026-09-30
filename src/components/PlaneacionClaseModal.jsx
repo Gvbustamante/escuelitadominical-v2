@@ -3,8 +3,13 @@ import { supabase } from '../lib/supabaseClient'
 import Modal from './Modal'
 import RichTextEditor from './RichTextEditor'
 import PdfViewer from './PdfViewer'
+import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
 
-const BUCKET = 'actividades'
+// PDFs en bucket privado 'planeaciones'. Los antiguos quedaron en 'actividades' con ruta 'planeaciones/...'.
+const BUCKET = 'planeaciones'
+const LEGADO = 'actividades'
+const esLegado = (path) => path?.startsWith('planeaciones/')
+const bucketDe = (path) => (esLegado(path) ? LEGADO : BUCKET)
 const MAX_MB = 20
 
 const escapar = (t) => (t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -19,8 +24,33 @@ export function guiaPlaneacion({ versiculo = '', historia = '', actividad = '' }
 <p><strong>Materiales:</strong> </p>`
 }
 
+/** { bucket, storage_path } para firmar con useArchivosFirmados. */
+export function archivoPdfPlaneacion(path) {
+  return path ? { bucket: bucketDe(path), storage_path: path } : null
+}
+
+/** URL del PDF (firmada si es privado; null mientras se firma). */
 export function urlPdfPlaneacion(path) {
-  return path ? supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl : null
+  return path ? urlArchivo(bucketDe(path), path) : null
+}
+
+/**
+ * Mueve los PDFs antiguos (públicos) al bucket privado. Idempotente; lo corre admin/coordinador.
+ * Si algo falla (p. ej. falta el bucket), se detiene sin romper nada.
+ */
+let migracionHecha = false
+export async function moverPdfsPlaneacionAPrivado() {
+  if (migracionHecha) return
+  migracionHecha = true
+  const { data } = await supabase.from('planeacion_clase').select('id, pdf_path').like('pdf_path', 'planeaciones/%')
+  for (const pl of data || []) {
+    const nuevo = pl.pdf_path.slice('planeaciones/'.length)
+    const { error: cpError } = await supabase.storage.from(LEGADO).copy(pl.pdf_path, nuevo, { destinationBucket: BUCKET })
+    if (cpError && !/exists/i.test(cpError.message)) return
+    const { error: upError } = await supabase.from('planeacion_clase').update({ pdf_path: nuevo }).eq('id', pl.id)
+    if (upError) return
+    await supabase.storage.from(LEGADO).remove([pl.pdf_path])
+  }
 }
 
 /**
@@ -36,6 +66,7 @@ export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved,
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const inputRef = useRef(null)
+  useArchivosFirmados([archivoPdfPlaneacion(planeacion?.pdf_path)].filter(Boolean))
 
   useEffect(() => {
     setContenido(planeacion?.contenido || '')
@@ -71,7 +102,7 @@ export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved,
 
     if (pdfNuevo) {
       const limpio = pdfNuevo.name.replace(/[^\w.-]+/g, '_')
-      const path = `planeaciones/${nivel.id}/${fecha}/${Date.now()}-${limpio}`
+      const path = `${nivel.id}/${fecha}/${Date.now()}-${limpio}`
       const { error: upError } = await supabase.storage
         .from(BUCKET)
         .upload(path, pdfNuevo, { contentType: 'application/pdf' })
@@ -108,7 +139,7 @@ export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved,
         { onConflict: 'nivel_id,fecha' },
       )
       if (saveError) {
-        if (pdfNuevo && pdf_path) await supabase.storage.from(BUCKET).remove([pdf_path])
+        if (pdfNuevo && pdf_path) await supabase.storage.from(bucketDe(pdf_path)).remove([pdf_path])
         setBusy(false)
         return setError('No se pudo guardar: ' + saveError.message)
       }
@@ -116,14 +147,15 @@ export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved,
 
     // Limpiar el PDF anterior si se reemplazó o se quitó.
     if (pdfAnterior && pdfAnterior !== pdf_path) {
-      await supabase.storage.from(BUCKET).remove([pdfAnterior])
+      await supabase.storage.from(bucketDe(pdfAnterior)).remove([pdfAnterior])
     }
 
     setBusy(false)
     onSaved?.()
   }
 
-  const pdfActualUrl = !quitarPdf && !pdfNuevo ? urlPdfPlaneacion(planeacion?.pdf_path) : null
+  const hayPdfActual = !quitarPdf && !pdfNuevo && !!planeacion?.pdf_path
+  const pdfActualUrl = hayPdfActual ? urlPdfPlaneacion(planeacion.pdf_path) : null
 
   return (
       <div className="flex flex-col gap-5">
@@ -162,10 +194,10 @@ export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved,
               </div>
               <PdfViewer src={pdfNuevo} nombre={pdfNuevo.name} />
             </div>
-          ) : pdfActualUrl ? (
+          ) : hayPdfActual ? (
             <div className="flex flex-col gap-2">
               <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-ink/5 px-3 py-2">
-                <a href={pdfActualUrl} target="_blank" rel="noreferrer" className="min-w-0 truncate text-sm font-bold text-sky-700 hover:underline">
+                <a href={pdfActualUrl || undefined} target="_blank" rel="noreferrer" className="min-w-0 truncate text-sm font-bold text-sky-700 hover:underline">
                   📄 {planeacion.pdf_nombre || 'Planeación.pdf'}
                 </a>
                 <div className="flex shrink-0 gap-3">
@@ -177,7 +209,11 @@ export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved,
                   </button>
                 </div>
               </div>
-              <PdfViewer src={pdfActualUrl} nombre={planeacion.pdf_nombre || 'Planeacion.pdf'} />
+              {pdfActualUrl ? (
+                <PdfViewer src={pdfActualUrl} nombre={planeacion.pdf_nombre || 'Planeacion.pdf'} />
+              ) : (
+                <div className="h-40 animate-pulse rounded-2xl bg-ink/5" aria-busy="true" aria-label="Cargando PDF" />
+              )}
             </div>
           ) : (
             <button type="button" onClick={() => inputRef.current?.click()} className="btn-secondary !py-2 !text-sm">

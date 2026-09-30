@@ -7,6 +7,7 @@ import HorarioSemanal from '../../components/HorarioSemanal'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 import EmptyState from '../../components/EmptyState'
 import PrepararClaseModal from '../../components/PrepararClaseModal'
+import { moverPdfsPlaneacionAPrivado } from '../../components/PlaneacionClaseModal'
 import CronogramaNiveles from '../../components/CronogramaNiveles'
 import TituloPagina from '../../components/ui/TituloPagina'
 
@@ -154,6 +155,11 @@ export default function Planeacion() {
   useEffect(() => {
     loadMes()
   }, [loadMes])
+
+  // Una vez: mover PDFs antiguos (públicos) al almacenamiento privado.
+  useEffect(() => {
+    if (['superadmin', 'admin', 'coordinador'].includes(profile?.role)) moverPdfsPlaneacionAPrivado().then(loadMes)
+  }, [profile?.role])
 
   const diasClaseSet = useMemo(() => new Set((diasClase || []).filter((d) => d.activo).map((d) => d.dia_semana)), [diasClase])
 

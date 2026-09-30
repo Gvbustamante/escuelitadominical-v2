@@ -4,10 +4,10 @@ import { supabase } from './supabaseClient'
 /**
  * URLs de archivos de Storage.
  * - Buckets públicos (actividades, logos…): URL pública, síncrona.
- * - Bucket 'drive' (privado): enlace firmado que caduca. Se firman en lote con
+ * - Buckets privados ('drive', 'planeaciones'): enlace firmado que caduca. Se firman en lote con
  *   useArchivosFirmados() y se leen síncronamente con urlArchivo() (null mientras carga).
  */
-const PRIVADOS = new Set(['drive'])
+const PRIVADOS = new Set(['drive', 'planeaciones'])
 const DURACION = 3600 // segundos
 const cache = new Map() // `${bucket}/${path}` -> { url, vence }
 

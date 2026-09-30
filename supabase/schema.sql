@@ -1419,3 +1419,23 @@ create policy "gestionar planeacion_clase" on public.planeacion_clase for all to
     exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
     or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = planeacion_clase.nivel_id and dn.docente_id = auth.uid())
   );
+
+-- ---------- PLANEACIONES (PDF privados) ----------
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('planeaciones', 'planeaciones', false, 20971520, array['application/pdf'])
+on conflict (id) do update set public = false;
+
+drop policy if exists "equipo lee planeaciones" on storage.objects;
+create policy "equipo lee planeaciones" on storage.objects for select to authenticated
+  using (bucket_id = 'planeaciones'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
+
+drop policy if exists "equipo sube planeaciones" on storage.objects;
+create policy "equipo sube planeaciones" on storage.objects for insert to authenticated
+  with check (bucket_id = 'planeaciones'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
+
+drop policy if exists "equipo borra planeaciones" on storage.objects;
+create policy "equipo borra planeaciones" on storage.objects for delete to authenticated
+  using (bucket_id = 'planeaciones'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
-import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
+import { urlArchivo, useArchivosFirmados, urlArchivoAsync } from '../lib/archivos'
 import Spinner from '../components/Spinner'
 import RichTextView from '../components/RichTextView'
 import ReaccionesBar from '../components/ReaccionesBar'
@@ -10,7 +10,7 @@ import { getVideoEmbedUrl } from '../lib/videoEmbed'
 import { useAuth } from '../contexts/AuthContext'
 import { useConfigIglesia } from '../lib/configIglesia'
 import { moduloActivo } from '../lib/modulos'
-import { urlPdfPlaneacion } from '../components/PlaneacionClaseModal'
+import { urlPdfPlaneacion, archivoPdfPlaneacion } from '../components/PlaneacionClaseModal'
 
 const ROLES_PLANEACION = ['superadmin', 'admin', 'coordinador', 'docente']
 
@@ -27,7 +27,7 @@ export default function DevocionalDetalle() {
   const [preview, setPreview] = useState(null)
   const [copiado, setCopiado] = useState(false)
   const [planeaciones, setPlaneaciones] = useState(null)
-  useArchivosFirmados(devocional?.devocional_archivos)
+  useArchivosFirmados([...(devocional?.devocional_archivos || []), ...(planeaciones || []).map((pl) => archivoPdfPlaneacion(pl.pdf_path)).filter(Boolean)])
   const { user, profile } = useAuth()
   const config = useConfigIglesia()
   const verPlaneacion = ROLES_PLANEACION.includes(profile?.role) && moduloActivo(config, 'planeacion')
@@ -247,7 +247,7 @@ export default function DevocionalDetalle() {
                       {pl.pdf_path && (
                         <button
                           type="button"
-                          onClick={() => setPreview({ url: urlPdfPlaneacion(pl.pdf_path), nombre: pl.pdf_nombre || 'Planeación.pdf', mime: 'application/pdf' })}
+                          onClick={async () => { const it = archivoPdfPlaneacion(pl.pdf_path); const url = urlPdfPlaneacion(pl.pdf_path) || (await urlArchivoAsync(it.bucket, it.storage_path)); if (url) setPreview({ url, nombre: pl.pdf_nombre || 'Planeación.pdf', mime: 'application/pdf' }) }}
                           className="mt-3 flex w-full items-center gap-3 rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 text-left transition-colors hover:border-sky-300 hover:bg-sky-50"
                         >
                           <span className="text-2xl">📄</span>
