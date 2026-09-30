@@ -16,7 +16,7 @@ const MOTIVOS = [
 ]
 
 const FEATURES = [
-  { icon: '🎒', title: 'Clases y niveles', text: 'Organiza a los peques por edad, con su docente asignada.' },
+  { icon: '🎒', title: 'Niveles por edad', text: 'Organiza a los peques por edad, con su docente asignada.' },
   { icon: '✅', title: 'Asistencia', text: 'La docente marca presentes tocando la pantalla, en segundos.' },
   { icon: '🎨', title: 'Actividades', text: 'Fotos y lo que aprendieron, directo para casa.' },
   { icon: '🌱', title: 'Progreso', text: 'Comportamiento, emociones y logros de cada niño/a.' },
@@ -170,7 +170,7 @@ export default function Landing() {
                 <div className="overflow-hidden rounded-[1.05rem] bg-white">
                   <img
                     src={appScreen}
-                    alt="Pantalla real de KidsMin con niños y clases"
+                    alt="Pantalla real de KidsMin con niños y niveles"
                     className="block w-full"
                   />
                 </div>

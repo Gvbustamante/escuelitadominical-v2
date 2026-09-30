@@ -181,12 +181,12 @@ export default function Clases() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Clases 🎒</h1>
+        <h1 className="text-3xl font-bold">Niveles 🎒</h1>
         <p className="text-ink/70">Niveles por edad de tu escuelita — usa ▲▼ para ordenarlas como quieras verlas</p>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <button className="btn-primary" onClick={openNew}>
-          + Nueva clase
+          + Nuevo nivel
         </button>
       </div>
 
@@ -282,7 +282,7 @@ export default function Clases() {
         </table>
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar clase' : 'Nueva clase'}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar nivel' : 'Nuevo nivel'}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="label">Nombre</label>
@@ -328,8 +328,8 @@ export default function Clases() {
             </div>
           </div>
           <div>
-            <label className="label">Personas asignadas a esta clase</label>
-            <p className="mb-2 text-xs text-ink/65">Marca a quienes enseñan o ayudan en esta clase — pueden ser docentes, coordinadores o admins.</p>
+            <label className="label">Personas asignadas a este nivel</label>
+            <p className="mb-2 text-xs text-ink/65">Marca a quienes enseñan o ayudan en este nivel — pueden ser docentes, coordinadores o admins.</p>
             <div className="flex flex-col gap-2 rounded-2xl border-2 border-ink/10 p-3 max-h-40 overflow-y-auto">
               {docentes.length === 0 && <p className="text-sm text-ink/65">Aún no hay cuentas de equipo.</p>}
               {docentes.map((d) => (
@@ -392,11 +392,11 @@ export default function Clases() {
         onClose={() => setConfirmDesactivar(null)}
         onConfirm={confirmarDesactivar}
         busy={confirmBusy}
-        title="¿Desactivar esta clase?"
+        title="¿Desactivar este nivel?"
         confirmLabel="Sí, desactivar"
         message={
           confirmDesactivar
-            ? `"${confirmDesactivar.nombre}" dejará de aparecer como clase activa. Puedes reactivarla cuando quieras.`
+            ? `"${confirmDesactivar.nombre}" dejará de aparecer como nivel activo. Puedes reactivarlo cuando quieras.`
             : ''
         }
       />

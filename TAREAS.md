@@ -42,7 +42,7 @@ Marca `[x]` cuando se complete.
 - [ ] Calcular costo real por iglesia vs. precio (margen).
 
 ## 🧭 Flujos (ver FLUJOS_UX.md)
-- [ ] Renombrar "Clase" → "Nivel" en pantallas (grupo = Nivel, sesión = Clase).
+- [x] Renombrar "Clase" → "Nivel" en pantallas (grupo = Nivel, sesión = Clase).
 - [ ] Asistencia: guardado automático + ⭐ en la fila + "⭐ a todos".
 - [ ] Nuevo niño con padre en el mismo formulario.
 - [ ] Nueva cuenta docente con niveles; asignar desde la lista de Niveles; horario a "Avanzado".

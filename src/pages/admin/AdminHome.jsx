@@ -86,7 +86,7 @@ export default function AdminHome() {
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard icon="🧒" label="Niños activos" value={stats.ninos} color="sky" delay={0} />
-        <StatCard icon="🎒" label="Clases activas" value={stats.clases} color="grass" delay={80} />
+        <StatCard icon="🎒" label="Niveles activos" value={stats.clases} color="grass" delay={80} />
         <StatCard icon="🍎" label="Equipo" value={stats.docentes} color="sunshine" delay={160} />
         {stats.esDiaClase ? (
           <StatCard icon="✅" label="Asistencia hoy" value={stats.asistenciaHoy} color="grape" delay={240} />
@@ -96,7 +96,7 @@ export default function AdminHome() {
               💤
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-lg font-bold leading-none text-ink/65 sm:text-xl">Sin clase</p>
+              <p className="text-lg font-bold leading-none text-ink/65 sm:text-xl">Sin nivel</p>
               <p className="mt-1 text-xs font-bold leading-tight text-ink/70 sm:text-sm">Hoy no toca escuelita</p>
             </div>
           </div>
@@ -121,7 +121,7 @@ export default function AdminHome() {
         <Link to="/clases" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '160ms' }}>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grass-100 text-2xl">🎒</span>
           <div className="min-w-0 flex-1">
-            <p className="font-bold">Gestionar clases</p>
+            <p className="font-bold">Gestionar niveles</p>
             <p className="text-sm text-ink/70">Niveles y edades</p>
           </div>
           <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>

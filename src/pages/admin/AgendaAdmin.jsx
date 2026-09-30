@@ -70,7 +70,7 @@ export default function AgendaAdmin() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Agenda 📅</h1>
-          <p className="text-ink/70">Eventos para toda la escuelita o por clase</p>
+          <p className="text-ink/70">Eventos para toda la escuelita o por nivel</p>
         </div>
         <button className="btn-primary" onClick={openNew}>
           + Nuevo evento
@@ -124,7 +124,7 @@ export default function AgendaAdmin() {
               <input type="date" required className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
             </div>
             <div>
-              <label className="label">Clase</label>
+              <label className="label">Nivel</label>
               <select className="input" value={form.nivel_id} onChange={(e) => setForm({ ...form, nivel_id: e.target.value })}>
                 <option value="">Toda la escuelita</option>
                 {niveles.map((n) => (

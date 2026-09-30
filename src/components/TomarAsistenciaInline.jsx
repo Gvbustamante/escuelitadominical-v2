@@ -148,7 +148,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
         ) : !ninos || total === 0 ? (
           <div className="py-12 text-center">
             <p className="text-3xl">📭</p>
-            <p className="mt-2 text-sm font-bold text-ink/65">No hay niños activos en esta clase.</p>
+            <p className="mt-2 text-sm font-bold text-ink/65">No hay niños activos en este nivel.</p>
           </div>
         ) : (
           <>

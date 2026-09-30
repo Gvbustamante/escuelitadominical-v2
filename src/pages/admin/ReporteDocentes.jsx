@@ -254,7 +254,7 @@ export default function ReporteDocentes() {
     ])
     exportExcel(
       `reporte-docentes-${mes}`,
-      ['Docente', 'Rol', 'Clases', 'Días asist.', 'Días bitácora', 'Bitácoras total', 'Actividades', 'Notas progreso', 'Niños agregados', 'Días activo', 'Días de clase', 'Cumplimiento'],
+      ['Docente', 'Rol', 'Niveles', 'Días asist.', 'Días bitácora', 'Bitácoras total', 'Actividades', 'Notas progreso', 'Niños agregados', 'Días activo', 'Días de clase', 'Cumplimiento'],
       filas,
     )
   }
@@ -341,7 +341,7 @@ export default function ReporteDocentes() {
                   <Avatar nombre={item.nombre} size="lg" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-base font-bold leading-tight">{item.nombre}</p>
-                    <p className="mt-0.5 text-xs text-ink/65">{item.clases.join(', ') || 'Sin clases'}</p>
+                    <p className="mt-0.5 text-xs text-ink/65">{item.clases.join(', ') || 'Sin niveles'}</p>
                     <div className="mt-2 flex items-center gap-2">
                       <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-ink/10">
                         <div

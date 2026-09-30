@@ -8,8 +8,8 @@ export const PERMISOS_DISPONIBLES = [
   {
     rol: 'docente',
     permiso: 'editar_ninos',
-    label: 'Editar los datos de los niños de su clase',
-    detalle: 'Nombre, fecha de nacimiento, alergias y notas — solo de las clases que tiene asignadas.',
+    label: 'Editar los datos de los niños de su nivel',
+    detalle: 'Nombre, edad, alergias y notas — solo de los niveles que tiene asignados.',
     porDefecto: true,
   },
   {
@@ -23,14 +23,14 @@ export const PERMISOS_DISPONIBLES = [
     rol: 'docente',
     permiso: 'vincular_padres',
     label: 'Vincular padres/madres a sus niños',
-    detalle: 'Crear una cuenta nueva de padre/madre (o vincular una existente) para los niños de su propia clase.',
+    detalle: 'Crear una cuenta nueva de padre/madre (o vincular una existente) para los niños de su propio nivel.',
     porDefecto: false,
   },
   {
     rol: 'docente',
     permiso: 'elegir_clase',
-    label: 'Elegir su propia clase/salón',
-    detalle: 'Desde su Inicio, puede unirse o salirse de cualquier clase sin que el admin tenga que asignarlo. Puede estar en más de una a la vez.',
+    label: 'Elegir su propio nivel/salón',
+    detalle: 'Desde su Inicio, puede unirse o salirse de cualquier nivel sin que el admin tenga que asignarlo. Puede estar en más de uno a la vez.',
     porDefecto: false,
   },
 ]

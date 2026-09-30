@@ -380,9 +380,9 @@ export default function Planeacion() {
 
               {nivelesVisibles.length === 0 ? (
                 esDocente ? (
-                  <EmptyState icon="🎒" titulo="Todavía no tienes clases asignadas" texto="Pide al administrador que te asigne a una clase en la sección Clases." />
+                  <EmptyState icon="🎒" titulo="Todavía no tienes niveles asignados" texto="Pide al administrador que te asigne a un nivel en la sección Niveles." />
                 ) : (
-                  <EmptyState icon="🎒" titulo="Todavía no hay clases creadas" texto="Crea las clases (grupos por edad) para poder planear cada día." accion={{ label: '+ Crear clases', to: '/clases' }} />
+                  <EmptyState icon="🎒" titulo="Todavía no hay niveles creados" texto="Crea los niveles (grupos por edad) para poder planear cada día." accion={{ label: '+ Crear niveles', to: '/clases' }} />
                 )
               ) : (
                 <div className="grid gap-3 xl:grid-cols-2">
@@ -546,7 +546,7 @@ export default function Planeacion() {
                                   <div className="min-w-0 flex-1">
                                     <p className="truncate font-bold text-sunshine-800">🙏 {dv.titulo}</p>
                                     {dv.versiculo && <p className="mt-0.5 truncate text-xs italic text-ink/65">📖 {dv.versiculo}</p>}
-                                    {!dv.nivel_id && <span className="text-xs font-bold text-ink/65">Para todas las clases</span>}
+                                    {!dv.nivel_id && <span className="text-xs font-bold text-ink/65">Para todos los niveles</span>}
                                   </div>
                                   <span className="shrink-0 text-xs text-sunshine-600">Ver →</span>
                                 </div>

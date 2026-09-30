@@ -288,7 +288,7 @@ export default function Actividades() {
   }
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes niveles asignados todavía.</p>
 
   // Filtrado por búsqueda + mes
   const actividadesFiltradas = (actividades || []).filter((a) =>
@@ -382,7 +382,7 @@ export default function Actividades() {
           ) : actividades.length === 0 ? (
             <div className="card flex flex-col items-center gap-3 py-12 text-center">
               <span className="text-5xl">🎨</span>
-              <p className="text-ink/70">Aún no hay actividades para esta clase.</p>
+              <p className="text-ink/70">Aún no hay actividades para este nivel.</p>
               <button className="btn-primary mt-1" onClick={openNew}>+ Nueva actividad</button>
             </div>
           ) : mesesOrdenados.length === 0 ? (

@@ -147,7 +147,7 @@ export default function CoberturaHoy() {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-xl font-bold">Cobertura de hoy 🗓️</h2>
-          <p className="text-sm text-ink/70">Quién está a cargo de cada clase y si ya se registró asistencia.</p>
+          <p className="text-sm text-ink/70">Quién está a cargo de cada nivel y si ya se registró asistencia.</p>
         </div>
         {filas.length === 0 ? null : alertas === 0 ? (
           <span className="badge bg-grass-100 text-grass-700">✅ Todo cubierto</span>
@@ -162,7 +162,7 @@ export default function CoberturaHoy() {
         <table className="tabla-tarjetas w-full text-left">
           <thead className="text-xs font-bold uppercase text-ink/65">
             <tr>
-              <th className="px-2 py-2">Clase</th>
+              <th className="px-2 py-2">Nivel</th>
               <th className="px-2 py-2">Docente(s)</th>
               <th className="px-2 py-2">Niños</th>
               <th className="px-2 py-2">Asistencia hoy</th>
@@ -218,7 +218,7 @@ export default function CoberturaHoy() {
       </div>
 
       <Link to="/clases" className="mt-4 inline-block text-sm font-bold text-sky-600 hover:underline">
-        Gestionar clases y docentes asignados →
+        Gestionar niveles y docentes asignados →
       </Link>
     </div>
   )

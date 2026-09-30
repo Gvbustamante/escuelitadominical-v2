@@ -36,7 +36,7 @@ export default function Bitacora() {
   }, [loadAmbos])
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes niveles asignados todavía.</p>
 
   return (
     <div className="flex flex-col gap-6">

@@ -373,7 +373,7 @@ export default function Devocionales() {
             )}
             {niveles.length > 0 && (
               <select className="input max-w-[180px]" value={nivelFiltro} onChange={(e) => setNivelFiltro(e.target.value)}>
-                <option value="">Todas las clases</option>
+                <option value="">Todos los niveles</option>
                 {niveles.map((n) => (
                   <option key={n.id} value={n.id}>{n.nombre}</option>
                 ))}
@@ -435,7 +435,7 @@ export default function Devocionales() {
                     {/* 1. Fecha y clase */}
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-sm font-extrabold capitalize text-sky-700">📅 {formatFechaLarga(d.fecha)}</span>
-                      <span className="badge bg-sky-100 text-sky-700">{d.nivel?.nombre || 'Todas las clases'}</span>
+                      <span className="badge bg-sky-100 text-sky-700">{d.nivel?.nombre || 'Todos los niveles'}</span>
                     </div>
 
                     {/* 2. Título */}
@@ -626,9 +626,9 @@ export default function Devocionales() {
                     <input type="date" className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
                   </div>
                   <div>
-                    <label className="label">Clase (opcional)</label>
+                    <label className="label">Nivel (opcional)</label>
                     <select className="input" value={form.nivel_id} onChange={(e) => setForm({ ...form, nivel_id: e.target.value })}>
-                      <option value="">Para todas las clases</option>
+                      <option value="">Para todos los niveles</option>
                       {niveles.map((n) => (
                         <option key={n.id} value={n.id}>
                           {n.nombre}

@@ -100,7 +100,7 @@ export default function Progreso() {
   }
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes niveles asignados todavía.</p>
 
   return (
     <div className="flex flex-col gap-6">
@@ -164,7 +164,7 @@ export default function Progreso() {
               {ninos.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-4 py-6 text-center text-ink/65">
-                    No hay niños activos en esta clase.
+                    No hay niños activos en este nivel.
                   </td>
                 </tr>
               )}
@@ -217,7 +217,7 @@ export default function Progreso() {
               </div>
             )
           })}
-          {ninos.length === 0 && <p className="text-ink/65">No hay niños activos en esta clase.</p>}
+          {ninos.length === 0 && <p className="text-ink/65">No hay niños activos en este nivel.</p>}
         </div>
       )}
 

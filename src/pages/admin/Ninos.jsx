@@ -213,7 +213,7 @@ export default function Ninos() {
         nino.pausado ? 'Sí' : 'No',
       ]
     })
-    exportExcel('ninos', ['Nombre', 'Sexo', 'Edad', 'Clase', 'Insignia', 'Estrellas', 'Asist. mes', 'Alergias', 'Padres/encargados', 'Estado', 'Pausado'], filas)
+    exportExcel('ninos', ['Nombre', 'Sexo', 'Edad', 'Nivel', 'Insignia', 'Estrellas', 'Asist. mes', 'Alergias', 'Padres/encargados', 'Estado', 'Pausado'], filas)
   }
 
   function handleToggleClick(nino) {
@@ -359,8 +359,8 @@ export default function Ninos() {
               onChange={(e) => setBusqueda(e.target.value)}
             />
             <select className="input !w-auto" value={filtroNivel} onChange={(e) => setFiltroNivel(e.target.value)}>
-              <option value="">Todas las clases</option>
-              {esDocente && <option value="__mios__">Mi clase</option>}
+              <option value="">Todos los niveles</option>
+              {esDocente && <option value="__mios__">Mi nivel</option>}
               {niveles.map((n) => (
                 <option key={n.id} value={n.id}>{n.nombre}</option>
               ))}
@@ -386,7 +386,7 @@ export default function Ninos() {
             <EmptyState
               icon="🧒"
               titulo="Todavía no hay niños registrados"
-              texto="Registra a cada niño con su nombre, edad y clase. Después podrás vincular a sus padres."
+              texto="Registra a cada niño con su nombre, edad y nivel. Después podrás vincular a sus padres."
               accion={{ label: '+ Registrar el primero', onClick: openNew }}
             />
           ) : filtrados.length === 0 ? (
@@ -534,7 +534,7 @@ export default function Ninos() {
               />
             </div>
             <div>
-              <label className="label">Clase</label>
+              <label className="label">Nivel</label>
               <select
                 className="input"
                 value={form.nivel_id}

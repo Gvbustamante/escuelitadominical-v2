@@ -43,8 +43,8 @@ export default function MiClase({ onChange }) {
 
   return (
     <div className="card">
-      <p className="font-bold">🎒 Elige tu clase</p>
-      <p className="mt-1 text-sm text-ink/70">Únete o sal de la clase que vayas a llevar — puedes estar en más de una.</p>
+      <p className="font-bold">🎒 Elige tu nivel</p>
+      <p className="mt-1 text-sm text-ink/70">Únete o sal del nivel que vayas a llevar — puedes estar en más de uno.</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {niveles.map((n) => {
           const dentro = misNivelIds.has(n.id)

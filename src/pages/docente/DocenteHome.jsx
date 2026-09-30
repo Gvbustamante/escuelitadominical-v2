@@ -45,7 +45,7 @@ export default function DocenteHome() {
           🌟
         </span>
         <h1 className="text-3xl font-bold">¡Hola, miss {profile.nombre_completo.split(' ')[0]}! 🌟</h1>
-        <p className="text-ink/70">Tus clases asignadas</p>
+        <p className="text-ink/70">Tus niveles asignados</p>
       </div>
 
       <CitaDelDia />
@@ -57,7 +57,7 @@ export default function DocenteHome() {
       ) : (
         clases.length === 0 && (
           <p className="card text-ink/70">
-            Aún no tienes clases asignadas. Pide al administrador que te asigne una en la sección de Clases.
+            Aún no tienes niveles asignados. Pide al administrador que te asigne uno en la sección Niveles.
           </p>
         )
       )}

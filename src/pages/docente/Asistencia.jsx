@@ -27,7 +27,7 @@ export default function Asistencia() {
   }, [load])
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes niveles asignados todavía.</p>
 
   const nivelActual = clases.find((c) => c.id === nivelId)
 

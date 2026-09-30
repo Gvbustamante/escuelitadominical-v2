@@ -51,7 +51,7 @@ export default function AsistenciaAdmin() {
     )
   }
 
-  if (niveles.length === 0) return <EmptyState icon="🎒" titulo="Todavía no hay clases creadas" texto="Primero crea las clases (grupos por edad). Después podrás usar esta sección." accion={{ label: '+ Crear clases', to: '/clases' }} />
+  if (niveles.length === 0) return <EmptyState icon="🎒" titulo="Todavía no hay niveles creados" texto="Primero crea los niveles (grupos por edad). Después podrás usar esta sección." accion={{ label: '+ Crear niveles', to: '/clases' }} />
 
   const nivelActual = niveles.find((n) => n.id === nivelId)
 
@@ -64,7 +64,7 @@ export default function AsistenciaAdmin() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold">Asistencia ✅</h1>
-        <p className="text-ink/70">Toma asistencia y revisa la tabla mensual por clase</p>
+        <p className="text-ink/70">Toma asistencia y revisa la tabla mensual por nivel</p>
       </div>
 
       <div className="flex flex-wrap gap-2">

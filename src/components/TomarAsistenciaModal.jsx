@@ -82,7 +82,7 @@ export default function TomarAsistenciaModal({ open, onClose, nivelId, nivelNomb
         {cargando ? (
           <p className="text-sm text-ink/65">Cargando...</p>
         ) : !ninos || ninos.length === 0 ? (
-          <p className="text-sm text-ink/65">No hay niños activos en esta clase.</p>
+          <p className="text-sm text-ink/65">No hay niños activos en este nivel.</p>
         ) : (
           <>
             <p className="font-bold text-ink/75">

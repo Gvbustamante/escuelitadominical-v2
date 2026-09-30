@@ -276,7 +276,7 @@ export default function ActividadesAdmin() {
   }
 
   if (!niveles) return <Spinner />
-  if (niveles.length === 0) return <EmptyState icon="🎒" titulo="Todavía no hay clases creadas" texto="Primero crea las clases (grupos por edad). Después podrás usar esta sección." accion={{ label: '+ Crear clases', to: '/clases' }} />
+  if (niveles.length === 0) return <EmptyState icon="🎒" titulo="Todavía no hay niveles creados" texto="Primero crea los niveles (grupos por edad). Después podrás usar esta sección." accion={{ label: '+ Crear niveles', to: '/clases' }} />
 
   // Filtrado por búsqueda + mes
   const actividadesFiltradas = (actividades || []).filter((a) =>
@@ -340,7 +340,7 @@ export default function ActividadesAdmin() {
         )}
       </div>
       {audiencia === 'docentes' && (
-        <p className="-mt-3 text-sm text-ink/70">Comunicados, capacitaciones o tareas dirigidas a todo el equipo docente, no a una clase en particular.</p>
+        <p className="-mt-3 text-sm text-ink/70">Comunicados, capacitaciones o tareas dirigidas a todo el equipo docente, no a un nivel en particular.</p>
       )}
 
       <div className="relative">
@@ -358,7 +358,7 @@ export default function ActividadesAdmin() {
       ) : actividades.length === 0 ? (
         <div className="card flex flex-col items-center gap-3 py-12 text-center">
           <span className="text-5xl">🎨</span>
-          <p className="text-ink/70">Aún no hay actividades para esta clase.</p>
+          <p className="text-ink/70">Aún no hay actividades para este nivel.</p>
           <button className="btn-primary mt-1" onClick={openNew}>+ Nueva actividad</button>
         </div>
       ) : mesesOrdenados.length === 0 ? (

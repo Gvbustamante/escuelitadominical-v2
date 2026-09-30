@@ -90,7 +90,7 @@ export default function BitacoraAdmin() {
       </div>
     )
   }
-  if (niveles.length === 0) return <EmptyState icon="🎒" titulo="Todavía no hay clases creadas" texto="Primero crea las clases (grupos por edad). Después podrás usar esta sección." accion={{ label: '+ Crear clases', to: '/clases' }} />
+  if (niveles.length === 0) return <EmptyState icon="🎒" titulo="Todavía no hay niveles creados" texto="Primero crea los niveles (grupos por edad). Después podrás usar esta sección." accion={{ label: '+ Crear niveles', to: '/clases' }} />
 
   const porFecha = agruparPorFecha(registros)
 
@@ -148,7 +148,7 @@ export default function BitacoraAdmin() {
           {!registros ? (
             <Skeleton className="h-64 w-full" />
           ) : porFecha.length === 0 ? (
-            <p className="card text-ink/70">Sin registros este mes para esta clase.</p>
+            <p className="card text-ink/70">Sin registros este mes para este nivel.</p>
           ) : (
             <div className="flex flex-col gap-4">
               {porFecha.map(({ fecha, antes, despues }) => (
@@ -340,7 +340,7 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
     <form onSubmit={guardar} className="flex flex-col gap-5">
       <div className="flex flex-wrap gap-3">
         <div className="flex-1">
-          <label className="label">Clase</label>
+          <label className="label">Nivel</label>
           <select className="input" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
             {niveles.map((n) => (
               <option key={n.id} value={n.id}>

@@ -70,7 +70,7 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
           <Spinner label="Cargando asistencia..." />
         </div>
       ) : ninos.length === 0 ? (
-        <p className="p-6 text-center text-ink/65">No hay niños activos en esta clase.</p>
+        <p className="p-6 text-center text-ink/65">No hay niños activos en este nivel.</p>
       ) : fechas.length === 0 ? (
         <p className="p-6 text-center text-ink/65">Todavía no se ha tomado asistencia este mes.</p>
       ) : (

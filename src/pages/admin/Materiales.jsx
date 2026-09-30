@@ -7,7 +7,7 @@ import MultiFilePicker from '../../components/MultiFilePicker'
 import FotosGaleria from '../../components/FotosGaleria'
 import { exportExcel } from '../../lib/exportExcel'
 
-const CATEGORIA_LABEL = { general: 'General', ninos: 'Para niños', clase: 'Para una clase' }
+const CATEGORIA_LABEL = { general: 'General', ninos: 'Para niños', clase: 'Para un nivel' }
 
 export default function Materiales() {
   const [materiales, setMateriales] = useState(null)
@@ -103,12 +103,12 @@ export default function Materiales() {
   function exportar() {
     const filas = materiales.map((m) => [
       m.nombre,
-      m.categoria === 'clase' ? m.nivel?.nombre || 'Para una clase' : CATEGORIA_LABEL[m.categoria],
+      m.categoria === 'clase' ? m.nivel?.nombre || 'Para un nivel' : CATEGORIA_LABEL[m.categoria],
       m.cantidad,
       m.notas || '',
       m.activo ? 'Activo' : 'Inactivo',
     ])
-    exportExcel('materiales', ['Nombre', 'Categoría/Clase', 'Cantidad', 'Notas', 'Estado'], filas)
+    exportExcel('materiales', ['Nombre', 'Categoría/Nivel', 'Cantidad', 'Notas', 'Estado'], filas)
   }
 
   if (!materiales) {
@@ -129,7 +129,7 @@ export default function Materiales() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-ink/70">Qué hay disponible para los niños y para cada clase</p>
+        <p className="text-ink/70">Qué hay disponible para los niños y para cada nivel</p>
         <div className="flex gap-2">
           <button className="btn-secondary" onClick={exportar}>
             📊 Exportar
@@ -145,7 +145,7 @@ export default function Materiales() {
             <thead className="bg-sky-50 text-xs font-bold uppercase text-ink/70">
               <tr>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Nombre</th>
-                <th className="px-3 py-1.5 sm:px-4 sm:py-2">Categoría/Clase</th>
+                <th className="px-3 py-1.5 sm:px-4 sm:py-2">Categoría/Nivel</th>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Archivos</th>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Cantidad</th>
                 <th className="px-3 py-1.5 sm:px-4 sm:py-2">Estado</th>
@@ -156,8 +156,8 @@ export default function Materiales() {
               {materiales.map((m) => (
                 <tr key={m.id} className={`border-t border-ink/5 ${!m.activo ? 'opacity-50' : ''}`}>
                   <td data-titulo className="px-3 py-1.5 sm:px-4 sm:py-2 font-bold">{m.nombre}</td>
-                  <td data-label="Categoría/Clase" className="px-3 py-1.5 sm:px-4 sm:py-2 text-ink/75">
-                    {m.categoria === 'clase' ? m.nivel?.nombre || 'Para una clase' : CATEGORIA_LABEL[m.categoria]}
+                  <td data-label="Categoría/Nivel" className="px-3 py-1.5 sm:px-4 sm:py-2 text-ink/75">
+                    {m.categoria === 'clase' ? m.nivel?.nombre || 'Para un nivel' : CATEGORIA_LABEL[m.categoria]}
                   </td>
                   <td data-label="Archivos" className="px-3 py-1.5 sm:px-4 sm:py-2">
                     <FotosGaleria fotos={fotosDe(m)} size="h-10 w-10" />
@@ -210,7 +210,7 @@ export default function Materiales() {
               <select className="input" value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })}>
                 <option value="general">General</option>
                 <option value="ninos">Para niños</option>
-                <option value="clase">Para una clase</option>
+                <option value="clase">Para un nivel</option>
               </select>
             </div>
             <div>
@@ -226,9 +226,9 @@ export default function Materiales() {
           </div>
           {form.categoria === 'clase' && (
             <div>
-              <label className="label">Clase</label>
+              <label className="label">Nivel</label>
               <select className="input" value={form.nivel_id} onChange={(e) => setForm({ ...form, nivel_id: e.target.value })}>
-                <option value="">Elige una clase</option>
+                <option value="">Elige un nivel</option>
                 {niveles.map((n) => (
                   <option key={n.id} value={n.id}>
                     {n.nombre}

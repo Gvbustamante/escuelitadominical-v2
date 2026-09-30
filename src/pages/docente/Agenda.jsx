@@ -56,7 +56,7 @@ export default function Agenda() {
   }
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/70">No tienes clases asignadas todavía.</p>
+  if (clases.length === 0) return <p className="card text-ink/70">No tienes niveles asignados todavía.</p>
 
   const hoy = hoyISO()
   const eventosDelDia = eventos ? (selectedDay ? eventos.filter((e) => e.fecha === selectedDay) : eventos) : []

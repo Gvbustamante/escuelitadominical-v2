@@ -66,7 +66,7 @@ export default function HorarioSemanal({
         </div>
         <div className="card flex items-center gap-2 !px-3 !py-2">
           <span className="text-lg font-extrabold text-grass-600">{(niveles || []).length}</span>
-          <span className="text-xs font-bold text-ink/65">Clases</span>
+          <span className="text-xs font-bold text-ink/65">Niveles</span>
         </div>
         <div className="card flex items-center gap-2 !px-3 !py-2">
           <span className="text-lg font-extrabold text-sunshine-600">{(devocionalesMes || []).length}</span>
@@ -100,7 +100,7 @@ export default function HorarioSemanal({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-ink/65">Sin clases asignadas</p>
+                    <p className="text-xs text-ink/65">Sin niveles asignados</p>
                   )}
                 </div>
               </div>
@@ -140,7 +140,7 @@ export default function HorarioSemanal({
 
       {!esDocente && (
         <p className="text-center text-xs text-ink/65">
-          Para cambiar las asignaciones de docentes, ve a <strong>Clases</strong>.
+          Para cambiar las asignaciones de docentes, ve a <strong>Niveles</strong>.
         </p>
       )}
     </div>

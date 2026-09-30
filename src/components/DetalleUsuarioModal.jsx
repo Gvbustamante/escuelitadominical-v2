@@ -168,9 +168,9 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
 
         {['superadmin', 'admin', 'coordinador', 'docente'].includes(persona.role) && (
           <div>
-            <p className="mb-2 text-xs font-extrabold uppercase text-ink/65">Clases asignadas</p>
+            <p className="mb-2 text-xs font-extrabold uppercase text-ink/65">Niveles asignados</p>
             {clases.length === 0 ? (
-              <p className="text-sm text-ink/65">Aún sin clases asignadas.</p>
+              <p className="text-sm text-ink/65">Aún sin niveles asignados.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {clases.map((nombre, i) => (

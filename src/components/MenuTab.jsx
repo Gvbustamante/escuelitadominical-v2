@@ -12,7 +12,7 @@ const ITEMS_MENU = [
   { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
   { to: '/drive', label: 'Drive', icon: '📁' },
   { to: '/ninos', label: 'Niños', icon: '🧒' },
-  { to: '/clases', label: 'Clases', icon: '🎒' },
+  { to: '/clases', label: 'Niveles', icon: '🎒' },
   { to: '/docentes', label: 'Equipo', icon: '🍎' },
   { to: '/reporte-docentes', label: 'Reporte docentes', icon: '📊' },
 ]

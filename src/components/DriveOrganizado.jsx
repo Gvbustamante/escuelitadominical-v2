@@ -188,7 +188,7 @@ export default function DriveOrganizado() {
     for (const b of datos.bitacoras) {
       const ma = mesAnio(b.fecha)
       if (!ma) continue
-      const nivel = b.nivel?.nombre || 'Clase'
+      const nivel = b.nivel?.nombre || 'Nivel'
       const label = `${nivel} — ${b.momento}`
       const quien = docentesMap[b.docente_id] || null
       if (b.salon_foto_url) bitItems.push({ ...ma, nivel, nombre: `${label} — salón`, url: b.salon_foto_url, fuente: label, mime: 'image/*', subidoPor: quien, fecha: b.fecha, tipoArchivo: 'Imagen' })

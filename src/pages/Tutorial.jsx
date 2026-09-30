@@ -35,8 +35,8 @@ function Step({ number, icon, title, children, color = 'sky' }) {
 function AdminGuide() {
   return (
     <>
-      <Step number="1" icon="🎒" title="Crea tus clases" color="grass">
-        Ve a <strong>Clases</strong> → <em>+ Nueva clase</em>. Ponle nombre y el rango de edad (ej. "Exploradores", 3 a 5 años).
+      <Step number="1" icon="🎒" title="Crea tus niveles" color="grass">
+        Ve a <strong>Niveles</strong> → <em>+ Nuevo nivel</em>. Ponle nombre y el rango de edad (ej. "Exploradores", 3 a 5 años).
         Puedes crear todas las que necesite tu escuelita.
       </Step>
       <Step number="2" icon="📆" title="Configura tus días de clase y horarios" color="sky">
@@ -52,8 +52,8 @@ function AdminGuide() {
         <strong>Ajustes</strong> → <em>Roles y permisos</em>, puedes prender o apagar cosas como que un docente
         edite/registre niños o vincule padres — vienen algunas activadas por defecto y otras no.
       </Step>
-      <Step number="4" icon="🔗" title="Asigna cada docente a su clase" color="sky">
-        En <strong>Clases</strong>, edita una clase y marca qué docente(s) la llevan. Si configuraste más de un horario,
+      <Step number="4" icon="🔗" title="Asigna cada docente a su nivel" color="sky">
+        En <strong>Niveles</strong>, edita un nivel y marca qué docente(s) lo llevan. Si configuraste más de un horario,
         también puedes fijar qué docente cubre cada uno — queda vinculado a la clase automáticamente, sin pasos extra.
       </Step>
       <Step number="5" icon="🧒" title="Registra a los niños" color="coral">
@@ -109,7 +109,7 @@ function AdminGuide() {
 function DocenteGuide() {
   return (
     <>
-      <Step number="1" icon="🏠" title="Revisa tus clases" color="sky">
+      <Step number="1" icon="🏠" title="Revisa tus niveles" color="sky">
         En el inicio ves las clases que el admin te asignó, con cuántos niños activos tiene cada una, y el widget
         "Agenda y tareas" con lo próximo que te toca.
       </Step>
@@ -199,28 +199,28 @@ const ROLES = [
     nombre: 'Admin',
     color: 'grape',
     texto:
-      'Es quien dirige toda la escuelita. Ve y gestiona absolutamente todo: crea clases, agrega docentes y coordinadores, registra niños, vincula padres, supervisa la asistencia de todas las clases y publica devocionales. Es el único rol que puede activar o desactivar cuentas del equipo.',
+      'Es quien dirige toda la escuelita. Ve y gestiona absolutamente todo: crea niveles, agrega docentes y coordinadores, registra niños, vincula padres, supervisa la asistencia de todos los niveles y publica devocionales. Es el único rol que puede activar o desactivar cuentas del equipo.',
   },
   {
     icon: '🗂️',
     nombre: 'Coordinador',
     color: 'sunshine',
     texto:
-      'Ayuda al admin en el día a día: puede crear/editar clases, registrar niños, agregar docentes y padres, y ver la asistencia general — igual que el admin, pero no puede agregar otros administradores ni coordinadores.',
+      'Ayuda al admin en el día a día: puede crear/editar niveles, registrar niños, agregar docentes y padres, y ver la asistencia general — igual que el admin, pero no puede agregar otros administradores ni coordinadores.',
   },
   {
     icon: '🍎',
     nombre: 'Docente',
     color: 'sky',
     texto:
-      'Es la "miss" o "profe" de una o varias clases. Solo ve y trabaja con sus propias clases asignadas: toma asistencia, publica actividades con fotos, registra el progreso de cada niño/a, y agenda eventos. Si además es mamá/papá de un niño de la escuelita, puede vincularse también como padre/madre y cambiar entre ambas vistas.',
+      'Es la "miss" o "profe" de uno o varios niveles. Solo ve y trabaja con sus propios niveles asignados: toma asistencia, publica actividades con fotos, registra el progreso de cada niño/a, y agenda eventos. Si además es mamá/papá de un niño de la escuelita, puede vincularse también como padre/madre y cambiar entre ambas vistas.',
   },
   {
     icon: '👪',
     nombre: 'Padre / Madre',
     color: 'coral',
     texto:
-      'Ve únicamente la información de su(s) propio(s) hijo/a(s): su ficha, asistencia, actividades (con opción de reaccionar), progreso y agenda de su clase. Si tiene más de un hijo/a en la escuelita, puede cambiar de vista entre cada uno.',
+      'Ve únicamente la información de su(s) propio(s) hijo/a(s): su ficha, asistencia, actividades (con opción de reaccionar), progreso y agenda de su nivel. Si tiene más de un hijo/a en la escuelita, puede cambiar de vista entre cada uno.',
   },
   {
     icon: '🧒',

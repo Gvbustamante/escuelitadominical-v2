@@ -8,7 +8,7 @@ function hoyISO() {
 
 /**
  * Widget de "qué viene": próximos eventos de agenda + tareas recientes.
- * - nivelIds: undefined/null = sin filtrar (admin/coordinador ve de todas las clases).
+ * - nivelIds: undefined/null = sin filtrar (admin/coordinador ve de todos los niveles).
  *   Un array (incluso vacío) filtra agenda/tareas a esas clases + eventos generales.
  * - soloTareasPendientes: si es true (uso del padre), en vez de listar todas las
  *   tareas recientes del nivel, solo muestra las que sus propios hijos (hijoIds)
