@@ -49,8 +49,9 @@ Marca `[x]` cuando se complete.
 - [x] "Primeros pasos" en Inicio del admin (9 pasos con check automático y botón Ir).
 - [x] Pantallas vacías con explicación y botón (sin clases, sin niños, días de clase).
 - [ ] Pedir a Henry 3–5 momentos exactos donde se perdió.
-- [ ] Menú admin con 14 opciones → usar menú por categorías por defecto.
-- [ ] Emojis como íconos se ven distinto en Android/iPhone → evaluar set de íconos (ej. Lucide).
+- [x] Menú por secciones (Enseñanza, Día de clase, Personas, Comunidad, Gestión) cuando la iglesia no armó uno propio.
+- [x] Menú con íconos Lucide (iguales en Android/iPhone/PC).
+- [ ] Íconos Lucide en el resto de la app (botones, títulos) — hoy siguen emojis.
 - [ ] Revisión visual real con la app abierta (celular + PC) con usuario de prueba.
 
 ## 📚 UI/UX — formación

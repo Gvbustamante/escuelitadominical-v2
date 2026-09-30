@@ -6,6 +6,48 @@ import { supabase } from '../lib/supabaseClient'
 import CambiarPasswordModal from './CambiarPasswordModal'
 import AppLogo from './AppLogo'
 import AppName from './AppName'
+import {
+  Home, BookHeart, ClipboardCheck, Palette, NotebookPen, CalendarRange, CalendarDays, MessagesSquare,
+  FolderOpen, Baby, School, Users, BarChart3, Settings, Sprout, LifeBuoy, HeartHandshake,
+} from 'lucide-react'
+
+// Íconos de línea (se ven igual en Android, iPhone y PC). Si una ruta no tiene, se usa su emoji.
+const ICONOS = {
+  '/': Home,
+  '/devocionales': BookHeart,
+  '/asistencia': ClipboardCheck,
+  '/actividades': Palette,
+  '/bitacora': NotebookPen,
+  '/planeacion': CalendarRange,
+  '/agenda': CalendarDays,
+  '/foro': MessagesSquare,
+  '/drive': FolderOpen,
+  '/ninos': Baby,
+  '/clases': School,
+  '/docentes': Users,
+  '/reporte-docentes': BarChart3,
+  '/ajustes': Settings,
+  '/progreso': Sprout,
+  '/ayuda': LifeBuoy,
+  '/mi-familia': HeartHandshake,
+}
+
+function Icono({ item, size = 22 }) {
+  const Cmp = ICONOS[item.to]
+  if (!Cmp) return <span className="text-xl">{item.icon}</span>
+  return <Cmp size={size} strokeWidth={2.2} aria-hidden="true" className="shrink-0" />
+}
+
+// Menú por secciones cuando la iglesia no armó uno propio (Ajustes → Menú).
+// Solo para menús largos; el de padres queda plano.
+const SECCIONES = [
+  { nombre: 'Enseñanza', rutas: ['/devocionales', '/planeacion', '/actividades', '/agenda'] },
+  { nombre: 'Día de clase', rutas: ['/asistencia', '/bitacora'] },
+  { nombre: 'Personas', rutas: ['/mi-familia', '/ninos', '/progreso', '/clases', '/docentes'] },
+  { nombre: 'Comunidad', rutas: ['/foro', '/drive'] },
+  { nombre: 'Gestión', rutas: ['/reporte-docentes', '/ajustes', '/ayuda'] },
+]
+const MIN_ITEMS_SECCIONES = 9
 
 const ADMIN_NAV = [
   { to: '/', label: 'Inicio', icon: '🏠', end: true },
@@ -82,12 +124,12 @@ function NavItem({ item }) {
       to={item.to}
       end={item.end}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold transition-colors sm:py-3 sm:text-lg ${
+        `flex items-center gap-3 rounded-2xl px-3 py-2 text-base font-bold transition-colors ${
           isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/75 hover:bg-sky-50'
         }`
       }
     >
-      <span className="text-xl sm:text-2xl">{item.icon}</span>
+      <Icono item={item} />
       <span>{item.label}</span>
     </NavLink>
   )
@@ -104,7 +146,7 @@ function NavSubItem({ item }) {
         }`
       }
     >
-      <span className="text-base sm:text-lg">{item.icon}</span>
+      <Icono item={item} size={18} />
       <span>{item.label}</span>
     </NavLink>
   )
@@ -130,9 +172,30 @@ function SidebarNav({ items, menuEstructura, pathname }) {
   }, [estructura, pathname])
 
   if (!estructura) {
+    if (items.length < MIN_ITEMS_SECCIONES) {
+      return (
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
+          {items.map((item) => <NavItem key={item.to} item={item} />)}
+        </nav>
+      )
+    }
+    const enSeccion = new Set(SECCIONES.flatMap((sec) => sec.rutas))
+    const arriba = items.filter((i) => !enSeccion.has(i.to))
     return (
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto sm:gap-2">
-        {items.map((item) => <NavItem key={item.to} item={item} />)}
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto" aria-label="Menú principal">
+        {arriba.map((item) => <NavItem key={item.to} item={item} />)}
+        {SECCIONES.map((sec) => {
+          const secItems = sec.rutas.map((r) => items.find((i) => i.to === r)).filter(Boolean)
+          if (secItems.length === 0) return null
+          return (
+            <div key={sec.nombre} className="mt-2">
+              <p className="px-3 pb-1 text-xs font-extrabold uppercase tracking-wider text-ink/65">{sec.nombre}</p>
+              <div className="flex flex-col gap-0.5">
+                {secItems.map((item) => <NavItem key={item.to} item={item} />)}
+              </div>
+            </div>
+          )
+        })}
       </nav>
     )
   }
