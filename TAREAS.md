@@ -14,6 +14,7 @@ Marca `[x]` cuando se complete.
 - [x] **Materiales: permitir PDF** — selector acepta fotos y PDF; columna "Archivos".
 - [x] **Edad en vez de fecha de nacimiento** — pedir solo edad, guardar año aproximado para que la edad suba sola cada año. Fecha exacta opcional.
 - [x] **Planeación de clase** — en Planeación, cada clase/día: escribir (con guía) y/o subir PDF con vista previa. Tabla `planeacion_clase`.
+- [ ] **Días de clase por nivel** — cada nivel elige en qué días activos tiene clase (ej. sábado solo Tweens). Columna `niveles.dias_semana int[]` (vacía = todos los días). Configurar en Niveles con chips de días. Respetarlo en: Próxima clase (Inicio), Asistencia, Cronograma/Planeación (casilla gris "—", no cuenta como "sin planear"), Reportes y Alertas. Luego (opcional): excepciones por fecha puntual ("este domingo no hay Tweens").
 - [ ] **Planeación con IA (plan Pro)** — subir PDF y que la IA llene título, versículo, historia, objetivos y materiales. Calcular costo por PDF antes.
 
 ## 🔧 Pendiente inmediato
