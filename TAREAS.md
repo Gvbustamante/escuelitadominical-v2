@@ -41,6 +41,14 @@ Marca `[x]` cuando se complete.
 - [ ] Método de cobro (Stripe, Mercado Pago, transferencia).
 - [ ] Calcular costo real por iglesia vs. precio (margen).
 
+## 🧭 Flujos (ver FLUJOS_UX.md)
+- [ ] Renombrar "Clase" → "Nivel" en pantallas (grupo = Nivel, sesión = Clase).
+- [ ] Asistencia: guardado automático + ⭐ en la fila + "⭐ a todos".
+- [ ] Nuevo niño con padre en el mismo formulario.
+- [ ] Nueva cuenta docente con niveles; asignar desde la lista de Niveles; horario a "Avanzado".
+- [ ] "Preparar clase": Enseñanza + Actividad + Planeación en una ventana con fecha y nivel puestos.
+- [ ] Cronograma (niveles × días) con docentes y estado; calendario Mes / Semana.
+
 ## 🎨 UI/UX — hallazgos en el código
 - [x] 43 textos con tamaño < 12px (`text-[0.6rem]` etc.) → mínimo 12px, 16px en inputs (evita zoom en iPhone).
 - [x] ~290 textos gris claro (`text-ink/30`, `/40`) → bajo contraste (WCAG AA); subir a `/60` mínimo.
@@ -50,7 +58,7 @@ Marca `[x]` cuando se complete.
 - [x] Pantallas vacías con explicación y botón (sin clases, sin niños, días de clase).
 - [ ] Pedir a Henry 3–5 momentos exactos donde se perdió.
 - [x] Menú por secciones (Enseñanza, Día de clase, Personas, Comunidad, Gestión) cuando la iglesia no armó uno propio.
-- [x] Menú con íconos Lucide (iguales en Android/iPhone/PC).
+- [x] Menú con íconos Lucide (iguales en Android/iPhone/PC) y color por sección.
 - [ ] Íconos Lucide en el resto de la app (botones, títulos) — hoy siguen emojis.
 - [ ] Revisión visual real con la app abierta (celular + PC) con usuario de prueba.
 
