@@ -94,32 +94,34 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
   const bloqueado = !esStaff && (!esHoy || !esDiaClase)
 
   // Guarda el día completo (todos los niños, presente o no) para que los reportes cuenten ausencias.
+  // Cada guardado lleva su propio nivel y fecha: si cambian mientras espera, se guarda donde corresponde.
   const guardarAhora = useCallback(
-    async (mapa) => {
-      if (!ninos?.length) return
+    async (pend) => {
+      if (!pend?.ninos?.length) return
       setEstadoGuardado('guardando')
-      const rows = ninos.map((n) => ({
+      const rows = pend.ninos.map((n) => ({
         nino_id: n.id,
-        nivel_id: nivelId,
-        fecha,
-        presente: !!mapa[n.id],
+        nivel_id: pend.nivelId,
+        fecha: pend.fecha,
+        presente: !!pend.mapa[n.id],
         tomada_por: userId,
       }))
       const { error } = await supabase.from('asistencia').upsert(rows, { onConflict: 'nino_id,fecha' })
-      if (pendienteRef.current === mapa) pendienteRef.current = null
+      if (pendienteRef.current === pend) pendienteRef.current = null
       setEstadoGuardado(error ? 'error' : 'guardado')
       if (!error) onSavedRef.current?.()
     },
-    [ninos, nivelId, fecha, userId],
+    [userId],
   )
   const guardarRef = useRef(guardarAhora)
   guardarRef.current = guardarAhora
 
   function programarGuardado(mapa) {
-    pendienteRef.current = mapa
+    const pend = { mapa, fecha, nivelId, ninos }
+    pendienteRef.current = pend
     setEstadoGuardado('guardando')
     clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => guardarRef.current(mapa), ESPERA_GUARDADO_MS)
+    timerRef.current = setTimeout(() => guardarRef.current(pend), ESPERA_GUARDADO_MS)
   }
 
   // Si cambia el nivel/fecha o se sale de la pantalla con un cambio pendiente, se guarda igual.
@@ -222,7 +224,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
     ) : estadoGuardado === 'guardado' ? (
       <span className="text-sm font-bold text-grass-700">✓ Guardado</span>
     ) : estadoGuardado === 'error' ? (
-      <button type="button" onClick={() => guardarAhora(marcados)} className="text-sm font-bold text-coral-600 underline">
+      <button type="button" onClick={() => guardarAhora({ mapa: marcados, fecha, nivelId, ninos })} className="text-sm font-bold text-coral-600 underline">
         ⚠️ No se guardó — reintentar
       </button>
     ) : null
