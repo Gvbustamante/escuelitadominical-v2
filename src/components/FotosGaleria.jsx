@@ -1,7 +1,8 @@
-import { supabase } from '../lib/supabaseClient'
+import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
 
+// bucket null = archivo antiguo en 'actividades' (público); los nuevos van a 'privado'.
 function urlDe(foto) {
-  return foto.storage_path ? supabase.storage.from('actividades').getPublicUrl(foto.storage_path).data.publicUrl : foto.url
+  return foto.storage_path ? urlArchivo(foto.bucket || 'actividades', foto.storage_path) : foto.url
 }
 
 function esImagen(foto) {
@@ -18,6 +19,7 @@ function nombreCorto(foto) {
 
 export default function FotosGaleria({ fotos, size = 'h-24 w-24' }) {
   const lista = (fotos || []).filter(Boolean)
+  useArchivosFirmados(lista.filter((f) => f.storage_path).map((f) => ({ bucket: f.bucket || 'actividades', storage_path: f.storage_path })))
   if (lista.length === 0) return null
   return (
     <div className="flex flex-wrap gap-2">

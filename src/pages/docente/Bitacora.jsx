@@ -131,11 +131,12 @@ function BitacoraForm({ nivelId, fecha, momento, registro, docenteId, onSaved })
   async function subirFotos(archivos, tipo, bitacoraId) {
     for (const file of archivos) {
       const path = `bitacora/${nivelId}/${fecha}-${momento}-${tipo}-${Date.now()}-${file.name}`
-      const { error: upError } = await supabase.storage.from('actividades').upload(path, file)
+      const { error: upError } = await supabase.storage.from('privado').upload(path, file)
       if (!upError) {
         await supabase.from('bitacora_fotos').insert({
           bitacora_id: bitacoraId,
           tipo,
+          bucket: 'privado',
           storage_path: path,
           nombre_archivo: file.name,
           mime: file.type,

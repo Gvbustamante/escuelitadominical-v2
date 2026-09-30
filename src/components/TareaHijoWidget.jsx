@@ -90,11 +90,11 @@ export default function TareaHijoWidget({ actividad, hijo, entrega, onSaved }) {
     }
     for (const archivo of archivos) {
       const path = `tareas/${actividad.id}/${hijo.id}/${Date.now()}-${archivo.name}`
-      const { error: upError } = await supabase.storage.from('actividades').upload(path, archivo)
+      const { error: upError } = await supabase.storage.from('privado').upload(path, archivo)
       if (!upError) {
         await supabase
           .from('tarea_entrega_archivos')
-          .insert({ entrega_id: fila.id, storage_path: path, nombre_archivo: archivo.name, tipo: archivo.type })
+          .insert({ entrega_id: fila.id, bucket: 'privado', storage_path: path, nombre_archivo: archivo.name, tipo: archivo.type })
       }
     }
     setBusy(false)

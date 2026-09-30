@@ -74,11 +74,11 @@ export default function Materiales() {
 
     for (const foto of fotos) {
       const path = `materiales-fotos/${materialId}/${Date.now()}-${foto.name}`
-      const { error: upError } = await supabase.storage.from('actividades').upload(path, foto)
+      const { error: upError } = await supabase.storage.from('privado').upload(path, foto)
       if (!upError) {
         await supabase
           .from('material_fotos')
-          .insert({ material_id: materialId, storage_path: path, nombre_archivo: foto.name, tipo: foto.type })
+          .insert({ material_id: materialId, bucket: 'privado', storage_path: path, nombre_archivo: foto.name, tipo: foto.type })
       }
     }
 

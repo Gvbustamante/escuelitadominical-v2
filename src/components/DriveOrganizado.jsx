@@ -89,15 +89,15 @@ export default function DriveOrganizado() {
         supabase.from('devocionales_ninos').select('id, titulo, fecha, imagen_url, enlace_externo, nivel_id, creado_por, nivel:niveles(nombre)').order('fecha', { ascending: false }),
         supabase.from('devocional_archivos').select('id, devocional_id, storage_path, nombre_archivo, tipo, bucket'),
         supabase.from('bitacora_clase').select('id, fecha, momento, nivel_id, docente_id, nivel:niveles(nombre), salon_foto_url, refrigerio_foto_url').order('fecha', { ascending: false }),
-        supabase.from('bitacora_fotos').select('id, bitacora_id, storage_path, nombre_archivo, mime, tipo'),
+        supabase.from('bitacora_fotos').select('id, bitacora_id, storage_path, nombre_archivo, mime, tipo, bucket'),
         supabase.from('materiales').select('id, nombre, foto_url, created_at'),
-        supabase.from('material_fotos').select('id, material_id, storage_path, nombre_archivo, tipo'),
+        supabase.from('material_fotos').select('id, material_id, storage_path, nombre_archivo, tipo, bucket'),
         supabase.from('profiles').select('id, nombre_completo, hoja_vida_url, role'),
         supabase.from('tarea_entregas').select('id, actividad_id, nino_id, docente_id, estado, archivo_url, entregado_at, actividad:actividades(titulo, fecha, audiencia, nivel_id, nivel:niveles(nombre))').eq('estado', 'entregada'),
-        supabase.from('tarea_entrega_archivos').select('id, entrega_id, storage_path, nombre_archivo, tipo'),
+        supabase.from('tarea_entrega_archivos').select('id, entrega_id, storage_path, nombre_archivo, tipo, bucket'),
         supabase.from('ninos').select('id, nombre_completo'),
       ])
-      await firmarArchivos([...(actArchivos.data || []), ...(devoArchivos.data || []), ...(perfiles.data || []).map((p) => refHojaVida(p.hoja_vida_url)).filter(Boolean)])
+      await firmarArchivos([...(actArchivos.data || []), ...(devoArchivos.data || []), ...(bitaFotos.data || []), ...(matFotos.data || []), ...(entregaArchivos.data || []), ...(perfiles.data || []).map((p) => refHojaVida(p.hoja_vida_url)).filter(Boolean)])
       setDatos({
         actividades: acts.data || [], actividadArchivos: actArchivos.data || [],
         devocionales: devos.data || [], devocionalArchivos: devoArchivos.data || [],
@@ -164,7 +164,7 @@ export default function DriveOrganizado() {
         if (e.archivo_url) items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, url: e.archivo_url, fuente: `Entrega de ${quien}`, mime: null, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(null, e.archivo_url) })
         const archivos = datos.entregaArchivos.filter(a => a.entrega_id === e.id)
         for (const a of archivos) {
-          items.push({ ...ma, nivel, nombre: a.nombre_archivo || `${e.actividad?.titulo} — ${quien}`, url: storageUrl('actividades', a.storage_path), fuente: `Entrega de ${quien}`, mime: a.tipo, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo), _tabla: 'tarea_entrega_archivos', _id: a.id, _campo: 'nombre_archivo' })
+          items.push({ ...ma, nivel, nombre: a.nombre_archivo || `${e.actividad?.titulo} — ${quien}`, url: storageUrl(a.bucket || 'actividades', a.storage_path), fuente: `Entrega de ${quien}`, mime: a.tipo, subidoPor: quien, fecha: fechaStr, tipoArchivo: tipoDeArchivo(a.tipo, a.nombre_archivo), _tabla: 'tarea_entrega_archivos', _id: a.id, _campo: 'nombre_archivo' })
         }
         if (!e.archivo_url && archivos.length === 0) items.push({ ...ma, nivel, nombre: `${e.actividad?.titulo} — ${quien}`, fuente: 'Sin archivo', soloInfo: true, subidoPor: quien, fecha: fechaStr, tipoArchivo: 'Entrega' })
       }
@@ -197,7 +197,7 @@ export default function DriveOrganizado() {
       if (b.refrigerio_foto_url) bitItems.push({ ...ma, nivel, nombre: `${label} — refrigerio`, url: b.refrigerio_foto_url, fuente: label, mime: 'image/*', subidoPor: quien, fecha: b.fecha, tipoArchivo: 'Imagen' })
       const fotos = datos.bitacoraFotos.filter(f => f.bitacora_id === b.id)
       for (const f of fotos) {
-        bitItems.push({ ...ma, nivel, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl('actividades', f.storage_path), fuente: label, mime: f.mime, subidoPor: quien, fecha: b.fecha, tipoArchivo: tipoDeArchivo(f.mime, f.nombre_archivo), _tabla: 'bitacora_fotos', _id: f.id, _campo: 'nombre_archivo' })
+        bitItems.push({ ...ma, nivel, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl(f.bucket || 'actividades', f.storage_path), fuente: label, mime: f.mime, subidoPor: quien, fecha: b.fecha, tipoArchivo: tipoDeArchivo(f.mime, f.nombre_archivo), _tabla: 'bitacora_fotos', _id: f.id, _campo: 'nombre_archivo' })
       }
     }
     result.bitacora = agruparPorMesYNivel(bitItems)
@@ -210,7 +210,7 @@ export default function DriveOrganizado() {
       if (m.foto_url) matItems.push({ ...ma, nombre: `${m.nombre} — foto`, url: m.foto_url, fuente: m.nombre, mime: 'image/*', fecha: fechaMat, tipoArchivo: 'Imagen' })
       const fotos = datos.materialFotos.filter(f => f.material_id === m.id)
       for (const f of fotos) {
-        matItems.push({ ...ma, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl('actividades', f.storage_path), fuente: m.nombre, mime: f.tipo, fecha: fechaMat, tipoArchivo: tipoDeArchivo(f.tipo, f.nombre_archivo), _tabla: 'material_fotos', _id: f.id, _campo: 'nombre_archivo' })
+        matItems.push({ ...ma, nombre: f.nombre_archivo || f.storage_path.split('/').pop(), url: storageUrl(f.bucket || 'actividades', f.storage_path), fuente: m.nombre, mime: f.tipo, fecha: fechaMat, tipoArchivo: tipoDeArchivo(f.tipo, f.nombre_archivo), _tabla: 'material_fotos', _id: f.id, _campo: 'nombre_archivo' })
       }
     }
     result.materiales = agruparPorMes(matItems)

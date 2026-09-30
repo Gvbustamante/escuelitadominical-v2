@@ -7,7 +7,7 @@ import { supabase } from './supabaseClient'
  * - Buckets privados ('drive', 'planeaciones', 'hojas_vida'): enlace firmado que caduca. Se firman en lote con
  *   useArchivosFirmados() y se leen síncronamente con urlArchivo() (null mientras carga).
  */
-const PRIVADOS = new Set(['drive', 'planeaciones', 'hojas_vida'])
+const PRIVADOS = new Set(['drive', 'planeaciones', 'hojas_vida', 'privado'])
 const DURACION = 3600 // segundos
 const cache = new Map() // `${bucket}/${path}` -> { url, vence }
 
