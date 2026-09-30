@@ -217,57 +217,33 @@ export default function Ajustes() {
         <p className="text-ink/70">Personaliza tu escuelita, tu cuenta, y consulta la ayuda</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setTab('general')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'general' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-        >
-          General
-        </button>
-        <button
-          onClick={() => setTab('cuenta')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'cuenta' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-        >
-          Mi cuenta
-        </button>
-        <button
-          onClick={() => setTab('ayuda')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'ayuda' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-        >
-          Ayuda
-        </button>
-        <button
-          onClick={() => setTab('estrellas')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'estrellas' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-        >
-          🌟 Estrellas
-        </button>
-        {profile.role === 'superadmin' && (
+      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[13rem_1fr] lg:items-start">
+      <nav aria-label="Secciones de ajustes" className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 lg:sticky lg:top-4 lg:flex-col lg:flex-nowrap lg:gap-1 lg:overflow-visible">
+        {[
+          ['general', '🏫', 'Escuelita', true],
+          ['estrellas', '🌟', 'Estrellas', true],
+          ['permisos', '👥', 'Roles y permisos', ['superadmin', 'admin'].includes(profile.role)],
+          ['modulos', '📦', 'Módulos', profile.role === 'superadmin'],
+          ['menu', '📋', 'Menú', profile.role === 'superadmin'],
+          ['cuenta', '🔑', 'Mi cuenta', true],
+          ['ayuda', '❓', 'Ayuda', true],
+        ].filter(([, , , ver]) => ver).map(([v, icon, texto]) => (
           <button
-            onClick={() => setTab('modulos')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'modulos' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
+            key={v}
+            type="button"
+            onClick={() => setTab(v)}
+            aria-current={tab === v ? 'page' : undefined}
+            className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-left text-sm font-bold transition-colors lg:rounded-xl lg:px-3 lg:py-2.5 ${
+              tab === v ? 'bg-sky-600 text-white' : 'bg-white text-ink/75 ring-1 ring-ink/10 hover:bg-sky-50 lg:bg-transparent lg:ring-0'
+            }`}
           >
-            📦 Módulos
+            <span aria-hidden="true">{icon}</span>
+            {texto}
           </button>
-        )}
-        {profile.role === 'superadmin' && (
-          <button
-            onClick={() => setTab('menu')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'menu' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-          >
-            📋 Menú
-          </button>
-        )}
-        {['superadmin', 'admin'].includes(profile.role) && (
-          <button
-            onClick={() => setTab('permisos')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'permisos' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-          >
-            Roles y permisos
-          </button>
-        )}
-      </div>
+        ))}
+      </nav>
 
+      <div className="flex min-w-0 flex-col gap-6">
       {tab === 'cuenta' && (
         <div className="card max-w-xl">
           <p className="label mb-1">Contraseña</p>
@@ -492,6 +468,9 @@ export default function Ajustes() {
       {tab === 'menu' && profile.role === 'superadmin' && (
         <MenuTab config={config} />
       )}
+
+      </div>
+      </div>
 
       <CambiarPasswordModal open={pwOpen} onClose={() => setPwOpen(false)} />
     </div>

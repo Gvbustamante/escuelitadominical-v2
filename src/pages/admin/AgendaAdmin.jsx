@@ -5,9 +5,10 @@ import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
-import { hoyLocal, fechaLarga } from '../../lib/fechas'
+import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import TituloPagina from '../../components/ui/TituloPagina'
+import ListaEventos from '../../components/ListaEventos'
 
 function hoyISO() {
   return hoyLocal()
@@ -65,8 +66,6 @@ export default function AgendaAdmin() {
 
   if (!eventos) return <Spinner />
 
-  const eventosDelDia = selectedDay ? eventos.filter((e) => e.fecha === selectedDay) : eventos
-  const hoy = hoyISO()
 
   return (
     <div className="flex flex-col gap-6">
@@ -82,28 +81,7 @@ export default function AgendaAdmin() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <CalendarioAgenda eventos={eventos} selectedDay={selectedDay} onSelectDay={setSelectedDay} />
-
-        <div className="flex flex-col gap-3">
-          {selectedDay && (
-            <button onClick={() => setSelectedDay(null)} className="self-start text-sm font-bold text-sky-600 hover:underline">
-              ← Ver todos los eventos
-            </button>
-          )}
-          {eventosDelDia.map((ev) => (
-            <div key={ev.id} className={`card flex items-center justify-between gap-3 ${ev.fecha < hoy ? 'opacity-50' : ''}`}>
-              <div>
-                <p className="font-bold">{ev.titulo}</p>
-                <p className="text-xs font-bold uppercase text-sky-600">{ev.nivel?.nombre || 'Toda la escuelita'}</p>
-                <p className="text-sm text-ink/70">{fechaLarga(ev.fecha)}</p>
-                {ev.descripcion && <p className="mt-1 text-sm text-ink/75">{ev.descripcion}</p>}
-              </div>
-              <button aria-label="Eliminar evento" title="Eliminar evento" onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/65 hover:text-coral-600">
-                🗑️
-              </button>
-            </div>
-          ))}
-          {eventosDelDia.length === 0 && <p className="card text-ink/70">No hay eventos.</p>}
-        </div>
+        <ListaEventos className="order-first lg:order-none" eventos={eventos} selectedDay={selectedDay} onClearDay={() => setSelectedDay(null)} onEliminar={setConfirmEliminar} />
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nuevo evento">

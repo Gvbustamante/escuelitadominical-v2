@@ -9,6 +9,7 @@ import FilePreview, { getFileIcon, getFileType } from '../components/FilePreview
 import DriveOrganizado from '../components/DriveOrganizado'
 import { coincide } from '../lib/busqueda'
 import TituloPagina from '../components/ui/TituloPagina'
+import ActionMenu from '../components/ui/ActionMenu'
 
 function fileUrl(path) {
   return urlArchivo('drive', path)
@@ -267,89 +268,61 @@ export default function Drive() {
     <div ref={dropRef} className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <TituloPagina ruta="/drive">{verPapelera ? 'Papelera' : 'Drive'}</TituloPagina>
           <p className="text-sm text-ink/70">
             {verPapelera ? 'Archivos eliminados' : 'Archivos compartidos del equipo'}
           </p>
         </div>
-        {!verPapelera && (
-          <div className="flex gap-1.5 sm:hidden">
-            <button aria-label="Mis archivos" title="Mis archivos"
-              onClick={() => setSeccion('archivos')}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'archivos' ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/70'}`}
-            >
-              📁
-            </button>
-            <button aria-label="Vista organizada" title="Vista organizada"
-              onClick={() => setSeccion('organizado')}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'organizado' ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/70'}`}
-            >
-              🗂️
-            </button>
-          </div>
-        )}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {!verPapelera && (
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          {verPapelera ? (
             <>
-              <button
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-600 text-white shadow-pop transition-transform hover:scale-105 active:scale-95 sm:h-auto sm:w-auto sm:rounded-full sm:px-4 sm:py-2"
-                onClick={openNuevaCarpeta}
-                title="Nueva carpeta"
-              >
-                <span className="sm:hidden text-lg">📁</span>
-                <span className="hidden sm:inline text-sm font-bold">📁 Nueva carpeta</span>
+              {enPapelera > 0 && esAdmin && (
+                <button className="rounded-full bg-coral-50 px-3 py-2 text-sm font-bold text-coral-700 hover:bg-coral-100" onClick={() => setConfirmVaciar(true)}>
+                  🗑️ Vaciar
+                </button>
+              )}
+              <button className="btn-secondary !py-2 !text-sm" onClick={() => { setVerPapelera(false); setBusqueda(''); setRuta([]) }}>
+                ← Volver al Drive
               </button>
-              <button
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-ink/75 shadow-pop ring-1 ring-ink/10 transition-transform hover:scale-105 active:scale-95 sm:h-auto sm:w-auto sm:rounded-full sm:px-4 sm:py-2"
-                disabled={subiendo}
-                onClick={() => fileInputRef.current?.click()}
-                title="Subir archivos"
-              >
-                <span className="sm:hidden text-lg">{subiendo ? '⏳' : '📤'}</span>
-                <span className="hidden sm:inline text-sm font-bold">{subiendo ? '⏳ Subiendo...' : '📤 Subir'}</span>
-              </button>
+            </>
+          ) : (
+            <>
+              {seccion === 'archivos' && (
+                <ActionMenu
+                  label="Nuevo"
+                  boton={subiendo ? '⏳ Subiendo…' : '+ Nuevo'}
+                  botonClass="btn-primary !py-2 !text-sm"
+                  acciones={[
+                    { label: 'Nueva carpeta', icon: '📁', onClick: openNuevaCarpeta },
+                    { label: 'Subir archivos', icon: '📤', onClick: () => fileInputRef.current?.click(), oculto: subiendo },
+                  ]}
+                />
+              )}
               <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(e) => { subirArchivos(e.target.files); e.target.value = '' }} />
+              <ActionMenu
+                label="Más opciones del Drive"
+                acciones={[{ label: enPapelera > 0 ? `Papelera (${enPapelera})` : 'Papelera', icon: '🗑️', onClick: () => { setVerPapelera(true); setBusqueda(''); setRuta([]) } }]}
+              />
             </>
           )}
-          {verPapelera && enPapelera > 0 && esAdmin && (
-            <button className="rounded-full bg-coral-50 px-3 py-2 text-xs font-bold text-coral-600 hover:bg-coral-100 sm:px-4 sm:text-sm" onClick={() => setConfirmVaciar(true)}>
-              🗑️ <span className="hidden sm:inline">Vaciar</span>
-            </button>
-          )}
-          <button
-            onClick={() => { setVerPapelera(!verPapelera); setBusqueda(''); setRuta([]) }}
-            className={`relative flex h-9 w-9 items-center justify-center rounded-xl transition-colors sm:h-auto sm:w-auto sm:rounded-full sm:px-4 sm:py-2 ${
-              verPapelera ? 'bg-coral-600 text-white' : 'bg-white text-ink/70 ring-1 ring-ink/10'
-            }`}
-            title="Papelera"
-          >
-            <span className="sm:hidden text-lg">🗑️</span>
-            <span className="hidden sm:inline text-sm font-bold">🗑️ Papelera</span>
-            {!verPapelera && enPapelera > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-coral-500 text-xs font-bold text-white sm:h-5 sm:w-5 sm:text-xs">
-                {enPapelera}
-              </span>
-            )}
-          </button>
         </div>
       </div>
 
-      {/* Section tabs */}
+      {/* Secciones */}
       {!verPapelera && (
-        <div className="hidden gap-2 sm:flex">
-          <button
-            onClick={() => setSeccion('archivos')}
-            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'archivos' ? 'bg-sky-600 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
-          >
-            📁 Mis archivos
-          </button>
-          <button
-            onClick={() => setSeccion('organizado')}
-            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'organizado' ? 'bg-sky-600 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
-          >
-            🗂️ Auto-organizado
-          </button>
+        <div className="flex gap-2" role="tablist" aria-label="Vista del Drive">
+          {[['archivos', '📁 Mis archivos'], ['organizado', '🗂️ Organizado']].map(([v, t]) => (
+            <button
+              key={v}
+              role="tab"
+              aria-selected={seccion === v}
+              onClick={() => setSeccion(v)}
+              className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === v ? 'bg-sky-600 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
+            >
+              {t}
+            </button>
+          ))}
         </div>
       )}
 

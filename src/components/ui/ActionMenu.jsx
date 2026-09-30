@@ -3,8 +3,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 /**
  * Menú ⋯ con acciones con texto. acciones: [{ label, icon, onClick, peligro, oculto }]
  * El menú flota (position: fixed) para no cortarse dentro de tarjetas con overflow-hidden.
+ * boton/botonClass: disparador propio (ej. "+ Nuevo") en lugar de ⋯.
  */
-export default function ActionMenu({ acciones, label = 'Más acciones' }) {
+export default function ActionMenu({ acciones, label = 'Más acciones', boton, botonClass }) {
   const [abierto, setAbierto] = useState(false)
   const [pos, setPos] = useState(null)
   const btnRef = useRef(null)
@@ -53,10 +54,10 @@ export default function ActionMenu({ acciones, label = 'Más acciones' }) {
         aria-haspopup="menu"
         aria-expanded={abierto}
         aria-label={label}
-        title={label}
-        className="flex h-9 w-9 items-center justify-center rounded-full text-xl font-bold leading-none text-ink/70 hover:bg-ink/5"
+        title={boton ? undefined : label}
+        className={botonClass || 'flex h-9 w-9 items-center justify-center rounded-full text-xl font-bold leading-none text-ink/70 hover:bg-ink/5'}
       >
-        ⋯
+        {boton || '⋯'}
       </button>
       {abierto && (
         <div
