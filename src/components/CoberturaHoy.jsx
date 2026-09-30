@@ -133,7 +133,7 @@ export default function CoberturaHoy() {
             <p className="text-sm text-ink/70">Hoy no es un día de clase configurado — no hay nada que cubrir.</p>
           </div>
         </div>
-        <Link to="/ajustes" className="mt-4 inline-block text-sm font-bold text-sky-600 hover:underline">
+        <Link to="/ajustes?s=horarios" className="mt-4 inline-block text-sm font-bold text-sky-600 hover:underline">
           Configurar días de clase en Ajustes →
         </Link>
       </div>

@@ -244,7 +244,7 @@ export default function Planeacion() {
             Ve a <strong>Ajustes → Días de clase</strong> y activa los días que corresponda (ej. Domingo).
           </p>
           {!esDocente && (
-            <button type="button" onClick={() => navigate('/ajustes')} className="btn-primary mt-3 !py-2 !text-sm">
+            <button type="button" onClick={() => navigate('/ajustes?s=horarios')} className="btn-primary mt-3 !py-2 !text-sm">
               Ir a Ajustes
             </button>
           )}
@@ -308,7 +308,7 @@ export default function Planeacion() {
                     <p className="text-sm text-ink/70">Toca una fecha del cronograma para cambiar de día. Si alguien falta, elige quién cubre.</p>
                   </div>
                   {horariosDelDia.length === 0 && (
-                    <p className="text-sm text-ink/70">Para elegir quién cubre cuando alguien falta, crea los horarios en <button type="button" onClick={() => navigate('/ajustes')} className="font-bold text-sky-700 hover:underline">Ajustes → Días y horarios</button>.</p>
+                    <p className="text-sm text-ink/70">Para elegir quién cubre cuando alguien falta, crea los horarios en <button type="button" onClick={() => navigate('/ajustes?s=horarios')} className="font-bold text-sky-700 hover:underline">Ajustes → Días y horarios</button>.</p>
                   )}
                   {!esDiaClase && <p className="rounded-xl bg-sunshine-50 px-3 py-2 text-sm font-bold text-sunshine-800">Este día no es día de clase.</p>}
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">

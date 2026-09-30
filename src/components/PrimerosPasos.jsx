@@ -9,7 +9,7 @@ const cuenta = (q) => q.then(({ count }) => (count ?? 0) > 0)
 const PASOS = [
   { key: 'iglesia', titulo: 'Pon el nombre y logo de tu iglesia', ayuda: 'Así la plataforma se ve como tuya.', to: '/ajustes',
     check: () => supabase.from('config_iglesia').select('nombre_iglesia, logo_url').limit(1).maybeSingle().then(({ data }) => !!(data?.nombre_iglesia || data?.logo_url)) },
-  { key: 'dias', titulo: 'Elige los días de clase', ayuda: 'Por ejemplo, domingo. Se usa en asistencia y planeación.', to: '/ajustes',
+  { key: 'dias', titulo: 'Elige los días de clase', ayuda: 'Por ejemplo, domingo. Se usa en asistencia y planeación.', to: '/ajustes?s=horarios',
     check: () => cuenta(supabase.from('dias_clase').select('dia_semana', { count: 'exact', head: true }).eq('activo', true)) },
   { key: 'clases', titulo: 'Crea tus niveles', ayuda: 'Una por grupo de edad (ej. Pequeños Héroes, 3–5 años).', to: '/clases',
     check: () => cuenta(supabase.from('niveles').select('id', { count: 'exact', head: true })) },

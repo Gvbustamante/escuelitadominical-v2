@@ -7,12 +7,12 @@ import PermisosTab from '../../components/PermisosTab'
 import CambiarPasswordModal from '../../components/CambiarPasswordModal'
 import ConfigEstrellas from './ConfigEstrellas'
 import MenuTab from '../../components/MenuTab'
-import { AyudaContenido } from '../Tutorial'
+import { useSearchParams } from 'react-router-dom'
 import { useConfigIglesia, refreshConfigIglesia } from '../../lib/configIglesia'
 import { MODULOS_KEYS } from '../../lib/modulos'
 import TituloPagina from '../../components/ui/TituloPagina'
 import Emo from '../../components/ui/Emo'
-import { School, Star, Users, Package, ListTree, KeyRound, LifeBuoy } from 'lucide-react'
+import { School, Star, Users, Package, ListTree, KeyRound, CalendarDays, UserCog } from 'lucide-react'
 
 const DIAS_SEMANA = [
   { dia_semana: 0, label: 'Domingo' },
@@ -24,9 +24,22 @@ const DIAS_SEMANA = [
   { dia_semana: 6, label: 'Sábado' },
 ]
 
+const INFO_SECCION = {
+  general: ['Escuelita', 'Nombre y logo que ven todos al entrar.'],
+  horarios: ['Días y horarios', 'Qué días hay clase y en qué horarios. Se usa en asistencia y planeación.'],
+  estrellas: ['Estrellas', 'Insignias y motivos para reconocer a los niños.'],
+  permisos: ['Roles y permisos', 'Qué puede hacer cada rol.'],
+  mantenimiento: ['Cuentas e inactividad', 'Solicitudes de contraseña y limpieza de cuentas sin uso.'],
+  modulos: ['Módulos', 'Qué partes de la plataforma están activas.'],
+  menu: ['Menú', 'Orden y agrupación del menú.'],
+  cuenta: ['Mi cuenta', 'Tu contraseña.'],
+}
+
 export default function Ajustes() {
   const { profile } = useAuth()
-  const [tab, setTab] = useState('general')
+  const [params] = useSearchParams()
+  const [tab, setTab] = useState(() => params.get('s') || 'general')
+  useEffect(() => { const sec = params.get('s'); if (sec) setTab(sec) }, [params])
   const [pwOpen, setPwOpen] = useState(false)
   const config = useConfigIglesia()
   const [nombreIglesia, setNombreIglesia] = useState('')
@@ -216,20 +229,21 @@ export default function Ajustes() {
     <div className="flex flex-col gap-6">
       <div>
         <TituloPagina ruta="/ajustes">Ajustes</TituloPagina>
-        <p className="text-ink/70">Personaliza tu escuelita, tu cuenta, y consulta la ayuda</p>
+        <p className="text-ink/70">Personaliza tu escuelita y tu cuenta</p>
       </div>
 
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[13rem_1fr] lg:items-start">
       <nav aria-label="Secciones de ajustes" className="sin-barra -mx-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 lg:sticky lg:top-4 lg:flex-col lg:flex-nowrap lg:gap-1 lg:overflow-visible">
         {[
           ['general', School, 'Escuelita', true],
+          ['horarios', CalendarDays, 'Días y horarios', true],
           ['estrellas', Star, 'Estrellas', true],
           ['permisos', Users, 'Roles y permisos', ['superadmin', 'admin'].includes(profile.role)],
+          ['mantenimiento', UserCog, 'Cuentas e inactividad', true, solicitudes.length],
           ['modulos', Package, 'Módulos', profile.role === 'superadmin'],
           ['menu', ListTree, 'Menú', profile.role === 'superadmin'],
           ['cuenta', KeyRound, 'Mi cuenta', true],
-          ['ayuda', LifeBuoy, 'Ayuda', true],
-        ].filter(([, , , ver]) => ver).map(([v, Icon, texto]) => (
+        ].filter(([, , , ver]) => ver).map(([v, Icon, texto, , badge]) => (
           <button
             key={v}
             type="button"
@@ -239,13 +253,20 @@ export default function Ajustes() {
               tab === v ? 'bg-sky-600 text-white' : 'bg-white text-ink/75 ring-1 ring-ink/10 hover:bg-sky-50 lg:bg-transparent lg:ring-0'
             }`}
           >
-            <Icon aria-hidden="true" size={16} strokeWidth={2.2} />
+            <Icon aria-hidden="true" size={16} strokeWidth={2.2} className="shrink-0" />
             {texto}
+            {badge > 0 && <span className={`ml-auto rounded-full px-1.5 text-xs ${tab === v ? 'bg-white/25' : 'bg-coral-600 text-white'}`}>{badge}</span>}
           </button>
         ))}
       </nav>
 
       <div className="flex min-w-0 flex-col gap-6">
+        {INFO_SECCION[tab] && (
+          <div className="-mb-2">
+            <h2 className="text-xl font-bold">{INFO_SECCION[tab][0]}</h2>
+            <p className="text-sm text-ink/70">{INFO_SECCION[tab][1]}</p>
+          </div>
+        )}
       {tab === 'cuenta' && (
         <div className="card max-w-xl">
           <p className="label mb-1">Contraseña</p>
@@ -255,8 +276,6 @@ export default function Ajustes() {
           </button>
         </div>
       )}
-
-      {tab === 'ayuda' && <AyudaContenido />}
 
       {tab === 'estrellas' && <ConfigEstrellas />}
 
@@ -315,7 +334,11 @@ export default function Ajustes() {
               {busy ? 'Guardando...' : 'Guardar cambios'}
             </button>
           </div>
+        </>
+      )}
 
+      {tab === 'mantenimiento' && (
+        <>
           <div className="card max-w-xl">
             <p className="label mb-1">Revisar inactividad</p>
             <p className="mb-4 text-sm text-ink/70">
@@ -363,7 +386,14 @@ export default function Ajustes() {
               </div>
             </div>
           )}
+          {!(['superadmin', 'admin'].includes(profile.role) && solicitudes.length > 0) && (
+            <p className="text-sm text-ink/65">No hay solicitudes de cambio de contraseña pendientes.</p>
+          )}
+        </>
+      )}
 
+      {tab === 'horarios' && (
+        <>
           <div className="card max-w-xl">
             <p className="label mb-1">Días de clase</p>
             <p className="mb-4 text-sm text-ink/70">

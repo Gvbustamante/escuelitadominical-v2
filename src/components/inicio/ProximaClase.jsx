@@ -91,7 +91,7 @@ export default function ProximaClase({ nivelIds, userId, puedePreparar = true })
           <p className="font-bold">📅 Próxima clase</p>
           <p className="text-sm text-ink/70">Todavía no hay días de clase configurados.</p>
         </div>
-        <Link to="/ajustes" className="btn-primary !py-2 !text-sm">Configurar días de clase</Link>
+        <Link to="/ajustes?s=horarios" className="btn-primary !py-2 !text-sm">Configurar días de clase</Link>
       </div>
     )
   }

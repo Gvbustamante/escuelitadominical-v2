@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { LifeBuoy } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useConfigIglesia } from '../lib/configIglesia'
 import { supabase } from '../lib/supabaseClient'
@@ -56,7 +57,6 @@ const NAV = {
     { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
     { to: '/foro', label: 'Comunidad', icon: '🤝', modulo: 'foro' },
     { to: '/drive', label: 'Drive', icon: '📁', modulo: 'drive' },
-    { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
   padre: [
     { to: '/', label: 'Mi hijo/a', icon: '🏠', end: true },
@@ -65,7 +65,6 @@ const NAV = {
     { to: '/progreso', label: 'Progreso', icon: '🌱', modulo: 'progreso' },
     { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
     { to: '/foro', label: 'Comunidad', icon: '🤝', modulo: 'foro' },
-    { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
 }
 
@@ -84,7 +83,7 @@ function NavItem({ item }) {
       end={item.end}
       title={item.label}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-2xl px-3 py-1.5 text-base font-bold transition-colors lg:py-1 md:justify-center md:px-2 lg:justify-start lg:px-3 ${
+        `flex items-center gap-3 rounded-2xl px-3 py-1.5 text-base font-bold transition-colors lg:py-[3px] md:justify-center md:px-2 lg:justify-start lg:px-3 ${
           isActive ? 'bg-sky-600 text-white shadow-pop' : 'text-ink/75 hover:bg-sky-50'
         }`
       }
@@ -143,7 +142,7 @@ function SidebarNav({ items, menuEstructura, pathname }) {
   if (!estructura) {
     if (items.length < MIN_ITEMS_SECCIONES) {
       return (
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
+        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
           {items.map((item) => <NavItem key={item.to} item={item} />)}
         </nav>
       )
@@ -151,13 +150,13 @@ function SidebarNav({ items, menuEstructura, pathname }) {
     const enSeccion = new Set(SECCIONES.flatMap((sec) => sec.rutas))
     const arriba = items.filter((i) => !enSeccion.has(i.to))
     return (
-      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto" aria-label="Menú principal">
+      <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto" aria-label="Menú principal">
         {arriba.map((item) => <NavItem key={item.to} item={item} />)}
         {SECCIONES.map((sec) => {
           const secItems = sec.rutas.map((r) => items.find((i) => i.to === r)).filter(Boolean)
           if (secItems.length === 0) return null
           return (
-            <div key={sec.nombre} className="mt-1.5">
+            <div key={sec.nombre} className="mt-1">
               <p className="px-3 pb-0.5 text-xs font-extrabold uppercase tracking-wider text-ink/65 md:hidden lg:block">{sec.nombre}</p>
               <div className="mx-3 mb-1 hidden h-px bg-ink/10 md:block lg:hidden" aria-hidden="true" />
               <div className="flex flex-col gap-0.5">
@@ -178,7 +177,7 @@ function SidebarNav({ items, menuEstructura, pathname }) {
   const sueltos = items.filter((i) => i.to !== '/' && i.to !== '/ajustes' && !asignados.has(i.to))
 
   return (
-    <nav className="flex flex-1 flex-col gap-1 overflow-y-auto sm:gap-2">
+    <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto sm:gap-2">
       {inicio && <NavItem item={inicio} />}
 
       {estructura.map((cat, idx) => {
@@ -291,18 +290,28 @@ export default function Layout() {
 
         <SidebarNav items={items} menuEstructura={config?.menu_estructura} pathname={pathname} />
 
-        <div className="mt-2 flex flex-col gap-2 border-t-2 border-ink/5 pt-3">
+        <div className="mt-2 flex flex-col gap-1.5 border-t-2 border-ink/5 pt-2">
+          <div className="min-w-0 px-1 md:hidden lg:block">
+            <p className="truncate text-sm font-bold">{profile?.nombre_completo}</p>
+            <p className="truncate text-xs text-ink/70">{ROLE_LABEL[profile?.role]}</p>
+          </div>
           <div className="flex items-center gap-2 md:flex-col lg:flex-row">
-            <div className="min-w-0 flex-1 md:hidden lg:block">
-              <p className="truncate text-sm font-bold">{profile?.nombre_completo}</p>
-              <p className="truncate text-xs text-ink/70">{ROLE_LABEL[profile?.role]}</p>
-            </div>
             {!['superadmin', 'admin', 'coordinador'].includes(profile?.role) && (
               <button onClick={() => setPwOpen(true)} title="Cambiar contraseña" aria-label="Cambiar contraseña" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink/5 text-lg hover:bg-sky-50">
                 🔑
               </button>
             )}
-            <button onClick={signOut} title="Salir" aria-label="Salir" className="flex h-10 shrink-0 items-center justify-center gap-1 rounded-full bg-ink/5 px-3 text-sm font-bold hover:bg-coral-50 md:w-10 md:px-0 lg:w-auto lg:px-3">
+            <Link
+              to="/ayuda"
+              onClick={() => setMenuOpen(false)}
+              title="Ayuda y sugerencias"
+              aria-label="Ayuda y sugerencias"
+              className={`flex h-10 shrink-0 items-center justify-center gap-1 rounded-full px-3 text-sm font-bold hover:bg-sky-50 md:w-10 md:px-0 lg:w-auto lg:px-3 ${pathname === '/ayuda' ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/75'}`}
+            >
+              <LifeBuoy size={18} strokeWidth={2.2} aria-hidden="true" />
+              <span className="md:sr-only lg:not-sr-only">Ayuda</span>
+            </Link>
+            <button onClick={signOut} title="Salir" aria-label="Salir" className="ml-auto flex h-10 shrink-0 items-center justify-center gap-1 rounded-full bg-ink/5 px-3 text-sm font-bold hover:bg-coral-50 md:ml-0 md:w-10 md:px-0 lg:ml-auto lg:w-auto lg:px-3">
               <span aria-hidden="true">🚪</span>
               <span className="md:sr-only lg:not-sr-only">Salir</span>
             </button>

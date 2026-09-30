@@ -30,6 +30,7 @@ Marca `[x]` cuando se complete.
 
 ## 🗄️ SQL pendiente en PRODUCCIÓN (lo corre Gisella/Carlos)
 - [x] **Boston** al día: drive, planeaciones, planeacion_archivos, hojas_vida y archivos_privados ✅ (30/sep).
+- [x] **PQR** (sugerencias, peticiones, quejas, reclamos, felicitaciones) con evidencia privada, en Ayuda. Solo Gisella (tabla `pqr_revisores`) ve todos y responde. Ambas bases ✅. Para agregar otra revisora: `insert into pqr_revisores (user_id) values ('<id>')`.
 - [x] `supabase/actualizacion_planeacion_archivos.sql` — después del de abajo (planeaciones_privado). Varios archivos por planeación.
 - [x] `supabase/actualizacion_planeaciones_privado.sql` — igual: solo cuando Boston reciba este código. La app mueve sola los PDF viejos la primera vez que un admin abre Planeación.
 - [x] `supabase/actualizacion_drive_privado.sql` — solo cuando Boston reciba el código del Drive privado (si no, sus archivos del Drive dejan de abrir).

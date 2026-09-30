@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { PqrFormulario, MisPqr, BandejaPqr, useEsRevisorPqr } from '../components/Pqr'
 import { primerosPasosOculto, mostrarPrimerosPasos } from '../components/PrimerosPasos'
 import { useAuth } from '../contexts/AuthContext'
 import GobeLogo from '../components/GobeLogo'
@@ -268,7 +269,11 @@ export function AyudaContenido() {
   const { profile, user } = useAuth()
   const navigate = useNavigate()
   const { Guide } = GUIDES[profile.role] || GUIDES.padre
-  const [tab, setTab] = useState('guia')
+  const [params] = useSearchParams()
+  const [tab, setTab] = useState(() => params.get('s') || 'guia')
+  useEffect(() => { const sec = params.get('s'); if (sec) setTab(sec) }, [params])
+  const esRevisor = useEsRevisorPqr()
+  const [recargar, setRecargar] = useState(0)
   const esAdmin = ['superadmin', 'admin', 'coordinador'].includes(profile.role)
   const pasosOcultos = esAdmin && primerosPasosOculto(user?.id)
 
@@ -289,34 +294,66 @@ export function AyudaContenido() {
           </button>
         </div>
       )}
-      <div className="flex gap-2">
-        <button
-          onClick={() => setTab('guia')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'guia' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-        >
-          Guía paso a paso
-        </button>
-        <button
-          onClick={() => setTab('roles')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'roles' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-        >
-          ¿Qué hace cada rol?
-        </button>
+      <div className="sin-barra -mx-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:px-0" role="tablist" aria-label="Secciones de ayuda">
+        {[
+          ['guia', 'Guía', true],
+          ['pqr', '💬 Sugerencias y reclamos', true],
+          ['roles', 'Roles', true],
+          ['bandeja', '📥 PQR recibidos', esRevisor],
+        ].filter(([, , ver]) => ver).map(([v, t]) => (
+          <button
+            key={v}
+            role="tab"
+            aria-selected={tab === v}
+            onClick={() => setTab(v)}
+            className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-bold ${tab === v ? 'bg-sky-600 text-white' : 'bg-white text-ink/70 ring-1 ring-ink/10'}`}
+          >
+            {t}
+          </button>
+        ))}
       </div>
 
-      {tab === 'guia' ? (
+      {tab === 'guia' && (
+        <button
+          type="button"
+          onClick={() => setTab('pqr')}
+          className="card-link flex max-w-2xl items-center gap-3 text-left ring-1 ring-sky-200"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-xl" aria-hidden="true">💬</span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-bold">¿Algo que mejorar o que no funcionó?</span>
+            <span className="block text-sm text-ink/70">Envíanos una sugerencia, petición, queja o reclamo, con capturas si quieres.</span>
+          </span>
+          <span className="shrink-0 font-bold text-sky-700" aria-hidden="true">→</span>
+        </button>
+      )}
+
+      {tab === 'pqr' && (
+        <div className="flex max-w-2xl flex-col gap-6">
+          <PqrFormulario onEnviado={() => setRecargar((r) => r + 1)} />
+          <MisPqr recargar={recargar} />
+        </div>
+      )}
+
+      {tab === 'bandeja' && esRevisor && (
+        <div className="max-w-3xl">
+          <BandejaPqr />
+        </div>
+      )}
+
+      {tab === 'guia' && (
         <>
           <div className="max-w-2xl">
             <Guide />
           </div>
           <div className="card max-w-2xl bg-sky-50">
             <p className="font-bold">¿Tienes dudas?</p>
-            <p className="text-ink/75">Pídele ayuda al administrador de tu escuelita, o vuelve a esta página cuando la necesites.</p>
+            <p className="text-ink/75">Pídele ayuda al administrador de tu escuelita, o escríbenos en <button type="button" onClick={() => setTab('pqr')} className="font-bold text-sky-700 underline">Sugerencias y reclamos</button>.</p>
           </div>
         </>
-      ) : (
-        <RolesTab role={profile.role} />
       )}
+
+      {tab === 'roles' && <RolesTab role={profile.role} />}
 
       <div className="card max-w-2xl">
         <p className="label mb-3">Acerca de KidsMin</p>
