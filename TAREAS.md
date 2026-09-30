@@ -46,6 +46,9 @@ Marca `[x]` cuando se complete.
 - [x] ~290 textos gris claro (`text-ink/30`, `/40`) → bajo contraste (WCAG AA); subir a `/60` mínimo.
 - [x] Botones de solo ícono con nombre (aria-label + tooltip) en ~45 botones.
 - [x] Tablas → tarjetas en celular (Equipo, Clases, Materiales, Citas, Progreso, Cobertura). Asistencia mensual y Tomar asistencia quedan como tabla.
+- [x] "Primeros pasos" en Inicio del admin (9 pasos con check automático y botón Ir).
+- [x] Pantallas vacías con explicación y botón (sin clases, sin niños, días de clase).
+- [ ] Pedir a Henry 3–5 momentos exactos donde se perdió.
 - [ ] Menú admin con 14 opciones → usar menú por categorías por defecto.
 - [ ] Emojis como íconos se ven distinto en Android/iPhone → evaluar set de íconos (ej. Lucide).
 - [ ] Revisión visual real con la app abierta (celular + PC) con usuario de prueba.

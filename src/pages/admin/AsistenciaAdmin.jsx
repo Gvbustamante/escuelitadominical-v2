@@ -5,6 +5,7 @@ import Skeleton from '../../components/Skeleton'
 import ResumenAsistenciaMensual from '../../components/ResumenAsistenciaMensual'
 import ProgresoNinoModal from '../../components/ProgresoNinoModal'
 import TomarAsistenciaInline from '../../components/TomarAsistenciaInline'
+import EmptyState from '../../components/EmptyState'
 
 export default function AsistenciaAdmin() {
   const { user } = useAuth()
@@ -50,7 +51,7 @@ export default function AsistenciaAdmin() {
     )
   }
 
-  if (niveles.length === 0) return <p className="card text-ink/70">Todavía no hay clases creadas.</p>
+  if (niveles.length === 0) return <EmptyState icon="🎒" titulo="Todavía no hay clases creadas" texto="Primero crea las clases (grupos por edad). Después podrás usar esta sección." accion={{ label: '+ Crear clases', to: '/clases' }} />
 
   const nivelActual = niveles.find((n) => n.id === nivelId)
 

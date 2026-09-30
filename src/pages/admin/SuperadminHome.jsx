@@ -7,6 +7,7 @@ import StatCard from '../../components/StatCard'
 import Skeleton from '../../components/Skeleton'
 import CitaDelDia from '../../components/CitaDelDia'
 import CoberturaHoy from '../../components/CoberturaHoy'
+import PrimerosPasos from '../../components/PrimerosPasos'
 
 export default function SuperadminHome() {
   const { profile } = useAuth()
@@ -134,6 +135,8 @@ export default function SuperadminHome() {
         <h1 className="text-3xl font-bold">Panel de control 🛡️</h1>
         <p className="text-ink/70">Vista panorámica de toda la plataforma</p>
       </div>
+
+      <PrimerosPasos />
 
       <CitaDelDia />
 

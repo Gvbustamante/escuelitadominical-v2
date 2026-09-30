@@ -8,6 +8,7 @@ import HorarioSemanal from '../../components/HorarioSemanal'
 import PlaneacionClaseModal, { urlPdfPlaneacion } from '../../components/PlaneacionClaseModal'
 import RichTextView from '../../components/RichTextView'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
+import EmptyState from '../../components/EmptyState'
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -252,6 +253,11 @@ export default function Planeacion() {
           <p className="mt-1 text-sm text-ink/75">
             Ve a <strong>Ajustes → Días de clase</strong> y activa los días que corresponda (ej. Domingo).
           </p>
+          {!esDocente && (
+            <button type="button" onClick={() => navigate('/ajustes')} className="btn-primary mt-3 !py-2 !text-sm">
+              Ir a Ajustes
+            </button>
+          )}
         </div>
       )}
 
@@ -373,9 +379,11 @@ export default function Planeacion() {
               </div>
 
               {nivelesVisibles.length === 0 ? (
-                <p className="card text-ink/70">
-                  {esDocente ? 'Todavía no tienes clases asignadas.' : 'Todavía no hay clases creadas.'}
-                </p>
+                esDocente ? (
+                  <EmptyState icon="🎒" titulo="Todavía no tienes clases asignadas" texto="Pide al administrador que te asigne a una clase en la sección Clases." />
+                ) : (
+                  <EmptyState icon="🎒" titulo="Todavía no hay clases creadas" texto="Crea las clases (grupos por edad) para poder planear cada día." accion={{ label: '+ Crear clases', to: '/clases' }} />
+                )
               ) : (
                 <div className="grid gap-3 xl:grid-cols-2">
                   {nivelesVisibles.map((nivel) => {

@@ -11,6 +11,7 @@ import RichTextEditor from '../../components/RichTextEditor'
 import MultiFilePicker from '../../components/MultiFilePicker'
 import DrivePicker from '../../components/DrivePicker'
 import { getVideoEmbedUrl } from '../../lib/videoEmbed'
+import EmptyState from '../../components/EmptyState'
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10)
@@ -275,7 +276,7 @@ export default function ActividadesAdmin() {
   }
 
   if (!niveles) return <Spinner />
-  if (niveles.length === 0) return <p className="card text-ink/70">Todavía no hay clases creadas.</p>
+  if (niveles.length === 0) return <EmptyState icon="🎒" titulo="Todavía no hay clases creadas" texto="Primero crea las clases (grupos por edad). Después podrás usar esta sección." accion={{ label: '+ Crear clases', to: '/clases' }} />
 
   // Filtrado por búsqueda + mes
   const actividadesFiltradas = (actividades || []).filter((a) =>

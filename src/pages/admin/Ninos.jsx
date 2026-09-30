@@ -13,6 +13,7 @@ import { BADGE_CLASSES } from '../../lib/colors'
 import { whatsappLink } from '../../lib/whatsapp'
 import { exportExcel } from '../../lib/exportExcel'
 import { generarCodigoFacil } from '../../lib/codigoFacil'
+import EmptyState from '../../components/EmptyState'
 
 const STAFF = ['superadmin', 'admin', 'coordinador']
 
@@ -381,10 +382,17 @@ export default function Ninos() {
             </div>
           </div>
 
-          {filtrados.length === 0 ? (
+          {ninos.length === 0 ? (
+            <EmptyState
+              icon="🧒"
+              titulo="Todavía no hay niños registrados"
+              texto="Registra a cada niño con su nombre, edad y clase. Después podrás vincular a sus padres."
+              accion={{ label: '+ Registrar el primero', onClick: openNew }}
+            />
+          ) : filtrados.length === 0 ? (
             <div className="card py-12 text-center">
               <p className="text-4xl">🔍</p>
-              <p className="mt-2 font-bold text-ink/65">No hay niños que coincidan.</p>
+              <p className="mt-2 font-bold text-ink/65">No hay niños que coincidan con la búsqueda o el filtro.</p>
             </div>
           ) : (
             <div className="card overflow-hidden !p-0">

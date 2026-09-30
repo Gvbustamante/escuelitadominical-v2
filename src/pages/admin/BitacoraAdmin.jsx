@@ -7,6 +7,7 @@ import Materiales from './Materiales'
 import MultiFilePicker from '../../components/MultiFilePicker'
 import FotosGaleria from '../../components/FotosGaleria'
 import { exportExcel } from '../../lib/exportExcel'
+import EmptyState from '../../components/EmptyState'
 
 function hoyYYYYMM() {
   return new Date().toISOString().slice(0, 7)
@@ -89,7 +90,7 @@ export default function BitacoraAdmin() {
       </div>
     )
   }
-  if (niveles.length === 0) return <p className="card text-ink/70">Todavía no hay clases creadas.</p>
+  if (niveles.length === 0) return <EmptyState icon="🎒" titulo="Todavía no hay clases creadas" texto="Primero crea las clases (grupos por edad). Después podrás usar esta sección." accion={{ label: '+ Crear clases', to: '/clases' }} />
 
   const porFecha = agruparPorFecha(registros)
 

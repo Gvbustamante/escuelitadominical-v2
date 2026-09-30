@@ -9,6 +9,7 @@ import CoberturaHoy from '../../components/CoberturaHoy'
 import ProximaAgenda from '../../components/ProximaAgenda'
 import ResumenHoy from '../../components/ResumenHoy'
 import ChecklistDocentesHoy from '../../components/ChecklistDocentesHoy'
+import PrimerosPasos from '../../components/PrimerosPasos'
 
 export default function AdminHome() {
   const { profile } = useAuth()
@@ -74,6 +75,8 @@ export default function AdminHome() {
         <h1 className="text-3xl font-bold">¡Hola, {profile.nombre_completo.split(' ')[0]}! 👋</h1>
         <p className="text-ink/70">Este es el resumen de tu escuelita hoy.</p>
       </div>
+
+      <PrimerosPasos />
 
       <CitaDelDia />
 
