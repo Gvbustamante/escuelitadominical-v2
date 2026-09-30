@@ -298,19 +298,19 @@ export default function Planeacion() {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setVista('calendario')}
-          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'calendario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
+          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'calendario' ? 'bg-sky-600 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
         >
           📅 Calendario
         </button>
         <button
           onClick={() => setVista('cronograma')}
-          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'cronograma' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
+          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'cronograma' ? 'bg-sky-600 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
         >
           🗂️ Cronograma
         </button>
         <button
           onClick={() => setVista('horario')}
-          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'horario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
+          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'horario' ? 'bg-sky-600 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
         >
           👥 Horario semanal
         </button>
@@ -407,7 +407,7 @@ export default function Planeacion() {
                     key={i}
                     onClick={() => setSelectedDay(iso)}
                     className={`flex ${escala === 'semana' ? 'min-h-[4.5rem]' : 'aspect-square'} flex-col items-center justify-center gap-0.5 rounded-xl p-1 text-sm font-bold transition-colors
-                      ${seleccionado ? 'bg-sky-400 text-white shadow-pop' : esClase ? 'bg-sky-50 hover:bg-sky-100' : esHoy ? 'bg-sunshine-100' : 'hover:bg-ink/5'}
+                      ${seleccionado ? 'bg-sky-600 text-white shadow-pop' : esClase ? 'bg-sky-50 hover:bg-sky-100' : esHoy ? 'bg-sunshine-100' : 'hover:bg-ink/5'}
                       ${esHoy && !seleccionado ? 'ring-2 ring-sunshine-300' : ''}`}
                   >
                     <span>{escala === 'semana' ? new Date(iso + 'T00:00:00').getDate() : d}</span>
@@ -415,8 +415,8 @@ export default function Planeacion() {
                       {esClase && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white' : 'bg-sky-400'}`} />}
                       {tieneDevocional && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-sunshine-400'}`} />}
                       {tieneActividad && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-grass-400'}`} />}
-                      {tienePlaneacion && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-coral-400'}`} />}
-                      {tieneCobertura && !tieneActividad && !tieneDevocional && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-grape-400'}`} />}
+                      {tienePlaneacion && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-grape-400'}`} />}
+                      {tieneCobertura && !tieneActividad && !tieneDevocional && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-ink/30'}`} />}
                     </div>
                   </button>
                 )
@@ -426,8 +426,8 @@ export default function Planeacion() {
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-sky-400" /> Día de clase</span>
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-sunshine-400" /> Devocional</span>
               <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grass-400" /> Actividad</span>
-              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-coral-400" /> Planeación</span>
-              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grape-400" /> Cobertura</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-grape-400" /> Planeación</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-ink/30" /> Cobertura</span>
             </div>
           </div>
 
@@ -460,7 +460,7 @@ export default function Planeacion() {
                     {new Date(selectedDay + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}
                   </h2>
                   {esDiaClase ? (
-                    <p className="text-sm font-bold text-sky-500">Día de clase</p>
+                    <p className="text-sm font-bold text-sky-600">Día de clase</p>
                   ) : (
                     <p className="text-sm text-ink/65">No es día de clase</p>
                   )}
@@ -605,7 +605,7 @@ export default function Planeacion() {
                                   href={urlPdfPlaneacion(planeacion.pdf_path)}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="inline-flex max-w-full items-center gap-1 self-start truncate rounded-full bg-coral-50 px-2.5 py-1 text-xs font-bold text-coral-700 hover:bg-coral-100"
+                                  className="inline-flex max-w-full items-center gap-1 self-start truncate rounded-full bg-grape-50 px-2.5 py-1 text-xs font-bold text-grape-700 hover:bg-grape-100"
                                 >
                                   📄 {planeacion.pdf_nombre || 'Ver PDF'}
                                 </a>
@@ -651,7 +651,7 @@ export default function Planeacion() {
                                     {dv.versiculo && <p className="mt-0.5 truncate text-xs italic text-ink/65">📖 {dv.versiculo}</p>}
                                     {!dv.nivel_id && <span className="text-xs font-bold text-ink/65">Para todos los niveles</span>}
                                   </div>
-                                  <span className="shrink-0 text-xs text-sunshine-600">Ver →</span>
+                                  <span className="shrink-0 text-xs text-sunshine-700">Ver →</span>
                                 </div>
                               ))}
                             </div>
@@ -766,14 +766,14 @@ export default function Planeacion() {
               <button
                 type="button"
                 onClick={() => setForm({ ...form, es_tarea: false })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.es_tarea ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.es_tarea ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
               >
                 Solo informativa
               </button>
               <button
                 type="button"
                 onClick={() => setForm({ ...form, es_tarea: true })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.es_tarea ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.es_tarea ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
               >
                 📝 Es una tarea
               </button>

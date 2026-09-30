@@ -128,7 +128,7 @@ export default function Devocionales() {
           ))}
         {verPlaneacion &&
           (tiene(contenidoDia.planeaciones, d) ? (
-            <span className="badge bg-coral-100 text-coral-700">📝 Con planeación</span>
+            <span className="badge bg-grape-100 text-grape-700">📝 Con planeación</span>
           ) : (
             <span className="badge bg-ink/5 text-ink/65">Sin planeación</span>
           ))}
@@ -332,14 +332,14 @@ export default function Devocionales() {
           <button
             type="button"
             onClick={() => setTab('devocionales')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'devocionales' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'devocionales' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
           >
             🙏 Devocionales
           </button>
           <button
             type="button"
             onClick={() => setTab('versiculos')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'versiculos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'versiculos' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
           >
             📖 Versículos
           </button>
@@ -366,7 +366,7 @@ export default function Devocionales() {
               <button aria-label="Vista tarjetas"
                 type="button"
                 onClick={() => setVista('tarjetas')}
-                className={`px-3 py-1.5 text-sm font-bold ${vista === 'tarjetas' ? 'bg-sky-400 text-white' : 'bg-white text-ink/65 hover:bg-ink/5'}`}
+                className={`px-3 py-1.5 text-sm font-bold ${vista === 'tarjetas' ? 'bg-sky-600 text-white' : 'bg-white text-ink/65 hover:bg-ink/5'}`}
                 title="Vista tarjetas"
               >
                 ▦
@@ -374,7 +374,7 @@ export default function Devocionales() {
               <button aria-label="Vista lista"
                 type="button"
                 onClick={() => setVista('lista')}
-                className={`px-3 py-1.5 text-sm font-bold ${vista === 'lista' ? 'bg-sky-400 text-white' : 'bg-white text-ink/65 hover:bg-ink/5'}`}
+                className={`px-3 py-1.5 text-sm font-bold ${vista === 'lista' ? 'bg-sky-600 text-white' : 'bg-white text-ink/65 hover:bg-ink/5'}`}
                 title="Vista lista"
               >
                 ☰
@@ -410,7 +410,7 @@ export default function Devocionales() {
             <button
               type="button"
               onClick={() => setVerTodos((v) => !v)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${verTodos ? 'bg-sky-400 text-white' : 'bg-white text-ink/70 ring-1 ring-ink/10'}`}
+              className={`rounded-full px-4 py-2 text-sm font-bold ${verTodos ? 'bg-sky-600 text-white' : 'bg-white text-ink/70 ring-1 ring-ink/10'}`}
             >
               {verTodos ? 'Ver por mes' : 'Ver todos los meses'}
             </button>
@@ -480,7 +480,7 @@ export default function Devocionales() {
 
                     {/* 5. Pie: reacciones y acciones */}
                     <div className="mt-auto flex items-center justify-between gap-2 border-t border-ink/5 pt-3">
-                      <span className="text-sm font-bold text-coral-500">❤️ {d.devocional_reacciones?.length || 0}</span>
+                      <span className="text-sm font-bold text-coral-600">❤️ {d.devocional_reacciones?.length || 0}</span>
                       {puedeCrear && (
                         <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                           <button
@@ -545,7 +545,7 @@ export default function Devocionales() {
 
                   {/* Acciones */}
                   <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    <span className="text-xs font-bold text-coral-500">{d.devocional_reacciones?.length || 0} ❤️</span>
+                    <span className="text-xs font-bold text-coral-600">{d.devocional_reacciones?.length || 0} ❤️</span>
                     {puedeCrear && (
                       <button
                         className="btn-secondary !py-1 !px-3 !text-xs"
@@ -560,7 +560,7 @@ export default function Devocionales() {
                       </button>
                     )}
                     {puedeCrear && (
-                      <button aria-label="Editar" onClick={() => openEdit(d)} className="text-lg text-ink/65 hover:text-sky-500" title="Editar">
+                      <button aria-label="Editar" onClick={() => openEdit(d)} className="text-lg text-ink/65 hover:text-sky-600" title="Editar">
                         ✏️
                       </button>
                     )}
@@ -709,7 +709,7 @@ export default function Devocionales() {
                       {archivosDrive.map((df, i) => (
                         <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
                           📁 {df.nombre}
-                          <button aria-label="Quitar archivo" title="Quitar archivo" type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500 hover:text-coral-700">×</button>
+                          <button aria-label="Quitar archivo" title="Quitar archivo" type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-600 hover:text-coral-700">×</button>
                         </span>
                       ))}
                     </div>

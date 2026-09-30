@@ -57,7 +57,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Escribe
             title={b.title}
             onClick={b.onClick}
             className={`flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors ${b.className} ${
-              b.activo ? 'bg-sky-400 text-white shadow-soft' : 'text-ink/70 hover:bg-white hover:text-ink'
+              b.activo ? 'bg-sky-600 text-white shadow-soft' : 'text-ink/70 hover:bg-white hover:text-ink'
             }`}
           >
             {b.label}

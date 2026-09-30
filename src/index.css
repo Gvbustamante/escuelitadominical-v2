@@ -22,16 +22,16 @@
            sm:px-6 sm:py-3 sm:text-lg;
   }
   .btn-primary {
-    @apply btn bg-sky-400 text-white hover:bg-sky-500;
+    @apply btn bg-sky-600 text-white hover:bg-sky-700;
   }
   .btn-secondary {
     @apply btn bg-white text-ink border-2 border-ink/10 hover:bg-ink/5;
   }
   .btn-success {
-    @apply btn bg-grass-400 text-white hover:bg-grass-500;
+    @apply btn bg-grass-600 text-white hover:bg-grass-700;
   }
   .btn-danger {
-    @apply btn bg-coral-400 text-white hover:bg-coral-500;
+    @apply btn bg-coral-600 text-white hover:bg-coral-700;
   }
   .card {
     @apply bg-white rounded-blob shadow-card border-2 border-sky-50 p-4 sm:p-6;
@@ -64,7 +64,7 @@
     @apply my-1 list-decimal pl-5;
   }
   .rich-content a {
-    @apply text-sky-500 underline decoration-2 underline-offset-2 hover:text-sky-600;
+    @apply text-sky-600 underline decoration-2 underline-offset-2 hover:text-sky-600;
   }
   .rich-content strong {
     @apply font-extrabold text-ink;

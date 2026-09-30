@@ -73,7 +73,7 @@ export default function ResumenHoy({ nivelIds }) {
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sunshine-100 text-2xl">🙏</span>
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-600">Devocional destacado</p>
+            <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-700">Devocional destacado</p>
             <p className="truncate font-bold">{devocional.titulo}</p>
             {devocional.versiculo && <p className="truncate text-sm italic text-ink/75">📖 "{devocional.versiculo}"</p>}
           </div>

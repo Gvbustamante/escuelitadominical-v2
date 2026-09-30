@@ -33,7 +33,7 @@ export default function PadreContacto({ padre, parentesco, onSaved, onDesvincula
           <button
             type="button"
             onClick={onDesvincular}
-            className="shrink-0 text-xs font-bold text-coral-500 hover:underline"
+            className="shrink-0 text-xs font-bold text-coral-600 hover:underline"
           >
             ✕ Desvincular
           </button>

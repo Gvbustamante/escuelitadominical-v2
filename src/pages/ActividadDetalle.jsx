@@ -169,7 +169,7 @@ export default function ActividadDetalle() {
                   {actividad.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
                 </div>
                 {actividad.nivel?.nombre && (
-                  <p className="mt-1 text-sm font-bold uppercase text-sky-500">{actividad.nivel.nombre}</p>
+                  <p className="mt-1 text-sm font-bold uppercase text-sky-600">{actividad.nivel.nombre}</p>
                 )}
               </div>
               <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/70">{actividad.fecha}</span>
@@ -187,7 +187,7 @@ export default function ActividadDetalle() {
                   <p className="text-base italic text-ink/80">📖 &ldquo;{actividad.versiculo_clave}&rdquo;</p>
                 )}
                 {actividad.historia_biblica && (
-                  <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {actividad.historia_biblica}</p>
+                  <p className="mt-1 text-sm font-bold text-sunshine-800">Historia: {actividad.historia_biblica}</p>
                 )}
               </div>
             )}
@@ -290,7 +290,7 @@ export default function ActividadDetalle() {
                 onChanged={load}
               />
             ) : (
-              <p className="text-sm font-bold text-coral-500">{actividad.actividad_reacciones.length} reacciones ❤️</p>
+              <p className="text-sm font-bold text-coral-600">{actividad.actividad_reacciones.length} reacciones ❤️</p>
             )}
           </div>
 
@@ -395,7 +395,7 @@ export default function ActividadDetalle() {
 function Breadcrumb({ navigate, titulo }) {
   return (
     <nav className="flex items-center gap-1.5 text-sm">
-      <button onClick={() => navigate('/actividades')} className="font-bold text-sky-500 hover:underline">
+      <button onClick={() => navigate('/actividades')} className="font-bold text-sky-600 hover:underline">
         Actividades
       </button>
       {titulo && (

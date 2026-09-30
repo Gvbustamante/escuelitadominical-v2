@@ -3,7 +3,7 @@ import { useCountUp } from '../lib/useCountUp'
 const COLORS = {
   sky: 'bg-sky-100 text-sky-700 ring-sky-200',
   grass: 'bg-grass-100 text-grass-700 ring-grass-200',
-  sunshine: 'bg-sunshine-100 text-sunshine-700 ring-sunshine-200',
+  sunshine: 'bg-sunshine-100 text-sunshine-800 ring-sunshine-200',
   coral: 'bg-coral-100 text-coral-700 ring-coral-200',
   grape: 'bg-grape-100 text-grape-700 ring-grape-200',
 }

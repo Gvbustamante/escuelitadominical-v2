@@ -84,12 +84,12 @@ export default function ArchivosExistentes({ archivos, tabla = 'actividad_archiv
             <div key={f.id} className="flex items-center gap-2 rounded-xl bg-ink/[0.03] px-3 py-2">
               <span className="text-lg">{iconoPorTipo(f.nombre_archivo)}</span>
               <span className="min-w-0 flex-1 truncate text-sm font-bold text-ink/70">{f.nombre_archivo || 'Archivo'}</span>
-              {f.bucket === 'drive' && <span className="text-xs font-bold text-sky-500">Drive</span>}
+              {f.bucket === 'drive' && <span className="text-xs font-bold text-sky-600">Drive</span>}
               <button
                 type="button"
                 onClick={() => eliminar(f)}
                 disabled={eliminando === f.id}
-                className="shrink-0 rounded-lg px-2 py-1 text-xs font-bold text-coral-500 hover:bg-coral-50 disabled:opacity-50"
+                className="shrink-0 rounded-lg px-2 py-1 text-xs font-bold text-coral-600 hover:bg-coral-50 disabled:opacity-50"
               >
                 {eliminando === f.id ? '...' : '🗑️ Quitar'}
               </button>

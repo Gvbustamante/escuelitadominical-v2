@@ -219,7 +219,7 @@ export default function Clases() {
                           type="button"
                           disabled={i === 0}
                           onClick={() => mover(nivel, -1)}
-                          className="leading-none text-ink/65 hover:text-sky-500 disabled:opacity-20 disabled:hover:text-ink/65"
+                          className="leading-none text-ink/65 hover:text-sky-600 disabled:opacity-20 disabled:hover:text-ink/65"
                           title="Subir"
                         >
                           ▲
@@ -228,7 +228,7 @@ export default function Clases() {
                           type="button"
                           disabled={i === niveles.length - 1}
                           onClick={() => mover(nivel, 1)}
-                          className="leading-none text-ink/65 hover:text-sky-500 disabled:opacity-20 disabled:hover:text-ink/65"
+                          className="leading-none text-ink/65 hover:text-sky-600 disabled:opacity-20 disabled:hover:text-ink/65"
                           title="Bajar"
                         >
                           ▼
@@ -361,7 +361,7 @@ export default function Clases() {
                   />
                   {d.nombre_completo}
                   {d.role !== 'docente' && (
-                    <span className={`ml-1 rounded-full px-2 py-0.5 text-xs font-bold ${['superadmin', 'admin'].includes(d.role) ? 'bg-grape-100 text-grape-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
+                    <span className={`ml-1 rounded-full px-2 py-0.5 text-xs font-bold ${['superadmin', 'admin'].includes(d.role) ? 'bg-grape-100 text-grape-700' : 'bg-sunshine-100 text-sunshine-800'}`}>
                       {['superadmin', 'admin'].includes(d.role) ? 'Admin' : 'Coord'}
                     </span>
                   )}

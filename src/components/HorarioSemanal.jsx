@@ -69,7 +69,7 @@ export default function HorarioSemanal({
           <span className="text-xs font-bold text-ink/65">Niveles</span>
         </div>
         <div className="card flex items-center gap-2 !px-3 !py-2">
-          <span className="text-lg font-extrabold text-sunshine-600">{(devocionalesMes || []).length}</span>
+          <span className="text-lg font-extrabold text-sunshine-700">{(devocionalesMes || []).length}</span>
           <span className="text-xs font-bold text-ink/65">Devocionales</span>
         </div>
         <span className="text-xs text-ink/65">Días de clase: {diasLabel}</span>

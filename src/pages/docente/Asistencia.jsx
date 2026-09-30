@@ -50,7 +50,7 @@ export default function Asistencia() {
           <button
             key={v}
             onClick={() => setTab(v)}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === v ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
           >
             {label}
           </button>

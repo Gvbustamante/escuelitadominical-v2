@@ -275,13 +275,13 @@ export default function Drive() {
           <div className="flex gap-1.5 sm:hidden">
             <button aria-label="Mis archivos" title="Mis archivos"
               onClick={() => setSeccion('archivos')}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'archivos' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'archivos' ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/70'}`}
             >
               📁
             </button>
             <button aria-label="Vista organizada" title="Vista organizada"
               onClick={() => setSeccion('organizado')}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'organizado' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold ${seccion === 'organizado' ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/70'}`}
             >
               🗂️
             </button>
@@ -291,7 +291,7 @@ export default function Drive() {
           {!verPapelera && (
             <>
               <button
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-400 text-white shadow-pop transition-transform hover:scale-105 active:scale-95 sm:h-auto sm:w-auto sm:rounded-full sm:px-4 sm:py-2"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-600 text-white shadow-pop transition-transform hover:scale-105 active:scale-95 sm:h-auto sm:w-auto sm:rounded-full sm:px-4 sm:py-2"
                 onClick={openNuevaCarpeta}
                 title="Nueva carpeta"
               >
@@ -318,7 +318,7 @@ export default function Drive() {
           <button
             onClick={() => { setVerPapelera(!verPapelera); setBusqueda(''); setRuta([]) }}
             className={`relative flex h-9 w-9 items-center justify-center rounded-xl transition-colors sm:h-auto sm:w-auto sm:rounded-full sm:px-4 sm:py-2 ${
-              verPapelera ? 'bg-coral-400 text-white' : 'bg-white text-ink/70 ring-1 ring-ink/10'
+              verPapelera ? 'bg-coral-600 text-white' : 'bg-white text-ink/70 ring-1 ring-ink/10'
             }`}
             title="Papelera"
           >
@@ -338,13 +338,13 @@ export default function Drive() {
         <div className="hidden gap-2 sm:flex">
           <button
             onClick={() => setSeccion('archivos')}
-            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'archivos' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
+            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'archivos' ? 'bg-sky-600 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
           >
             📁 Mis archivos
           </button>
           <button
             onClick={() => setSeccion('organizado')}
-            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'organizado' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
+            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${seccion === 'organizado' ? 'bg-sky-600 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
           >
             🗂️ Auto-organizado
           </button>
@@ -390,7 +390,7 @@ export default function Drive() {
             <button aria-label={v === 'grid' ? 'Cuadrícula' : 'Lista'}
               key={v}
               onClick={() => setVista(v)}
-              className={`px-3 py-2 text-sm font-bold transition-colors ${vista === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/65 hover:bg-sky-50'}`}
+              className={`px-3 py-2 text-sm font-bold transition-colors ${vista === v ? 'bg-sky-600 text-white' : 'bg-white text-ink/65 hover:bg-sky-50'}`}
               title={v === 'grid' ? 'Cuadrícula' : 'Lista'}
             >
               {icon}
@@ -666,7 +666,7 @@ const ACTION_LABELS = { '♻️': 'Restaurar', '🗑️': 'Eliminar', '✏️': 
 
 function ActionBtn({ icon, onClick, color, label }) {
   const nombre = label || ACTION_LABELS[icon] || 'Acción'
-  const colors = color === 'grass' ? 'text-grass-600 hover:bg-grass-50' : color === 'coral' ? 'text-coral-500 hover:bg-coral-50' : 'text-sky-500 hover:bg-sky-50'
+  const colors = color === 'grass' ? 'text-grass-600 hover:bg-grass-50' : color === 'coral' ? 'text-coral-600 hover:bg-coral-50' : 'text-sky-600 hover:bg-sky-50'
   return (
     <button onClick={onClick} aria-label={nombre} title={nombre} className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs transition-colors active:scale-90 ${colors}`}>
       {icon}

@@ -72,7 +72,7 @@ export default function Bitacora() {
               }`}
             >
               <p className="text-sm font-bold sm:text-base">{m.label}</p>
-              <span className={`badge mt-1 ${hecha ? 'bg-grass-100 text-grass-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
+              <span className={`badge mt-1 ${hecha ? 'bg-grass-100 text-grass-700' : 'bg-sunshine-100 text-sunshine-800'}`}>
                 {hecha ? '✅ Hecha' : '⏳ Falta'}
               </span>
             </button>
@@ -189,14 +189,14 @@ function BitacoraForm({ nivelId, fecha, momento, registro, docenteId, onSaved })
           <button
             type="button"
             onClick={() => setSalonOk(true)}
-            className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${salonOk ? 'bg-grass-400 text-white' : 'bg-ink/5'}`}
+            className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${salonOk ? 'bg-grass-600 text-white' : 'bg-ink/5'}`}
           >
             ✅ En buen estado
           </button>
           <button
             type="button"
             onClick={() => setSalonOk(false)}
-            className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${!salonOk ? 'bg-coral-400 text-white' : 'bg-ink/5'}`}
+            className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${!salonOk ? 'bg-coral-600 text-white' : 'bg-ink/5'}`}
           >
             ⚠️ Hubo daños
           </button>

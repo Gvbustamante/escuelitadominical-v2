@@ -71,7 +71,7 @@ export default function CalendarioAgenda({ eventos, onSelectDay, selectedDay }) 
               key={i}
               onClick={() => onSelectDay(evs.length ? iso : null)}
               className={`flex aspect-square flex-col items-center justify-start gap-0.5 rounded-xl p-1 text-sm font-bold transition-colors
-                ${seleccionado ? 'bg-sky-400 text-white' : esHoy ? 'bg-sunshine-100 text-sunshine-700' : 'hover:bg-ink/5'}`}
+                ${seleccionado ? 'bg-sky-600 text-white' : esHoy ? 'bg-sunshine-100 text-sunshine-800' : 'hover:bg-ink/5'}`}
             >
               <span>{d}</span>
               {evs.length > 0 && (

@@ -97,7 +97,7 @@ export default function PrimerosPasos() {
             return (
               <li key={p.key} className={`flex items-center gap-3 px-4 py-3 sm:px-6 ${esSiguiente ? 'bg-sky-50/70' : ''}`}>
                 <span
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${hecho ? 'bg-grass-100 text-grass-700' : esSiguiente ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/65'}`}
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${hecho ? 'bg-grass-100 text-grass-700' : esSiguiente ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/65'}`}
                   aria-hidden="true"
                 >
                   {hecho ? '✓' : i + 1}
@@ -107,7 +107,7 @@ export default function PrimerosPasos() {
                   {!hecho && <p className="text-sm text-ink/70">{p.ayuda}</p>}
                 </div>
                 {!hecho && (
-                  <Link to={p.to} className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-bold ${esSiguiente ? 'bg-sky-400 text-white hover:bg-sky-500' : 'bg-sky-50 text-sky-700 hover:bg-sky-100'}`}>
+                  <Link to={p.to} className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-bold ${esSiguiente ? 'bg-sky-600 text-white hover:bg-sky-700' : 'bg-sky-50 text-sky-700 hover:bg-sky-100'}`}>
                     Ir →
                   </Link>
                 )}
@@ -120,7 +120,7 @@ export default function PrimerosPasos() {
         siguiente && (
           <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6">
             <p className="text-sm"><span className="font-bold">Siguiente:</span> {siguiente.titulo}</p>
-            <Link to={siguiente.to} className="shrink-0 rounded-full bg-sky-400 px-4 py-1.5 text-sm font-bold text-white hover:bg-sky-500">Ir →</Link>
+            <Link to={siguiente.to} className="shrink-0 rounded-full bg-sky-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-sky-700">Ir →</Link>
           </div>
         )
       )}

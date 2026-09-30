@@ -92,7 +92,7 @@ export default function ProgresoNinoModal({ nino, nivelId, open, onClose }) {
                   type="button"
                   key={c}
                   onClick={() => setForm({ ...form, comportamiento: c })}
-                  className={`rounded-full px-3 py-2 text-sm font-bold ${form.comportamiento === c ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                  className={`rounded-full px-3 py-2 text-sm font-bold ${form.comportamiento === c ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
                 >
                   {c}
                 </button>
@@ -107,7 +107,7 @@ export default function ProgresoNinoModal({ nino, nivelId, open, onClose }) {
                   type="button"
                   key={em}
                   onClick={() => setForm({ ...form, emocion: em })}
-                  className={`rounded-full px-3 py-2 text-sm font-bold ${form.emocion === em ? 'bg-coral-400 text-white' : 'bg-ink/5'}`}
+                  className={`rounded-full px-3 py-2 text-sm font-bold ${form.emocion === em ? 'bg-coral-600 text-white' : 'bg-ink/5'}`}
                 >
                   {em}
                 </button>

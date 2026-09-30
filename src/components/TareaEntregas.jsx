@@ -6,7 +6,7 @@ import ArticulosAdjuntos from './ArticulosAdjuntos'
 
 const ESTADO_BADGE = {
   pendiente: 'bg-ink/10 text-ink/70',
-  pausada: 'bg-sunshine-100 text-sunshine-700',
+  pausada: 'bg-sunshine-100 text-sunshine-800',
   entregada: 'bg-grass-100 text-grass-700',
 }
 const ESTADO_LABEL = { pendiente: '⏳ Pendiente', pausada: '⏸️ Pausada', entregada: '✅ Entregada' }

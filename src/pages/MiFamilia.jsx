@@ -35,11 +35,11 @@ function iniciales(nombre) {
 }
 
 const COLORES_AVATAR = [
-  'bg-sky-400 text-white',
-  'bg-coral-400 text-white',
-  'bg-grape-400 text-white',
-  'bg-sunshine-400 text-white',
-  'bg-grass-400 text-white',
+  'bg-sky-600 text-white',
+  'bg-coral-600 text-white',
+  'bg-grape-500 text-white',
+  'bg-sunshine-400 text-ink',
+  'bg-grass-600 text-white',
 ]
 
 export default function MiFamilia() {
@@ -194,7 +194,7 @@ No hay niños registrados todavía.
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-600">⭐ Devocional de hoy</p>
+                      <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-700">⭐ Devocional de hoy</p>
                       <h3 className="truncate text-base font-bold">{devocionalActivo.titulo}</h3>
                       {devocionalActivo.versiculo && (
                         <p className="truncate text-xs italic text-ink/70">📖 &ldquo;{devocionalActivo.versiculo}&rdquo;</p>

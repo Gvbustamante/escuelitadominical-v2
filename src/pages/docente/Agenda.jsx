@@ -92,7 +92,7 @@ export default function Agenda() {
 
           <div className="flex flex-col gap-3">
             {selectedDay && (
-              <button onClick={() => setSelectedDay(null)} className="self-start text-sm font-bold text-sky-500 hover:underline">
+              <button onClick={() => setSelectedDay(null)} className="self-start text-sm font-bold text-sky-600 hover:underline">
                 ← Ver todos los eventos
               </button>
             )}
@@ -103,7 +103,7 @@ export default function Agenda() {
                   <p className="text-sm text-ink/70">{ev.fecha}</p>
                   {ev.descripcion && <p className="text-sm text-ink/70">{ev.descripcion}</p>}
                 </div>
-                <button aria-label="Eliminar evento" title="Eliminar evento" onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/65 hover:text-coral-500">
+                <button aria-label="Eliminar evento" title="Eliminar evento" onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/65 hover:text-coral-600">
                   🗑️
                 </button>
               </div>

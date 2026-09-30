@@ -151,7 +151,7 @@ export default function DrivePicker({ open, onClose, onSelect, multiple = true, 
                 onClick={() => toggle(a.id)}
                 className={`flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors ${selected ? 'bg-sky-100' : 'hover:bg-ink/5'}`}
               >
-                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 text-xs font-bold ${selected ? 'border-sky-400 bg-sky-400 text-white' : 'border-ink/20'}`}>
+                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 text-xs font-bold ${selected ? 'border-sky-400 bg-sky-600 text-white' : 'border-ink/20'}`}>
                   {selected ? '✓' : ''}
                 </span>
                 {esImagen ? (

@@ -18,6 +18,8 @@ Marca `[x]` cuando se complete.
 
 ## 🔧 Pendiente inmediato
 - [x] Proyecto "Escuelita Dominical - v2" ya tiene `modulos_activos` (text[]). Correr la migración solo en proyectos de iglesias nuevas/otras.
+- [ ] **Drive privado**: el bucket `drive` es público → quien tenga el enlace abre el archivo (los padres no ven la lista). Pasar a bucket privado + enlaces firmados (requiere SQL en ambas bases).
+- [ ] Unificar pantallas repetidas: Equipo ("Todas las cuentas" vs "Docentes") y Planeación (Calendario vs Cronograma).
 - [ ] Bumblebee usa el bucket `bumblebee-images` dentro del proyecto de Escuelita → moverlo a su propio proyecto.
 
 ## 🗄️ SQL pendiente en PRODUCCIÓN (lo corre Gisella/Carlos)
@@ -64,6 +66,7 @@ Marca `[x]` cuando se complete.
 ## 🎨 UI/UX — hallazgos en el código
 - [x] 43 textos con tamaño < 12px (`text-[0.6rem]` etc.) → mínimo 12px, 16px en inputs (evita zoom en iPhone).
 - [x] ~290 textos gris claro (`text-ink/30`, `/40`) → bajo contraste (WCAG AA); subir a `/60` mínimo.
+- [x] Colores accesibles: botones con texto blanco en tonos 600 (contraste ≥4.5:1), texto oscuro sobre amarillo, planeación = morado, coral solo alertas, tonos 800/900 añadidos.
 - [x] Botones de solo ícono con nombre (aria-label + tooltip) en ~45 botones.
 - [x] Tablas → tarjetas en celular (Equipo, Clases, Materiales, Citas, Progreso, Cobertura). Asistencia mensual y Tomar asistencia quedan como tabla.
 - [x] "Primeros pasos" en Inicio del admin (9 pasos con check automático y botón Ir).

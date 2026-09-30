@@ -83,7 +83,7 @@ export default function Landing() {
           <div className="mb-10 flex items-center justify-between">
             <a href="#inicio" className="flex items-center gap-2">
               <AppLogo emojiClassName="text-2xl" imgClassName="h-10 w-10 object-contain" />
-              <span className="text-xl font-black text-sky-700">Kids<span className="text-coral-500">Min</span></span>
+              <span className="text-xl font-black text-sky-700">Kids<span className="text-coral-600">Min</span></span>
             </a>
 
             <div className="hidden items-center gap-7 text-sm font-extrabold text-sky-800/75 md:flex">
@@ -122,7 +122,7 @@ export default function Landing() {
                 El ministerio infantil de tu iglesia,
                 <span className="mt-1 block">
                   <span className="text-sky-600">en un </span>
-                  <span className="text-coral-500">solo</span>
+                  <span className="text-coral-600">solo</span>
                   <span className="text-sunshine-500"> lugar.</span>
                 </span>
               </h1>
@@ -202,7 +202,7 @@ export default function Landing() {
                 <p className="text-sm font-black text-ink">Organiza · conecta · acompaña</p>
               </div>
 
-              <div className="absolute bottom-[7%] right-[33%] z-20 hidden text-2xl text-coral-500 sm:block">✦</div>
+              <div className="absolute bottom-[7%] right-[33%] z-20 hidden text-2xl text-coral-600 sm:block">✦</div>
               <div className="absolute right-[5%] top-[49%] z-20 hidden text-3xl text-sunshine-500 sm:block">✦</div>
             </div>
           </div>
@@ -275,7 +275,7 @@ export default function Landing() {
       <section id="como-funciona" className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20 lg:py-24">
         <div className="grid gap-8 sm:gap-12 lg:grid-cols-[.75fr_1.25fr] lg:items-start">
           <div>
-            <span className="rounded-full bg-sunshine-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sunshine-700">Así funciona</span>
+            <span className="rounded-full bg-sunshine-100 px-4 py-2 text-xs font-extrabold uppercase tracking-[.12em] text-sunshine-800">Así funciona</span>
             <h2 className="mt-4 text-2xl font-black tracking-tight text-ink sm:text-4xl md:text-5xl">De la idea a tu iglesia, paso a paso.</h2>
             <p className="mt-5 leading-relaxed text-ink/75">
               Queremos que la tecnología quite trabajo, no que agregue más. Por eso el camino para comenzar debe ser sencillo.

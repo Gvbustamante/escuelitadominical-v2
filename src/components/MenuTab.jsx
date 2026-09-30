@@ -107,14 +107,14 @@ export default function MenuTab({ config }) {
           <button
             type="button"
             onClick={() => { setModo('plano'); setOk('') }}
-            className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${modo === 'plano' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
+            className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${modo === 'plano' ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/70'}`}
           >
             📋 Solo menús
           </button>
           <button
             type="button"
             onClick={() => { setModo('categorizado'); setOk('') }}
-            className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${modo === 'categorizado' ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'}`}
+            className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${modo === 'categorizado' ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/70'}`}
           >
             📂 Menús y submenús
           </button>
@@ -161,7 +161,7 @@ export default function MenuTab({ config }) {
                   <button aria-label="Eliminar categoría" title="Eliminar categoría"
                     type="button"
                     onClick={() => eliminarCategoria(idx)}
-                    className="rounded-lg px-2 py-1 text-xs font-bold text-coral-500 hover:bg-coral-50"
+                    className="rounded-lg px-2 py-1 text-xs font-bold text-coral-600 hover:bg-coral-50"
                   >
                     ✕
                   </button>
@@ -182,7 +182,7 @@ export default function MenuTab({ config }) {
                       <button aria-label="Quitar de la categoría" title="Quitar de la categoría"
                         type="button"
                         onClick={() => quitarItemDeCat(idx, ruta)}
-                        className="text-xs font-bold text-ink/65 hover:text-coral-500"
+                        className="text-xs font-bold text-ink/65 hover:text-coral-600"
                       >
                         ✕
                       </button>
@@ -220,7 +220,7 @@ export default function MenuTab({ config }) {
 
           {itemsLibres.length > 0 && (
             <div className="rounded-xl bg-sunshine-50 px-4 py-3">
-              <p className="text-xs font-bold text-sunshine-700 mb-2">Items sin categoría (se mostrarán sueltos):</p>
+              <p className="text-xs font-bold text-sunshine-800 mb-2">Items sin categoría (se mostrarán sueltos):</p>
               <div className="flex flex-wrap gap-1.5">
                 {itemsLibres.map((item) => (
                   <span key={item.to} className="badge bg-white text-ink/70">

@@ -344,14 +344,14 @@ export default function Actividades() {
         <button
           type="button"
           onClick={() => setSeccion('clase')}
-          className={`rounded-full px-4 py-2 text-sm font-bold ${seccion === 'clase' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70 border-2 border-ink/10'}`}
+          className={`rounded-full px-4 py-2 text-sm font-bold ${seccion === 'clase' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70 border-2 border-ink/10'}`}
         >
           🧒 Mi clase
         </button>
         <button
           type="button"
           onClick={() => setSeccion('equipo')}
-          className={`relative rounded-full px-4 py-2 text-sm font-bold ${seccion === 'equipo' ? 'bg-grape-400 text-white' : 'bg-white text-ink/70 border-2 border-ink/10'}`}
+          className={`relative rounded-full px-4 py-2 text-sm font-bold ${seccion === 'equipo' ? 'bg-grape-500 text-white' : 'bg-white text-ink/70 border-2 border-ink/10'}`}
         >
           🍎 Para el equipo
           {paraEquipo && paraEquipo.some((a) => a.es_tarea && (misEntregas[a.id]?.estado || 'pendiente') !== 'entregada') && (
@@ -472,7 +472,7 @@ export default function Actividades() {
                           {(a.versiculo_clave || a.historia_biblica) && (
                             <div className="mt-3 rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
                               {a.versiculo_clave && <p className="italic text-ink/80">📖 &ldquo;{a.versiculo_clave}&rdquo;</p>}
-                              {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
+                              {a.historia_biblica && <p className="mt-1 text-sm font-bold text-sunshine-800">Historia: {a.historia_biblica}</p>}
                             </div>
                           )}
                           {a.enlace_externo && (
@@ -565,14 +565,14 @@ export default function Actividades() {
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, visible_padres: true })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.visible_padres ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.visible_padres ? 'bg-sky-600 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     👀 Padres ven
                   </button>
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, visible_padres: false })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.visible_padres ? 'bg-grape-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.visible_padres ? 'bg-grape-500 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     🙈 Solo equipo
                   </button>
@@ -584,20 +584,20 @@ export default function Actividades() {
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, es_tarea: false })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.es_tarea ? 'bg-sky-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${!form.es_tarea ? 'bg-sky-600 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     📢 Informativa
                   </button>
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, es_tarea: true })}
-                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.es_tarea ? 'bg-sunshine-400 text-white shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
+                    className={`flex-1 rounded-chunky px-3 py-2.5 text-sm font-bold transition-all ${form.es_tarea ? 'bg-sunshine-400 text-ink shadow-sm' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'}`}
                   >
                     📝 Tarea
                   </button>
                 </div>
                 {form.es_tarea && (
-                  <p className="mt-1.5 rounded-xl bg-sunshine-50 px-3 py-1.5 text-xs text-sunshine-700">
+                  <p className="mt-1.5 rounded-xl bg-sunshine-50 px-3 py-1.5 text-xs text-sunshine-800">
                     🔔 Cada niño del nivel podrá entregar su evidencia.
                   </p>
                 )}
@@ -666,7 +666,7 @@ export default function Actividades() {
                   {archivosDrive.map((df, i) => (
                     <span key={i} className="flex items-center gap-1 rounded-xl bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700">
                       📁 {df.nombre}
-                      <button aria-label="Quitar archivo" title="Quitar archivo" type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-500 hover:text-coral-700">×</button>
+                      <button aria-label="Quitar archivo" title="Quitar archivo" type="button" onClick={() => setArchivosDrive(archivosDrive.filter((_, j) => j !== i))} className="ml-1 text-coral-600 hover:text-coral-700">×</button>
                     </span>
                   ))}
                 </div>

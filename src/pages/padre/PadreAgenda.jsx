@@ -51,19 +51,19 @@ export default function PadreAgenda() {
 
         <div className="flex flex-col gap-3">
           {selectedDay && (
-            <button onClick={() => setSelectedDay(null)} className="self-start text-sm font-bold text-sky-500 hover:underline">
+            <button onClick={() => setSelectedDay(null)} className="self-start text-sm font-bold text-sky-600 hover:underline">
               ← Ver todos los eventos
             </button>
           )}
           {eventosDelDia.map((ev) => (
             <div key={ev.id} className={`card flex items-center gap-4 ${ev.fecha < hoy ? 'opacity-50' : ''}`}>
-              <div className="flex h-14 w-14 flex-col items-center justify-center rounded-2xl bg-sunshine-100 text-sunshine-700">
+              <div className="flex h-14 w-14 flex-col items-center justify-center rounded-2xl bg-sunshine-100 text-sunshine-800">
                 <span className="text-xs font-bold">{new Date(ev.fecha + 'T00:00').toLocaleDateString('es', { month: 'short' })}</span>
                 <span className="text-lg font-bold leading-none">{new Date(ev.fecha + 'T00:00').getDate()}</span>
               </div>
               <div>
                 <p className="font-bold">{ev.titulo}</p>
-                {ev.nivel?.nombre && <p className="text-xs font-bold uppercase text-sky-500">{ev.nivel.nombre}</p>}
+                {ev.nivel?.nombre && <p className="text-xs font-bold uppercase text-sky-600">{ev.nivel.nombre}</p>}
                 {ev.descripcion && <p className="text-sm text-ink/70">{ev.descripcion}</p>}
               </div>
             </div>

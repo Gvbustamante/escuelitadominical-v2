@@ -31,7 +31,7 @@ function pctColor(pct) {
 
 function pctBadge(pct) {
   if (pct >= 80) return 'bg-grass-100 text-grass-700'
-  if (pct >= 50) return 'bg-sunshine-100 text-sunshine-700'
+  if (pct >= 50) return 'bg-sunshine-100 text-sunshine-800'
   return 'bg-coral-100 text-coral-700'
 }
 
@@ -373,7 +373,7 @@ export default function ReporteDocentes() {
                     <span className="text-xs font-bold text-ink/65">Activid.</span>
                   </div>
                   <div className="flex flex-1 flex-col items-center border-r border-ink/5 py-2">
-                    <span className="text-sm font-extrabold text-sunshine-600">{item.progresos}</span>
+                    <span className="text-sm font-extrabold text-sunshine-700">{item.progresos}</span>
                     <span className="text-xs font-bold text-ink/65">Notas</span>
                   </div>
                   <div className="flex flex-1 flex-col items-center py-2">
@@ -419,7 +419,7 @@ export default function ReporteDocentes() {
                 <p className="text-xs font-bold text-ink/65">Actividades</p>
               </div>
               <div className="rounded-xl bg-sunshine-50 p-2">
-                <p className="text-lg font-extrabold text-sunshine-600">{r.progresos}</p>
+                <p className="text-lg font-extrabold text-sunshine-700">{r.progresos}</p>
                 <p className="text-xs font-bold text-ink/65">Notas</p>
               </div>
               <div className="rounded-xl bg-coral-50 p-2">

@@ -154,7 +154,7 @@ export default function Progreso() {
                     <td data-label="Insignia" className="px-3 py-2 sm:px-4 sm:py-3">
                       {badge.emoji} <span className="text-ink/70">{badge.nombre}</span>
                     </td>
-                    <td data-label="Estrellas" className="px-3 py-2 sm:px-4 sm:py-3 font-bold text-sunshine-700">{estrellas.length} ⭐</td>
+                    <td data-label="Estrellas" className="px-3 py-2 sm:px-4 sm:py-3 font-bold text-sunshine-800">{estrellas.length} ⭐</td>
                     <td data-label="Última nota" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/70">{ultima ? ultima.fecha : 'Sin notas'}</td>
                     <td data-acciones className="px-3 py-2 sm:px-4 sm:py-3 text-right">
                       <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setHistorialNino(n)}>
@@ -198,12 +198,12 @@ export default function Progreso() {
                 )}
 
                 <div className="mt-3 flex items-center justify-between gap-2 rounded-full bg-sunshine-50 px-3 py-2">
-                  <span className="truncate text-sm font-extrabold text-sunshine-700">
+                  <span className="truncate text-sm font-extrabold text-sunshine-800">
                     {badge.emoji} {estrellas.length} ⭐
                   </span>
                   <button
                     onClick={() => setHistorialNino(n)}
-                    className="shrink-0 rounded-full bg-sunshine-400 px-3 py-1 text-xs font-extrabold text-white transition-transform hover:scale-105 active:scale-95"
+                    className="shrink-0 rounded-full bg-sunshine-400 px-3 py-1 text-xs font-extrabold text-ink transition-transform hover:scale-105 active:scale-95"
                   >
                     ⭐ Dar
                   </button>
@@ -238,7 +238,7 @@ export default function Progreso() {
                   type="button"
                   key={c}
                   onClick={() => setForm({ ...form, comportamiento: c })}
-                  className={`rounded-full px-3 py-2 text-sm font-bold ${form.comportamiento === c ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                  className={`rounded-full px-3 py-2 text-sm font-bold ${form.comportamiento === c ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
                 >
                   {c}
                 </button>
@@ -253,7 +253,7 @@ export default function Progreso() {
                   type="button"
                   key={em}
                   onClick={() => setForm({ ...form, emocion: em })}
-                  className={`rounded-full px-3 py-2 text-sm font-bold ${form.emocion === em ? 'bg-coral-400 text-white' : 'bg-ink/5'}`}
+                  className={`rounded-full px-3 py-2 text-sm font-bold ${form.emocion === em ? 'bg-coral-600 text-white' : 'bg-ink/5'}`}
                 >
                   {em}
                 </button>

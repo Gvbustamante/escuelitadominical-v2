@@ -10,7 +10,7 @@ import AlertasAdmin from '../../components/inicio/AlertasAdmin'
 import { hoyLocal } from '../../lib/fechas'
 
 function Numero({ to, icon, valor, label, tono }) {
-  const TONO = { sky: 'bg-sky-100 text-sky-700', grass: 'bg-grass-100 text-grass-700', sunshine: 'bg-sunshine-100 text-sunshine-700', grape: 'bg-grape-100 text-grape-700' }
+  const TONO = { sky: 'bg-sky-100 text-sky-700', grass: 'bg-grass-100 text-grass-700', sunshine: 'bg-sunshine-100 text-sunshine-800', grape: 'bg-grape-100 text-grape-700' }
   return (
     <Link to={to} className="card flex items-center gap-3 !p-3 transition-transform hover:-translate-y-0.5 sm:!p-4">
       <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg ${TONO[tono]}`} aria-hidden="true">{icon}</span>

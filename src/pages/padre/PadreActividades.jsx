@@ -191,8 +191,8 @@ export default function PadreActividades() {
                         <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" />
                         {/* Badges sobre la imagen */}
                         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-                          {nuevo && <span className="badge bg-grass-400 text-white shadow-sm">✨ Nuevo</span>}
-                          {a.es_tarea && <span className="badge bg-sky-400/90 text-white shadow-sm">📝 Tarea</span>}
+                          {nuevo && <span className="badge bg-grass-600 text-white shadow-sm">✨ Nuevo</span>}
+                          {a.es_tarea && <span className="badge bg-sky-600/90 text-white shadow-sm">📝 Tarea</span>}
                         </div>
                         {/* File counts */}
                         {(fotos.length > 1 || otros.length > 0) && (
@@ -221,7 +221,7 @@ export default function PadreActividades() {
                             {!heroFoto && nuevo && <span className="badge bg-grass-100 text-grass-700">✨ Nuevo</span>}
                             {!heroFoto && a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
                           </div>
-                          <p className="text-xs font-bold uppercase text-sky-500">{a.nivel?.nombre}</p>
+                          <p className="text-xs font-bold uppercase text-sky-600">{a.nivel?.nombre}</p>
                         </div>
                         <span className="shrink-0 text-xs text-ink/65">{formatFecha(a.fecha)}</span>
                       </div>
@@ -237,7 +237,7 @@ export default function PadreActividades() {
                       {(a.versiculo_clave || a.historia_biblica) && (
                         <div className="rounded-2xl border-l-4 border-sunshine-300 bg-sunshine-50 p-3">
                           {a.versiculo_clave && <p className="text-sm italic text-ink/80">📖 &ldquo;{a.versiculo_clave}&rdquo;</p>}
-                          {a.historia_biblica && <p className="mt-1 text-xs font-bold text-sunshine-700">Historia: {a.historia_biblica}</p>}
+                          {a.historia_biblica && <p className="mt-1 text-xs font-bold text-sunshine-800">Historia: {a.historia_biblica}</p>}
                         </div>
                       )}
 

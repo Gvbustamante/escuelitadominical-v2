@@ -60,7 +60,7 @@ export default function Login() {
         <div className="card w-full max-w-md">
           <div className="mb-6 flex flex-col items-center gap-2 text-center">
             <AppLogo emojiClassName="text-6xl" imgClassName="h-16 w-16 object-contain" />
-            <h1 className="text-2xl font-bold text-sky-500">Restablecer contraseña</h1>
+            <h1 className="text-2xl font-bold text-sky-600">Restablecer contraseña</h1>
             <p className="text-sm text-ink/70">Envía una solicitud y el administrador la aprobará.</p>
           </div>
 
@@ -102,7 +102,7 @@ export default function Login() {
               <button type="submit" disabled={resetBusy} className="btn-primary justify-center">
                 {resetBusy ? 'Enviando...' : 'Enviar solicitud'}
               </button>
-              <button type="button" onClick={() => setModo('login')} className="text-sm font-bold text-sky-500 hover:underline">
+              <button type="button" onClick={() => setModo('login')} className="text-sm font-bold text-sky-600 hover:underline">
                 ← Volver al inicio de sesión
               </button>
             </form>
@@ -117,7 +117,7 @@ export default function Login() {
       <div className="card w-full max-w-md">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
           <AppLogo emojiClassName="text-6xl" imgClassName="h-16 w-16 object-contain" />
-          <h1 className="text-3xl uppercase text-sky-500">
+          <h1 className="text-3xl uppercase text-sky-600">
             <AppName />
           </h1>
           <p className="font-bold text-ink/70">Ingresa con tu cuenta</p>
@@ -153,7 +153,7 @@ export default function Login() {
         <button
           type="button"
           onClick={() => setModo('reset')}
-          className="mt-4 block w-full text-center text-sm font-bold text-coral-500 hover:underline"
+          className="mt-4 block w-full text-center text-sm font-bold text-coral-600 hover:underline"
         >
           ¿Olvidaste tu contraseña?
         </button>
@@ -161,7 +161,7 @@ export default function Login() {
         <p className="mt-4 text-center text-sm text-ink/65">
           ¿No tienes cuenta? Pide al administrador de tu escuelita que te invite.
         </p>
-        <Link to="/bienvenida" className="mt-2 block text-center text-sm font-bold text-sky-500 hover:underline">
+        <Link to="/bienvenida" className="mt-2 block text-center text-sm font-bold text-sky-600 hover:underline">
           ← Conoce KidsMin
         </Link>
       </div>

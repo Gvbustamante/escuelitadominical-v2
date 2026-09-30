@@ -114,7 +114,7 @@ export default function SuperadminHome() {
   const ROLE_BADGE = {
     superadmin: 'bg-grape-100 text-grape-700',
     admin: 'bg-grape-100 text-grape-700',
-    coordinador: 'bg-sunshine-100 text-sunshine-700',
+    coordinador: 'bg-sunshine-100 text-sunshine-800',
     docente: 'bg-sky-100 text-sky-700',
   }
   const ROLE_LABEL = {
@@ -173,7 +173,7 @@ export default function SuperadminHome() {
           <p className="font-bold">🍎 Equipo de la plataforma</p>
           <div className="flex gap-2 text-xs font-bold text-ink/65">
             <span className="badge bg-grape-100 text-grape-700">{stats.admins} admin</span>
-            <span className="badge bg-sunshine-100 text-sunshine-700">{stats.coordinadores} coord</span>
+            <span className="badge bg-sunshine-100 text-sunshine-800">{stats.coordinadores} coord</span>
             <span className="badge bg-sky-100 text-sky-700">{stats.docentes} docentes</span>
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function SuperadminHome() {
             ))}
           </div>
         )}
-        <Link to="/docentes" className="mt-3 inline-block text-sm font-bold text-sky-500 hover:underline">
+        <Link to="/docentes" className="mt-3 inline-block text-sm font-bold text-sky-600 hover:underline">
           Ver todo el equipo →
         </Link>
       </div>
@@ -202,7 +202,7 @@ export default function SuperadminHome() {
         <div className="card">
           <div className="mb-3 flex items-center justify-between gap-2">
             <p className="font-bold">📦 Módulos activos</p>
-            <Link to="/ajustes" className="text-sm font-bold text-sky-500 hover:underline">
+            <Link to="/ajustes" className="text-sm font-bold text-sky-600 hover:underline">
               Configurar →
             </Link>
           </div>

@@ -99,7 +99,7 @@ export default function ProximaAgenda({ nivelIds, soloTareasPendientes = false, 
     <div className="card">
       <div className="flex items-center justify-between gap-2">
         <p className="font-bold">📅 Agenda y tareas</p>
-        <Link to="/agenda" className="text-sm font-bold text-sky-500 hover:underline">
+        <Link to="/agenda" className="text-sm font-bold text-sky-600 hover:underline">
           Ver agenda →
         </Link>
       </div>

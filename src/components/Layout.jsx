@@ -85,7 +85,7 @@ function NavItem({ item }) {
       title={item.label}
       className={({ isActive }) =>
         `flex items-center gap-3 rounded-2xl px-3 py-1.5 text-base font-bold transition-colors lg:py-1 md:justify-center md:px-2 lg:justify-start lg:px-3 ${
-          isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/75 hover:bg-sky-50'
+          isActive ? 'bg-sky-600 text-white shadow-pop' : 'text-ink/75 hover:bg-sky-50'
         }`
       }
     >
@@ -107,7 +107,7 @@ function NavSubItem({ item }) {
       title={item.label}
       className={({ isActive }) =>
         `flex items-center gap-2 rounded-xl px-3 py-1.5 pl-6 text-sm md:justify-center md:pl-2 lg:justify-start lg:pl-6 font-bold transition-colors sm:text-base ${
-          isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/70 hover:bg-sky-50'
+          isActive ? 'bg-sky-600 text-white shadow-pop' : 'text-ink/70 hover:bg-sky-50'
         }`
       }
     >
@@ -276,7 +276,7 @@ export default function Layout() {
         <div className="mb-2 flex items-center justify-between gap-2 px-1">
           <div className="flex items-center gap-2">
             <AppLogo emojiClassName="text-3xl sm:text-4xl" imgClassName="h-9 w-9 object-contain sm:h-11 sm:w-11" />
-            <span className="font-display text-lg font-extrabold uppercase leading-tight tracking-wide text-sky-500 md:hidden lg:inline">
+            <span className="font-display text-lg font-extrabold uppercase leading-tight tracking-wide text-sky-600 md:hidden lg:inline">
               <AppName />
             </span>
           </div>
@@ -321,7 +321,7 @@ export default function Layout() {
           </button>
           <div className="flex items-center gap-2">
             <AppLogo emojiClassName="text-2xl" imgClassName="h-7 w-7 object-contain" />
-            <span className="font-display text-base font-extrabold uppercase tracking-wide text-sky-500">
+            <span className="font-display text-base font-extrabold uppercase tracking-wide text-sky-600">
               <AppName />
             </span>
           </div>

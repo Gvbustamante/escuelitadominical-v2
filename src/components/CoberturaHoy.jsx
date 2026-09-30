@@ -202,7 +202,7 @@ export default function CoberturaHoy() {
                   ) : !f.algunoPaso ? (
                     <span className="badge bg-ink/5 text-ink/65">⏳ Aún no empieza</span>
                   ) : (
-                    <span className="badge bg-sunshine-100 text-sunshine-700">⏳ Pendiente</span>
+                    <span className="badge bg-sunshine-100 text-sunshine-800">⏳ Pendiente</span>
                   )}
                 </td>
               </tr>

@@ -1,6 +1,6 @@
 import { useConfigIglesia } from '../lib/configIglesia'
 
-export default function AppName({ acentoClassName = 'text-coral-500' }) {
+export default function AppName({ acentoClassName = 'text-coral-600' }) {
   const config = useConfigIglesia()
   const nombre = config?.nombre_iglesia?.trim()
 

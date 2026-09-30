@@ -7,7 +7,7 @@ const ROLE_LABEL = { superadmin: 'Administrador', admin: 'Administrador', coordi
 const ROLE_BADGE = {
   superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',
-  coordinador: 'bg-sunshine-100 text-sunshine-700',
+  coordinador: 'bg-sunshine-100 text-sunshine-800',
   docente: 'bg-sky-100 text-sky-700',
   padre: 'bg-coral-100 text-coral-700',
 }

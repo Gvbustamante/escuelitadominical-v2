@@ -41,7 +41,7 @@ export default function TareaHijoWidget({ actividad, hijo, entrega, onSaved }) {
 
   if (estado === 'pausada') {
     return (
-      <div className="rounded-2xl bg-sunshine-50 px-3 py-2 text-sm font-bold text-sunshine-700">
+      <div className="rounded-2xl bg-sunshine-50 px-3 py-2 text-sm font-bold text-sunshine-800">
         ⏸️ El docente puso esta tarea en pausa para {hijo.nombre_completo.split(' ')[0]}.
       </div>
     )

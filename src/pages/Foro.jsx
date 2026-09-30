@@ -140,13 +140,13 @@ export default function Foro() {
       <div className="flex flex-col gap-6">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <button onClick={() => setSeleccionado(null)} className="mb-2 text-sm font-bold text-sky-500 hover:underline">
+            <button onClick={() => setSeleccionado(null)} className="mb-2 text-sm font-bold text-sky-600 hover:underline">
               ← Volver a Comunidad
             </button>
             <h1 className="text-2xl font-bold">{seleccionado.titulo}</h1>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {seleccionado.evento?.titulo && (
-                <span className="badge bg-sunshine-100 text-sunshine-700">📅 {seleccionado.evento.titulo}</span>
+                <span className="badge bg-sunshine-100 text-sunshine-800">📅 {seleccionado.evento.titulo}</span>
               )}
               <span className={`badge ${seleccionado.privado ? 'bg-grape-100 text-grape-700' : 'bg-grass-100 text-grass-700'}`}>
                 {seleccionado.privado ? '🔒 Privado' : '🌍 Público'}
@@ -157,7 +157,7 @@ export default function Foro() {
                     await cambiarPrivacidadForo(seleccionado)
                     setSeleccionado({ ...seleccionado, privado: !seleccionado.privado })
                   }}
-                  className="text-xs font-bold text-sky-500 hover:underline"
+                  className="text-xs font-bold text-sky-600 hover:underline"
                 >
                   cambiar
                 </button>
@@ -165,7 +165,7 @@ export default function Foro() {
             </div>
           </div>
           {(esStaff || seleccionado.creado_por === user.id) && (
-            <button aria-label="Eliminar foro" title="Eliminar foro" onClick={() => borrarForo(seleccionado.id)} className="text-2xl text-ink/65 hover:text-coral-500">
+            <button aria-label="Eliminar foro" title="Eliminar foro" onClick={() => borrarForo(seleccionado.id)} className="text-2xl text-ink/65 hover:text-coral-600">
               🗑️
             </button>
           )}
@@ -184,7 +184,7 @@ export default function Foro() {
                       <p className="text-xs text-ink/65">{new Date(m.created_at).toLocaleString('es')}</p>
                     </div>
                     {(esStaff || m.autor_id === user.id) && (
-                      <button aria-label="Eliminar mensaje" title="Eliminar mensaje" onClick={() => borrarMensaje(m.id)} className="text-lg text-ink/65 hover:text-coral-500">
+                      <button aria-label="Eliminar mensaje" title="Eliminar mensaje" onClick={() => borrarMensaje(m.id)} className="text-lg text-ink/65 hover:text-coral-600">
                         🗑️
                       </button>
                     )}
@@ -224,7 +224,7 @@ export default function Foro() {
             setTabPrincipal('foro')
             setBusqueda('')
           }}
-          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'foro' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'foro' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           💬 Foro
         </button>
@@ -233,7 +233,7 @@ export default function Foro() {
             setTabPrincipal('oracion')
             setBusqueda('')
           }}
-          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'oracion' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-4 py-2 text-xs font-bold sm:px-5 sm:text-sm ${tabPrincipal === 'oracion' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           🙏 Peticiones de oración
         </button>
@@ -261,7 +261,7 @@ export default function Foro() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-bold">{f.titulo}</h3>
-                    {f.categoria === 'evento' && <span className="badge bg-sunshine-100 text-sunshine-700">📅 Evento</span>}
+                    {f.categoria === 'evento' && <span className="badge bg-sunshine-100 text-sunshine-800">📅 Evento</span>}
                     {f.privado && <span className="badge bg-grape-100 text-grape-700">🔒 Privado</span>}
                   </div>
                   <p className="text-sm text-ink/70">
@@ -295,14 +295,14 @@ export default function Foro() {
                 <button
                   type="button"
                   onClick={() => setFormPeticion({ ...formPeticion, privado: true })}
-                  className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:flex-none sm:px-4 sm:text-sm ${formPeticion.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                  className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:flex-none sm:px-4 sm:text-sm ${formPeticion.privado ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
                 >
                   🔒 Privado (equipo)
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormPeticion({ ...formPeticion, privado: false })}
-                  className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:flex-none sm:px-4 sm:text-sm ${!formPeticion.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                  className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:flex-none sm:px-4 sm:text-sm ${!formPeticion.privado ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
                 >
                   🌍 Público (comunidad)
                 </button>
@@ -326,12 +326,12 @@ export default function Foro() {
                       {p.privado ? '🔒 Privado' : '🌍 Público'}
                     </span>
                     {(esStaff || p.autor_id === user.id) && (
-                      <button onClick={() => cambiarPrivacidad(p)} className="text-sm font-bold text-sky-500 hover:underline">
+                      <button onClick={() => cambiarPrivacidad(p)} className="text-sm font-bold text-sky-600 hover:underline">
                         cambiar
                       </button>
                     )}
                     {(esStaff || p.autor_id === user.id) && (
-                      <button aria-label="Eliminar petición" title="Eliminar petición" onClick={() => borrarPeticion(p.id)} className="text-lg text-ink/65 hover:text-coral-500">
+                      <button aria-label="Eliminar petición" title="Eliminar petición" onClick={() => borrarPeticion(p.id)} className="text-lg text-ink/65 hover:text-coral-600">
                         🗑️
                       </button>
                     )}
@@ -364,14 +364,14 @@ export default function Foro() {
               <button
                 type="button"
                 onClick={() => setForm({ ...form, categoria: 'general' })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.categoria === 'general' ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.categoria === 'general' ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
               >
                 General
               </button>
               <button
                 type="button"
                 onClick={() => setForm({ ...form, categoria: 'evento' })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.categoria === 'evento' ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.categoria === 'evento' ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
               >
                 De un evento
               </button>
@@ -396,14 +396,14 @@ export default function Foro() {
               <button
                 type="button"
                 onClick={() => setForm({ ...form, privado: false })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${!form.privado ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
               >
                 🌍 Público (toda la comunidad)
               </button>
               <button
                 type="button"
                 onClick={() => setForm({ ...form, privado: true })}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.privado ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${form.privado ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
               >
                 🔒 Privado (solo el equipo)
               </button>

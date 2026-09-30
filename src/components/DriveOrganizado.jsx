@@ -444,7 +444,7 @@ export default function DriveOrganizado() {
             </button>
           )}
           {seleccion.size > 0 && (
-            <button onClick={descargarSeleccionados} className="rounded-xl bg-sky-400 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-500">
+            <button onClick={descargarSeleccionados} className="rounded-xl bg-sky-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-700">
               📥 Descargar {seleccion.size} como ZIP
             </button>
           )}
@@ -543,7 +543,7 @@ function FolderCard({ folder, onClick, onDownload }) {
       <div className="relative">
         <FolderIcon color={colors.fill} />
         {folder.count > 0 && (
-          <span className="absolute -right-2 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-sky-400 px-1 text-xs font-extrabold text-white">
+          <span className="absolute -right-2 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-sky-600 px-1 text-xs font-extrabold text-white">
             {folder.count}
           </span>
         )}
@@ -590,7 +590,7 @@ function FileCard({ archivo, selected, onToggle, onPreview, onDownload, onOpenLi
         {onToggle && (
           <div
             onClick={(e) => { e.stopPropagation(); onToggle() }}
-            className={`absolute left-2 top-2 flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg border-2 text-xs font-bold transition-all ${selected ? 'border-sky-400 bg-sky-400 text-white' : 'border-white/80 bg-white/70 text-transparent hover:border-sky-300'}`}
+            className={`absolute left-2 top-2 flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg border-2 text-xs font-bold transition-all ${selected ? 'border-sky-400 bg-sky-600 text-white' : 'border-white/80 bg-white/70 text-transparent hover:border-sky-300'}`}
           >
             {selected ? '✓' : ''}
           </div>

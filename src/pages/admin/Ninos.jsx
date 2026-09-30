@@ -394,7 +394,7 @@ export default function Ninos() {
                 <button
                   key={v}
                   onClick={() => setFiltro(v)}
-                  className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+                  className={`rounded-full px-4 py-2 text-sm font-bold ${filtro === v ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
                 >
                   {label}
                 </button>
@@ -448,7 +448,7 @@ export default function Ninos() {
                             </span>
                           )}
                           {nino.alergias && (
-                            <span className="text-xs text-coral-500" title={nino.alergias}>⚠️</span>
+                            <span className="text-xs text-coral-600" title={nino.alergias}>⚠️</span>
                           )}
                           {!nino.activo && (
                             <span className="rounded-full bg-coral-100 px-1.5 py-0.5 text-xs font-bold leading-none text-coral-700">Inactivo</span>
@@ -481,16 +481,16 @@ export default function Ninos() {
                       </div>
 
                       <div className="flex shrink-0 items-center gap-0.5">
-                        <button aria-label="Detalle" className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => setDetalleNino(nino)} title="Detalle">
+                        <button aria-label="Detalle" className="rounded-lg p-1.5 text-xs text-sky-600 hover:bg-sky-100" onClick={() => setDetalleNino(nino)} title="Detalle">
                           👁️
                         </button>
                         {puedeEditar && (!esDocente || misNivelIds?.has(nino.nivel_id)) && (
-                          <button aria-label="Editar" className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => openEdit(nino)} title="Editar">
+                          <button aria-label="Editar" className="rounded-lg p-1.5 text-xs text-sky-600 hover:bg-sky-100" onClick={() => openEdit(nino)} title="Editar">
                             ✏️
                           </button>
                         )}
                         {puedeVincularPadre && (!esDocente || misNivelIds?.has(nino.nivel_id)) && (
-                          <button aria-label="Vincular padre" className="rounded-lg p-1.5 text-xs text-sky-500 hover:bg-sky-100" onClick={() => openInvite(nino)} title="Vincular padre">
+                          <button aria-label="Vincular padre" className="rounded-lg p-1.5 text-xs text-sky-600 hover:bg-sky-100" onClick={() => openInvite(nino)} title="Vincular padre">
                             👪
                           </button>
                         )}
@@ -531,7 +531,7 @@ export default function Ninos() {
                   type="button"
                   key={v}
                   onClick={() => setForm({ ...form, sexo: v })}
-                  className={`flex-1 rounded-full px-3 py-2 text-sm font-bold ${form.sexo === v ? (v === 'M' ? 'bg-sky-400 text-white' : 'bg-coral-400 text-white') : 'bg-ink/5'}`}
+                  className={`flex-1 rounded-full px-3 py-2 text-sm font-bold ${form.sexo === v ? (v === 'M' ? 'bg-sky-600 text-white' : 'bg-coral-600 text-white') : 'bg-ink/5'}`}
                 >
                   {label}
                 </button>
@@ -630,14 +630,14 @@ export default function Ninos() {
               <button
                 type="button"
                 onClick={() => setModoVinculo('nueva')}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${modoVinculo === 'nueva' ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${modoVinculo === 'nueva' ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
               >
                 Crear cuenta nueva
               </button>
               <button
                 type="button"
                 onClick={() => setModoVinculo('existente')}
-                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${modoVinculo === 'existente' ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+                className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${modoVinculo === 'existente' ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
               >
                 Ya tiene cuenta
               </button>

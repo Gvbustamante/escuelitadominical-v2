@@ -105,7 +105,7 @@ export default function ConfigEstrellas() {
                   {m.activo ? 'Ocultar' : 'Mostrar'}
                 </button>
                 <button
-                  className="text-xs font-bold text-coral-500 hover:underline"
+                  className="text-xs font-bold text-coral-600 hover:underline"
                   onClick={() => setConfirmBorrar({ tipo: 'motivo', item: m })}
                 >
                   Borrar
@@ -170,7 +170,7 @@ export default function ConfigEstrellas() {
                   <span>⭐</span>
                 </div>
                 <button
-                  className="shrink-0 text-xs font-bold text-coral-500 hover:underline"
+                  className="shrink-0 text-xs font-bold text-coral-600 hover:underline"
                   onClick={() => setConfirmBorrar({ tipo: 'nivel', item: n })}
                 >
                   Borrar

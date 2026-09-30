@@ -22,7 +22,7 @@ function MotivoChips({ motivos, onElegir, onCancelar, busy, titulo }) {
     <div className="flex flex-col gap-2 rounded-2xl bg-sunshine-50 p-3 ring-1 ring-sunshine-200">
       <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-800">{titulo}</p>
       <div className="flex flex-wrap gap-2">
-        <button type="button" disabled={busy} onClick={() => onElegir(null)} className="rounded-full bg-sunshine-400 px-3 py-2 text-sm font-bold text-white hover:bg-sunshine-500 disabled:opacity-50">
+        <button type="button" disabled={busy} onClick={() => onElegir(null)} className="rounded-full bg-sunshine-400 px-3 py-2 text-sm font-bold text-ink hover:bg-sunshine-500 disabled:opacity-50">
           ⭐ Dar estrella
         </button>
         {motivos.map((m) => (
@@ -321,7 +321,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
                         aria-pressed={presente}
                         aria-label={`${presente ? 'Quitar presente a' : 'Marcar presente a'} ${n.nombre_completo}`}
                         className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg font-bold shadow-pop transition-all active:translate-y-0.5 active:shadow-none ${
-                          presente ? 'bg-grass-400 text-white ring-2 ring-grass-200' : 'bg-white text-ink/65 ring-2 ring-ink/10 hover:ring-ink/20'
+                          presente ? 'bg-grass-600 text-white ring-2 ring-grass-200' : 'bg-white text-ink/65 ring-2 ring-ink/10 hover:ring-ink/20'
                         } ${bloqueado ? 'cursor-not-allowed opacity-60' : ''}`}
                       >
                         {presente ? '✓' : ''}
@@ -340,7 +340,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
                             <span>{stars} ⭐</span>
                             {hoy > 0 && (
                               <>
-                                <span className="font-bold text-sunshine-700">+{hoy} hoy</span>
+                                <span className="font-bold text-sunshine-800">+{hoy} hoy</span>
                                 <button type="button" onClick={() => deshacerEstrella(n.id)} className="font-bold text-ink/65 underline" aria-label={`Quitar la última estrella de ${n.nombre_completo}`}>
                                   deshacer
                                 </button>

@@ -147,7 +147,7 @@ export default function DevocionalDetalle() {
                 {devocional.activo && <span className="badge bg-sunshine-200 text-sunshine-800">🟢 Activo</span>}
               </div>
               {devocional.nivel?.nombre && (
-                <p className="mt-1 text-sm font-bold uppercase text-sky-500">{devocional.nivel.nombre}</p>
+                <p className="mt-1 text-sm font-bold uppercase text-sky-600">{devocional.nivel.nombre}</p>
               )}
             </div>
             <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/70">{devocional.fecha}</span>
@@ -327,7 +327,7 @@ export default function DevocionalDetalle() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold">{d.titulo}</p>
                       {d.versiculo && <p className="truncate text-xs italic text-ink/70">&ldquo;{d.versiculo}&rdquo;</p>}
-                      <p className="mt-0.5 text-xs font-bold text-coral-500">{d.devocional_reacciones?.length || 0} ❤️</p>
+                      <p className="mt-0.5 text-xs font-bold text-coral-600">{d.devocional_reacciones?.length || 0} ❤️</p>
                     </div>
                   </button>
                 ))}
@@ -352,7 +352,7 @@ export default function DevocionalDetalle() {
 function Breadcrumb({ navigate, titulo }) {
   return (
     <nav className="flex items-center gap-1.5 text-sm">
-      <button onClick={() => navigate('/devocionales')} className="font-bold text-sky-500 hover:underline">
+      <button onClick={() => navigate('/devocionales')} className="font-bold text-sky-600 hover:underline">
         Devocionales
       </button>
       {titulo && (

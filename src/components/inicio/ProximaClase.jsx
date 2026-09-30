@@ -7,9 +7,9 @@ import PrepararClaseModal from '../PrepararClaseModal'
 
 const STRIPE = { sky: 'border-l-sky-400', grass: 'border-l-grass-400', sunshine: 'border-l-sunshine-400', coral: 'border-l-coral-400', grape: 'border-l-grape-400' }
 const PASOS = [
-  { key: 'e', letra: 'E', nombre: 'Enseñanza', on: 'bg-sunshine-400 text-white' },
-  { key: 'a', letra: 'A', nombre: 'Actividad', on: 'bg-grass-400 text-white' },
-  { key: 'p', letra: 'P', nombre: 'Planeación', on: 'bg-coral-400 text-white' },
+  { key: 'e', letra: 'E', nombre: 'Enseñanza', on: 'bg-sunshine-400 text-ink' },
+  { key: 'a', letra: 'A', nombre: 'Actividad', on: 'bg-grass-600 text-white' },
+  { key: 'p', letra: 'P', nombre: 'Planeación', on: 'bg-grape-500 text-white' },
 ]
 
 /** Próximo día de clase desde hoy (incluye hoy). Sin días configurados: null. */
@@ -105,7 +105,7 @@ export default function ProximaClase({ nivelIds, userId, puedePreparar = true })
         <div>
           <h2 id="proxima-clase" className="text-lg font-bold">📅 Próxima clase · <span className="capitalize">{fechaTxt}</span></h2>
           <p className="text-sm text-ink/70">
-            <span className={`mr-2 rounded-full px-2 py-0.5 text-xs font-extrabold ${esHoy ? 'bg-grass-400 text-white' : 'bg-white text-sky-700'}`}>{cuando(datos.fecha, hoy)}</span>
+            <span className={`mr-2 rounded-full px-2 py-0.5 text-xs font-extrabold ${esHoy ? 'bg-grass-600 text-white' : 'bg-white text-sky-700'}`}>{cuando(datos.fecha, hoy)}</span>
             {datos.niveles.length === 0 ? 'Sin niveles' : sinPreparar === 0 ? 'Todos los niveles están listos ✅' : `${sinPreparar} de ${datos.niveles.length} nivel${datos.niveles.length === 1 ? '' : 'es'} por preparar`}
           </p>
         </div>

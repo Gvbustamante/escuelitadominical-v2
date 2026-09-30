@@ -16,7 +16,7 @@ const ROLE_LABEL = { superadmin: 'Administrador', admin: 'Administrador', coordi
 const ROLE_BADGE = {
   superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',
-  coordinador: 'bg-sunshine-100 text-sunshine-700',
+  coordinador: 'bg-sunshine-100 text-sunshine-800',
   docente: 'bg-sky-100 text-sky-700',
   padre: 'bg-coral-100 text-coral-700',
 }
@@ -203,13 +203,13 @@ export default function Docentes() {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setVista('todos')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'todos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'todos' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           📋 Todas las cuentas
         </button>
         <button
           onClick={() => setVista('docentes')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'docentes' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'docentes' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           🍎 Docentes
         </button>
@@ -248,7 +248,7 @@ export default function Docentes() {
                     key={v}
                     onClick={() => setFiltroRol(v)}
                     className={`rounded-full px-3 py-1.5 text-xs font-bold sm:px-4 sm:text-sm ${
-                      filtroRol === v ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'
+                      filtroRol === v ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'
                     }`}
                   >
                     {label}
@@ -427,7 +427,7 @@ export default function Docentes() {
                         type="button"
                         aria-pressed={on}
                         onClick={() => toggleNivel(n.id)}
-                        className={`rounded-full px-3 py-2 text-sm font-bold transition-colors ${on ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/75 hover:bg-sky-50'}`}
+                        className={`rounded-full px-3 py-2 text-sm font-bold transition-colors ${on ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/75 hover:bg-sky-50'}`}
                       >
                         {on ? '✓ ' : ''}{n.nombre}
                       </button>

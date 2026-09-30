@@ -27,7 +27,7 @@ export const ICONOS = {
 // Color por sección del menú: ayuda a reconocer dónde está cada cosa.
 export const COLOR_SECCION = {
   inicio: 'bg-coral-100 text-coral-600',
-  'Enseñanza': 'bg-sunshine-100 text-sunshine-700',
+  'Enseñanza': 'bg-sunshine-100 text-sunshine-800',
   'Día de clase': 'bg-grass-100 text-grass-700',
   Personas: 'bg-sky-100 text-sky-700',
   Comunidad: 'bg-grape-100 text-grape-700',

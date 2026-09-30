@@ -36,7 +36,7 @@ export default function RewardsPanel({ estrellas, recientes = [], onAward, busy 
           {badge.emoji}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-700">Insignia actual</p>
+          <p className="text-xs font-extrabold uppercase tracking-wide text-sunshine-800">Insignia actual</p>
           <p className="truncate text-lg font-extrabold text-ink">{badge.nombre}</p>
           <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-white">
             <div
@@ -54,7 +54,7 @@ export default function RewardsPanel({ estrellas, recientes = [], onAward, busy 
       </div>
 
       {onAward && !pickerOpen && (
-        <button onClick={() => setPickerOpen(true)} className="btn-primary mt-4 w-full justify-center !bg-sunshine-500 hover:!bg-sunshine-600">
+        <button onClick={() => setPickerOpen(true)} className="btn-primary mt-4 w-full justify-center !bg-sunshine-400 !text-ink hover:!bg-sunshine-300">
           ⭐ Dar una estrella
         </button>
       )}
@@ -72,7 +72,7 @@ export default function RewardsPanel({ estrellas, recientes = [], onAward, busy 
                   setMotivoLibre('')
                 }}
                 className={`rounded-full px-3 py-2 text-sm font-bold ${
-                  motivoElegido === m.texto ? 'bg-sunshine-400 text-white' : 'bg-ink/5'
+                  motivoElegido === m.texto ? 'bg-sunshine-400 text-ink' : 'bg-ink/5'
                 }`}
               >
                 {m.emoji} {m.texto}
@@ -101,7 +101,7 @@ export default function RewardsPanel({ estrellas, recientes = [], onAward, busy 
             >
               Cancelar
             </button>
-            <button disabled={busy} onClick={confirmarEstrella} className="btn-primary flex-1 !py-2 !text-sm justify-center !bg-sunshine-500 hover:!bg-sunshine-600">
+            <button disabled={busy} onClick={confirmarEstrella} className="btn-primary flex-1 !py-2 !text-sm justify-center !bg-sunshine-400 !text-ink hover:!bg-sunshine-300">
               {busy ? 'Guardando...' : '⭐ Confirmar'}
             </button>
           </div>

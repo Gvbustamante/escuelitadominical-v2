@@ -7,7 +7,7 @@ const ROLE_LABEL = { superadmin: 'Administrador', admin: 'Administrador', coordi
 const ROLE_BADGE = {
   superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',
-  coordinador: 'bg-sunshine-100 text-sunshine-700',
+  coordinador: 'bg-sunshine-100 text-sunshine-800',
   docente: 'bg-sky-100 text-sky-700',
   padre: 'bg-coral-100 text-coral-700',
 }
@@ -83,7 +83,7 @@ export default function PermisosTab() {
               onClick={() => toggle(p.rol, p.permiso)}
               disabled={busyKey === key}
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold transition-colors ${
-                activo ? 'bg-grass-400 text-white' : 'bg-ink/10 text-ink/70'
+                activo ? 'bg-grass-600 text-white' : 'bg-ink/10 text-ink/70'
               }`}
             >
               {busyKey === key ? '...' : activo ? '✅ Activado' : 'Desactivado'}

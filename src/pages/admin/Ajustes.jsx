@@ -220,32 +220,32 @@ export default function Ajustes() {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setTab('general')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'general' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'general' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           General
         </button>
         <button
           onClick={() => setTab('cuenta')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'cuenta' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'cuenta' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           Mi cuenta
         </button>
         <button
           onClick={() => setTab('ayuda')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'ayuda' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'ayuda' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           Ayuda
         </button>
         <button
           onClick={() => setTab('estrellas')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'estrellas' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'estrellas' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           🌟 Estrellas
         </button>
         {profile.role === 'superadmin' && (
           <button
             onClick={() => setTab('modulos')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'modulos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'modulos' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
           >
             📦 Módulos
           </button>
@@ -253,7 +253,7 @@ export default function Ajustes() {
         {profile.role === 'superadmin' && (
           <button
             onClick={() => setTab('menu')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'menu' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'menu' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
           >
             📋 Menú
           </button>
@@ -261,7 +261,7 @@ export default function Ajustes() {
         {['superadmin', 'admin'].includes(profile.role) && (
           <button
             onClick={() => setTab('permisos')}
-            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'permisos' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'permisos' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
           >
             Roles y permisos
           </button>
@@ -307,7 +307,7 @@ export default function Ajustes() {
                     type="button"
                     onClick={handleQuitarLogo}
                     disabled={busy}
-                    className="text-sm font-bold text-coral-500 hover:underline"
+                    className="text-sm font-bold text-coral-600 hover:underline"
                   >
                     Quitar logo y usar el ícono por defecto
                   </button>
@@ -404,7 +404,7 @@ export default function Ajustes() {
                       type="button"
                       onClick={() => toggleDiaClase(d.dia_semana)}
                       className={`rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${
-                        activo ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/70'
+                        activo ? 'bg-sky-600 text-white' : 'bg-ink/5 text-ink/70'
                       }`}
                     >
                       {d.label}

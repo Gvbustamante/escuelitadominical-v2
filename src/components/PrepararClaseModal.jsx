@@ -149,7 +149,7 @@ export default function PrepararClaseModal({ open, onClose, nivel, fecha, userId
                 aria-selected={activo}
                 onClick={() => { setPaso(p.key); setError('') }}
                 className={`flex flex-col items-center gap-0.5 rounded-2xl px-2 py-2 text-sm font-bold transition-colors ${
-                  activo ? 'bg-sky-400 text-white shadow-pop' : hecho[p.key] ? 'bg-grass-50 text-grass-800' : 'bg-ink/5 text-ink/75 hover:bg-sky-50'
+                  activo ? 'bg-sky-600 text-white shadow-pop' : hecho[p.key] ? 'bg-grass-50 text-grass-800' : 'bg-ink/5 text-ink/75 hover:bg-sky-50'
                 }`}
               >
                 <span className="text-base">{hecho[p.key] ? '✅' : p.num}</span>
@@ -215,7 +215,7 @@ export default function PrepararClaseModal({ open, onClose, nivel, fecha, userId
                 <label className="label">¿Para quién?</label>
                 <div className="flex gap-2">
                   {[[false, `Solo ${nivel?.nombre || 'este nivel'}`], [true, 'Todos los niveles']].map(([v, t]) => (
-                    <button key={String(v)} type="button" onClick={() => setFormDevo({ ...formDevo, paraTodos: v })} className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${formDevo.paraTodos === v ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}>
+                    <button key={String(v)} type="button" onClick={() => setFormDevo({ ...formDevo, paraTodos: v })} className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${formDevo.paraTodos === v ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}>
                       {t}
                     </button>
                   ))}
@@ -251,7 +251,7 @@ export default function PrepararClaseModal({ open, onClose, nivel, fecha, userId
             </div>
             <div className="flex gap-2">
               {[[false, 'Solo informativa'], [true, '📝 Es una tarea']].map(([v, t]) => (
-                <button key={String(v)} type="button" onClick={() => setFormAct({ ...formAct, es_tarea: v })} className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${formAct.es_tarea === v ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}>
+                <button key={String(v)} type="button" onClick={() => setFormAct({ ...formAct, es_tarea: v })} className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${formAct.es_tarea === v ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}>
                   {t}
                 </button>
               ))}

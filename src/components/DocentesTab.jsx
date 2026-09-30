@@ -8,7 +8,7 @@ const ROLE_LABEL = { superadmin: 'Admin', admin: 'Admin', coordinador: 'Coordina
 const ROLE_BADGE = {
   superadmin: 'bg-grape-100 text-grape-700',
   admin: 'bg-grape-100 text-grape-700',
-  coordinador: 'bg-sunshine-100 text-sunshine-700',
+  coordinador: 'bg-sunshine-100 text-sunshine-800',
   docente: 'bg-sky-100 text-sky-700',
 }
 
@@ -116,7 +116,7 @@ export default function DocentesTab({ usuarios, clasesPorDocente, onReload, miRo
                   {u.email && (
                     <div className="flex items-center gap-2 text-ink/75">
                       <span className="shrink-0">📧</span>
-                      <a href={`mailto:${u.email}`} className="truncate hover:text-sky-500">{u.email}</a>
+                      <a href={`mailto:${u.email}`} className="truncate hover:text-sky-600">{u.email}</a>
                     </div>
                   )}
                   {(u.whatsapp || u.telefono) && (
@@ -217,7 +217,7 @@ export default function DocentesTab({ usuarios, clasesPorDocente, onReload, miRo
                   <button
                     type="button"
                     onClick={quitarHojaVida}
-                    className="text-xs font-bold text-coral-500 hover:underline"
+                    className="text-xs font-bold text-coral-600 hover:underline"
                   >
                     Quitar
                   </button>

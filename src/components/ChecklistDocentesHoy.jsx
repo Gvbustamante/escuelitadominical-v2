@@ -156,7 +156,7 @@ export default function ChecklistDocentesHoy() {
                   </span>
                 )}
                 {doc.progs.length > 0 && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-sunshine-100 px-2 py-1 text-xs font-bold text-sunshine-700">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-sunshine-100 px-2 py-1 text-xs font-bold text-sunshine-800">
                     🌱 {doc.progs.length} nota{doc.progs.length !== 1 ? 's' : ''}
                   </span>
                 )}

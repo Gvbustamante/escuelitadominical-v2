@@ -1,9 +1,9 @@
 const COLORES_AVATAR = [
-  'bg-sky-400 text-white',
-  'bg-coral-400 text-white',
-  'bg-grape-400 text-white',
-  'bg-sunshine-400 text-white',
-  'bg-grass-400 text-white',
+  'bg-sky-600 text-white',
+  'bg-coral-600 text-white',
+  'bg-grape-500 text-white',
+  'bg-sunshine-400 text-ink',
+  'bg-grass-600 text-white',
 ]
 
 const TAMANOS = {

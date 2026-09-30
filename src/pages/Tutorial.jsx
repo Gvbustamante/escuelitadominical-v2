@@ -236,7 +236,7 @@ function RolesTab({ role }) {
   const badge = {
     sky: 'bg-sky-100 text-sky-700',
     grass: 'bg-grass-100 text-grass-700',
-    sunshine: 'bg-sunshine-100 text-sunshine-700',
+    sunshine: 'bg-sunshine-100 text-sunshine-800',
     coral: 'bg-coral-100 text-coral-700',
     grape: 'bg-grape-100 text-grape-700',
   }
@@ -292,13 +292,13 @@ export function AyudaContenido() {
       <div className="flex gap-2">
         <button
           onClick={() => setTab('guia')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'guia' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'guia' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           Guía paso a paso
         </button>
         <button
           onClick={() => setTab('roles')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'roles' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'roles' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           ¿Qué hace cada rol?
         </button>
@@ -335,7 +335,7 @@ export function AyudaContenido() {
             </a>
             <p className="text-sm text-ink/75">
               Creado por{' '}
-              <a href="https://gobeapp.com/gise/" target="_blank" rel="noreferrer" className="font-bold text-coral-500 hover:underline">
+              <a href="https://gobeapp.com/gise/" target="_blank" rel="noreferrer" className="font-bold text-coral-600 hover:underline">
                 Gisella Bustamante
               </a>
             </p>

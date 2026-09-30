@@ -121,14 +121,14 @@ export default function BitacoraAdmin() {
         <button
           type="button"
           onClick={() => setTab('bitacora')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'bitacora' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'bitacora' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           📋 Bitácora
         </button>
         <button
           type="button"
           onClick={() => setTab('materiales')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'materiales' ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
+          className={`rounded-full px-5 py-2 text-sm font-bold ${tab === 'materiales' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
         >
           🧰 Materiales
         </button>
@@ -160,10 +160,10 @@ export default function BitacoraAdmin() {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="font-bold">{fecha}</p>
                     <div className="flex gap-2">
-                      <span className={`badge ${antes ? 'bg-grass-100 text-grass-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
+                      <span className={`badge ${antes ? 'bg-grass-100 text-grass-700' : 'bg-sunshine-100 text-sunshine-800'}`}>
                         {antes ? '✅' : '⏳'} Antes de clase
                       </span>
-                      <span className={`badge ${despues ? 'bg-grass-100 text-grass-700' : 'bg-sunshine-100 text-sunshine-700'}`}>
+                      <span className={`badge ${despues ? 'bg-grass-100 text-grass-700' : 'bg-sunshine-100 text-sunshine-800'}`}>
                         {despues ? '✅' : '⏳'} Después de clase
                       </span>
                     </div>
@@ -365,13 +365,13 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
             key={m.value}
             type="button"
             onClick={() => setMomento(m.value)}
-            className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${momento === m.value ? 'bg-sky-400 text-white' : 'bg-ink/5'}`}
+            className={`flex-1 rounded-chunky px-3 py-2 text-sm font-bold ${momento === m.value ? 'bg-sky-600 text-white' : 'bg-ink/5'}`}
           >
             {m.label}
           </button>
         ))}
       </div>
-      {registro && <p className="text-xs font-bold text-sunshine-700">Ya hay una bitácora de "{meta.label}" para esta clase y fecha — se va a actualizar.</p>}
+      {registro && <p className="text-xs font-bold text-sunshine-800">Ya hay una bitácora de "{meta.label}" para esta clase y fecha — se va a actualizar.</p>}
 
       <div>
         <label className="label">{meta.pregunta}</label>
@@ -379,14 +379,14 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
           <button
             type="button"
             onClick={() => setSalonOk(true)}
-            className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${salonOk ? 'bg-grass-400 text-white' : 'bg-ink/5'}`}
+            className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${salonOk ? 'bg-grass-600 text-white' : 'bg-ink/5'}`}
           >
             ✅ En buen estado
           </button>
           <button
             type="button"
             onClick={() => setSalonOk(false)}
-            className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${!salonOk ? 'bg-coral-400 text-white' : 'bg-ink/5'}`}
+            className={`flex-1 rounded-full px-3 py-2 text-xs font-bold sm:px-4 sm:text-sm ${!salonOk ? 'bg-coral-600 text-white' : 'bg-ink/5'}`}
           >
             ⚠️ Hubo daños
           </button>

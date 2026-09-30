@@ -9,9 +9,9 @@ const STRIPE = {
 }
 
 const ESTADOS = [
-  { key: 'ensenanza', letra: 'E', nombre: 'Enseñanza', on: 'bg-sunshine-400 text-white' },
-  { key: 'actividad', letra: 'A', nombre: 'Actividad', on: 'bg-grass-400 text-white' },
-  { key: 'planeacion', letra: 'P', nombre: 'Planeación', on: 'bg-coral-400 text-white' },
+  { key: 'ensenanza', letra: 'E', nombre: 'Enseñanza', on: 'bg-sunshine-400 text-ink' },
+  { key: 'actividad', letra: 'A', nombre: 'Actividad', on: 'bg-grass-600 text-white' },
+  { key: 'planeacion', letra: 'P', nombre: 'Planeación', on: 'bg-grape-500 text-white' },
 ]
 
 function corto(nombre) {

@@ -58,7 +58,7 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
 
       {/* Actions */}
       <div className="flex shrink-0 items-center gap-2">
-        <span className="text-xs font-bold text-coral-500">{a.actividad_reacciones?.length || 0} ❤️</span>
+        <span className="text-xs font-bold text-coral-600">{a.actividad_reacciones?.length || 0} ❤️</span>
         <div className="flex items-center gap-1.5">
           {a.es_tarea && onVerEntregas && (
             <button className="btn-secondary !py-1 !px-2 !text-xs" onClick={() => onVerEntregas(a)}>
@@ -71,12 +71,12 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
             </button>
           )}
           {onEdit && (
-            <button aria-label="Editar" onClick={() => onEdit(a)} className="text-lg text-ink/65 hover:text-sky-500" title="Editar">
+            <button aria-label="Editar" onClick={() => onEdit(a)} className="text-lg text-ink/65 hover:text-sky-600" title="Editar">
               ✏️
             </button>
           )}
           {onDelete && (
-            <button aria-label="Eliminar" onClick={() => onDelete(a.id)} className="text-lg text-ink/65 hover:text-coral-500" title="Eliminar">
+            <button aria-label="Eliminar" onClick={() => onDelete(a.id)} className="text-lg text-ink/65 hover:text-coral-600" title="Eliminar">
               🗑️
             </button>
           )}
