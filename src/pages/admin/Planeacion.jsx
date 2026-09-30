@@ -9,6 +9,8 @@ import PlaneacionClaseModal, { urlPdfPlaneacion } from '../../components/Planeac
 import RichTextView from '../../components/RichTextView'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 import EmptyState from '../../components/EmptyState'
+import PrepararClaseModal from '../../components/PrepararClaseModal'
+import CronogramaNiveles from '../../components/CronogramaNiveles'
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -16,6 +18,15 @@ const MESES = [
 ]
 const DIAS = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
 
+function sumarDias(iso, n) {
+  const d = new Date(iso + 'T00:00:00')
+  d.setDate(d.getDate() + n)
+  return toISO(d.getFullYear(), d.getMonth(), d.getDate())
+}
+function inicioSemana(iso) {
+  const d = new Date(iso + 'T00:00:00')
+  return sumarDias(iso, -d.getDay())
+}
 function toISO(y, m, d) {
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
 }
@@ -62,6 +73,9 @@ export default function Planeacion() {
   const [selectedDay, setSelectedDay] = useState(null)
 
   const [vista, setVista] = useState('calendario')
+  const [escala, setEscala] = useState('mes') // 'mes' | 'semana'
+  const [semanaIni, setSemanaIni] = useState(() => inicioSemana(hoyISO()))
+  const [preparar, setPreparar] = useState(null) // { nivel, fecha }
   const [modalActividad, setModalActividad] = useState(null)
   const [form, setForm] = useState({ titulo: '', descripcion: '', versiculo_clave: '', historia_biblica: '', visible_padres: true, es_tarea: false })
   const [busy, setBusy] = useState(false)
@@ -92,33 +106,82 @@ export default function Planeacion() {
   const { year, month } = cursor
   const inicioMes = toISO(year, month, 1)
   const finMes = toISO(year, month, new Date(year, month + 1, 0).getDate())
+  const inicioRango = escala === 'semana' ? semanaIni : inicioMes
+  const finRango = escala === 'semana' ? sumarDias(semanaIni, 6) : finMes
+  const fechasRango = useMemo(() => {
+    const out = []
+    for (let f = inicioRango; f <= finRango; f = sumarDias(f, 1)) out.push(f)
+    return out
+  }, [inicioRango, finRango])
+
+  function irA(delta) {
+    if (escala === 'semana') {
+      const nueva = sumarDias(semanaIni, 7 * delta)
+      setSemanaIni(nueva)
+      const d = new Date(nueva + 'T00:00:00')
+      setCursor({ year: d.getFullYear(), month: d.getMonth() })
+    } else {
+      setCursor((c) => {
+        const m = c.month + delta
+        return { year: c.year + Math.floor(m / 12), month: ((m % 12) + 12) % 12 }
+      })
+    }
+  }
+  function irAHoy() {
+    const h = new Date()
+    setCursor({ year: h.getFullYear(), month: h.getMonth() })
+    setSemanaIni(inicioSemana(hoyISO()))
+  }
+  function cambiarEscala(e) {
+    setEscala(e)
+    // Al pasar a semana, mostrar la semana de hoy si es este mes, o la primera del mes visible.
+    if (e === 'semana') {
+      const hoyStr = hoyISO()
+      setSemanaIni(hoyStr >= inicioMes && hoyStr <= finMes ? inicioSemana(hoyStr) : inicioSemana(inicioMes))
+    }
+  }
+  const tituloRango =
+    escala === 'semana'
+      ? `${new Date(inicioRango + 'T00:00:00').toLocaleDateString('es', { day: 'numeric', month: 'short' })} – ${new Date(finRango + 'T00:00:00').toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}`
+      : `${MESES[month]} ${year}`
 
   const loadMes = useCallback(async () => {
     const [{ data: acts }, { data: devos }, { data: cob }, { data: plans }] = await Promise.all([
-      supabase.from('actividades').select('id, nivel_id, fecha, titulo').gte('fecha', inicioMes).lte('fecha', finMes),
-      supabase.from('devocionales_ninos').select('id, nivel_id, fecha, titulo, versiculo').gte('fecha', inicioMes).lte('fecha', finMes),
+      supabase.from('actividades').select('id, nivel_id, fecha, titulo').gte('fecha', inicioRango).lte('fecha', finRango),
+      supabase.from('devocionales_ninos').select('id, nivel_id, fecha, titulo, versiculo').gte('fecha', inicioRango).lte('fecha', finRango),
       supabase
         .from('cobertura_dia')
         .select('*, docente:profiles(nombre_completo)')
-        .gte('fecha', inicioMes)
-        .lte('fecha', finMes),
+        .gte('fecha', inicioRango)
+        .lte('fecha', finRango),
       supabase
         .from('planeacion_clase')
         .select('id, nivel_id, fecha, contenido, pdf_path, pdf_nombre, updated_at, autor:profiles(nombre_completo)')
-        .gte('fecha', inicioMes)
-        .lte('fecha', finMes),
+        .gte('fecha', inicioRango)
+        .lte('fecha', finRango),
     ])
     setPlaneacionesMes(plans || [])
     setActividadesMes(acts || [])
     setDevocionalesMes(devos || [])
     setCoberturaMes(cob || [])
-  }, [inicioMes, finMes])
+  }, [inicioRango, finRango])
 
   useEffect(() => {
     loadMes()
   }, [loadMes])
 
   const diasClaseSet = useMemo(() => new Set((diasClase || []).filter((d) => d.activo).map((d) => d.dia_semana)), [diasClase])
+
+  // Menos clics: si el día elegido no está en el rango visible, elegir solo el próximo día de clase.
+  useEffect(() => {
+    if (!diasClase || fechasRango.length === 0) return
+    if (selectedDay && fechasRango.includes(selectedDay)) return
+    const esClase = (f) => diasClaseSet.size === 0 || diasClaseSet.has(new Date(f + 'T00:00:00').getDay())
+    const hoyStr = hoyISO()
+    const clases = fechasRango.filter(esClase)
+    const proximo = clases.find((f) => f >= hoyStr) || clases[clases.length - 1]
+    if (proximo) setSelectedDay(proximo)
+  }, [diasClase, diasClaseSet, fechasRango, selectedDay])
 
   const nivelesVisibles = useMemo(() => {
     if (!esDocente) return niveles
@@ -135,9 +198,8 @@ export default function Planeacion() {
   const resumenMes = useMemo(() => {
     let planeadas = 0
     let sinPlanear = 0
-    for (let d = 1; d <= diasEnMes; d++) {
-      const iso = toISO(year, month, d)
-      const diaSem = new Date(year, month, d).getDay()
+    for (const iso of fechasRango) {
+      const diaSem = new Date(iso + 'T00:00:00').getDay()
       if (!diasClaseSet.has(diaSem)) continue
       const tieneContenido =
         actividadesMes.some((a) => a.fecha === iso) ||
@@ -147,7 +209,7 @@ export default function Planeacion() {
       else sinPlanear++
     }
     return { planeadas, sinPlanear }
-  }, [actividadesMes, devocionalesMes, planeacionesMes, diasClaseSet, diasEnMes, year, month])
+  }, [actividadesMes, devocionalesMes, planeacionesMes, diasClaseSet, fechasRango])
 
   function openActividad(nivel, actividadExistente) {
     setModalActividad({ nivel, actividad: actividadExistente })
@@ -232,7 +294,7 @@ export default function Planeacion() {
         <p className="text-ink/70">Organiza las clases: quién enseña, qué se enseña y cuándo</p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setVista('calendario')}
           className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'calendario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
@@ -240,10 +302,16 @@ export default function Planeacion() {
           📅 Calendario
         </button>
         <button
+          onClick={() => setVista('cronograma')}
+          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'cronograma' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
+        >
+          🗂️ Cronograma
+        </button>
+        <button
           onClick={() => setVista('horario')}
           className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${vista === 'horario' ? 'bg-sky-400 text-white shadow-pop' : 'bg-ink/5 text-ink/75 hover:bg-ink/10'}`}
         >
-          👥 Equipo
+          👥 Horario semanal
         </button>
       </div>
 
@@ -259,6 +327,44 @@ export default function Planeacion() {
             </button>
           )}
         </div>
+      )}
+
+      {vista !== 'horario' && (
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex overflow-hidden rounded-full bg-ink/5 p-1" role="group" aria-label="Escala">
+            {[['mes', 'Mes'], ['semana', 'Semana']].map(([v, t]) => (
+              <button key={v} type="button" aria-pressed={escala === v} onClick={() => cambiarEscala(v)} className={`rounded-full px-4 py-1.5 text-sm font-bold ${escala === v ? 'bg-white text-sky-700 shadow-sm' : 'text-ink/70'}`}>
+                {t}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-1">
+            <button type="button" onClick={() => irA(-1)} aria-label={escala === 'semana' ? 'Semana anterior' : 'Mes anterior'} title={escala === 'semana' ? 'Semana anterior' : 'Mes anterior'} className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5">‹</button>
+            <span className="min-w-[9rem] text-center text-base font-bold capitalize">{tituloRango}</span>
+            <button type="button" onClick={() => irA(1)} aria-label={escala === 'semana' ? 'Semana siguiente' : 'Mes siguiente'} title={escala === 'semana' ? 'Semana siguiente' : 'Mes siguiente'} className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5">›</button>
+          </div>
+          <button type="button" onClick={irAHoy} className="rounded-full bg-sunshine-100 px-3 py-1.5 text-sm font-bold text-sunshine-800 hover:bg-sunshine-200">Hoy</button>
+        </div>
+      )}
+
+      {vista === 'cronograma' && (
+        nivelesVisibles.length === 0 ? (
+          <EmptyState icon="🎒" titulo="Todavía no hay niveles" texto="Crea los niveles para ver su cronograma." accion={esDocente ? undefined : { label: '+ Crear niveles', to: '/clases' }} />
+        ) : (
+          <CronogramaNiveles
+            niveles={nivelesVisibles}
+            dias={fechasRango.filter((f) => diasClaseSet.size === 0 || diasClaseSet.has(new Date(f + 'T00:00:00').getDay()))}
+            hoy={hoyISO()}
+            actividades={actividadesMes}
+            devocionales={devocionalesMes}
+            planeaciones={planeacionesMes}
+            cobertura={coberturaMes}
+            asignaciones={asignaciones}
+            asignacionesHorario={asignacionesHorario}
+            horarios={horarios}
+            onAbrir={(nivel, fecha) => setPreparar({ nivel, fecha })}
+          />
+        )
       )}
 
       {vista === 'horario' && (
@@ -278,34 +384,16 @@ export default function Planeacion() {
         {/* Calendario */}
         <div className="flex flex-col gap-4">
           <div className="card">
-            <div className="mb-4 flex items-center justify-between">
-              <button aria-label="Mes anterior" title="Mes anterior"
-                onClick={() => setCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 }))}
-                className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5"
-              >
-                ‹
-              </button>
-              <h3 className="text-lg font-bold">
-                {MESES[month]} {year}
-              </h3>
-              <button aria-label="Mes siguiente" title="Mes siguiente"
-                onClick={() => setCursor((c) => (c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 }))}
-                className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5"
-              >
-                ›
-              </button>
-            </div>
-
             <div className="grid grid-cols-7 gap-1 text-center">
               {DIAS.map((d, i) => (
                 <div key={i} className="pb-2 text-xs font-extrabold uppercase text-ink/65">
                   {d}
                 </div>
               ))}
-              {celdas.map((d, i) => {
+              {(escala === 'semana' ? fechasRango : celdas).map((d, i) => {
                 if (d === null) return <div key={i} />
-                const iso = toISO(year, month, d)
-                const diaSemana = new Date(year, month, d).getDay()
+                const iso = escala === 'semana' ? d : toISO(year, month, d)
+                const diaSemana = new Date(iso + 'T00:00:00').getDay()
                 const esClase = diasClaseSet.has(diaSemana)
                 const esHoy = iso === hoy
                 const seleccionado = iso === selectedDay
@@ -317,11 +405,11 @@ export default function Planeacion() {
                   <button
                     key={i}
                     onClick={() => setSelectedDay(iso)}
-                    className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-xl p-1 text-sm font-bold transition-colors
+                    className={`flex ${escala === 'semana' ? 'min-h-[4.5rem]' : 'aspect-square'} flex-col items-center justify-center gap-0.5 rounded-xl p-1 text-sm font-bold transition-colors
                       ${seleccionado ? 'bg-sky-400 text-white shadow-pop' : esClase ? 'bg-sky-50 hover:bg-sky-100' : esHoy ? 'bg-sunshine-100' : 'hover:bg-ink/5'}
                       ${esHoy && !seleccionado ? 'ring-2 ring-sunshine-300' : ''}`}
                   >
-                    <span>{d}</span>
+                    <span>{escala === 'semana' ? new Date(iso + 'T00:00:00').getDate() : d}</span>
                     <div className="flex gap-0.5">
                       {esClase && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white' : 'bg-sky-400'}`} />}
                       {tieneDevocional && <span className={`h-1.5 w-1.5 rounded-full ${seleccionado ? 'bg-white/70' : 'bg-sunshine-400'}`} />}
@@ -396,7 +484,6 @@ export default function Planeacion() {
                     const actividad = actividadesDelDia.find((a) => a.nivel_id === nivel.id)
                     const planeacion = planeacionesDelDia.find((pl) => pl.nivel_id === nivel.id)
                     const soloUnHorario = horariosDelDia.length <= 1
-                    const tieneContenido = devosNivel.length > 0 || actividad || planeacion
 
                     return (
                       <div
@@ -407,7 +494,7 @@ export default function Planeacion() {
                         <div className={`flex items-center justify-between gap-2 px-3 py-2 ${BG_LIGHT[color] || BG_LIGHT.sky}`}>
                           <div className="flex items-center gap-2">
                             <span className={`inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold text-white ${DOT_CLASSES[color] || DOT_CLASSES.sky}`}>
-                              {nivel.nombre.charAt(0)}
+                              {Array.from(nivel.nombre)[0]}
                             </span>
                             <div>
                               <h3 className="font-bold leading-tight">{nivel.nombre}</h3>
@@ -416,15 +503,23 @@ export default function Planeacion() {
                               )}
                             </div>
                           </div>
-                          {tieneContenido ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-grass-100 px-2 py-0.5 text-xs font-bold text-grass-700">
-                              ✅ Planeada
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-ink/5 px-2 py-0.5 text-xs font-bold text-ink/65">
-                              Sin planear
-                            </span>
-                          )}
+                          {(() => {
+                            const listos = (devosNivel.length > 0 ? 1 : 0) + (actividad ? 1 : 0) + (planeacion ? 1 : 0)
+                            return listos === 3 ? (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-grass-100 px-2 py-0.5 text-xs font-bold text-grass-700">✅ Clase lista</span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-ink/5 px-2 py-0.5 text-xs font-bold text-ink/70">{listos} de 3 listos</span>
+                            )
+                          })()}
+                        </div>
+                        <div className="px-3 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setPreparar({ nivel, fecha: selectedDay })}
+                            className="btn-primary w-full justify-center !py-2 !text-sm"
+                          >
+                            ✨ Preparar clase
+                          </button>
                         </div>
 
                         {/* Docentes */}
@@ -481,9 +576,16 @@ export default function Planeacion() {
                                 </div>
                               )
                             })}
-                            {horariosDelDia.length === 0 && (
-                              <p className="text-xs text-ink/65">No hay horarios configurados para este día.</p>
-                            )}
+                            {horariosDelDia.length === 0 &&
+                              (fijosGenerales.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {fijosGenerales.map((n) => (
+                                    <span key={n} className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold ${BADGE_CLASSES[color] || BADGE_CLASSES.sky}`}>{n}</span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="inline-flex w-fit items-center rounded-full bg-coral-100 px-2 py-0.5 text-xs font-bold text-coral-700">Sin docente</span>
+                              ))}
                           </div>
                         </div>
 
@@ -557,7 +659,7 @@ export default function Planeacion() {
                               <p className="text-sm text-ink/65">Sin devocional para este día</p>
                               <button
                                 className="btn-primary shrink-0 !py-1.5 !px-3 !text-xs"
-                                onClick={() => navigate('/devocionales')}
+                                onClick={() => setPreparar({ nivel, fecha: selectedDay, paso: 'ensenanza' })}
                               >
                                 + Crear devocional
                               </button>
@@ -585,7 +687,7 @@ export default function Planeacion() {
                               <p className="text-sm text-ink/65">Sin actividad complementaria</p>
                               <button
                                 className="btn-secondary shrink-0 !py-1.5 !px-3 !text-xs"
-                                onClick={() => openActividad(nivel, null)}
+                                onClick={() => setPreparar({ nivel, fecha: selectedDay, paso: 'actividad' })}
                               >
                                 + Agregar
                               </button>
@@ -601,6 +703,16 @@ export default function Planeacion() {
           )}
         </div>
       </div>}
+
+      <PrepararClaseModal
+        open={!!preparar}
+        onClose={() => setPreparar(null)}
+        nivel={preparar?.nivel}
+        fecha={preparar?.fecha}
+        pasoInicial={preparar?.paso}
+        userId={user?.id}
+        onSaved={loadMes}
+      />
 
       <PlaneacionClaseModal
         open={!!modalPlaneacion}

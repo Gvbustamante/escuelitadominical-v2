@@ -46,8 +46,8 @@ Marca `[x]` cuando se complete.
 - [x] Asistencia: guardado automático + ⭐ en la fila + "⭐ a todos" + deshacer.
 - [x] Nuevo niño → sigue directo a vincular padre/madre (omitible) → WhatsApp con datos → "Registrar otro niño".
 - [x] Nueva cuenta docente con niveles (varios); asignar/quitar desde la lista de Niveles; horario en "Avanzado".
-- [ ] "Preparar clase": Enseñanza + Actividad + Planeación en una ventana con fecha y nivel puestos.
-- [ ] Cronograma (niveles × días) con docentes y estado; calendario Mes / Semana.
+- [x] "Preparar clase": Enseñanza + Actividad + Planeación en una ventana con fecha y nivel puestos; avanza sola; guía con versículo/historia/actividad.
+- [x] Cronograma (niveles × días) con docentes y estado E·A·P; Mes / Semana / Hoy; día de clase elegido solo.
 
 ## 🎨 UI/UX — hallazgos en el código
 - [x] 43 textos con tamaño < 12px (`text-[0.6rem]` etc.) → mínimo 12px, 16px en inputs (evita zoom en iPhone).

@@ -7,22 +7,28 @@ import PdfViewer from './PdfViewer'
 const BUCKET = 'actividades'
 const MAX_MB = 20
 
-const GUIA = `<p><strong>Objetivo:</strong> </p>
-<p><strong>Versículo clave:</strong> </p>
-<p><strong>Historia bíblica:</strong> </p>
+const escapar = (t) => (t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+// Guía de planeación; completa versículo e historia si ya se conocen (desde "Preparar clase").
+export function guiaPlaneacion({ versiculo = '', historia = '', actividad = '' } = {}) {
+  return `<p><strong>Objetivo:</strong> </p>
+<p><strong>Versículo clave:</strong> ${escapar(versiculo)}</p>
+<p><strong>Historia bíblica:</strong> ${escapar(historia)}</p>
 <p><strong>Desarrollo de la clase:</strong></p>
-<ol><li><p>Bienvenida y oración</p></li><li><p>Enseñanza</p></li><li><p>Actividad</p></li><li><p>Cierre y oración</p></li></ol>
+<ol><li><p>Bienvenida y oración</p></li><li><p>Enseñanza</p></li><li><p>Actividad${actividad ? ': ' + escapar(actividad) : ''}</p></li><li><p>Cierre y oración</p></li></ol>
 <p><strong>Materiales:</strong> </p>`
+}
 
 export function urlPdfPlaneacion(path) {
   return path ? supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl : null
 }
 
 /**
- * Planeación de una clase (nivel + fecha): texto escrito y/o un PDF.
+ * Formulario de la planeación de una clase (nivel + fecha): texto escrito y/o un PDF.
  * `planeacion` es la fila existente de planeacion_clase o null.
+ * Se usa en su propia ventana y dentro de "Preparar clase".
  */
-export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, planeacion, userId, onSaved }) {
+export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved, textoBoton = 'Guardar planeación', datosGuia }) {
   const [contenido, setContenido] = useState('')
   const [editorKey, setEditorKey] = useState(0)
   const [pdfNuevo, setPdfNuevo] = useState(null)
@@ -32,16 +38,15 @@ export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, plan
   const inputRef = useRef(null)
 
   useEffect(() => {
-    if (!open) return
     setContenido(planeacion?.contenido || '')
     setEditorKey((k) => k + 1)
     setPdfNuevo(null)
     setQuitarPdf(false)
     setError('')
-  }, [open, planeacion])
+  }, [planeacion])
 
   function usarGuia() {
-    setContenido(GUIA)
+    setContenido(guiaPlaneacion(datosGuia))
     setEditorKey((k) => k + 1)
   }
 
@@ -116,19 +121,12 @@ export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, plan
 
     setBusy(false)
     onSaved?.()
-    onClose()
   }
 
   const pdfActualUrl = !quitarPdf && !pdfNuevo ? urlPdfPlaneacion(planeacion?.pdf_path) : null
-  const fechaLarga = fecha
-    ? new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })
-    : ''
 
   return (
-    <Modal open={open} onClose={onClose} wide title={`Planeación — ${nivel?.nombre || ''}`}>
       <div className="flex flex-col gap-5">
-        <p className="-mt-2 text-sm font-bold capitalize text-ink/75">{fechaLarga}</p>
-
         {/* Escrita */}
         <div>
           <div className="mb-1 flex items-center justify-between gap-2">
@@ -193,9 +191,31 @@ export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, plan
         {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
 
         <button type="button" disabled={busy} onClick={guardar} className="btn-primary justify-center">
-          {busy ? 'Guardando...' : 'Guardar planeación'}
+          {busy ? 'Guardando...' : textoBoton}
         </button>
       </div>
+  )
+}
+
+export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, planeacion, userId, onSaved }) {
+  const fechaLarga = fecha
+    ? new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })
+    : ''
+  return (
+    <Modal open={open} onClose={onClose} wide title={`Planeación — ${nivel?.nombre || ''}`}>
+      <p className="-mt-2 mb-4 text-sm font-bold capitalize text-ink/75">{fechaLarga}</p>
+      {open && (
+        <PlaneacionClaseForm
+          nivel={nivel}
+          fecha={fecha}
+          planeacion={planeacion}
+          userId={userId}
+          onSaved={() => {
+            onSaved?.()
+            onClose()
+          }}
+        />
+      )}
     </Modal>
   )
 }
