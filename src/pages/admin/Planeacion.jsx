@@ -142,7 +142,7 @@ export default function Planeacion() {
         .lte('fecha', finRango),
       supabase
         .from('planeacion_clase')
-        .select('id, nivel_id, fecha, contenido, pdf_path, pdf_nombre, updated_at, autor:profiles(nombre_completo)')
+        .select('id, nivel_id, fecha')
         .gte('fecha', inicioRango)
         .lte('fecha', finRango),
     ])

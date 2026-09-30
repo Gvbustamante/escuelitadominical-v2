@@ -1439,3 +1439,45 @@ drop policy if exists "equipo borra planeaciones" on storage.objects;
 create policy "equipo borra planeaciones" on storage.objects for delete to authenticated
   using (bucket_id = 'planeaciones'
     and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
+
+-- ---------- PLANEACION: VARIOS ARCHIVOS ----------
+create table if not exists public.planeacion_archivos (
+  id uuid primary key default gen_random_uuid(),
+  planeacion_id uuid not null references public.planeacion_clase(id) on delete cascade,
+  storage_path text not null,
+  nombre text not null,
+  tipo text,
+  tamano bigint,
+  created_at timestamptz not null default now()
+);
+comment on table public.planeacion_archivos is 'Archivos de una planeación. Bucket privado planeaciones (rutas antiguas planeaciones/... están en actividades).';
+create index if not exists planeacion_archivos_planeacion_idx on public.planeacion_archivos (planeacion_id);
+
+alter table public.planeacion_archivos enable row level security;
+
+drop policy if exists "leer planeacion_archivos" on public.planeacion_archivos;
+create policy "leer planeacion_archivos" on public.planeacion_archivos for select to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
+
+drop policy if exists "gestionar planeacion_archivos" on public.planeacion_archivos;
+create policy "gestionar planeacion_archivos" on public.planeacion_archivos for all to authenticated
+  using (exists (
+    select 1 from public.planeacion_clase pc where pc.id = planeacion_archivos.planeacion_id and (
+      exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
+      or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = pc.nivel_id and dn.docente_id = auth.uid()))))
+  with check (exists (
+    select 1 from public.planeacion_clase pc where pc.id = planeacion_archivos.planeacion_id and (
+      exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
+      or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = pc.nivel_id and dn.docente_id = auth.uid()))));
+
+-- Más tipos de archivo en el bucket privado (máx. 20 MB).
+update storage.buckets
+set allowed_mime_types = array[
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'image/*'
+]
+where id = 'planeaciones';

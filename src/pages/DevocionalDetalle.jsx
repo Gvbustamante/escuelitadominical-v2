@@ -10,7 +10,7 @@ import { getVideoEmbedUrl } from '../lib/videoEmbed'
 import { useAuth } from '../contexts/AuthContext'
 import { useConfigIglesia } from '../lib/configIglesia'
 import { moduloActivo } from '../lib/modulos'
-import { urlPdfPlaneacion, archivoPdfPlaneacion } from '../components/PlaneacionClaseModal'
+import { urlArchivoPlaneacion, archivoPlaneacion } from '../components/PlaneacionClaseModal'
 
 const ROLES_PLANEACION = ['superadmin', 'admin', 'coordinador', 'docente']
 
@@ -27,7 +27,7 @@ export default function DevocionalDetalle() {
   const [preview, setPreview] = useState(null)
   const [copiado, setCopiado] = useState(false)
   const [planeaciones, setPlaneaciones] = useState(null)
-  useArchivosFirmados([...(devocional?.devocional_archivos || []), ...(planeaciones || []).map((pl) => archivoPdfPlaneacion(pl.pdf_path)).filter(Boolean)])
+  useArchivosFirmados([...(devocional?.devocional_archivos || []), ...(planeaciones || []).flatMap((pl) => (pl.planeacion_archivos || []).map(archivoPlaneacion)).filter(Boolean)])
   const { user, profile } = useAuth()
   const config = useConfigIglesia()
   const verPlaneacion = ROLES_PLANEACION.includes(profile?.role) && moduloActivo(config, 'planeacion')
@@ -54,7 +54,7 @@ export default function DevocionalDetalle() {
     ;(async () => {
       let q = supabase
         .from('planeacion_clase')
-        .select('id, nivel_id, contenido, pdf_path, pdf_nombre, nivel:niveles(nombre, orden), autor:profiles(nombre_completo)')
+        .select('id, nivel_id, contenido, planeacion_archivos(id, storage_path, nombre, tipo, created_at), nivel:niveles(nombre, orden), autor:profiles(nombre_completo)')
         .eq('fecha', devocional.fecha)
       if (devocional.nivel_id) q = q.eq('nivel_id', devocional.nivel_id)
       const { data } = await q
@@ -244,17 +244,22 @@ export default function DevocionalDetalle() {
                         <p className="mb-2 text-sm font-extrabold text-sky-700">{pl.nivel.nombre}</p>
                       )}
                       {pl.contenido && <RichTextView html={pl.contenido} className="text-ink/80" />}
-                      {pl.pdf_path && (
+                      {[...(pl.planeacion_archivos || [])].sort((x, y) => (x.created_at || '').localeCompare(y.created_at || '')).map((ar) => (
                         <button
+                          key={ar.id}
                           type="button"
-                          onClick={async () => { const it = archivoPdfPlaneacion(pl.pdf_path); const url = urlPdfPlaneacion(pl.pdf_path) || (await urlArchivoAsync(it.bucket, it.storage_path)); if (url) setPreview({ url, nombre: pl.pdf_nombre || 'Planeación.pdf', mime: 'application/pdf' }) }}
+                          onClick={async () => {
+                            const it = archivoPlaneacion(ar)
+                            const url = urlArchivoPlaneacion(ar) || (await urlArchivoAsync(it.bucket, it.storage_path))
+                            if (url) setPreview({ url, nombre: ar.nombre, mime: ar.tipo || (/\.pdf$/i.test(ar.nombre) ? 'application/pdf' : '') })
+                          }}
                           className="mt-3 flex w-full items-center gap-3 rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 text-left transition-colors hover:border-sky-300 hover:bg-sky-50"
                         >
-                          <span className="text-2xl">📄</span>
-                          <span className="min-w-0 flex-1 truncate font-bold text-ink">{pl.pdf_nombre || 'Planeación.pdf'}</span>
+                          <span className="text-2xl">{getFileIcon(ar.nombre, ar.tipo)}</span>
+                          <span className="min-w-0 flex-1 truncate font-bold text-ink">{ar.nombre}</span>
                           <span className="shrink-0 text-sm font-bold text-sky-600">👁️ Ver</span>
                         </button>
-                      )}
+                      ))}
                       {pl.autor?.nombre_completo && <p className="mt-2 text-xs text-ink/65">Por {pl.autor.nombre_completo}</p>}
                     </div>
                   ))}

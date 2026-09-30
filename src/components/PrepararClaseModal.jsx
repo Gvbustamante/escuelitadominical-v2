@@ -37,7 +37,7 @@ export default function PrepararClaseModal({ open, onClose, nivel, fecha, userId
     const [{ data: d }, { data: a }, { data: p }] = await Promise.all([
       supabase.from('devocionales_ninos').select('id, titulo, versiculo, contenido, nivel_id').eq('fecha', fecha).or(`nivel_id.eq.${nivel.id},nivel_id.is.null`),
       supabase.from('actividades').select('*').eq('fecha', fecha).eq('nivel_id', nivel.id).limit(1).maybeSingle(),
-      supabase.from('planeacion_clase').select('*').eq('fecha', fecha).eq('nivel_id', nivel.id).maybeSingle(),
+      supabase.from('planeacion_clase').select('*, planeacion_archivos(id, storage_path, nombre, tipo, created_at)').eq('fecha', fecha).eq('nivel_id', nivel.id).maybeSingle(),
     ])
     setDevos(d || [])
     setActividad(a || null)

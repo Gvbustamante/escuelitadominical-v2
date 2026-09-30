@@ -24,55 +24,97 @@ export function guiaPlaneacion({ versiculo = '', historia = '', actividad = '' }
 <p><strong>Materiales:</strong> </p>`
 }
 
-/** { bucket, storage_path } para firmar con useArchivosFirmados. */
-export function archivoPdfPlaneacion(path) {
-  return path ? { bucket: bucketDe(path), storage_path: path } : null
+/** { bucket, storage_path } de un archivo de planeación, para firmar con useArchivosFirmados. */
+export function archivoPlaneacion(a) {
+  return a?.storage_path ? { bucket: bucketDe(a.storage_path), storage_path: a.storage_path } : null
 }
 
-/** URL del PDF (firmada si es privado; null mientras se firma). */
-export function urlPdfPlaneacion(path) {
-  return path ? urlArchivo(bucketDe(path), path) : null
+/** URL del archivo (firmada; null mientras se firma). */
+export function urlArchivoPlaneacion(a) {
+  return a?.storage_path ? urlArchivo(bucketDe(a.storage_path), a.storage_path) : null
 }
 
 /**
- * Mueve los PDFs antiguos (públicos) al bucket privado. Idempotente; lo corre admin/coordinador.
+ * Mueve los archivos antiguos (bucket público) al privado. Idempotente; lo corre admin/coordinador.
  * Si algo falla (p. ej. falta el bucket), se detiene sin romper nada.
  */
 let migracionHecha = false
 export async function moverPdfsPlaneacionAPrivado() {
   if (migracionHecha) return
   migracionHecha = true
-  const { data } = await supabase.from('planeacion_clase').select('id, pdf_path').like('pdf_path', 'planeaciones/%')
-  for (const pl of data || []) {
-    const nuevo = pl.pdf_path.slice('planeaciones/'.length)
-    const { error: cpError } = await supabase.storage.from(LEGADO).copy(pl.pdf_path, nuevo, { destinationBucket: BUCKET })
+  const { data, error } = await supabase.from('planeacion_archivos').select('id, storage_path').like('storage_path', 'planeaciones/%')
+  if (error) return
+  for (const a of data || []) {
+    const nuevo = a.storage_path.slice('planeaciones/'.length)
+    const { error: cpError } = await supabase.storage.from(LEGADO).copy(a.storage_path, nuevo, { destinationBucket: BUCKET })
     if (cpError && !/exists/i.test(cpError.message)) return
-    const { error: upError } = await supabase.from('planeacion_clase').update({ pdf_path: nuevo }).eq('id', pl.id)
+    const { error: upError } = await supabase.from('planeacion_archivos').update({ storage_path: nuevo }).eq('id', a.id)
     if (upError) return
-    await supabase.storage.from(LEGADO).remove([pl.pdf_path])
+    await supabase.storage.from(LEGADO).remove([a.storage_path])
   }
 }
 
+const ACEPTA = '.pdf,.doc,.docx,.ppt,.pptx,image/*'
+const PERMITIDO = /\.(pdf|docx?|pptx?|png|jpe?g|gif|webp|heic|avif)$/i
+
+function esPdf(nombre, tipo) {
+  return tipo === 'application/pdf' || /\.pdf$/i.test(nombre || '')
+}
+function esImagen(nombre, tipo) {
+  return (tipo || '').startsWith('image/') || /\.(png|jpe?g|gif|webp|heic|avif)$/i.test(nombre || '')
+}
+function icono(nombre, tipo) {
+  if (esPdf(nombre, tipo)) return '📄'
+  if (esImagen(nombre, tipo)) return '🖼️'
+  if (/\.pptx?$/i.test(nombre || '')) return '📊'
+  return '📝'
+}
+
+/** Vista dentro del formulario: PDF con visor (zoom, imprimir, descargar), imagen o enlace. */
+function VistaArchivo({ src, nombre, tipo }) {
+  const [objUrl, setObjUrl] = useState(null)
+  useEffect(() => {
+    if (!(src instanceof Blob) || esPdf(nombre, tipo)) return
+    const u = URL.createObjectURL(src)
+    setObjUrl(u)
+    return () => URL.revokeObjectURL(u)
+  }, [src, nombre, tipo])
+  if (!src) return <div className="h-40 animate-pulse rounded-2xl bg-ink/5" aria-busy="true" aria-label="Cargando archivo" />
+  if (esPdf(nombre, tipo)) return <PdfViewer src={src} nombre={nombre} />
+  const url = src instanceof Blob ? objUrl : src
+  if (esImagen(nombre, tipo)) return url ? <img src={url} alt={nombre} className="max-h-[60vh] w-full rounded-2xl bg-ink/5 object-contain" /> : null
+  return (
+    <p className="rounded-xl bg-ink/5 px-3 py-2 text-sm text-ink/75">
+      Este archivo no se puede ver aquí.{' '}
+      {url && <a href={url} target="_blank" rel="noreferrer" download={nombre} className="font-bold text-sky-700 hover:underline">Descargar {nombre}</a>}
+    </p>
+  )
+}
+
 /**
- * Formulario de la planeación de una clase (nivel + fecha): texto escrito y/o un PDF.
- * `planeacion` es la fila existente de planeacion_clase o null.
+ * Formulario de la planeación de una clase (nivel + fecha): texto escrito y/o uno o más archivos.
+ * `planeacion` es la fila de planeacion_clase (con planeacion_archivos) o null.
  * Se usa en su propia ventana y dentro de "Preparar clase".
  */
 export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved, textoBoton = 'Guardar planeación', datosGuia }) {
   const [contenido, setContenido] = useState('')
   const [editorKey, setEditorKey] = useState(0)
-  const [pdfNuevo, setPdfNuevo] = useState(null)
-  const [quitarPdf, setQuitarPdf] = useState(false)
+  const [nuevos, setNuevos] = useState([]) // File[]
+  const [quitados, setQuitados] = useState([]) // ids de planeacion_archivos
+  const [abierto, setAbierto] = useState(null) // clave del archivo visible
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const inputRef = useRef(null)
-  useArchivosFirmados([archivoPdfPlaneacion(planeacion?.pdf_path)].filter(Boolean))
+  const existentes = [...(planeacion?.planeacion_archivos || [])].sort((x, y) => (x.created_at || '').localeCompare(y.created_at || ''))
+  useArchivosFirmados(existentes.map(archivoPlaneacion).filter(Boolean))
 
   useEffect(() => {
     setContenido(planeacion?.contenido || '')
     setEditorKey((k) => k + 1)
-    setPdfNuevo(null)
-    setQuitarPdf(false)
+    setNuevos([])
+    setQuitados([])
+    const lista = planeacion?.planeacion_archivos || []
+    setAbierto(lista.length === 1 ? `e-${lista[0].id}` : null)
     setError('')
   }, [planeacion])
 
@@ -81,81 +123,100 @@ export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved,
     setEditorKey((k) => k + 1)
   }
 
-  function elegirPdf(e) {
-    const f = e.target.files?.[0]
+  function elegirArchivos(e) {
+    const files = Array.from(e.target.files || [])
     e.target.value = ''
-    if (!f) return
-    const esPdf = f.type === 'application/pdf' || /\.pdf$/i.test(f.name)
-    if (!esPdf) return setError('Solo se permiten archivos PDF.')
-    if (f.size > MAX_MB * 1024 * 1024) return setError(`El PDF pesa más de ${MAX_MB} MB.`)
-    setError('')
-    setPdfNuevo(f)
-    setQuitarPdf(false)
+    if (files.length === 0) return
+    const malos = files.filter((f) => !PERMITIDO.test(f.name))
+    const grandes = files.filter((f) => f.size > MAX_MB * 1024 * 1024)
+    const buenos = files.filter((f) => PERMITIDO.test(f.name) && f.size <= MAX_MB * 1024 * 1024)
+    const avisos = []
+    if (malos.length) avisos.push(`No se permiten: ${malos.map((f) => f.name).join(', ')} (solo PDF, Word, PowerPoint o imágenes).`)
+    if (grandes.length) avisos.push(`Pesan más de ${MAX_MB} MB: ${grandes.map((f) => f.name).join(', ')}.`)
+    setError(avisos.join(' '))
+    if (buenos.length) {
+      setNuevos((prev) => [...prev, ...buenos])
+      if (!abierto && existentes.length === 0 && nuevos.length === 0 && buenos.length === 1) setAbierto('n-0')
+    }
   }
 
   async function guardar() {
     setBusy(true)
     setError('')
-    const pdfAnterior = planeacion?.pdf_path || null
-    let pdf_path = quitarPdf ? null : pdfAnterior
-    let pdf_nombre = quitarPdf ? null : planeacion?.pdf_nombre || null
-
-    if (pdfNuevo) {
-      const limpio = pdfNuevo.name.replace(/[^\w.-]+/g, '_')
-      const path = `${nivel.id}/${fecha}/${Date.now()}-${limpio}`
-      const { error: upError } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, pdfNuevo, { contentType: 'application/pdf' })
-      if (upError) {
-        setBusy(false)
-        return setError('No se pudo subir el PDF: ' + upError.message)
-      }
-      pdf_path = path
-      pdf_nombre = pdfNuevo.name
-    }
-
     const texto = contenido && contenido.replace(/<[^>]*>/g, '').trim() ? contenido : null
+    const quedan = existentes.filter((a) => !quitados.includes(a.id))
+    const aBorrar = existentes.filter((a) => quitados.includes(a.id))
 
-    if (!texto && !pdf_path) {
-      // Sin nada: se borra la planeación existente.
+    // Sin texto ni archivos: se borra la planeación.
+    if (!texto && quedan.length === 0 && nuevos.length === 0) {
       if (planeacion) {
         const { error: delError } = await supabase.from('planeacion_clase').delete().eq('id', planeacion.id)
         if (delError) {
           setBusy(false)
           return setError('No se pudo guardar: ' + delError.message)
         }
+        await borrarDeStorage(existentes)
       }
-    } else {
-      const { error: saveError } = await supabase.from('planeacion_clase').upsert(
-        {
-          nivel_id: nivel.id,
-          fecha,
-          contenido: texto,
-          pdf_path,
-          pdf_nombre,
-          autor_id: userId,
-          updated_at: new Date().toISOString(),
-        },
+      setBusy(false)
+      return onSaved?.()
+    }
+
+    const { data: fila, error: saveError } = await supabase
+      .from('planeacion_clase')
+      .upsert(
+        { nivel_id: nivel.id, fecha, contenido: texto, autor_id: userId, updated_at: new Date().toISOString() },
         { onConflict: 'nivel_id,fecha' },
       )
-      if (saveError) {
-        if (pdfNuevo && pdf_path) await supabase.storage.from(bucketDe(pdf_path)).remove([pdf_path])
+      .select('id')
+      .single()
+    if (saveError) {
+      setBusy(false)
+      return setError('No se pudo guardar: ' + saveError.message)
+    }
+
+    // Subir los nuevos (en paralelo) y registrarlos.
+    const subidos = []
+    const fallidos = []
+    await Promise.all(nuevos.map(async (f, i) => {
+      const limpio = f.name.replace(/[^\w.-]+/g, '_')
+      const path = `${nivel.id}/${fecha}/${Date.now()}-${i}-${limpio}`
+      const { error: upError } = await supabase.storage.from(BUCKET).upload(path, f, { contentType: f.type || undefined })
+      if (upError) fallidos.push(f.name)
+      else subidos.push({ planeacion_id: fila.id, storage_path: path, nombre: f.name, tipo: f.type || null, tamano: f.size })
+    }))
+    if (subidos.length) {
+      const { error: insError } = await supabase.from('planeacion_archivos').insert(subidos)
+      if (insError) {
+        await supabase.storage.from(BUCKET).remove(subidos.map((s) => s.storage_path))
         setBusy(false)
-        return setError('No se pudo guardar: ' + saveError.message)
+        return setError('No se pudieron guardar los archivos: ' + insError.message)
       }
     }
 
-    // Limpiar el PDF anterior si se reemplazó o se quitó.
-    if (pdfAnterior && pdfAnterior !== pdf_path) {
-      await supabase.storage.from(bucketDe(pdfAnterior)).remove([pdfAnterior])
+    // Quitar los que se marcaron.
+    if (aBorrar.length) {
+      await supabase.from('planeacion_archivos').delete().in('id', aBorrar.map((a) => a.id))
+      await borrarDeStorage(aBorrar)
     }
 
     setBusy(false)
+    if (fallidos.length) {
+      setNuevos(nuevos.filter((f) => fallidos.includes(f.name)))
+      return setError(`Se guardó la planeación, pero no se pudieron subir: ${fallidos.join(', ')}. Intenta de nuevo.`)
+    }
     onSaved?.()
   }
 
-  const hayPdfActual = !quitarPdf && !pdfNuevo && !!planeacion?.pdf_path
-  const pdfActualUrl = hayPdfActual ? urlPdfPlaneacion(planeacion.pdf_path) : null
+  async function borrarDeStorage(archivos) {
+    const porBucket = {}
+    for (const a of archivos) (porBucket[bucketDe(a.storage_path)] ||= []).push(a.storage_path)
+    await Promise.all(Object.entries(porBucket).map(([b, paths]) => supabase.storage.from(b).remove(paths)))
+  }
+
+  const visibles = [
+    ...existentes.filter((a) => !quitados.includes(a.id)).map((a) => ({ key: `e-${a.id}`, nombre: a.nombre, tipo: a.tipo, src: urlArchivoPlaneacion(a), quitar: () => setQuitados((q) => [...q, a.id]) })),
+    ...nuevos.map((f, i) => ({ key: `n-${i}`, nombre: f.name, tipo: f.type, src: f, nuevo: true, quitar: () => setNuevos((n) => n.filter((_, j) => j !== i)) })),
+  ]
 
   return (
       <div className="flex flex-col gap-5">
@@ -179,49 +240,40 @@ export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved,
           </div>
         </div>
 
-        {/* PDF */}
+        {/* Archivos */}
         <div>
-          <label className="label">📄 O subir la planeación en PDF</label>
-          <input ref={inputRef} type="file" accept="application/pdf,.pdf" className="hidden" onChange={elegirPdf} />
+          <label className="label">📎 O subir archivos (uno o varios)</label>
+          <input ref={inputRef} type="file" multiple accept={ACEPTA} className="hidden" onChange={elegirArchivos} />
 
-          {pdfNuevo ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between gap-2 rounded-xl bg-sky-50 px-3 py-2">
-                <span className="min-w-0 truncate text-sm font-bold text-sky-700">📄 {pdfNuevo.name}</span>
-                <button type="button" onClick={() => setPdfNuevo(null)} className="shrink-0 text-sm font-bold text-coral-600">
-                  Quitar
-                </button>
-              </div>
-              <PdfViewer src={pdfNuevo} nombre={pdfNuevo.name} />
-            </div>
-          ) : hayPdfActual ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-ink/5 px-3 py-2">
-                <a href={pdfActualUrl || undefined} target="_blank" rel="noreferrer" className="min-w-0 truncate text-sm font-bold text-sky-700 hover:underline">
-                  📄 {planeacion.pdf_nombre || 'Planeación.pdf'}
-                </a>
-                <div className="flex shrink-0 gap-3">
-                  <button type="button" onClick={() => inputRef.current?.click()} className="text-sm font-bold text-sky-600">
-                    Reemplazar
-                  </button>
-                  <button type="button" onClick={() => setQuitarPdf(true)} className="text-sm font-bold text-coral-600">
-                    Quitar
-                  </button>
-                </div>
-              </div>
-              {pdfActualUrl ? (
-                <PdfViewer src={pdfActualUrl} nombre={planeacion.pdf_nombre || 'Planeacion.pdf'} />
-              ) : (
-                <div className="h-40 animate-pulse rounded-2xl bg-ink/5" aria-busy="true" aria-label="Cargando PDF" />
-              )}
-            </div>
-          ) : (
-            <button type="button" onClick={() => inputRef.current?.click()} className="btn-secondary !py-2 !text-sm">
-              📎 Elegir PDF
-            </button>
+          {visibles.length > 0 && (
+            <ul className="mb-2 flex flex-col gap-2">
+              {visibles.map((v) => (
+                <li key={v.key} className="flex flex-col gap-2">
+                  <div className={`flex flex-wrap items-center justify-between gap-2 rounded-xl px-3 py-2 ${v.nuevo ? 'bg-sky-50' : 'bg-ink/5'}`}>
+                    <span className="min-w-0 flex-1 truncate text-sm font-bold text-ink">
+                      {icono(v.nombre, v.tipo)} {v.nombre}
+                      {v.nuevo && <span className="ml-2 text-xs font-bold text-sky-700">Nuevo</span>}
+                    </span>
+                    <div className="flex shrink-0 gap-3">
+                      <button type="button" onClick={() => setAbierto(abierto === v.key ? null : v.key)} aria-expanded={abierto === v.key} className="text-sm font-bold text-sky-700">
+                        {abierto === v.key ? 'Ocultar' : 'Ver'}
+                      </button>
+                      <button type="button" onClick={() => { if (abierto === v.key) setAbierto(null); v.quitar() }} className="text-sm font-bold text-coral-600">
+                        Quitar
+                      </button>
+                    </div>
+                  </div>
+                  {abierto === v.key && <VistaArchivo src={v.src} nombre={v.nombre} tipo={v.tipo} />}
+                </li>
+              ))}
+            </ul>
           )}
-          {quitarPdf && <p className="mt-1 text-sm text-coral-600">El PDF se quitará al guardar.</p>}
-          <p className="mt-1 text-sm text-ink/75">Máximo {MAX_MB} MB. Puedes escribir, subir PDF o ambos.</p>
+
+          <button type="button" onClick={() => inputRef.current?.click()} className="btn-secondary !py-2 !text-sm">
+            📎 {visibles.length ? 'Agregar más archivos' : 'Elegir archivos'}
+          </button>
+          {quitados.length > 0 && <p className="mt-1 text-sm text-coral-600">{quitados.length === 1 ? 'Se quitará 1 archivo' : `Se quitarán ${quitados.length} archivos`} al guardar.</p>}
+          <p className="mt-1 text-sm text-ink/75">PDF, Word, PowerPoint o imágenes. Máximo {MAX_MB} MB cada uno. Puedes escribir, subir archivos o ambos.</p>
         </div>
 
         {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
