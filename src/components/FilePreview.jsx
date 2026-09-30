@@ -77,7 +77,8 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
   if (!open || !url) return null
 
   const tipo = tipoArchivo(nombre, mime)
-  const puedeImprimir = tipo === 'imagen' || tipo === 'pdf'
+  // El PDF trae su propia barra (zoom, imprimir, descargar) en <PdfViewer>.
+  const puedeImprimir = tipo === 'imagen'
 
   return (
     <div
@@ -104,14 +105,16 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
                 🖨️ Imprimir
               </button>
             )}
-            <a
-              href={url}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-xl bg-sky-50 px-3 py-1.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
-            >
-              ⬇️ Descargar
-            </a>
+            {tipo !== 'pdf' && (
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-xl bg-sky-50 px-3 py-1.5 text-sm font-bold text-sky-600 transition-colors hover:bg-sky-100"
+              >
+                ⬇️ Descargar
+              </a>
+            )}
             <button
               onClick={onClose}
               className="flex h-9 w-9 items-center justify-center rounded-full bg-ink/5 text-xl leading-none text-ink/75 transition-colors hover:bg-ink/10"
@@ -133,7 +136,7 @@ export default function FilePreview({ url, nombre, mime, open, onClose }) {
           )}
 
           {tipo === 'pdf' && (
-            <PdfViewer src={url} alto="h-[78vh]" className="w-[92vw] !rounded-none sm:w-[720px]" />
+            <PdfViewer src={url} nombre={nombre || 'documento.pdf'} alto="h-[70vh]" className="w-[92vw] !rounded-none sm:w-[720px]" />
           )}
 
           {tipo === 'video' && (

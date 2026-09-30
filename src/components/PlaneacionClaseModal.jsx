@@ -162,7 +162,7 @@ export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, plan
                   Quitar
                 </button>
               </div>
-              <PdfViewer src={pdfNuevo} />
+              <PdfViewer src={pdfNuevo} nombre={pdfNuevo.name} />
             </div>
           ) : pdfActualUrl ? (
             <div className="flex flex-col gap-2">
@@ -179,7 +179,7 @@ export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, plan
                   </button>
                 </div>
               </div>
-              <PdfViewer src={pdfActualUrl} />
+              <PdfViewer src={pdfActualUrl} nombre={planeacion.pdf_nombre || 'Planeacion.pdf'} />
             </div>
           ) : (
             <button type="button" onClick={() => inputRef.current?.click()} className="btn-secondary !py-2 !text-sm">
