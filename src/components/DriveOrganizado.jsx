@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
+import { urlArchivo, firmarArchivos } from '../lib/archivos'
 import Skeleton from './Skeleton'
 import FilePreview from './FilePreview'
 import { getFileIcon } from './FilePreview'
@@ -97,6 +97,7 @@ export default function DriveOrganizado() {
         supabase.from('tarea_entrega_archivos').select('id, entrega_id, storage_path, nombre_archivo, tipo'),
         supabase.from('ninos').select('id, nombre_completo'),
       ])
+      await firmarArchivos([...(actArchivos.data || []), ...(devoArchivos.data || [])])
       setDatos({
         actividades: acts.data || [], actividadArchivos: actArchivos.data || [],
         devocionales: devos.data || [], devocionalArchivos: devoArchivos.data || [],

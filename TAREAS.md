@@ -18,11 +18,12 @@ Marca `[x]` cuando se complete.
 
 ## 🔧 Pendiente inmediato
 - [x] Proyecto "Escuelita Dominical - v2" ya tiene `modulos_activos` (text[]). Correr la migración solo en proyectos de iglesias nuevas/otras.
-- [ ] **Drive privado**: el bucket `drive` es público → quien tenga el enlace abre el archivo (los padres no ven la lista). Pasar a bucket privado + enlaces firmados (requiere SQL en ambas bases).
+- [x] **Drive privado** (enlaces firmados de 1 h). Base de prueba ✅.
 - [ ] Unificar pantallas repetidas: Equipo ("Todas las cuentas" vs "Docentes") y Planeación (Calendario vs Cronograma).
 - [ ] Bumblebee usa el bucket `bumblebee-images` dentro del proyecto de Escuelita → moverlo a su propio proyecto.
 
 ## 🗄️ SQL pendiente en PRODUCCIÓN (lo corre Gisella/Carlos)
+- [ ] `supabase/actualizacion_drive_privado.sql` — solo cuando Boston reciba el código del Drive privado (si no, sus archivos del Drive dejan de abrir).
 - [x] `supabase/actualizacion_modulos_activos.sql`
 - [x] `supabase/actualizacion_planeacion_clase.sql`
 

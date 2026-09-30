@@ -44,6 +44,7 @@ export default function ActividadDetalle() {
   const [otrasDelMes, setOtrasDelMes] = useState(null)
   const [prevNext, setPrevNext] = useState({ prev: null, next: null })
   const [preview, setPreview] = useState(null)
+  useArchivosFirmados([...(actividad?.actividad_archivos || []), ...(otrasDelMes || []).flatMap((o) => o.actividad_archivos || [])])
 
   const load = useCallback(async () => {
     const { data, error } = await supabase

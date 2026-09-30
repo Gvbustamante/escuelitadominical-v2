@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { urlArchivo, firmarArchivos } from '../lib/archivos'
 import { useAuth } from '../contexts/AuthContext'
 import Skeleton from '../components/Skeleton'
 import Modal from '../components/Modal'
@@ -10,7 +11,7 @@ import { coincide } from '../lib/busqueda'
 import TituloPagina from '../components/ui/TituloPagina'
 
 function fileUrl(path) {
-  return supabase.storage.from('drive').getPublicUrl(path).data.publicUrl
+  return urlArchivo('drive', path)
 }
 
 function formatBytes(bytes) {
@@ -58,6 +59,7 @@ export default function Drive() {
       supabase.from('carpetas_drive').select('*, creador:profiles(nombre_completo)').order('nombre'),
       supabase.from('archivos_drive').select('*, subidor:profiles(nombre_completo)').order('nombre'),
     ])
+    await firmarArchivos((a || []).map((x) => ({ bucket: 'drive', storage_path: x.storage_path })))
     setCarpetas(c || [])
     setArchivos(a || [])
   }, [])

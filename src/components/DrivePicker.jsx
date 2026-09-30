@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { urlArchivo, firmarArchivos } from '../lib/archivos'
 import Modal from './Modal'
 import { getFileIcon, getFileType } from './FilePreview'
 import { coincide } from '../lib/busqueda'
 
 function fileUrl(path) {
-  return supabase.storage.from('drive').getPublicUrl(path).data.publicUrl
+  return urlArchivo('drive', path)
 }
 
 /**
@@ -35,6 +36,7 @@ export default function DrivePicker({ open, onClose, onSelect, multiple = true, 
       supabase.from('carpetas_drive').select('id, nombre, padre_id').order('nombre'),
       supabase.from('archivos_drive').select('id, nombre, storage_path, tipo, tamano, carpeta_id').order('nombre'),
     ])
+    await firmarArchivos((a || []).map((x) => ({ bucket: 'drive', storage_path: x.storage_path })))
     setCarpetas(c || [])
     setArchivos(a || [])
     setLoading(false)

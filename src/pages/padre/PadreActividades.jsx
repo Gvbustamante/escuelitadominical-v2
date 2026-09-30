@@ -120,6 +120,8 @@ export default function PadreActividades() {
     load()
   }
 
+  useArchivosFirmados((actividades || []).flatMap((a) => a.actividad_archivos || []))
+
   if (!hijos || !actividades) return <Spinner />
 
   const hijosParaTarea = (nivelId) => (selectedId ? hijos.filter((h) => h.id === selectedId) : hijos).filter((h) => h.nivel_id === nivelId)

@@ -27,6 +27,7 @@ export default function DevocionalDetalle() {
   const [preview, setPreview] = useState(null)
   const [copiado, setCopiado] = useState(false)
   const [planeaciones, setPlaneaciones] = useState(null)
+  useArchivosFirmados(devocional?.devocional_archivos)
   const { user, profile } = useAuth()
   const config = useConfigIglesia()
   const verPlaneacion = ROLES_PLANEACION.includes(profile?.role) && moduloActivo(config, 'planeacion')

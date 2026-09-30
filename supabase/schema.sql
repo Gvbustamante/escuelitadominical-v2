@@ -1331,11 +1331,19 @@ create policy "gestionar archivos drive" on public.archivos_drive for all to aut
   using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')))
   with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente')));
 
-insert into storage.buckets (id, name, public) values ('drive', 'drive', true)
+-- Drive privado: enlaces firmados. Padres solo ven archivos adjuntos a actividades/devocionales visibles.
+insert into storage.buckets (id, name, public) values ('drive', 'drive', false)
 on conflict (id) do nothing;
 
-create policy "lectura publica de archivos drive" on storage.objects for select to public
-  using (bucket_id = 'drive');
+create policy "leer archivos drive privado" on storage.objects for select to authenticated
+  using (
+    bucket_id = 'drive'
+    and (
+      exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador','docente'))
+      or exists (select 1 from public.actividad_archivos aa where aa.bucket = 'drive' and aa.storage_path = storage.objects.name)
+      or exists (select 1 from public.devocional_archivos da where da.bucket = 'drive' and da.storage_path = storage.objects.name)
+    )
+  );
 
 create policy "staff sube archivos drive" on storage.objects for insert to authenticated
   with check (
