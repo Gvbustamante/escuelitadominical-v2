@@ -301,6 +301,16 @@ create policy "leer actividades" on public.actividades for select to authenticat
       )
     )
   );
+
+-- Política adicional (existe en producción; se suma a la anterior con OR).
+create policy "ver actividades propias o públicas" on public.actividades for select to authenticated
+  using (
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin','coordinador'))
+    or exists (select 1 from public.docentes_niveles dn where dn.nivel_id = actividades.nivel_id and dn.docente_id = auth.uid())
+    or (nivel_id is null and audiencia = 'ninos' and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'docente'))
+    or (visible_padres = true and exists (select 1 from public.ninos_padres np join public.ninos n on n.id = np.nino_id where np.padre_id = auth.uid() and n.nivel_id = actividades.nivel_id))
+    or (nivel_id is null and audiencia = 'ninos' and visible_padres = true and exists (select 1 from public.ninos_padres np where np.padre_id = auth.uid()))
+  );
 create policy "gestionar actividades" on public.actividades for all to authenticated
   using (
     exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador'))
@@ -825,18 +835,10 @@ create policy "staff elimina logos" on storage.objects for delete to authenticat
 
 -- ---------- STORAGE: hojas de vida ----------
 
+-- Bucket privado y sus políticas: ver la sección "HOJAS DE VIDA (privado)" al final.
 insert into storage.buckets (id, name, public)
-values ('hojas_vida', 'hojas_vida', true)
+values ('hojas_vida', 'hojas_vida', false)
 on conflict (id) do nothing;
-
-create policy "Staff puede subir hojas de vida" on storage.objects for insert to authenticated
-  with check (bucket_id = 'hojas_vida');
-
-create policy "Todos pueden ver hojas de vida" on storage.objects for select to authenticated
-  using (bucket_id = 'hojas_vida');
-
-create policy "Staff puede borrar hojas de vida" on storage.objects for delete to authenticated
-  using (bucket_id = 'hojas_vida');
 
 -- ---------- BITÁCORA DE CLASE (salón + refrigerio) ----------
 
@@ -1371,21 +1373,13 @@ create table public.solicitudes_reset (
 
 alter table public.solicitudes_reset enable row level security;
 
-create policy "cualquiera inserta solicitud reset" on public.solicitudes_reset
-  for insert to authenticated with check (true);
+-- Anónimo (pantalla de ingreso) puede pedir el cambio; admin/coordinador activos las gestionan.
+create policy "cualquiera inserta solicitud" on public.solicitudes_reset
+  for insert to public with check (true);
 
-create policy "staff lee solicitudes reset" on public.solicitudes_reset
-  for select to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador') and p.activo = true));
-
-create policy "staff actualiza solicitudes reset" on public.solicitudes_reset
-  for update to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador') and p.activo = true))
-  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador') and p.activo = true));
-
-create policy "staff borra solicitudes reset" on public.solicitudes_reset
-  for delete to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador') and p.activo = true));
+create policy "admin gestiona solicitudes_reset" on public.solicitudes_reset
+  for all to public
+  using (exists (select 1 from public.profiles where profiles.id = auth.uid() and profiles.role in ('admin','coordinador') and profiles.activo = true));
 
 -- ---------- PLANEACIÓN DE CLASE ----------
 
