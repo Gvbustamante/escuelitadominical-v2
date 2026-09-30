@@ -6,9 +6,10 @@ import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
+import { hoyLocal } from '../../lib/fechas'
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 export default function Agenda() {

@@ -2,11 +2,12 @@ import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
+import { hoyLocal } from '../lib/fechas'
 
 const STAFF = ['superadmin', 'admin', 'coordinador']
 
 function hoyStr() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 function diaDelAnio() {

@@ -3,9 +3,10 @@ import { supabase } from '../lib/supabaseClient'
 import { useNivelesEstrella, badgeActual } from '../lib/nivelesEstrella'
 import Modal from './Modal'
 import RewardBurst from './RewardBurst'
+import { hoyLocal } from '../lib/fechas'
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 const MENSAJES_COMPLETO = ['¡Asistencia completa! 🎉', '¡Todos presentes hoy! 🙌', '¡Qué domingo tan lleno! 🌟']

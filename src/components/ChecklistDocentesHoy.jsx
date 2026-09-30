@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import Avatar from './Avatar'
 import Skeleton from './Skeleton'
+import { hoyLocal } from '../lib/fechas'
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 function hora(ts) {

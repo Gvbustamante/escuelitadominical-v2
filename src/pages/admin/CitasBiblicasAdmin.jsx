@@ -4,9 +4,10 @@ import { coincide } from '../../lib/busqueda'
 import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
+import { hoyLocal } from '../../lib/fechas'
 
 function hoyStr() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 export default function CitasBiblicasAdmin() {

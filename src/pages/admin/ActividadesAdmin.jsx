@@ -12,9 +12,10 @@ import MultiFilePicker from '../../components/MultiFilePicker'
 import DrivePicker from '../../components/DrivePicker'
 import { getVideoEmbedUrl } from '../../lib/videoEmbed'
 import EmptyState from '../../components/EmptyState'
+import { hoyLocal } from '../../lib/fechas'
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 function hoyYYYYMM() {

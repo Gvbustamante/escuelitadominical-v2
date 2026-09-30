@@ -4,6 +4,7 @@ import Skeleton from '../../components/Skeleton'
 import Avatar from '../../components/Avatar'
 import Modal from '../../components/Modal'
 import { exportExcel } from '../../lib/exportExcel'
+import { fechaLocal } from '../../lib/fechas'
 
 function hoyYYYYMM() {
   return new Date().toISOString().slice(0, 7)
@@ -191,7 +192,7 @@ export default function ReporteDocentes() {
     setSeleccionado(doc.id)
     setHistorial(null)
 
-    const hace14 = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    const hace14 = fechaLocal(new Date(Date.now() - 14 * 24 * 60 * 60 * 1000))
     const hace14Ts = `${hace14}T00:00:00`
 
     const [{ data: asist }, { data: bita }, { data: acts }, { data: progs }, { data: ninos }] = await Promise.all([

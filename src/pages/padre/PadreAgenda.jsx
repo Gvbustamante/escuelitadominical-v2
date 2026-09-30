@@ -4,9 +4,10 @@ import { useMisHijos } from '../../lib/useMisHijos'
 import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
+import { hoyLocal } from '../../lib/fechas'
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 export default function PadreAgenda() {

@@ -43,7 +43,7 @@ Marca `[x]` cuando se complete.
 
 ## 🧭 Flujos (ver FLUJOS_UX.md)
 - [x] Renombrar "Clase" → "Nivel" en pantallas (grupo = Nivel, sesión = Clase).
-- [ ] Asistencia: guardado automático + ⭐ en la fila + "⭐ a todos".
+- [x] Asistencia: guardado automático + ⭐ en la fila + "⭐ a todos" + deshacer.
 - [ ] Nuevo niño con padre en el mismo formulario.
 - [ ] Nueva cuenta docente con niveles; asignar desde la lista de Niveles; horario a "Avanzado".
 - [ ] "Preparar clase": Enseñanza + Actividad + Planeación en una ventana con fecha y nivel puestos.

@@ -9,12 +9,13 @@ import RewardBurst from '../../components/RewardBurst'
 import VistaToggle from '../../components/VistaToggle'
 import { useNivelesEstrella, badgeActual } from '../../lib/nivelesEstrella'
 import { mensajeAleatorio, playSound } from '../../lib/gamification'
+import { hoyLocal } from '../../lib/fechas'
 
 const COMPORTAMIENTOS = ['Excelente', 'Bueno', 'Regular', 'Necesita apoyo']
 const EMOCIONES = ['😊 Feliz', '🤩 Emocionado', '😐 Tranquilo', '😢 Triste', '😡 Molesto', '😴 Cansado']
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 export default function Progreso() {

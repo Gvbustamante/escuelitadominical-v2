@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { hoyLocal, fechaLocal } from '../lib/fechas'
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 /**
@@ -22,7 +23,7 @@ export default function ProximaAgenda({ nivelIds, soloTareasPendientes = false, 
   useEffect(() => {
     let cancelado = false
     const hoy = hoyISO()
-    const hace7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    const hace7 = fechaLocal(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
 
     async function load() {
       if (nivelIds && nivelIds.length === 0) {

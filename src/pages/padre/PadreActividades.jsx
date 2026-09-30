@@ -9,6 +9,7 @@ import HijoSelector from '../../components/HijoSelector'
 import RichTextView from '../../components/RichTextView'
 import TareaHijoWidget from '../../components/TareaHijoWidget'
 import { getVideoEmbedUrl } from '../../lib/videoEmbed'
+import { hoyLocal } from '../../lib/fechas'
 
 const REACCIONES = ['❤️', '👏', '🙌', '😍']
 const TRES_DIAS = 3 * 24 * 60 * 60 * 1000
@@ -77,7 +78,7 @@ export default function PadreActividades() {
       .select('*, nivel:niveles(nombre), actividad_archivos(*), actividad_reacciones(*)')
       .or(`nivel_id.in.(${nivelIds.join(',')}),nivel_id.is.null`)
       .eq('audiencia', 'ninos')
-      .lte('fecha', new Date().toISOString().slice(0, 10))
+      .lte('fecha', hoyLocal())
       .order('fecha', { ascending: false })
     setActividades(data || [])
 

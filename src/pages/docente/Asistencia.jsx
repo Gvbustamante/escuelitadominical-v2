@@ -56,13 +56,15 @@ export default function Asistencia() {
         ))}
       </div>
 
-      <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
-        {clases.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.nombre}
-          </option>
-        ))}
-      </select>
+      {clases.length > 1 && (
+        <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)} aria-label="Nivel">
+          {clases.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.nombre}
+            </option>
+          ))}
+        </select>
+      )}
 
       {tab === 'tomar' ? (
         <TomarAsistenciaInline

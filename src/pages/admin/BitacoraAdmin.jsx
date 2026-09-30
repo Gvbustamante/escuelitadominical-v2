@@ -8,13 +8,14 @@ import MultiFilePicker from '../../components/MultiFilePicker'
 import FotosGaleria from '../../components/FotosGaleria'
 import { exportExcel } from '../../lib/exportExcel'
 import EmptyState from '../../components/EmptyState'
+import { hoyLocal } from '../../lib/fechas'
 
 function hoyYYYYMM() {
   return new Date().toISOString().slice(0, 7)
 }
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 function diasEnMes(yyyyMM) {

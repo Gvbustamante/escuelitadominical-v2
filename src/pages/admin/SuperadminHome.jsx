@@ -8,6 +8,7 @@ import Skeleton from '../../components/Skeleton'
 import CitaDelDia from '../../components/CitaDelDia'
 import CoberturaHoy from '../../components/CoberturaHoy'
 import PrimerosPasos from '../../components/PrimerosPasos'
+import { hoyLocal } from '../../lib/fechas'
 
 export default function SuperadminHome() {
   const { profile } = useAuth()
@@ -18,7 +19,7 @@ export default function SuperadminHome() {
 
   useEffect(() => {
     async function load() {
-      const today = new Date().toISOString().slice(0, 10)
+      const today = hoyLocal()
       const hace30dias = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
       const hace7dias = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
       const diaSemana = new Date().getDay()

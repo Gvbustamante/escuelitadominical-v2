@@ -6,6 +6,7 @@ import { useMisHijos } from '../lib/useMisHijos'
 import Spinner from '../components/Spinner'
 import HijoSelector from '../components/HijoSelector'
 import { BADGE_CLASSES } from '../lib/colors'
+import { hoyLocal } from '../lib/fechas'
 
 function calcularEdad(fecha) {
   if (!fecha) return null
@@ -70,7 +71,7 @@ export default function MiFamilia() {
     async function loadAll() {
       const ninoIds = hijos.map((h) => h.id)
       const nivelIds = [...new Set(hijos.map((h) => h.nivel_id).filter(Boolean))]
-      const hoy = new Date().toISOString().slice(0, 10)
+      const hoy = hoyLocal()
 
       const [{ data: allActs }, { data: allNotas }, { data: allAgenda }] = await Promise.all([
         nivelIds.length > 0

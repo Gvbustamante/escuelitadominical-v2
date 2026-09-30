@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { coincide } from '../lib/busqueda'
 import Spinner from '../components/Spinner'
 import Modal from '../components/Modal'
+import { hoyLocal } from '../lib/fechas'
 
 export default function Foro() {
   const { user, profile } = useAuth()
@@ -46,7 +47,7 @@ export default function Foro() {
   useEffect(() => {
     load()
     cargarPeticiones()
-    supabase.from('agenda').select('id, titulo, fecha').gte('fecha', new Date().toISOString().slice(0, 10)).order('fecha').then(({ data }) => setEventos(data || []))
+    supabase.from('agenda').select('id, titulo, fecha').gte('fecha', hoyLocal()).order('fecha').then(({ data }) => setEventos(data || []))
   }, [load, cargarPeticiones])
 
   async function abrirForo(foro) {

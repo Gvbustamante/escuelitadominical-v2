@@ -5,12 +5,13 @@ import Modal from './Modal'
 import RewardsPanel from './RewardsPanel'
 import RewardBurst from './RewardBurst'
 import { mensajeAleatorio, playSound } from '../lib/gamification'
+import { hoyLocal } from '../lib/fechas'
 
 const COMPORTAMIENTOS = ['Excelente', 'Bueno', 'Regular', 'Necesita apoyo']
 const EMOCIONES = ['😊 Feliz', '🤩 Emocionado', '😐 Tranquilo', '😢 Triste', '😡 Molesto', '😴 Cansado']
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 export default function ProgresoNinoModal({ nino, nivelId, open, onClose }) {

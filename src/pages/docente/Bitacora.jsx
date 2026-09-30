@@ -5,9 +5,10 @@ import { useMisClases } from '../../lib/useMisClases'
 import Spinner from '../../components/Spinner'
 import MultiFilePicker from '../../components/MultiFilePicker'
 import FotosGaleria from '../../components/FotosGaleria'
+import { hoyLocal } from '../../lib/fechas'
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 const MOMENTOS = [

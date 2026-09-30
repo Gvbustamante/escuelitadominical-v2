@@ -10,6 +10,7 @@ import ProximaAgenda from '../../components/ProximaAgenda'
 import ResumenHoy from '../../components/ResumenHoy'
 import ChecklistDocentesHoy from '../../components/ChecklistDocentesHoy'
 import PrimerosPasos from '../../components/PrimerosPasos'
+import { hoyLocal } from '../../lib/fechas'
 
 export default function AdminHome() {
   const { profile } = useAuth()
@@ -17,7 +18,7 @@ export default function AdminHome() {
 
   useEffect(() => {
     async function load() {
-      const today = new Date().toISOString().slice(0, 10)
+      const today = hoyLocal()
       const hace7dias = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
       const diaSemana = new Date().getDay()
       const [ninos, clases, docentes, asistenciaHoy, eventosProximos, peticionesRecientes, diasClase] = await Promise.all([

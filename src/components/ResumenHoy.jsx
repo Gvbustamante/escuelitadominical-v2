@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { hoyLocal } from '../lib/fechas'
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10)
+  return hoyLocal()
 }
 
 /**
