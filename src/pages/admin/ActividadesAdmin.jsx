@@ -13,13 +13,14 @@ import DrivePicker from '../../components/DrivePicker'
 import { getVideoEmbedUrl } from '../../lib/videoEmbed'
 import EmptyState from '../../components/EmptyState'
 import { hoyLocal } from '../../lib/fechas'
+import FechaCampo from '../../components/ui/FechaCampo'
 
 function hoyISO() {
   return hoyLocal()
 }
 
 function hoyYYYYMM() {
-  return new Date().toISOString().slice(0, 7)
+  return hoyLocal().slice(0, 7)
 }
 
 const MESES_NOMBRE = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
@@ -420,7 +421,7 @@ export default function ActividadesAdmin() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="label">Fecha</label>
-                <input type="date" className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
+                <FechaCampo value={form.fecha} onChange={(v) => setForm({ ...form, fecha: v })} />
               </div>
               <div>
                 <label className="label">Historia bíblica (opcional)</label>
@@ -607,7 +608,7 @@ export default function ActividadesAdmin() {
             </p>
             <div>
               <label className="label">Nueva fecha</label>
-              <input type="date" className="input" value={dupFecha} onChange={(e) => setDupFecha(e.target.value)} />
+              <FechaCampo value={dupFecha} onChange={(v) => setDupFecha(v)} />
             </div>
             <button disabled={dupBusy} onClick={duplicarActividad} className="btn-primary justify-center">
               {dupBusy ? 'Duplicando...' : '📋 Duplicar actividad'}

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import Spinner from './Spinner'
 import { exportExcel } from '../lib/exportExcel'
+import MesSelector from './ui/MesSelector'
+import { hoyLocal } from '../lib/fechas'
 
 function hoyYYYYMM() {
-  return new Date().toISOString().slice(0, 7)
+  return hoyLocal().slice(0, 7)
 }
 
 function diasEnMes(yyyyMM) {
@@ -58,7 +60,7 @@ export default function ResumenAsistenciaMensual({ nivelId, ninos }) {
           <p className="text-xs text-ink/65">Solo se muestran los días en que se tomó asistencia</p>
         </div>
         <div className="flex items-center gap-2">
-          <input type="month" className="input !w-auto !py-2" value={mes} onChange={(e) => setMes(e.target.value)} />
+          <MesSelector value={mes} onChange={(v) => setMes(v)} />
           <button className="btn-secondary !py-2 !text-sm" onClick={exportar} disabled={fechas.length === 0}>
             📊 Exportar
           </button>

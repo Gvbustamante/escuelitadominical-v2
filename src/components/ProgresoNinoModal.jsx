@@ -6,6 +6,7 @@ import RewardsPanel from './RewardsPanel'
 import RewardBurst from './RewardBurst'
 import { mensajeAleatorio, playSound } from '../lib/gamification'
 import { hoyLocal } from '../lib/fechas'
+import FechaCampo from './ui/FechaCampo'
 
 const COMPORTAMIENTOS = ['Excelente', 'Bueno', 'Regular', 'Necesita apoyo']
 const EMOCIONES = ['😊 Feliz', '🤩 Emocionado', '😐 Tranquilo', '😢 Triste', '😡 Molesto', '😴 Cansado']
@@ -81,7 +82,7 @@ export default function ProgresoNinoModal({ nino, nivelId, open, onClose }) {
         <form onSubmit={guardarNota} className="flex flex-col gap-4">
           <div>
             <label className="label">Fecha</label>
-            <input type="date" className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
+            <FechaCampo value={form.fecha} onChange={(v) => setForm({ ...form, fecha: v })} />
           </div>
           <div>
             <label className="label">¿Cómo se comportó?</label>

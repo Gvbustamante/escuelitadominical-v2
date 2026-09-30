@@ -6,6 +6,7 @@ import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
 import { hoyLocal } from '../../lib/fechas'
+import FechaCampo from '../../components/ui/FechaCampo'
 
 function hoyISO() {
   return hoyLocal()
@@ -122,7 +123,7 @@ export default function AgendaAdmin() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label">Fecha</label>
-              <input type="date" required className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
+              <FechaCampo value={form.fecha} onChange={(v) => setForm({ ...form, fecha: v })} required />
             </div>
             <div>
               <label className="label">Nivel</label>

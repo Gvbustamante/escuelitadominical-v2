@@ -4,10 +4,11 @@ import Skeleton from '../../components/Skeleton'
 import Avatar from '../../components/Avatar'
 import Modal from '../../components/Modal'
 import { exportExcel } from '../../lib/exportExcel'
-import { fechaLocal } from '../../lib/fechas'
+import { hoyLocal, fechaLocal } from '../../lib/fechas'
+import MesSelector from '../../components/ui/MesSelector'
 
 function hoyYYYYMM() {
-  return new Date().toISOString().slice(0, 7)
+  return hoyLocal().slice(0, 7)
 }
 
 function diasDeClaseEnMes(diasClase, yyyyMM) {
@@ -290,7 +291,7 @@ export default function ReporteDocentes() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <input type="month" className="input !w-auto" value={mes} onChange={(e) => setMes(e.target.value)} />
+          <MesSelector value={mes} onChange={(v) => setMes(v)} />
           <button className="btn-secondary" onClick={exportar} disabled={reporte.length === 0}>
             📊 Exportar
           </button>

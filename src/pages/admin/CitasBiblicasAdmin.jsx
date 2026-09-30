@@ -5,6 +5,7 @@ import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import { hoyLocal } from '../../lib/fechas'
+import FechaCampo from '../../components/ui/FechaCampo'
 
 function hoyStr() {
   return hoyLocal()
@@ -256,12 +257,7 @@ export default function CitasBiblicasAdmin() {
           </div>
           <div>
             <label className="label">Mostrar el día (opcional)</label>
-            <input
-              type="date"
-              className="input"
-              value={form.fecha_mostrar}
-              onChange={(e) => setForm({ ...form, fecha_mostrar: e.target.value })}
-            />
+            <FechaCampo value={form.fecha_mostrar} onChange={(v) => setForm({ ...form, fecha_mostrar: v })} />
             <p className="mt-1 text-xs text-ink/65">Déjalo vacío para que quede disponible sin fecha fija.</p>
           </div>
           <label className="flex items-center gap-2 text-sm font-bold">

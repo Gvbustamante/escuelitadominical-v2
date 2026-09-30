@@ -6,6 +6,7 @@ import Spinner from '../../components/Spinner'
 import MultiFilePicker from '../../components/MultiFilePicker'
 import FotosGaleria from '../../components/FotosGaleria'
 import { hoyLocal } from '../../lib/fechas'
+import FechaCampo from '../../components/ui/FechaCampo'
 
 function hoyISO() {
   return hoyLocal()
@@ -54,7 +55,7 @@ export default function Bitacora() {
             </option>
           ))}
         </select>
-        <input type="date" className="input max-w-xs" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+        <FechaCampo value={fecha} onChange={(v) => setFecha(v)} flechas className="max-w-md" />
       </div>
 
       <div className="flex gap-2">

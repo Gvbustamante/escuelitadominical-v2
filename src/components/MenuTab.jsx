@@ -9,7 +9,7 @@ const ITEMS_MENU = [
   { to: '/bitacora', label: 'Bitácora', icon: '📋' },
   { to: '/planeacion', label: 'Planeación', icon: '📆' },
   { to: '/agenda', label: 'Agenda', icon: '📅' },
-  { to: '/foro', label: 'Nuestra comunidad', icon: '🤝' },
+  { to: '/foro', label: 'Comunidad', icon: '🤝' },
   { to: '/drive', label: 'Drive', icon: '📁' },
   { to: '/ninos', label: 'Niños', icon: '🧒' },
   { to: '/clases', label: 'Niveles', icon: '🎒' },

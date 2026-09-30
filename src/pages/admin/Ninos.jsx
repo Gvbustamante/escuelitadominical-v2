@@ -14,6 +14,7 @@ import { whatsappLink } from '../../lib/whatsapp'
 import { exportExcel } from '../../lib/exportExcel'
 import { generarCodigoFacil } from '../../lib/codigoFacil'
 import EmptyState from '../../components/EmptyState'
+import { hoyLocal } from '../../lib/fechas'
 
 const STAFF = ['superadmin', 'admin', 'coordinador']
 
@@ -84,7 +85,7 @@ export default function Ninos() {
   const [confirmDesvincular, setConfirmDesvincular] = useState(null)
 
   const load = useCallback(async () => {
-    const mesActual = new Date().toISOString().slice(0, 7)
+    const mesActual = hoyLocal().slice(0, 7)
     const inicioMes = `${mesActual}-01`
     const queries = [
       supabase.from('ninos').select('*').order('nombre_completo'),

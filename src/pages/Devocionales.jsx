@@ -14,13 +14,15 @@ import DrivePicker from '../components/DrivePicker'
 import CitasBiblicasAdmin from './admin/CitasBiblicasAdmin'
 import { getVideoEmbedUrl } from '../lib/videoEmbed'
 import { hoyLocal } from '../lib/fechas'
+import FechaCampo from '../components/ui/FechaCampo'
+import MesSelector from '../components/ui/MesSelector'
 
 function hoyISO() {
   return hoyLocal()
 }
 
 function hoyYYYYMM() {
-  return new Date().toISOString().slice(0, 7)
+  return hoyLocal().slice(0, 7)
 }
 
 function diasEnMes(yyyyMM) {
@@ -370,7 +372,7 @@ export default function Devocionales() {
               />
             </div>
             {!verTodos && (
-              <input type="month" className="input max-w-[180px]" value={mes} onChange={(e) => setMes(e.target.value)} />
+              <MesSelector value={mes} onChange={(v) => setMes(v)} />
             )}
             {niveles.length > 0 && (
               <select className="input max-w-[180px]" value={nivelFiltro} onChange={(e) => setNivelFiltro(e.target.value)}>
@@ -624,7 +626,7 @@ export default function Devocionales() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <label className="label">Fecha</label>
-                    <input type="date" className="input" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} />
+                    <FechaCampo value={form.fecha} onChange={(v) => setForm({ ...form, fecha: v })} />
                   </div>
                   <div>
                     <label className="label">Nivel (opcional)</label>
@@ -743,7 +745,7 @@ export default function Devocionales() {
                 </p>
                 <div>
                   <label className="label">Nueva fecha</label>
-                  <input type="date" className="input" value={dupFecha} onChange={(e) => setDupFecha(e.target.value)} />
+                  <FechaCampo value={dupFecha} onChange={(v) => setDupFecha(v)} />
                 </div>
                 <button disabled={dupBusy} onClick={duplicarDevocional} className="btn-primary justify-center">
                   {dupBusy ? 'Duplicando...' : '📋 Duplicar devocional'}

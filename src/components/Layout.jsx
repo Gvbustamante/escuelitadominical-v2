@@ -6,68 +6,7 @@ import { supabase } from '../lib/supabaseClient'
 import CambiarPasswordModal from './CambiarPasswordModal'
 import AppLogo from './AppLogo'
 import AppName from './AppName'
-import {
-  Home, BookHeart, ClipboardCheck, Palette, NotebookPen, CalendarRange, CalendarDays, MessagesSquare,
-  FolderOpen, Baby, School, Users, BarChart3, Settings, Sprout, LifeBuoy, HeartHandshake,
-} from 'lucide-react'
-
-// Íconos de línea (se ven igual en Android, iPhone y PC). Si una ruta no tiene, se usa su emoji.
-const ICONOS = {
-  '/': Home,
-  '/devocionales': BookHeart,
-  '/asistencia': ClipboardCheck,
-  '/actividades': Palette,
-  '/bitacora': NotebookPen,
-  '/planeacion': CalendarRange,
-  '/agenda': CalendarDays,
-  '/foro': MessagesSquare,
-  '/drive': FolderOpen,
-  '/ninos': Baby,
-  '/clases': School,
-  '/docentes': Users,
-  '/reporte-docentes': BarChart3,
-  '/ajustes': Settings,
-  '/progreso': Sprout,
-  '/ayuda': LifeBuoy,
-  '/mi-familia': HeartHandshake,
-}
-
-// Color por sección del menú: ayuda a reconocer dónde está cada cosa.
-const COLOR_SECCION = {
-  inicio: 'bg-coral-100 text-coral-600',
-  'Enseñanza': 'bg-sunshine-100 text-sunshine-700',
-  'Día de clase': 'bg-grass-100 text-grass-700',
-  Personas: 'bg-sky-100 text-sky-700',
-  Comunidad: 'bg-grape-100 text-grape-700',
-  'Gestión': 'bg-ink/5 text-ink/75',
-}
-
-function colorDe(ruta) {
-  if (ruta === '/') return COLOR_SECCION.inicio
-  const sec = SECCIONES.find((x) => x.rutas.includes(ruta))
-  return COLOR_SECCION[sec?.nombre] || 'bg-ink/5 text-ink/75'
-}
-
-function Icono({ item, size = 20, activo = false }) {
-  const Cmp = ICONOS[item.to]
-  const chip = activo ? 'bg-white/25 text-white' : colorDe(item.to)
-  return (
-    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${chip}`} aria-hidden="true">
-      {Cmp ? <Cmp size={size} strokeWidth={2.2} /> : <span className="text-base">{item.icon}</span>}
-    </span>
-  )
-}
-
-// Menú por secciones cuando la iglesia no armó uno propio (Ajustes → Menú).
-// Solo para menús largos; el de padres queda plano.
-const SECCIONES = [
-  { nombre: 'Enseñanza', rutas: ['/devocionales', '/planeacion', '/actividades', '/agenda'] },
-  { nombre: 'Día de clase', rutas: ['/asistencia', '/bitacora'] },
-  { nombre: 'Personas', rutas: ['/mi-familia', '/ninos', '/progreso', '/clases', '/docentes'] },
-  { nombre: 'Comunidad', rutas: ['/foro', '/drive'] },
-  { nombre: 'Gestión', rutas: ['/reporte-docentes', '/ajustes', '/ayuda'] },
-]
-const MIN_ITEMS_SECCIONES = 9
+import { Icono, SECCIONES, MIN_ITEMS_SECCIONES } from './IconoRuta'
 
 const ADMIN_NAV = [
   { to: '/', label: 'Inicio', icon: '🏠', end: true },
@@ -77,7 +16,7 @@ const ADMIN_NAV = [
   { to: '/bitacora', label: 'Bitácora', icon: '📋', modulo: 'bitacora' },
   { to: '/planeacion', label: 'Planeación', icon: '📆', modulo: 'planeacion' },
   { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
-  { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
+  { to: '/foro', label: 'Comunidad', icon: '🤝', modulo: 'foro' },
   { to: '/drive', label: 'Drive', icon: '📁', modulo: 'drive' },
   { to: '/ninos', label: 'Niños', icon: '🧒' },
   { to: '/clases', label: 'Niveles', icon: '🎒' },
@@ -97,7 +36,7 @@ const NAV = {
     { to: '/bitacora', label: 'Bitácora', icon: '📋', modulo: 'bitacora' },
     { to: '/planeacion', label: 'Planeación', icon: '📆', modulo: 'planeacion' },
     { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
-    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
+    { to: '/foro', label: 'Comunidad', icon: '🤝', modulo: 'foro' },
     { to: '/drive', label: 'Drive', icon: '📁', modulo: 'drive' },
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/clases', label: 'Niveles', icon: '🎒' },
@@ -115,7 +54,7 @@ const NAV = {
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/progreso', label: 'Progreso', icon: '🌱', modulo: 'progreso' },
     { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
-    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
+    { to: '/foro', label: 'Comunidad', icon: '🤝', modulo: 'foro' },
     { to: '/drive', label: 'Drive', icon: '📁', modulo: 'drive' },
     { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
@@ -125,7 +64,7 @@ const NAV = {
     { to: '/actividades', label: 'Actividades', icon: '🎨', modulo: 'actividades' },
     { to: '/progreso', label: 'Progreso', icon: '🌱', modulo: 'progreso' },
     { to: '/agenda', label: 'Agenda', icon: '📅', modulo: 'agenda' },
-    { to: '/foro', label: 'Nuestra comunidad', icon: '🤝', modulo: 'foro' },
+    { to: '/foro', label: 'Comunidad', icon: '🤝', modulo: 'foro' },
     { to: '/ayuda', label: 'Ayuda', icon: '🎓' },
   ],
 }
@@ -143,8 +82,9 @@ function NavItem({ item }) {
     <NavLink
       to={item.to}
       end={item.end}
+      title={item.label}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-2xl px-3 py-2 text-base font-bold transition-colors ${
+        `flex items-center gap-3 rounded-2xl px-3 py-2 text-base font-bold transition-colors md:justify-center md:px-2 lg:justify-start lg:px-3 ${
           isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/75 hover:bg-sky-50'
         }`
       }
@@ -152,7 +92,7 @@ function NavItem({ item }) {
       {({ isActive }) => (
         <>
           <Icono item={item} activo={isActive} />
-          <span>{item.label}</span>
+          <span className="md:sr-only lg:not-sr-only">{item.label}</span>
         </>
       )}
     </NavLink>
@@ -164,8 +104,9 @@ function NavSubItem({ item }) {
     <NavLink
       to={item.to}
       end={item.end}
+      title={item.label}
       className={({ isActive }) =>
-        `flex items-center gap-2 rounded-xl px-3 py-1.5 pl-6 text-sm font-bold transition-colors sm:text-base ${
+        `flex items-center gap-2 rounded-xl px-3 py-1.5 pl-6 text-sm md:justify-center md:pl-2 lg:justify-start lg:pl-6 font-bold transition-colors sm:text-base ${
           isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/70 hover:bg-sky-50'
         }`
       }
@@ -173,7 +114,7 @@ function NavSubItem({ item }) {
       {({ isActive }) => (
         <>
           <Icono item={item} size={16} activo={isActive} />
-          <span>{item.label}</span>
+          <span className="md:sr-only lg:not-sr-only">{item.label}</span>
         </>
       )}
     </NavLink>
@@ -217,7 +158,8 @@ function SidebarNav({ items, menuEstructura, pathname }) {
           if (secItems.length === 0) return null
           return (
             <div key={sec.nombre} className="mt-2">
-              <p className="px-3 pb-1 text-xs font-extrabold uppercase tracking-wider text-ink/65">{sec.nombre}</p>
+              <p className="px-3 pb-1 text-xs font-extrabold uppercase tracking-wider text-ink/65 md:hidden lg:block">{sec.nombre}</p>
+              <div className="mx-3 mb-1 hidden h-px bg-ink/10 md:block lg:hidden" aria-hidden="true" />
               <div className="flex flex-col gap-0.5">
                 {secItems.map((item) => <NavItem key={item.to} item={item} />)}
               </div>
@@ -251,8 +193,8 @@ function SidebarNav({ items, menuEstructura, pathname }) {
               className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold text-ink/75 transition-colors hover:bg-sky-50 sm:py-3 sm:text-lg"
             >
               <span className="text-xl sm:text-2xl">{cat.icon}</span>
-              <span className="flex-1 text-left">{cat.nombre}</span>
-              <span className={`text-xs text-ink/65 transition-transform ${open ? 'rotate-90' : ''}`}>▶</span>
+              <span className="flex-1 text-left md:sr-only lg:not-sr-only">{cat.nombre}</span>
+              <span className={`text-xs text-ink/65 transition-transform md:hidden lg:inline ${open ? 'rotate-90' : ''}`}>▶</span>
             </button>
             {open && (
               <div className="flex flex-col gap-0.5">
@@ -329,12 +271,12 @@ export default function Layout() {
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col gap-1 border-r-4 border-sky-100 bg-white px-4 py-4 transition-transform duration-300 ease-out
           ${menuOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:static md:z-auto md:w-64 md:translate-x-0 md:py-6`}
+          md:sticky md:top-0 md:z-auto md:h-screen md:w-20 md:translate-x-0 md:overflow-y-auto md:px-2 md:py-6 lg:w-64 lg:px-4`}
       >
         <div className="mb-3 flex items-center justify-between gap-2 px-1 sm:mb-6">
           <div className="flex items-center gap-2">
             <AppLogo emojiClassName="text-3xl sm:text-4xl" imgClassName="h-9 w-9 object-contain sm:h-11 sm:w-11" />
-            <span className="font-display text-lg font-extrabold uppercase leading-tight tracking-wide text-sky-500">
+            <span className="font-display text-lg font-extrabold uppercase leading-tight tracking-wide text-sky-500 md:hidden lg:inline">
               <AppName />
             </span>
           </div>
@@ -350,25 +292,25 @@ export default function Layout() {
         <SidebarNav items={items} menuEstructura={config?.menu_estructura} pathname={pathname} />
 
         <div className="mt-2 flex flex-col gap-2 border-t-2 border-ink/5 pt-3 sm:mt-4 sm:pt-4">
-          <div className="text-center">
+          <div className="text-center md:hidden lg:block">
             <p className="truncate text-sm font-bold">{profile?.nombre_completo}</p>
             <p className="text-xs text-ink/70">{ROLE_LABEL[profile?.role]}</p>
           </div>
           {!['superadmin', 'admin', 'coordinador'].includes(profile?.role) && (
-            <button onClick={() => setPwOpen(true)} className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
-              <span>🔑</span>
-              <span>Contraseña</span>
+            <button onClick={() => setPwOpen(true)} title="Contraseña" className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
+              <span aria-hidden="true">🔑</span>
+              <span className="md:sr-only lg:not-sr-only">Contraseña</span>
             </button>
           )}
-          <button onClick={signOut} className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
-            <span>🚪</span>
-            <span>Salir</span>
+          <button onClick={signOut} title="Salir" className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
+            <span aria-hidden="true">🚪</span>
+            <span className="md:sr-only lg:not-sr-only">Salir</span>
           </button>
           <a
             href="https://gobeapp.com"
             target="_blank"
             rel="noreferrer"
-            className="mt-1 text-center text-xs font-bold uppercase tracking-wide text-ink/65 hover:text-sky-500"
+            className="mt-1 text-center text-xs font-bold uppercase tracking-wide text-ink/65 hover:text-sky-500 md:hidden lg:block"
           >
             Gobe App Technology
           </a>
@@ -393,7 +335,7 @@ export default function Layout() {
           <span className="w-9" aria-hidden="true" />
         </header>
 
-        <main ref={mainRef} className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-8">
+        <main ref={mainRef} className="flex-1 overflow-y-auto p-3 pb-28 sm:p-4 sm:pb-28 md:p-6 lg:p-8">
           <div className="mx-auto w-full max-w-screen-2xl">
             {bienvenidaDeVuelta && (
               <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50 px-4 py-3">
@@ -415,7 +357,52 @@ export default function Layout() {
         </main>
       </div>
 
+      <BarraInferior items={items} rol={profile?.role} onMas={() => setMenuOpen(true)} />
+
       <CambiarPasswordModal open={pwOpen} onClose={() => setPwOpen(false)} />
     </div>
+  )
+}
+
+// Accesos de la barra inferior (celular) por rol, en orden de prioridad.
+const BARRA_INFERIOR = {
+  staff: ['/', '/asistencia', '/planeacion', '/ninos', '/devocionales', '/actividades'],
+  docente: ['/', '/asistencia', '/planeacion', '/ninos', '/devocionales', '/actividades'],
+  padre: ['/', '/actividades', '/progreso', '/agenda', '/devocionales'],
+}
+
+function BarraInferior({ items, rol, onMas }) {
+  const orden = BARRA_INFERIOR[rol === 'padre' ? 'padre' : rol === 'docente' ? 'docente' : 'staff']
+  const accesos = orden.map((r) => items.find((i) => i.to === r)).filter(Boolean).slice(0, 4)
+  return (
+    <nav
+      aria-label="Accesos rápidos"
+      className="fixed inset-x-0 bottom-0 z-30 border-t-2 border-sky-100 bg-white/95 backdrop-blur md:hidden"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
+      <div className="mx-auto grid max-w-md grid-cols-5">
+        {accesos.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.end}
+            className={({ isActive }) =>
+              `flex flex-col items-center gap-0.5 px-1 py-2 text-xs font-bold ${isActive ? 'text-sky-700' : 'text-ink/70'}`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Icono item={item} size={18} activo={false} />
+                <span className={`truncate ${isActive ? 'underline decoration-2 underline-offset-4' : ''}`}>{item.to === '/' ? 'Inicio' : item.label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
+        <button type="button" onClick={onMas} className="flex flex-col items-center gap-0.5 px-1 py-2 text-xs font-bold text-ink/70" aria-label="Más opciones del menú">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-ink/5 text-lg" aria-hidden="true">☰</span>
+          <span>Más</span>
+        </button>
+      </div>
+    </nav>
   )
 }

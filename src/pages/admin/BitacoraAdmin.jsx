@@ -9,9 +9,11 @@ import FotosGaleria from '../../components/FotosGaleria'
 import { exportExcel } from '../../lib/exportExcel'
 import EmptyState from '../../components/EmptyState'
 import { hoyLocal } from '../../lib/fechas'
+import FechaCampo from '../../components/ui/FechaCampo'
+import MesSelector from '../../components/ui/MesSelector'
 
 function hoyYYYYMM() {
-  return new Date().toISOString().slice(0, 7)
+  return hoyLocal().slice(0, 7)
 }
 
 function hoyISO() {
@@ -143,7 +145,7 @@ export default function BitacoraAdmin() {
                 </option>
               ))}
             </select>
-            <input type="month" className="input max-w-xs" value={mes} onChange={(e) => setMes(e.target.value)} />
+            <MesSelector value={mes} onChange={(v) => setMes(v)} />
           </div>
 
           {!registros ? (
@@ -352,7 +354,7 @@ function RegistrarBitacoraForm({ niveles, nivelIdInicial, onSaved }) {
         </div>
         <div>
           <label className="label">Fecha</label>
-          <input type="date" className="input" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+          <FechaCampo value={fecha} onChange={(v) => setFecha(v)} />
         </div>
       </div>
 

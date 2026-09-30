@@ -140,7 +140,7 @@ export default function Foro() {
         <div className="flex items-start justify-between gap-3">
           <div>
             <button onClick={() => setSeleccionado(null)} className="mb-2 text-sm font-bold text-sky-500 hover:underline">
-              ← Volver a Nuestra comunidad
+              ← Volver a Comunidad
             </button>
             <h1 className="text-2xl font-bold">{seleccionado.titulo}</h1>
             <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -213,7 +213,7 @@ export default function Foro() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Nuestra comunidad 🤝</h1>
+        <h1 className="text-3xl font-bold">Comunidad 🤝</h1>
         <p className="text-ink/70">Conversemos y oremos los unos por los otros</p>
       </div>
 

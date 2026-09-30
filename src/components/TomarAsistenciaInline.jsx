@@ -5,6 +5,7 @@ import { useMotivosReconocimiento } from '../lib/motivosReconocimiento'
 import { mensajeAleatorio, playSound } from '../lib/gamification'
 import Avatar from './Avatar'
 import RewardBurst from './RewardBurst'
+import FechaCampo from './ui/FechaCampo'
 
 // Fecha local (no UTC): un domingo a las 8 p. m. en América sigue siendo domingo.
 function hoyISO() {
@@ -244,7 +245,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             {indicador}
             {esStaff ? (
-              <input type="date" className="input !w-auto" value={fecha} onChange={(e) => setFecha(e.target.value)} aria-label="Fecha de la asistencia" />
+              <FechaCampo value={fecha} onChange={(v) => setFecha(v)} flechas paso={7} className="w-full sm:w-auto sm:min-w-[20rem]" />
             ) : (
               <span className="text-sm font-bold capitalize text-ink/65">
                 {new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}
