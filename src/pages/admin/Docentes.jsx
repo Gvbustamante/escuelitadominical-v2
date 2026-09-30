@@ -7,7 +7,6 @@ import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleUsuarioModal from '../../components/DetalleUsuarioModal'
-import DocentesTab from '../../components/DocentesTab'
 import Avatar from '../../components/Avatar'
 import { whatsappLink } from '../../lib/whatsapp'
 import TituloPagina from '../../components/ui/TituloPagina'
@@ -25,8 +24,8 @@ const FILTROS_ROL = [
   ['admin', 'Admin'],
   ['coordinador', 'Coordinador'],
   ['docente', 'Docente'],
-  ['padre', 'Padre/madre'],
 ]
+const ROLES_EQUIPO = ['superadmin', 'admin', 'coordinador', 'docente']
 
 export default function Docentes() {
   const { profile } = useAuth()
@@ -49,7 +48,7 @@ export default function Docentes() {
   const [creado, setCreado] = useState(null)
   const [busy, setBusy] = useState(false)
 
-  const [vista, setVista] = useState('todos')
+  const [vista, setVista] = useState('equipo') // 'equipo' | 'familias'
   const [detallePersona, setDetallePersona] = useState(null)
   const [confirmDesactivar, setConfirmDesactivar] = useState(null)
   const [confirmBusy, setConfirmBusy] = useState(false)
@@ -89,8 +88,11 @@ export default function Docentes() {
 
   const rolesInvitables = ['superadmin', 'admin'].includes(profile.role) ? ['docente', 'coordinador', 'admin', 'padre'] : ['docente', 'padre']
 
-  const filtrados = (usuarios || [])
-    .filter((u) => filtroRol === 'todos' || u.role === filtroRol || (filtroRol === 'admin' && u.role === 'superadmin'))
+  const enVista = (usuarios || []).filter((u) => (vista === 'familias' ? u.role === 'padre' : ROLES_EQUIPO.includes(u.role)))
+  const cuentaEquipo = (usuarios || []).filter((u) => ROLES_EQUIPO.includes(u.role)).length
+  const cuentaFamilias = (usuarios || []).filter((u) => u.role === 'padre').length
+  const filtrados = enVista
+    .filter((u) => vista === 'familias' || filtroRol === 'todos' || u.role === filtroRol || (filtroRol === 'admin' && u.role === 'superadmin'))
     .filter(
       (u) =>
         u.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()) || (u.cedula || '').includes(busqueda),
@@ -101,7 +103,7 @@ export default function Docentes() {
     : []
 
   function openInvite() {
-    setForm({ cedula: '', nombre_completo: '', role: 'docente', email: '', whatsapp: '' })
+    setForm({ cedula: '', nombre_completo: '', role: vista === 'familias' ? 'padre' : 'docente', email: '', whatsapp: '' })
     setBusquedaNino('')
     setNinoSeleccionado(null)
     setParentesco('')
@@ -197,34 +199,24 @@ export default function Docentes() {
     <div className="flex flex-col gap-6">
       <div>
         <TituloPagina ruta="/docentes">Equipo</TituloPagina>
-        <p className="text-ink/70">Docentes, coordinadores, administradores y padres — todas las cuentas de tu escuelita</p>
+        <p className="text-ink/70">Todas las cuentas de tu escuelita: el equipo que enseña y las familias</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setVista('todos')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'todos' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-        >
-          📋 Todas las cuentas
-        </button>
-        <button
-          onClick={() => setVista('docentes')}
-          className={`rounded-full px-5 py-2 text-sm font-bold ${vista === 'docentes' ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
-        >
-          🍎 Docentes
-        </button>
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Tipo de cuenta">
+        {[['equipo', '🍎 Equipo', cuentaEquipo], ['familias', '👪 Familias', cuentaFamilias]].map(([v, label, n]) => (
+          <button
+            key={v}
+            role="tab"
+            aria-selected={vista === v}
+            onClick={() => { setVista(v); setFiltroRol('todos') }}
+            className={`rounded-full px-5 py-2 text-sm font-bold ${vista === v ? 'bg-sky-600 text-white' : 'bg-white text-ink/70'}`}
+          >
+            {label} {usuarios && <span className="ml-1 tabular-nums opacity-80">{n}</span>}
+          </button>
+        ))}
       </div>
 
-      {vista === 'docentes' && (
-        <DocentesTab
-          usuarios={usuarios}
-          clasesPorDocente={clasesPorDocente}
-          onReload={load}
-          miRole={profile.role}
-        />
-      )}
-
-      {vista === 'todos' && !usuarios && (
+      {!usuarios && (
         <div className="flex flex-col gap-4">
           <Skeleton className="h-12 w-full" />
           {Array.from({ length: 5 }).map((_, i) => (
@@ -232,7 +224,7 @@ export default function Docentes() {
           ))}
         </div>
       )}
-      {vista === 'todos' && usuarios && (
+      {usuarios && (
         <>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
@@ -242,7 +234,7 @@ export default function Docentes() {
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
-              <div className="flex flex-wrap gap-2">
+              {vista === 'equipo' && <div className="flex flex-wrap gap-2">
                 {FILTROS_ROL.map(([v, label]) => (
                   <button
                     key={v}
@@ -254,7 +246,7 @@ export default function Docentes() {
                     {label}
                   </button>
                 ))}
-              </div>
+              </div>}
             </div>
             <button className="btn-primary fab-movil" onClick={openInvite}>
               + Nueva cuenta
@@ -268,7 +260,7 @@ export default function Docentes() {
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Rol</th>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Usuario</th>
-                  <th className="px-3 py-2 sm:px-4 sm:py-3">Nivel</th>
+                  <th className="px-3 py-2 sm:px-4 sm:py-3">{vista === 'familias' ? 'Hijos' : 'Nivel'}</th>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Estado</th>
                   <th className="px-3 py-2 sm:px-4 sm:py-3">Acciones</th>
                 </tr>
@@ -286,7 +278,7 @@ export default function Docentes() {
                       <span className={`badge ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
                     </td>
                     <td data-label="Usuario" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">{u.cedula || '—'}</td>
-                    <td data-label="Nivel" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
+                    <td data-label={vista === 'familias' ? 'Hijos' : 'Nivel'} className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
                       {['superadmin', 'admin', 'coordinador', 'docente'].includes(u.role)
                         ? clasesPorDocente[u.id]?.join(', ') || (u.role === 'docente' ? 'Sin asignar' : '—')
                         : u.role === 'padre'
@@ -300,9 +292,9 @@ export default function Docentes() {
                     </td>
                     <td data-acciones className="px-3 py-2 sm:px-4 sm:py-3">
                       <div className="flex flex-wrap gap-2">
-                        {whatsappLink(u.telefono) && (
+                        {whatsappLink(u.whatsapp || u.telefono) && (
                           <a
-                            href={whatsappLink(u.telefono)}
+                            href={whatsappLink(u.whatsapp || u.telefono)}
                             target="_blank"
                             rel="noreferrer"
                             title="Abrir WhatsApp"
@@ -310,6 +302,9 @@ export default function Docentes() {
                           >
                             💬
                           </a>
+                        )}
+                        {u.hoja_vida_url && (
+                          <a href={u.hoja_vida_url} target="_blank" rel="noreferrer" title="Ver hoja de vida" aria-label="Ver hoja de vida" className="rounded-lg bg-grape-50 px-2 py-1 text-xs font-bold text-grape-700 hover:bg-grape-100">📄</a>
                         )}
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetallePersona(u)}>
                           Ver detalle
@@ -334,7 +329,7 @@ export default function Docentes() {
                 {filtrados.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-4 py-6 text-center text-ink/65">
-                      No hay cuentas que coincidan.
+                      {vista === 'familias' ? 'No hay familias que coincidan.' : 'No hay cuentas que coincidan.'}
                     </td>
                   </tr>
                 )}

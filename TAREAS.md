@@ -19,7 +19,7 @@ Marca `[x]` cuando se complete.
 ## 🔧 Pendiente inmediato
 - [x] Proyecto "Escuelita Dominical - v2" ya tiene `modulos_activos` (text[]). Correr la migración solo en proyectos de iglesias nuevas/otras.
 - [x] **Drive privado** (enlaces firmados de 1 h). Base de prueba ✅.
-- [ ] Unificar pantallas repetidas: Equipo ("Todas las cuentas" vs "Docentes") y Planeación (Calendario vs Cronograma).
+- [x] Pantallas unificadas: Equipo = pestañas Equipo / Familias (hoja de vida en el detalle); Planeación = Cronograma + "Quién enseña" (cobertura) + Horario semanal.
 - [ ] Bumblebee usa el bucket `bumblebee-images` dentro del proyecto de Escuelita → moverlo a su propio proyecto.
 
 ## 🗄️ SQL pendiente en PRODUCCIÓN (lo corre Gisella/Carlos)

@@ -129,8 +129,8 @@ function DocenteGuide() {
         Ve a <strong>Agenda</strong> → <em>+ Nuevo evento</em> para avisar de un paseo o actividad especial próxima.
       </Step>
       <Step number="5" icon="📋" title="Planea tu clase con anticipación" color="coral">
-        En <strong>Planeación</strong> ves el calendario del mes con tus días de clase. Elige un día para ver quién cubre
-        tu clase (o planear tú la actividad de ese día) — solo ves tus propias clases, no las de todo el equipo.
+        En <strong>Planeación</strong> ves el cronograma de tus niveles por día de clase: quién enseña y qué falta preparar
+        (E·A·P). Toca una celda para preparar la clase — solo ves tus propios niveles, no los de todo el equipo.
       </Step>
       <Step number="6" icon="🌱" title="Registra el progreso de cada niño" color="grass">
         Ve a <strong>Progreso</strong>, elige un niño y anota cómo se comportó, cómo se sintió y qué logró ese día. Ahí

@@ -34,6 +34,8 @@ export default function CronogramaNiveles({
   asignacionesHorario,
   horarios,
   onAbrir,
+  diaSeleccionado,
+  onDia,
 }) {
   if (niveles.length === 0 || dias.length === 0) return null
 
@@ -76,10 +78,20 @@ export default function CronogramaNiveles({
               {dias.map((f) => {
                 const d = new Date(f + 'T00:00:00')
                 const esHoy = f === hoy
-                return (
-                  <th key={f} className={`min-w-[7.5rem] px-2 py-2 text-center text-xs font-extrabold uppercase ${esHoy ? 'bg-sunshine-100 text-sunshine-800' : 'bg-sky-50 text-ink/65'}`}>
+                const sel = f === diaSeleccionado
+                const contenido = (
+                  <>
                     <span className="block">{d.toLocaleDateString('es', { weekday: 'short' })}</span>
-                    <span className="block text-base normal-case text-ink">{d.getDate()} {d.toLocaleDateString('es', { month: 'short' })}</span>
+                    <span className={`block text-base normal-case ${sel ? 'text-white' : 'text-ink'}`}>{d.getDate()} {d.toLocaleDateString('es', { month: 'short' })}</span>
+                  </>
+                )
+                return (
+                  <th key={f} className={`min-w-[7.5rem] px-2 py-2 text-center text-xs font-extrabold uppercase ${sel ? 'bg-sky-600 text-white' : esHoy ? 'bg-sunshine-100 text-sunshine-800' : 'bg-sky-50 text-ink/65'}`}>
+                    {onDia ? (
+                      <button type="button" onClick={() => onDia(f)} aria-pressed={sel} title="Ver quién enseña este día" className="w-full rounded-lg uppercase">
+                        {contenido}
+                      </button>
+                    ) : contenido}
                   </th>
                 )
               })}
