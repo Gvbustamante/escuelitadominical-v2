@@ -27,14 +27,14 @@ Marca `[x]` cuando se complete.
 
 ## 🗄️ SQL pendiente en PRODUCCIÓN (lo corre Gisella/Carlos)
 - [ ] **Boston**: `supabase/actualizacion_hojas_vida_privado.sql` (tras respaldo). Los 3 anteriores (drive, planeaciones, planeacion_archivos) ya están en Boston ✅.
-- [ ] `supabase/actualizacion_planeacion_archivos.sql` — después del de abajo (planeaciones_privado). Varios archivos por planeación.
-- [ ] `supabase/actualizacion_planeaciones_privado.sql` — igual: solo cuando Boston reciba este código. La app mueve sola los PDF viejos la primera vez que un admin abre Planeación.
-- [ ] `supabase/actualizacion_drive_privado.sql` — solo cuando Boston reciba el código del Drive privado (si no, sus archivos del Drive dejan de abrir).
+- [x] `supabase/actualizacion_planeacion_archivos.sql` — después del de abajo (planeaciones_privado). Varios archivos por planeación.
+- [x] `supabase/actualizacion_planeaciones_privado.sql` — igual: solo cuando Boston reciba este código. La app mueve sola los PDF viejos la primera vez que un admin abre Planeación.
+- [x] `supabase/actualizacion_drive_privado.sql` — solo cuando Boston reciba el código del Drive privado (si no, sus archivos del Drive dejan de abrir).
 - [x] `supabase/actualizacion_modulos_activos.sql`
 - [x] `supabase/actualizacion_planeacion_clase.sql`
 
 ## 🏗️ Técnico / escalabilidad
-- [ ] Migrar a **multi-tenant** (ver MULTITENANT.md — decisiones tomadas 30/sep: 1 cuenta = 1 iglesia, un solo sitio, Boston Kids aparte por ahora).
+- [ ] Migrar a **multi-tenant** (ver MULTITENANT.md — decisiones tomadas 30/sep: 1 cuenta = 1 iglesia, un solo sitio, Boston Kids se integra al final, cuando el multi-tenant esté estable).
   - [ ] Fase 1: base de datos + prueba de aislamiento (en pruebas)
   - [ ] Fase 2: app (registro de iglesia, demo, archivos por iglesia)
   - [ ] Fase 3: panel de la dueña
