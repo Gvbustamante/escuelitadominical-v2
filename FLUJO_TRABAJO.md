@@ -1,28 +1,28 @@
 # Flujo de trabajo (ramas)
 
 ```
-mejora/xxx ──► pruebas ──► kidsmin ──► BostonKids        main (congelada)
+mejora/xxx ──► pruebas ──► kidsmin        (SaaS multi-tenant: Sharat, Henry, iglesias nuevas)
+
+BostonKids                                 (aparte, SIN multi-tenant; versión estable propia)
+main                                       (congelada)
 ```
 
 ## Ramas
 | Rama | Para qué |
 |---|---|
 | `pruebas` | Todo se programa y prueba aquí primero (Vercel: pruebas-escuelita.vercel.app). |
-| `kidsmin` | Producto KidsMin estable, ya probado. |
-| `BostonKids` | Versión que usa la iglesia Boston Kids (en funcionamiento). |
+| `kidsmin` | Producto KidsMin (SaaS). Recibe `pruebas` cuando está probado. |
+| `BostonKids` | Iglesia Boston Kids. **Fuera del multi-tenant.** Recibió todo hasta el 30 sep 2026 (antes del multi-tenant). Desde ahí **no** recibe `kidsmin`; solo arreglos puntuales aplicados a mano. |
 | `main` | **Congelada.** No se sube nada hasta que Gisella lo autorice. |
-| `mejora/…` · `arreglo/…` | Cambios grandes, opcional. Salen de `pruebas` y vuelven a `pruebas`. |
 
 ## Pasos para cada cambio
-1. Programar en `pruebas` (o en `mejora/…` y unir a `pruebas`).
-2. Probar en pruebas-escuelita.vercel.app (celular y PC).
-3. OK → pasar `pruebas` a `kidsmin`.
-4. OK → pasar `kidsmin` a `BostonKids` (+ correr su SQL en la base de Boston Kids).
-5. Nada a `main` sin autorización de Gisella.
+1. Programar en `pruebas` y probar en pruebas-escuelita.vercel.app.
+2. OK → pasar `pruebas` a `kidsmin`.
+3. Boston Kids: solo si Gisella pide un arreglo concreto; se copia a mano a `BostonKids`, sin nada del multi-tenant, y sin cambios de base de datos salvo que se pidan.
 
 ## Base de datos
 - Cada SQL nuevo va en `supabase/actualizacion_*.sql` (y en `schema.sql`).
-- Se corre primero en la base de pruebas; en la de Boston Kids solo al pasar a `BostonKids`.
+- El SQL del multi-tenant **nunca** se corre en la base de Boston Kids.
 - Anotar en `TAREAS.md` dónde ya se corrió.
 
 ## Vercel (un solo proyecto)
