@@ -8,6 +8,7 @@ import ConfirmModal from '../../components/ConfirmModal'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
 import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 function hoyISO() {
   return hoyLocal()
@@ -67,10 +68,10 @@ export default function Agenda() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Agenda 📅</h1>
+          <TituloPagina ruta="/agenda">Agenda</TituloPagina>
           <p className="text-ink/70">Próximos eventos y actividades especiales</p>
         </div>
-        <button className="btn-primary" onClick={openNew}>
+        <button className="btn-primary fab-movil" onClick={openNew}>
           + Nuevo evento
         </button>
       </div>

@@ -6,6 +6,7 @@ import ResumenAsistenciaMensual from '../../components/ResumenAsistenciaMensual'
 import ProgresoNinoModal from '../../components/ProgresoNinoModal'
 import TomarAsistenciaInline from '../../components/TomarAsistenciaInline'
 import EmptyState from '../../components/EmptyState'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 export default function AsistenciaAdmin() {
   const { user } = useAuth()
@@ -63,7 +64,7 @@ export default function AsistenciaAdmin() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Asistencia ✅</h1>
+        <TituloPagina ruta="/asistencia">Asistencia</TituloPagina>
         <p className="text-ink/70">Toma asistencia y revisa la tabla mensual por nivel</p>
       </div>
 

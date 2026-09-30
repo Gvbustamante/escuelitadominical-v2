@@ -54,9 +54,9 @@ Marca `[x]` cuando se complete.
 - [x] Cronograma (niveles × días) con docentes y estado E·A·P; Mes / Semana / Hoy; día de clase elegido solo.
 
 ## 🖥️ Reorganización de pantallas (ver UI_PANTALLAS.md)
-- [ ] Base común: título de página, barra de filtros, ‹ Mes › en español, menú ⋯, botón flotante en celular
-- [ ] Navegación: barra inferior en celular, menú de íconos en tablet
-- [ ] Inicio con "Próxima clase"
+- [x] Base común: título de página, barra de filtros, ‹ Mes › en español, menú ⋯, botón flotante en celular (aplicado: títulos, fechas, botón flotante; filtros en Devocionales)
+- [x] Navegación: barra inferior en celular, menú de íconos en tablet, menú PC compacto
+- [x] Inicio por rol: admin/coordinador/superadmin (pendientes + Próxima clase + números), docente (sus niveles + alergias), padre (tarjeta por hijo)
 - [ ] Niños y Equipo (filas con ⋯, Familias aparte)
 - [ ] Asistencia, Devocionales, Actividades, Bitácora con barra común
 - [ ] Ajustes, Agenda, Drive, Comunidad

@@ -14,6 +14,7 @@ import { getVideoEmbedUrl } from '../../lib/videoEmbed'
 import EmptyState from '../../components/EmptyState'
 import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 function hoyISO() {
   return hoyLocal()
@@ -305,10 +306,10 @@ export default function ActividadesAdmin() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Actividades 🎨</h1>
+          <TituloPagina ruta="/actividades">Actividades</TituloPagina>
           <p className="text-ink/70">Lo que se hace en cada clase — fotos, versículo e historia bíblica</p>
         </div>
-        <button className="btn-primary" onClick={openNew}>
+        <button className="btn-primary fab-movil" onClick={openNew}>
           + Nueva actividad
         </button>
       </div>

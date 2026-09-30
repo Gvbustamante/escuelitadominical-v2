@@ -50,9 +50,11 @@ export default function PrimerosPasos() {
 
   useEffect(() => {
     if (oculto) return
-    Promise.all(PASOS.map((p) => p.check().catch(() => false))).then((r) =>
-      setHechos(Object.fromEntries(PASOS.map((p, i) => [p.key, r[i]]))),
-    )
+    Promise.all(PASOS.map((p) => p.check().catch(() => false))).then((r) => {
+      setHechos(Object.fromEntries(PASOS.map((p, i) => [p.key, r[i]])))
+      // Con el arranque avanzado, se muestra compacta ("Siguiente: …") para no tapar el Inicio.
+      if (r.filter(Boolean).length >= 3) setAbierto(false)
+    })
   }, [oculto])
 
   if (oculto || !hechos) return null

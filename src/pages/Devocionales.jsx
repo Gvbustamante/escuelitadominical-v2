@@ -16,6 +16,8 @@ import { getVideoEmbedUrl } from '../lib/videoEmbed'
 import { hoyLocal } from '../lib/fechas'
 import FechaCampo from '../components/ui/FechaCampo'
 import MesSelector from '../components/ui/MesSelector'
+import FilterBar from '../components/ui/FilterBar'
+import TituloPagina from '../components/ui/TituloPagina'
 
 function hoyISO() {
   return hoyLocal()
@@ -315,11 +317,11 @@ export default function Devocionales() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Devocionales 🙏</h1>
+          <TituloPagina ruta="/devocionales">Devocionales</TituloPagina>
           <p className="text-ink/70">Reflexiones para niños, y el versículo que se muestra cada día</p>
         </div>
         {tab === 'devocionales' && puedeCrear && (
-          <button className="btn-primary" onClick={openNew}>
+          <button className="btn-primary fab-movil" onClick={openNew}>
             + Nuevo devocional
           </button>
         )}
@@ -348,48 +350,19 @@ export default function Devocionales() {
         <CitasBiblicasAdmin />
       ) : (
         <>
-          {/* ═══ Contadores ═══ */}
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-sky-600">
-              {devocionales.length} devocional{devocionales.length !== 1 ? 'es' : ''}
-            </span>
-            {totalActivos > 0 && (
-              <span className="rounded-full bg-sunshine-50 px-3 py-1 text-xs font-bold text-sunshine-700">
-                ⭐ {totalActivos} activo{totalActivos !== 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
-
-          {/* ═══ Filtros ═══ */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/65">🔍</span>
-              <input
-                className="input max-w-xs !pl-9"
-                placeholder="Buscar devocional..."
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-              />
-            </div>
-            {!verTodos && (
+          {/* ═══ Mes (siempre visible) + vista ═══ */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            {verTodos ? (
+              <span className="text-base font-bold">Todos los devocionales</span>
+            ) : (
               <MesSelector value={mes} onChange={(v) => setMes(v)} />
             )}
-            {niveles.length > 0 && (
-              <select className="input max-w-[180px]" value={nivelFiltro} onChange={(e) => setNivelFiltro(e.target.value)}>
-                <option value="">Todos los niveles</option>
-                {niveles.map((n) => (
-                  <option key={n.id} value={n.id}>{n.nombre}</option>
-                ))}
-              </select>
-            )}
-            <button
-              onClick={() => setVerTodos((v) => !v)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${verTodos ? 'bg-sky-400 text-white' : 'bg-white text-ink/70'}`}
-            >
-              {verTodos ? 'Ver por mes' : 'Ver todos'}
-            </button>
+            <div className="flex items-center gap-2">
+              <span className="hidden text-sm font-bold text-ink/65 sm:inline">
+                {devocionales.length} devocional{devocionales.length !== 1 ? 'es' : ''}{totalActivos > 0 ? ` · ⭐ ${totalActivos} activo${totalActivos !== 1 ? 's' : ''}` : ''}
+              </span>
             {/* Toggle de vista */}
-            <div className="ml-auto flex overflow-hidden rounded-xl border-2 border-ink/10">
+            <div className="flex shrink-0 overflow-hidden rounded-xl border-2 border-ink/10">
               <button aria-label="Vista tarjetas"
                 type="button"
                 onClick={() => setVista('tarjetas')}
@@ -407,7 +380,41 @@ export default function Devocionales() {
                 ☰
               </button>
             </div>
+            </div>
           </div>
+
+          {/* ═══ Filtros: buscar visible; nivel y "ver todos" plegables en celular ═══ */}
+          <FilterBar
+            activos={(nivelFiltro ? 1 : 0) + (verTodos ? 1 : 0)}
+            buscador={
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/65" aria-hidden="true">🔍</span>
+                <input
+                  className="input w-full !pl-9"
+                  placeholder="Buscar devocional..."
+                  aria-label="Buscar devocional"
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                />
+              </div>
+            }
+          >
+            {niveles.length > 0 && (
+              <select className="input md:!w-auto" value={nivelFiltro} onChange={(e) => setNivelFiltro(e.target.value)} aria-label="Nivel">
+                <option value="">Todos los niveles</option>
+                {niveles.map((n) => (
+                  <option key={n.id} value={n.id}>{n.nombre}</option>
+                ))}
+              </select>
+            )}
+            <button
+              type="button"
+              onClick={() => setVerTodos((v) => !v)}
+              className={`rounded-full px-4 py-2 text-sm font-bold ${verTodos ? 'bg-sky-400 text-white' : 'bg-white text-ink/70 ring-1 ring-ink/10'}`}
+            >
+              {verTodos ? 'Ver por mes' : 'Ver todos los meses'}
+            </button>
+          </FilterBar>
 
           {/* ═══ Vista tarjetas ═══ */}
           {vista === 'tarjetas' && devocionalesFiltrados.length > 0 && (

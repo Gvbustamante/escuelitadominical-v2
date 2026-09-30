@@ -44,7 +44,7 @@ export function Icono({ item, size = 20, activo = false }) {
   const Cmp = ICONOS[item.to]
   const chip = activo ? 'bg-white/25 text-white' : colorDe(item.to)
   return (
-    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${chip}`} aria-hidden="true">
+    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl lg:h-7 lg:w-7 ${chip}`} aria-hidden="true">
       {Cmp ? <Cmp size={size} strokeWidth={2.2} /> : <span className="text-base">{item.icon}</span>}
     </span>
   )

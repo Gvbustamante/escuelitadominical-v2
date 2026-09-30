@@ -5,6 +5,7 @@ import { coincide } from '../lib/busqueda'
 import Spinner from '../components/Spinner'
 import Modal from '../components/Modal'
 import { hoyLocal } from '../lib/fechas'
+import TituloPagina from '../components/ui/TituloPagina'
 
 export default function Foro() {
   const { user, profile } = useAuth()
@@ -213,7 +214,7 @@ export default function Foro() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Comunidad 🤝</h1>
+        <TituloPagina ruta="/foro">Comunidad</TituloPagina>
         <p className="text-ink/70">Conversemos y oremos los unos por los otros</p>
       </div>
 
@@ -246,7 +247,7 @@ export default function Foro() {
           onChange={(e) => setBusqueda(e.target.value)}
         />
         {tabPrincipal === 'foro' && (
-          <button className="btn-primary" onClick={openNew}>
+          <button className="btn-primary fab-movil" onClick={openNew}>
             + Nuevo tema
           </button>
         )}

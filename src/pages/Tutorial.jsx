@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { primerosPasosOculto, mostrarPrimerosPasos } from '../components/PrimerosPasos'
 import { useAuth } from '../contexts/AuthContext'
 import GobeLogo from '../components/GobeLogo'
+import TituloPagina from '../components/ui/TituloPagina'
 
 function Step({ number, icon, title, children, color = 'sky' }) {
   const bg = {
@@ -352,7 +353,7 @@ export default function Tutorial() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Ayuda 🎓</h1>
+        <TituloPagina ruta="/ayuda">Ayuda</TituloPagina>
         <p className="text-ink/70">{title}</p>
       </div>
       <AyudaContenido />

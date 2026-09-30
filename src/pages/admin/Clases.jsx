@@ -5,6 +5,7 @@ import Skeleton from '../../components/Skeleton'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 const COLOR_OPTIONS = ['sky', 'grass', 'sunshine', 'coral', 'grape']
 const DIA_LABEL = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -186,11 +187,11 @@ export default function Clases() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Niveles 🎒</h1>
+        <TituloPagina ruta="/clases">Niveles</TituloPagina>
         <p className="text-ink/70">Niveles por edad de tu escuelita — usa ▲▼ para ordenarlas como quieras verlas</p>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <button className="btn-primary" onClick={openNew}>
+        <button className="btn-primary fab-movil" onClick={openNew}>
           + Nuevo nivel
         </button>
       </div>

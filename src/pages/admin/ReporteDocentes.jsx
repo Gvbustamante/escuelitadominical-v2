@@ -6,6 +6,7 @@ import Modal from '../../components/Modal'
 import { exportExcel } from '../../lib/exportExcel'
 import { hoyLocal, fechaLocal } from '../../lib/fechas'
 import MesSelector from '../../components/ui/MesSelector'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 function hoyYYYYMM() {
   return hoyLocal().slice(0, 7)
@@ -284,7 +285,7 @@ export default function ReporteDocentes() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Reporte docentes 📊</h1>
+          <TituloPagina ruta="/reporte-docentes">Reporte docentes</TituloPagina>
           <p className="text-ink/70">
             Resumen mensual de participación — {totalDiasClase} día{totalDiasClase !== 1 ? 's' : ''} de clase en{' '}
             {new Date(mes + '-01').toLocaleDateString('es', { month: 'long', year: 'numeric' })}

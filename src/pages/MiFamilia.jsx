@@ -7,6 +7,7 @@ import Spinner from '../components/Spinner'
 import HijoSelector from '../components/HijoSelector'
 import { BADGE_CLASSES } from '../lib/colors'
 import { hoyLocal } from '../lib/fechas'
+import TituloPagina from '../components/ui/TituloPagina'
 
 function calcularEdad(fecha) {
   if (!fecha) return null
@@ -115,7 +116,7 @@ export default function MiFamilia() {
   if (hijos.length === 0) {
     return (
       <div className="flex flex-col gap-6">
-        <h1 className="text-3xl font-bold">Mi familia 👪</h1>
+        <TituloPagina ruta="/mi-familia">Mi familia</TituloPagina>
         <p className="card text-ink/70">
 No hay niños registrados todavía.
         </p>
@@ -130,7 +131,7 @@ No hay niños registrados todavía.
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Mi familia 👪</h1>
+        <TituloPagina ruta="/mi-familia">Mi familia</TituloPagina>
         <p className="text-ink/70">
           {hijos.length === 1
             ? 'La información de tu hijo/a en la escuelita'

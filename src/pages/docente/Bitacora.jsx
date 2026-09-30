@@ -7,6 +7,7 @@ import MultiFilePicker from '../../components/MultiFilePicker'
 import FotosGaleria from '../../components/FotosGaleria'
 import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 function hoyISO() {
   return hoyLocal()
@@ -43,7 +44,7 @@ export default function Bitacora() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Bitácora 📋</h1>
+        <TituloPagina ruta="/bitacora">Bitácora</TituloPagina>
         <p className="text-ink/70">Deja constancia del salón antes y después de cada clase</p>
       </div>
 

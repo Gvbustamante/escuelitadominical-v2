@@ -15,6 +15,7 @@ import { exportExcel } from '../../lib/exportExcel'
 import { generarCodigoFacil } from '../../lib/codigoFacil'
 import EmptyState from '../../components/EmptyState'
 import { hoyLocal } from '../../lib/fechas'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 const STAFF = ['superadmin', 'admin', 'coordinador']
 
@@ -351,7 +352,7 @@ export default function Ninos() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Niños 🧒</h1>
+          <TituloPagina ruta="/ninos">Niños</TituloPagina>
           <p className="text-ink/70">
             {filtrados.length} de {ninosVisibles.length} en total
           </p>
@@ -363,7 +364,7 @@ export default function Ninos() {
             </button>
           )}
           {puedeAgregar && (
-            <button className="btn-primary" onClick={openNew}>
+            <button className="btn-primary fab-movil" onClick={openNew}>
               + Nuevo niño/a
             </button>
           )}

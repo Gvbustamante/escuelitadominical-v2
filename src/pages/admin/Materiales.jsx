@@ -134,7 +134,7 @@ export default function Materiales() {
           <button className="btn-secondary" onClick={exportar}>
             📊 Exportar
           </button>
-          <button className="btn-primary" onClick={openNew}>
+          <button className="btn-primary fab-movil" onClick={openNew}>
             + Agregar material
           </button>
         </div>

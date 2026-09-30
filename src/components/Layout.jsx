@@ -21,7 +21,7 @@ const ADMIN_NAV = [
   { to: '/ninos', label: 'Niños', icon: '🧒' },
   { to: '/clases', label: 'Niveles', icon: '🎒' },
   { to: '/docentes', label: 'Equipo', icon: '🍎' },
-  { to: '/reporte-docentes', label: 'Reporte docentes', icon: '📊' },
+  { to: '/reporte-docentes', label: 'Reportes', icon: '📊' },
   { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
 ]
 
@@ -41,7 +41,7 @@ const NAV = {
     { to: '/ninos', label: 'Niños', icon: '🧒' },
     { to: '/clases', label: 'Niveles', icon: '🎒' },
     { to: '/docentes', label: 'Equipo', icon: '🍎' },
-    { to: '/reporte-docentes', label: 'Reporte docentes', icon: '📊' },
+    { to: '/reporte-docentes', label: 'Reportes', icon: '📊' },
     { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
   ],
   docente: [
@@ -84,7 +84,7 @@ function NavItem({ item }) {
       end={item.end}
       title={item.label}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-2xl px-3 py-2 text-base font-bold transition-colors md:justify-center md:px-2 lg:justify-start lg:px-3 ${
+        `flex items-center gap-3 rounded-2xl px-3 py-1.5 text-base font-bold transition-colors lg:py-1 md:justify-center md:px-2 lg:justify-start lg:px-3 ${
           isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/75 hover:bg-sky-50'
         }`
       }
@@ -151,14 +151,14 @@ function SidebarNav({ items, menuEstructura, pathname }) {
     const enSeccion = new Set(SECCIONES.flatMap((sec) => sec.rutas))
     const arriba = items.filter((i) => !enSeccion.has(i.to))
     return (
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto" aria-label="Menú principal">
+      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto" aria-label="Menú principal">
         {arriba.map((item) => <NavItem key={item.to} item={item} />)}
         {SECCIONES.map((sec) => {
           const secItems = sec.rutas.map((r) => items.find((i) => i.to === r)).filter(Boolean)
           if (secItems.length === 0) return null
           return (
-            <div key={sec.nombre} className="mt-2">
-              <p className="px-3 pb-1 text-xs font-extrabold uppercase tracking-wider text-ink/65 md:hidden lg:block">{sec.nombre}</p>
+            <div key={sec.nombre} className="mt-1.5">
+              <p className="px-3 pb-0.5 text-xs font-extrabold uppercase tracking-wider text-ink/65 md:hidden lg:block">{sec.nombre}</p>
               <div className="mx-3 mb-1 hidden h-px bg-ink/10 md:block lg:hidden" aria-hidden="true" />
               <div className="flex flex-col gap-0.5">
                 {secItems.map((item) => <NavItem key={item.to} item={item} />)}
@@ -271,9 +271,9 @@ export default function Layout() {
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col gap-1 border-r-4 border-sky-100 bg-white px-4 py-4 transition-transform duration-300 ease-out
           ${menuOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:sticky md:top-0 md:z-auto md:h-screen md:w-20 md:translate-x-0 md:overflow-y-auto md:px-2 md:py-6 lg:w-64 lg:px-4`}
+          md:sticky md:top-0 md:z-auto md:h-screen md:w-20 md:translate-x-0 md:overflow-y-auto md:px-2 md:py-4 lg:w-64 lg:px-4`}
       >
-        <div className="mb-3 flex items-center justify-between gap-2 px-1 sm:mb-6">
+        <div className="mb-2 flex items-center justify-between gap-2 px-1">
           <div className="flex items-center gap-2">
             <AppLogo emojiClassName="text-3xl sm:text-4xl" imgClassName="h-9 w-9 object-contain sm:h-11 sm:w-11" />
             <span className="font-display text-lg font-extrabold uppercase leading-tight tracking-wide text-sky-500 md:hidden lg:inline">
@@ -291,29 +291,22 @@ export default function Layout() {
 
         <SidebarNav items={items} menuEstructura={config?.menu_estructura} pathname={pathname} />
 
-        <div className="mt-2 flex flex-col gap-2 border-t-2 border-ink/5 pt-3 sm:mt-4 sm:pt-4">
-          <div className="text-center md:hidden lg:block">
-            <p className="truncate text-sm font-bold">{profile?.nombre_completo}</p>
-            <p className="text-xs text-ink/70">{ROLE_LABEL[profile?.role]}</p>
-          </div>
-          {!['superadmin', 'admin', 'coordinador'].includes(profile?.role) && (
-            <button onClick={() => setPwOpen(true)} title="Contraseña" className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
-              <span aria-hidden="true">🔑</span>
-              <span className="md:sr-only lg:not-sr-only">Contraseña</span>
+        <div className="mt-2 flex flex-col gap-2 border-t-2 border-ink/5 pt-3">
+          <div className="flex items-center gap-2 md:flex-col lg:flex-row">
+            <div className="min-w-0 flex-1 md:hidden lg:block">
+              <p className="truncate text-sm font-bold">{profile?.nombre_completo}</p>
+              <p className="truncate text-xs text-ink/70">{ROLE_LABEL[profile?.role]}</p>
+            </div>
+            {!['superadmin', 'admin', 'coordinador'].includes(profile?.role) && (
+              <button onClick={() => setPwOpen(true)} title="Cambiar contraseña" aria-label="Cambiar contraseña" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink/5 text-lg hover:bg-sky-50">
+                🔑
+              </button>
+            )}
+            <button onClick={signOut} title="Salir" aria-label="Salir" className="flex h-10 shrink-0 items-center justify-center gap-1 rounded-full bg-ink/5 px-3 text-sm font-bold hover:bg-coral-50 md:w-10 md:px-0 lg:w-auto lg:px-3">
+              <span aria-hidden="true">🚪</span>
+              <span className="md:sr-only lg:not-sr-only">Salir</span>
             </button>
-          )}
-          <button onClick={signOut} title="Salir" className="btn-secondary w-full !px-2 !py-2 !text-sm sm:!text-base">
-            <span aria-hidden="true">🚪</span>
-            <span className="md:sr-only lg:not-sr-only">Salir</span>
-          </button>
-          <a
-            href="https://gobeapp.com"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-1 text-center text-xs font-bold uppercase tracking-wide text-ink/65 hover:text-sky-500 md:hidden lg:block"
-          >
-            Gobe App Technology
-          </a>
+          </div>
         </div>
       </aside>
 
@@ -335,7 +328,7 @@ export default function Layout() {
           <span className="w-9" aria-hidden="true" />
         </header>
 
-        <main ref={mainRef} className="flex-1 overflow-y-auto p-3 pb-28 sm:p-4 sm:pb-28 md:p-6 lg:p-8">
+        <main ref={mainRef} className="flex-1 overflow-y-auto p-3 pb-44 sm:p-4 sm:pb-44 md:p-6 lg:p-8">
           <div className="mx-auto w-full max-w-screen-2xl">
             {bienvenidaDeVuelta && (
               <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50 px-4 py-3">

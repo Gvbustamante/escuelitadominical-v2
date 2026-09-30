@@ -11,6 +11,7 @@ import { useNivelesEstrella, badgeActual } from '../../lib/nivelesEstrella'
 import { mensajeAleatorio, playSound } from '../../lib/gamification'
 import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 const COMPORTAMIENTOS = ['Excelente', 'Bueno', 'Regular', 'Necesita apoyo']
 const EMOCIONES = ['😊 Feliz', '🤩 Emocionado', '😐 Tranquilo', '😢 Triste', '😡 Molesto', '😴 Cansado']
@@ -110,7 +111,7 @@ export default function Progreso() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Progreso 🌱</h1>
+          <TituloPagina ruta="/progreso">Progreso</TituloPagina>
           <p className="text-ink/70">Comportamiento, emociones y logros de cada niño/a</p>
         </div>
         <VistaToggle vista={vista} onChange={setVista} />

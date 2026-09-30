@@ -7,6 +7,7 @@ import ConfirmModal from '../components/ConfirmModal'
 import FilePreview, { getFileIcon, getFileType } from '../components/FilePreview'
 import DriveOrganizado from '../components/DriveOrganizado'
 import { coincide } from '../lib/busqueda'
+import TituloPagina from '../components/ui/TituloPagina'
 
 function fileUrl(path) {
   return supabase.storage.from('drive').getPublicUrl(path).data.publicUrl
@@ -265,7 +266,7 @@ export default function Drive() {
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold sm:text-3xl">{verPapelera ? '🗑️ Papelera' : '📁 Drive'}</h1>
+          <TituloPagina ruta="/drive">{verPapelera ? 'Papelera' : 'Drive'}</TituloPagina>
           <p className="text-sm text-ink/70">
             {verPapelera ? 'Archivos eliminados' : 'Archivos compartidos del equipo'}
           </p>

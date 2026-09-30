@@ -11,6 +11,7 @@ import EmptyState from '../../components/EmptyState'
 import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import MesSelector from '../../components/ui/MesSelector'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 function hoyYYYYMM() {
   return hoyLocal().slice(0, 7)
@@ -101,12 +102,12 @@ export default function BitacoraAdmin() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Bitácora 📋</h1>
+          <TituloPagina ruta="/bitacora">Bitácora</TituloPagina>
           <p className="text-ink/70">Constancia de salón antes/después de clase, refrigerio, y materiales</p>
         </div>
         {tab === 'bitacora' && (
           <div className="flex gap-2">
-            <button className="btn-primary" onClick={() => setModalOpen(true)}>
+            <button className="btn-primary fab-movil" onClick={() => setModalOpen(true)}>
               📝 Registrar bitácora
             </button>
             <button className="btn-secondary" onClick={exportar} disabled={!registros || registros.length === 0}>

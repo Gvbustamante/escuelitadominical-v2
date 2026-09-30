@@ -10,6 +10,7 @@ import RichTextView from '../../components/RichTextView'
 import TareaHijoWidget from '../../components/TareaHijoWidget'
 import { getVideoEmbedUrl } from '../../lib/videoEmbed'
 import { hoyLocal } from '../../lib/fechas'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 const REACCIONES = ['❤️', '👏', '🙌', '😍']
 const TRES_DIAS = 3 * 24 * 60 * 60 * 1000
@@ -129,7 +130,7 @@ export default function PadreActividades() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Actividades 🎨</h1>
+        <TituloPagina ruta="/actividades">Actividades</TituloPagina>
         <p className="text-ink/70">Lo que hicieron en la escuelita</p>
       </div>
 

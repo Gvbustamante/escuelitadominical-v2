@@ -7,6 +7,7 @@ import ResumenAsistenciaMensual from '../../components/ResumenAsistenciaMensual'
 import ProgresoNinoModal from '../../components/ProgresoNinoModal'
 import AlertasAusencia from '../../components/AlertasAusencia'
 import TomarAsistenciaInline from '../../components/TomarAsistenciaInline'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 export default function Asistencia() {
   const { user } = useAuth()
@@ -40,7 +41,7 @@ export default function Asistencia() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Asistencia ✅</h1>
+        <TituloPagina ruta="/asistencia">Asistencia</TituloPagina>
         <p className="text-ink/70">Toma asistencia, revisa el mes y las ausencias</p>
       </div>
 

@@ -191,7 +191,20 @@ export default function App() {
 
 function RoleSwitchHome() {
   const { profile } = useAuth()
-  if (profile.role === 'superadmin') return <SuperadminHome />
+  if (profile.role === 'superadmin') {
+    return (
+      <AdminHome
+        extra={
+          <details className="card">
+            <summary className="cursor-pointer text-lg font-bold">📈 Ver métricas completas</summary>
+            <div className="mt-4">
+              <SuperadminHome />
+            </div>
+          </details>
+        }
+      />
+    )
+  }
   if (profile.role === 'docente') return <DocenteHome />
   if (profile.role === 'padre') return <PadreHome />
   return <AdminHome />

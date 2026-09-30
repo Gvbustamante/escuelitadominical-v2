@@ -5,6 +5,7 @@ import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
 import { hoyLocal } from '../../lib/fechas'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 function hoyISO() {
   return hoyLocal()
@@ -39,7 +40,7 @@ export default function PadreAgenda() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Agenda 📅</h1>
+        <TituloPagina ruta="/agenda">Agenda</TituloPagina>
         <p className="text-ink/70">Próximos eventos de la escuelita</p>
       </div>
 

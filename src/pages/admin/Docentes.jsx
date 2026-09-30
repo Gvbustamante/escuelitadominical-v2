@@ -10,6 +10,7 @@ import DetalleUsuarioModal from '../../components/DetalleUsuarioModal'
 import DocentesTab from '../../components/DocentesTab'
 import Avatar from '../../components/Avatar'
 import { whatsappLink } from '../../lib/whatsapp'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 const ROLE_LABEL = { superadmin: 'Administrador', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
 const ROLE_BADGE = {
@@ -195,7 +196,7 @@ export default function Docentes() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Equipo 🍎</h1>
+        <TituloPagina ruta="/docentes">Equipo</TituloPagina>
         <p className="text-ink/70">Docentes, coordinadores, administradores y padres — todas las cuentas de tu escuelita</p>
       </div>
 
@@ -255,7 +256,7 @@ export default function Docentes() {
                 ))}
               </div>
             </div>
-            <button className="btn-primary" onClick={openInvite}>
+            <button className="btn-primary fab-movil" onClick={openInvite}>
               + Nueva cuenta
             </button>
           </div>

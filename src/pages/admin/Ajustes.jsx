@@ -10,6 +10,7 @@ import MenuTab from '../../components/MenuTab'
 import { AyudaContenido } from '../Tutorial'
 import { useConfigIglesia, refreshConfigIglesia } from '../../lib/configIglesia'
 import { MODULOS_KEYS } from '../../lib/modulos'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 const DIAS_SEMANA = [
   { dia_semana: 0, label: 'Domingo' },
@@ -212,7 +213,7 @@ export default function Ajustes() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Ajustes ⚙️</h1>
+        <TituloPagina ruta="/ajustes">Ajustes</TituloPagina>
         <p className="text-ink/70">Personaliza tu escuelita, tu cuenta, y consulta la ayuda</p>
       </div>
 

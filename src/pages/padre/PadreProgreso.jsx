@@ -4,6 +4,7 @@ import { useMisHijos } from '../../lib/useMisHijos'
 import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
 import RewardsPanel from '../../components/RewardsPanel'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 export default function PadreProgreso() {
   const hijos = useMisHijos()
@@ -50,7 +51,7 @@ export default function PadreProgreso() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Progreso 🌱</h1>
+        <TituloPagina ruta="/progreso">Progreso</TituloPagina>
         <p className="text-ink/70">Cómo le fue a tu hijo/a en cada clase</p>
       </div>
 

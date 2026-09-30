@@ -1,17 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
-import { useAuth } from '../../contexts/AuthContext'
 import { useConfigIglesia } from '../../lib/configIglesia'
 import StatCard from '../../components/StatCard'
 import Skeleton from '../../components/Skeleton'
-import CitaDelDia from '../../components/CitaDelDia'
 import CoberturaHoy from '../../components/CoberturaHoy'
-import PrimerosPasos from '../../components/PrimerosPasos'
 import { hoyLocal } from '../../lib/fechas'
 
+/** Métricas completas del superadmin (se muestran plegadas debajo del Inicio de acción). */
 export default function SuperadminHome() {
-  const { profile } = useAuth()
   const config = useConfigIglesia()
   const [stats, setStats] = useState(null)
   const [equipo, setEquipo] = useState(null)
@@ -129,17 +126,6 @@ export default function SuperadminHome() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="relative">
-        <span className="animate-float-soft pointer-events-none absolute -right-2 -top-6 text-5xl opacity-10 sm:text-6xl" aria-hidden="true">
-          🛡️
-        </span>
-        <h1 className="text-3xl font-bold">Panel de control 🛡️</h1>
-        <p className="text-ink/70">Vista panorámica de toda la plataforma</p>
-      </div>
-
-      <PrimerosPasos />
-
-      <CitaDelDia />
 
       {/* Personas */}
       <div>
@@ -231,41 +217,6 @@ export default function SuperadminHome() {
         </div>
       )}
 
-      {/* Accesos rápidos */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-        <Link to="/ninos" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '80ms' }}>
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-2xl">🧒</span>
-          <div className="min-w-0 flex-1">
-            <p className="font-bold">Niños</p>
-            <p className="text-sm text-ink/70">Gestionar niños</p>
-          </div>
-          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
-        </Link>
-        <Link to="/clases" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '160ms' }}>
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grass-100 text-2xl">🎒</span>
-          <div className="min-w-0 flex-1">
-            <p className="font-bold">Niveles</p>
-            <p className="text-sm text-ink/70">Niveles y edades</p>
-          </div>
-          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
-        </Link>
-        <Link to="/docentes" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '240ms' }}>
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sunshine-100 text-2xl">🍎</span>
-          <div className="min-w-0 flex-1">
-            <p className="font-bold">Equipo</p>
-            <p className="text-sm text-ink/70">Invitar y gestionar</p>
-          </div>
-          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
-        </Link>
-        <Link to="/ajustes" className="card-link animate-pop-in group flex items-center gap-3" style={{ animationDelay: '320ms' }}>
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-grape-100 text-2xl">⚙️</span>
-          <div className="min-w-0 flex-1">
-            <p className="font-bold">Ajustes</p>
-            <p className="text-sm text-ink/70">Módulos y config</p>
-          </div>
-          <span className="text-ink/65 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink/65">→</span>
-        </Link>
-      </div>
     </div>
   )
 }

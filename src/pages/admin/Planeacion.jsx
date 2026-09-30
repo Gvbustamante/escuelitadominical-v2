@@ -11,6 +11,7 @@ import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 import EmptyState from '../../components/EmptyState'
 import PrepararClaseModal from '../../components/PrepararClaseModal'
 import CronogramaNiveles from '../../components/CronogramaNiveles'
+import TituloPagina from '../../components/ui/TituloPagina'
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -290,7 +291,7 @@ export default function Planeacion() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">Planeación 📆</h1>
+        <TituloPagina ruta="/planeacion">Planeación</TituloPagina>
         <p className="text-ink/70">Organiza las clases: quién enseña, qué se enseña y cuándo</p>
       </div>
 

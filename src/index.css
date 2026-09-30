@@ -125,3 +125,16 @@
   .tabla-tarjetas td[data-acciones] { padding-top: 0.5rem !important; }
   .tabla-tarjetas td[data-acciones] > * { justify-content: flex-start; }
 }
+
+/* Botón principal de cada pantalla: en celular pasa a botón flotante sobre la barra inferior. */
+@media (max-width: 767px) {
+  .fab-movil {
+    position: fixed !important;
+    right: 1rem;
+    bottom: calc(5.75rem + env(safe-area-inset-bottom));
+    z-index: 30;
+    border-radius: 9999px !important;
+    padding: 0.85rem 1.25rem !important;
+    box-shadow: 0 10px 25px -5px rgb(21 32 46 / 0.35) !important;
+  }
+}

@@ -14,7 +14,7 @@ const ITEMS_MENU = [
   { to: '/ninos', label: 'Niños', icon: '🧒' },
   { to: '/clases', label: 'Niveles', icon: '🎒' },
   { to: '/docentes', label: 'Equipo', icon: '🍎' },
-  { to: '/reporte-docentes', label: 'Reporte docentes', icon: '📊' },
+  { to: '/reporte-docentes', label: 'Reportes', icon: '📊' },
 ]
 
 const ICONOS_CATEGORIA = ['📚', '📂', '👥', '📊', '🎯', '🛠️', '🌟', '📌', '🏫', '💡']
