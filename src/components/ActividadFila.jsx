@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabaseClient'
+import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
 
 function fileUrl(path, bucket = 'actividades') {
-  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
+  return urlArchivo(bucket, path)
 }
 
 function esFoto(f) {
@@ -15,6 +15,7 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
   const fotos = archivos.filter(esFoto)
   const otros = archivos.filter((f) => !esFoto(f))
   const thumb = fotos[0]
+  useArchivosFirmados(thumb ? [thumb] : [])
 
   const fechaObj = a.fecha ? new Date(a.fecha + 'T12:00:00') : null
 

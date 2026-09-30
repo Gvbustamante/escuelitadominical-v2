@@ -1,7 +1,7 @@
-import { supabase } from '../lib/supabaseClient'
+import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
 
 function fileUrl(bucket, path) {
-  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
+  return urlArchivo(bucket, path)
 }
 
 function icono(f) {
@@ -21,6 +21,7 @@ function icono(f) {
  * DevocionalDetalle.jsx, debajo del contenido principal.
  */
 export default function ArticulosAdjuntos({ archivos, bucket = 'actividades', titulo = '📎 Materiales para descargar' }) {
+  useArchivosFirmados((archivos || []).map((f) => ({ bucket: f.bucket || bucket, storage_path: f.storage_path })))
   if (!archivos || archivos.length === 0) return null
 
   return (

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
 import { useAuth } from '../contexts/AuthContext'
 import { useMisHijos } from '../lib/useMisHijos'
 import { useMisClases } from '../lib/useMisClases'
@@ -24,7 +25,7 @@ function esVideo(f) {
 }
 
 function fileUrl(path, bucket = 'actividades') {
-  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
+  return urlArchivo(bucket, path)
 }
 
 function formatMes(fecha) {

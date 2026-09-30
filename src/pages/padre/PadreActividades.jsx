@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
+import { urlArchivo, useArchivosFirmados } from '../../lib/archivos'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMisHijos } from '../../lib/useMisHijos'
 import { coincide } from '../../lib/busqueda'
@@ -16,7 +17,7 @@ const REACCIONES = ['❤️', '👏', '🙌', '😍']
 const TRES_DIAS = 3 * 24 * 60 * 60 * 1000
 
 function fileUrl(path, bucket = 'actividades') {
-  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
+  return urlArchivo(bucket, path)
 }
 
 function esFoto(f) {

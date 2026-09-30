@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
 
 function fileUrl(path, bucket = 'actividades') {
-  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
+  return urlArchivo(bucket, path)
 }
 
 function esFoto(f) {
@@ -28,6 +29,7 @@ function iconoPorTipo(nombre) {
  */
 export default function ArchivosExistentes({ archivos, tabla = 'actividad_archivos', onDeleted }) {
   const [eliminando, setEliminando] = useState(null)
+  useArchivosFirmados(archivos)
 
   if (!archivos || archivos.length === 0) return null
 

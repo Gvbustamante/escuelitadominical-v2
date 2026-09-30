@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
 import Spinner from '../components/Spinner'
 import RichTextView from '../components/RichTextView'
 import ReaccionesBar from '../components/ReaccionesBar'
@@ -14,7 +15,7 @@ import { urlPdfPlaneacion } from '../components/PlaneacionClaseModal'
 const ROLES_PLANEACION = ['superadmin', 'admin', 'coordinador', 'docente']
 
 function fileUrl(bucket, path) {
-  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
+  return urlArchivo(bucket, path)
 }
 
 export default function DevocionalDetalle() {
