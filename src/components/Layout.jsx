@@ -32,10 +32,30 @@ const ICONOS = {
   '/mi-familia': HeartHandshake,
 }
 
-function Icono({ item, size = 22 }) {
+// Color por sección del menú: ayuda a reconocer dónde está cada cosa.
+const COLOR_SECCION = {
+  inicio: 'bg-coral-100 text-coral-600',
+  'Enseñanza': 'bg-sunshine-100 text-sunshine-700',
+  'Día de clase': 'bg-grass-100 text-grass-700',
+  Personas: 'bg-sky-100 text-sky-700',
+  Comunidad: 'bg-grape-100 text-grape-700',
+  'Gestión': 'bg-ink/5 text-ink/75',
+}
+
+function colorDe(ruta) {
+  if (ruta === '/') return COLOR_SECCION.inicio
+  const sec = SECCIONES.find((x) => x.rutas.includes(ruta))
+  return COLOR_SECCION[sec?.nombre] || 'bg-ink/5 text-ink/75'
+}
+
+function Icono({ item, size = 20, activo = false }) {
   const Cmp = ICONOS[item.to]
-  if (!Cmp) return <span className="text-xl">{item.icon}</span>
-  return <Cmp size={size} strokeWidth={2.2} aria-hidden="true" className="shrink-0" />
+  const chip = activo ? 'bg-white/25 text-white' : colorDe(item.to)
+  return (
+    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${chip}`} aria-hidden="true">
+      {Cmp ? <Cmp size={size} strokeWidth={2.2} /> : <span className="text-base">{item.icon}</span>}
+    </span>
+  )
 }
 
 // Menú por secciones cuando la iglesia no armó uno propio (Ajustes → Menú).
@@ -129,8 +149,12 @@ function NavItem({ item }) {
         }`
       }
     >
-      <Icono item={item} />
-      <span>{item.label}</span>
+      {({ isActive }) => (
+        <>
+          <Icono item={item} activo={isActive} />
+          <span>{item.label}</span>
+        </>
+      )}
     </NavLink>
   )
 }
@@ -141,13 +165,17 @@ function NavSubItem({ item }) {
       to={item.to}
       end={item.end}
       className={({ isActive }) =>
-        `flex items-center gap-2 rounded-xl px-3 py-2 pl-9 text-sm font-bold transition-colors sm:text-base ${
+        `flex items-center gap-2 rounded-xl px-3 py-1.5 pl-6 text-sm font-bold transition-colors sm:text-base ${
           isActive ? 'bg-sky-400 text-white shadow-pop' : 'text-ink/70 hover:bg-sky-50'
         }`
       }
     >
-      <Icono item={item} size={18} />
-      <span>{item.label}</span>
+      {({ isActive }) => (
+        <>
+          <Icono item={item} size={16} activo={isActive} />
+          <span>{item.label}</span>
+        </>
+      )}
     </NavLink>
   )
 }
