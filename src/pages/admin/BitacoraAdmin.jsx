@@ -12,6 +12,7 @@ import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import MesSelector from '../../components/ui/MesSelector'
 import TituloPagina from '../../components/ui/TituloPagina'
+import NivelChips from '../../components/ui/NivelChips'
 
 function hoyYYYYMM() {
   return hoyLocal().slice(0, 7)
@@ -110,9 +111,11 @@ export default function BitacoraAdmin() {
             <button className="btn-primary fab-movil" onClick={() => setModalOpen(true)}>
               📝 Registrar bitácora
             </button>
-            <button className="btn-secondary" onClick={exportar} disabled={!registros || registros.length === 0}>
-              📊 Exportar
-            </button>
+            {registros?.length > 0 && (
+              <button className="btn-secondary" onClick={exportar}>
+                📊 Exportar
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -138,21 +141,15 @@ export default function BitacoraAdmin() {
         <Materiales />
       ) : (
         <>
-          <div className="flex flex-wrap gap-3">
-            <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
-              {niveles.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.nombre}
-                </option>
-              ))}
-            </select>
+          <div className="flex flex-col gap-3">
+            <NivelChips niveles={niveles} value={nivelId} onChange={setNivelId} />
             <MesSelector value={mes} onChange={(v) => setMes(v)} />
           </div>
 
           {!registros ? (
             <Skeleton className="h-64 w-full" />
           ) : porFecha.length === 0 ? (
-            <p className="card text-ink/70">Sin registros este mes para este nivel.</p>
+            <EmptyState icon="📝" titulo="Sin bitácoras este mes" texto="Registra cómo encontraron y dejaron el salón en cada clase." accion={{ label: '+ Registrar bitácora', onClick: () => setModalOpen(true) }} />
           ) : (
             <div className="flex flex-col gap-4">
               {porFecha.map(({ fecha, antes, despues }) => (

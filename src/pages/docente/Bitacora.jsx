@@ -9,6 +9,7 @@ import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import TituloPagina from '../../components/ui/TituloPagina'
 import EmptyState from '../../components/EmptyState'
+import NivelChips from '../../components/ui/NivelChips'
 
 function hoyISO() {
   return hoyLocal()
@@ -49,14 +50,8 @@ export default function Bitacora() {
         <p className="text-ink/70">Deja constancia del salón antes y después de cada clase</p>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
-          {clases.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nombre}
-            </option>
-          ))}
-        </select>
+      <div className="flex flex-col gap-3">
+        <NivelChips niveles={clases} value={nivelId} onChange={setNivelId} />
         <FechaCampo value={fecha} onChange={(v) => setFecha(v)} flechas className="max-w-md" />
       </div>
 

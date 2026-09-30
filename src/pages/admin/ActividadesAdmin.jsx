@@ -15,6 +15,7 @@ import EmptyState from '../../components/EmptyState'
 import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import TituloPagina from '../../components/ui/TituloPagina'
+import NivelChips from '../../components/ui/NivelChips'
 
 function hoyISO() {
   return hoyLocal()
@@ -332,14 +333,7 @@ export default function ActividadesAdmin() {
           </button>
         </div>
         {audiencia === 'ninos' && (
-          <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
-            <option value="__todos__">🏫 Toda la escuelita</option>
-            {niveles.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
+          <NivelChips niveles={niveles} value={nivelId} onChange={setNivelId} extra={[{ id: '__todos__', nombre: '🏫 Toda la escuelita' }]} />
         )}
       </div>
       {audiencia === 'docentes' && (

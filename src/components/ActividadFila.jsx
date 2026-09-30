@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
+import ActionMenu from './ui/ActionMenu'
 import { fechaCorta } from '../lib/fechas'
 
 function fileUrl(path, bucket = 'actividades') {
@@ -61,28 +62,21 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
       {/* Actions */}
       <div className="flex shrink-0 items-center gap-2">
         <span className="text-xs font-bold text-coral-600">{a.actividad_reacciones?.length || 0} ❤️</span>
-        <div className="flex items-center gap-1.5">
-          {a.es_tarea && onVerEntregas && (
-            <button className="btn-secondary !py-1 !px-2 !text-xs" onClick={() => onVerEntregas(a)}>
-              📋 Entregas
-            </button>
-          )}
-          {onDuplicate && (
-            <button aria-label="Duplicar para otra fecha" onClick={() => onDuplicate(a)} className="text-lg text-ink/65 hover:text-grape-500" title="Duplicar para otra fecha">
-              📋
-            </button>
-          )}
-          {onEdit && (
-            <button aria-label="Editar" onClick={() => onEdit(a)} className="text-lg text-ink/65 hover:text-sky-600" title="Editar">
-              ✏️
-            </button>
-          )}
-          {onDelete && (
-            <button aria-label="Eliminar" onClick={() => onDelete(a.id)} className="text-lg text-ink/65 hover:text-coral-600" title="Eliminar">
-              🗑️
-            </button>
-          )}
-        </div>
+        {a.es_tarea && onVerEntregas && (
+          <button className="btn-secondary hidden !py-1 !px-2 !text-xs sm:inline-flex" onClick={() => onVerEntregas(a)}>
+            📋 Entregas
+          </button>
+        )}
+        <ActionMenu
+          label={`Acciones de ${a.titulo}`}
+          acciones={[
+            { label: 'Ver', icon: '👁️', onClick: () => navigate(`/actividades/${a.id}`) },
+            { label: 'Ver entregas', icon: '📋', onClick: () => onVerEntregas(a), oculto: !(a.es_tarea && onVerEntregas) },
+            { label: 'Editar', icon: '✏️', onClick: () => onEdit(a), oculto: !onEdit },
+            { label: 'Duplicar para otra fecha', icon: '📄', onClick: () => onDuplicate(a), oculto: !onDuplicate },
+            { label: 'Eliminar', icon: '🗑️', onClick: () => onDelete(a.id), oculto: !onDelete, peligro: true },
+          ]}
+        />
       </div>
     </div>
   )

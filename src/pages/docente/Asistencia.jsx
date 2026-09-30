@@ -9,6 +9,7 @@ import AlertasAusencia from '../../components/AlertasAusencia'
 import TomarAsistenciaInline from '../../components/TomarAsistenciaInline'
 import TituloPagina from '../../components/ui/TituloPagina'
 import EmptyState from '../../components/EmptyState'
+import NivelChips from '../../components/ui/NivelChips'
 
 export default function Asistencia() {
   const { user } = useAuth()
@@ -58,15 +59,7 @@ export default function Asistencia() {
         ))}
       </div>
 
-      {clases.length > 1 && (
-        <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)} aria-label="Nivel">
-          {clases.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nombre}
-            </option>
-          ))}
-        </select>
-      )}
+      <NivelChips niveles={clases} value={nivelId} onChange={setNivelId} />
 
       {tab === 'tomar' ? (
         <TomarAsistenciaInline

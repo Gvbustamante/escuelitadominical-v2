@@ -13,6 +13,7 @@ import { hoyLocal, fechaCorta, fechaLarga } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import TituloPagina from '../../components/ui/TituloPagina'
 import EmptyState from '../../components/EmptyState'
+import NivelChips from '../../components/ui/NivelChips'
 
 const COMPORTAMIENTOS = ['Excelente', 'Bueno', 'Regular', 'Necesita apoyo']
 const EMOCIONES = ['😊 Feliz', '🤩 Emocionado', '😐 Tranquilo', '😢 Triste', '😡 Molesto', '😴 Cansado']
@@ -118,13 +119,7 @@ export default function Progreso() {
         <VistaToggle vista={vista} onChange={setVista} />
       </div>
 
-      <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
-        {clases.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.nombre}
-          </option>
-        ))}
-      </select>
+      <NivelChips niveles={clases} value={nivelId} onChange={setNivelId} />
 
       {!ninos ? (
         <Spinner />

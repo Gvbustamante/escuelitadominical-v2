@@ -7,6 +7,7 @@ import ProgresoNinoModal from '../../components/ProgresoNinoModal'
 import TomarAsistenciaInline from '../../components/TomarAsistenciaInline'
 import EmptyState from '../../components/EmptyState'
 import TituloPagina from '../../components/ui/TituloPagina'
+import NivelChips from '../../components/ui/NivelChips'
 
 export default function AsistenciaAdmin() {
   const { user } = useAuth()
@@ -80,13 +81,7 @@ export default function AsistenciaAdmin() {
         ))}
       </div>
 
-      <select className="input max-w-xs" value={nivelId} onChange={(e) => setNivelId(e.target.value)}>
-        {niveles.map((n) => (
-          <option key={n.id} value={n.id}>
-            {n.nombre}
-          </option>
-        ))}
-      </select>
+      <NivelChips niveles={niveles} value={nivelId} onChange={setNivelId} />
 
       {tab === 'tomar' ? (
         <TomarAsistenciaInline
