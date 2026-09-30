@@ -53,6 +53,14 @@ Marca `[x]` cuando se complete.
 - [x] "Preparar clase": Enseñanza + Actividad + Planeación en una ventana con fecha y nivel puestos; avanza sola; guía con versículo/historia/actividad.
 - [x] Cronograma (niveles × días) con docentes y estado E·A·P; Mes / Semana / Hoy; día de clase elegido solo.
 
+## 🖥️ Reorganización de pantallas (ver UI_PANTALLAS.md)
+- [ ] Base común: título de página, barra de filtros, ‹ Mes › en español, menú ⋯, botón flotante en celular
+- [ ] Navegación: barra inferior en celular, menú de íconos en tablet
+- [ ] Inicio con "Próxima clase"
+- [ ] Niños y Equipo (filas con ⋯, Familias aparte)
+- [ ] Asistencia, Devocionales, Actividades, Bitácora con barra común
+- [ ] Ajustes, Agenda, Drive, Comunidad
+
 ## 🎨 UI/UX — hallazgos en el código
 - [x] 43 textos con tamaño < 12px (`text-[0.6rem]` etc.) → mínimo 12px, 16px en inputs (evita zoom en iPhone).
 - [x] ~290 textos gris claro (`text-ink/30`, `/40`) → bajo contraste (WCAG AA); subir a `/60` mínimo.
