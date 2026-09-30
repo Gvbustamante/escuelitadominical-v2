@@ -13,6 +13,26 @@
   h1, h2, h3, h4 {
     @apply font-display font-extrabold tracking-tight;
   }
+
+  /* Barras de desplazamiento delgadas y discretas (Firefox + Chrome/Safari/Edge) */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(0 0 0 / 0.18) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(0 0 0 / 0.18);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(0 0 0 / 0.32);
+  }
 }
 
 @layer components {
@@ -79,6 +99,13 @@
 }
 
 @layer utilities {
+  /* Filas deslizables (chips, pestañas): sin barra visible */
+  .sin-barra {
+    scrollbar-width: none;
+  }
+  .sin-barra::-webkit-scrollbar {
+    display: none;
+  }
   @keyframes float-soft {
     0%, 100% { transform: translateY(0) rotate(0deg); }
     50% { transform: translateY(-10px) rotate(3deg); }

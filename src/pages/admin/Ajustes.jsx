@@ -220,7 +220,7 @@ export default function Ajustes() {
       </div>
 
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[13rem_1fr] lg:items-start">
-      <nav aria-label="Secciones de ajustes" className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 lg:sticky lg:top-4 lg:flex-col lg:flex-nowrap lg:gap-1 lg:overflow-visible">
+      <nav aria-label="Secciones de ajustes" className="sin-barra -mx-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 lg:sticky lg:top-4 lg:flex-col lg:flex-nowrap lg:gap-1 lg:overflow-visible">
         {[
           ['general', School, 'Escuelita', true],
           ['estrellas', Star, 'Estrellas', true],

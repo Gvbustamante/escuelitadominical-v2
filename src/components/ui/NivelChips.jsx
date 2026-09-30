@@ -18,7 +18,7 @@ export default function NivelChips({ niveles, value, onChange, extra = [], conte
     )
   }
   return (
-    <div role="group" aria-label={label} className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+    <div role="group" aria-label={label} className="sin-barra -mx-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
       {opciones.map((n) => {
         const activo = value === n.id
         return (
