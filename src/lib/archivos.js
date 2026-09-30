@@ -4,10 +4,10 @@ import { supabase } from './supabaseClient'
 /**
  * URLs de archivos de Storage.
  * - Buckets públicos (actividades, logos…): URL pública, síncrona.
- * - Buckets privados ('drive', 'planeaciones'): enlace firmado que caduca. Se firman en lote con
+ * - Buckets privados ('drive', 'planeaciones', 'hojas_vida'): enlace firmado que caduca. Se firman en lote con
  *   useArchivosFirmados() y se leen síncronamente con urlArchivo() (null mientras carga).
  */
-const PRIVADOS = new Set(['drive', 'planeaciones'])
+const PRIVADOS = new Set(['drive', 'planeaciones', 'hojas_vida'])
 const DURACION = 3600 // segundos
 const cache = new Map() // `${bucket}/${path}` -> { url, vence }
 
@@ -61,4 +61,15 @@ export function useArchivosFirmados(items) {
     firmarArchivos(lista).then(() => { if (vivo) setVersion((v) => v + 1) })
     return () => { vivo = false }
   }, [key])
+}
+
+/**
+ * Hoja de vida: profiles.hoja_vida_url guarda la ruta en el bucket privado 'hojas_vida'
+ * (las antiguas guardaban la URL pública completa). Devuelve { bucket, storage_path } o null.
+ */
+export function refHojaVida(valor) {
+  if (!valor) return null
+  const i = valor.indexOf('/hojas_vida/')
+  const path = /^https?:/.test(valor) ? (i >= 0 ? decodeURIComponent(valor.slice(i + '/hojas_vida/'.length).split('?')[0]) : null) : valor
+  return path ? { bucket: 'hojas_vida', storage_path: path } : null
 }

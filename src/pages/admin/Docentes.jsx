@@ -10,6 +10,7 @@ import DetalleUsuarioModal from '../../components/DetalleUsuarioModal'
 import Avatar from '../../components/Avatar'
 import { whatsappLink } from '../../lib/whatsapp'
 import TituloPagina from '../../components/ui/TituloPagina'
+import { urlArchivo, useArchivosFirmados, refHojaVida } from '../../lib/archivos'
 
 const ROLE_LABEL = { superadmin: 'Administrador', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
 const ROLE_BADGE = {
@@ -54,6 +55,8 @@ export default function Docentes() {
   const [confirmBusy, setConfirmBusy] = useState(false)
   const [confirmBorrar, setConfirmBorrar] = useState(null)
   const [borrarBusy, setBorrarBusy] = useState(false)
+  useArchivosFirmados((usuarios || []).map((u) => refHojaVida(u.hoja_vida_url)).filter(Boolean))
+  const urlHV = (u) => { const r = refHojaVida(u.hoja_vida_url); return r ? urlArchivo(r.bucket, r.storage_path) : null }
 
   const load = useCallback(async () => {
     const [{ data: perfiles }, { data: asignaciones }, { data: vinculos }, { data: n }] = await Promise.all([
@@ -303,8 +306,8 @@ export default function Docentes() {
                             💬
                           </a>
                         )}
-                        {u.hoja_vida_url && (
-                          <a href={u.hoja_vida_url} target="_blank" rel="noreferrer" title="Ver hoja de vida" aria-label="Ver hoja de vida" className="rounded-lg bg-grape-50 px-2 py-1 text-xs font-bold text-grape-700 hover:bg-grape-100">📄</a>
+                        {urlHV(u) && (
+                          <a href={urlHV(u)} target="_blank" rel="noreferrer" title="Ver hoja de vida" aria-label="Ver hoja de vida" className="rounded-lg bg-grape-50 px-2 py-1 text-xs font-bold text-grape-700 hover:bg-grape-100">📄</a>
                         )}
                         <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetallePersona(u)}>
                           Ver detalle

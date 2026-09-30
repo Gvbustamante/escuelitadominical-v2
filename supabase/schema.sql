@@ -1481,3 +1481,23 @@ set allowed_mime_types = array[
   'image/*'
 ]
 where id = 'planeaciones';
+
+-- ---------- HOJAS DE VIDA (privado) ----------
+update storage.buckets set public = false where id = 'hojas_vida';
+
+drop policy if exists "Todos pueden ver hojas de vida" on storage.objects;
+drop policy if exists "Staff puede subir hojas de vida" on storage.objects;
+drop policy if exists "Staff puede borrar hojas de vida" on storage.objects;
+drop policy if exists "admin lee hojas de vida" on storage.objects;
+drop policy if exists "admin sube hojas de vida" on storage.objects;
+drop policy if exists "admin borra hojas de vida" on storage.objects;
+
+create policy "admin lee hojas de vida" on storage.objects for select to authenticated
+  using (bucket_id = 'hojas_vida'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin','coordinador')));
+create policy "admin sube hojas de vida" on storage.objects for insert to authenticated
+  with check (bucket_id = 'hojas_vida'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin')));
+create policy "admin borra hojas de vida" on storage.objects for delete to authenticated
+  using (bucket_id = 'hojas_vida'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('superadmin','admin')));

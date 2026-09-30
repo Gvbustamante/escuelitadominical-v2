@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { whatsappLink } from '../lib/whatsapp'
 import Modal from './Modal'
+import { urlArchivo, useArchivosFirmados, refHojaVida } from '../lib/archivos'
 
 const ROLE_LABEL = { superadmin: 'Administrador', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
 const ROLE_BADGE = {
@@ -22,6 +23,9 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
   const [nuevaPassword, setNuevaPassword] = useState('')
   const [archivoHV, setArchivoHV] = useState(null)
   const [hojaVida, setHojaVida] = useState(null)
+  const refHV = refHojaVida(hojaVida)
+  useArchivosFirmados(refHV ? [refHV] : [])
+  const urlHV = refHV ? urlArchivo(refHV.bucket, refHV.storage_path) : null
 
   useEffect(() => {
     if (open && persona) {
@@ -69,7 +73,7 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
         setError(upError.message)
         return
       }
-      payload.hoja_vida_url = supabase.storage.from('hojas_vida').getPublicUrl(path).data.publicUrl
+      payload.hoja_vida_url = path
     }
     const { error: saveError } = await supabase.from('profiles').update(payload).eq('id', persona.id)
     setBusy(false)
@@ -88,6 +92,7 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
   async function quitarHojaVida() {
     setBusy(true)
     const { error: e } = await supabase.from('profiles').update({ hoja_vida_url: null }).eq('id', persona.id)
+    if (!e && refHV) await supabase.storage.from('hojas_vida').remove([refHV.storage_path])
     setBusy(false)
     if (e) return setError(e.message)
     setHojaVida(null)
@@ -181,7 +186,7 @@ export default function DetalleUsuarioModal({ persona, clases = [], hijos = [], 
             <label className="label">Hoja de vida / CV</label>
             {hojaVida && (
               <div className="mb-2 flex items-center gap-3">
-                <a href={hojaVida} target="_blank" rel="noreferrer" className="text-sm font-bold text-grape-700 hover:underline">📄 Ver hoja de vida</a>
+                <a href={urlHV || undefined} target="_blank" rel="noreferrer" className="text-sm font-bold text-grape-700 hover:underline">📄 Ver hoja de vida</a>
                 {puedeHojaVida && <button type="button" onClick={quitarHojaVida} disabled={busy} className="text-xs font-bold text-coral-600 hover:underline">Quitar</button>}
               </div>
             )}

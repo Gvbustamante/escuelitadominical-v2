@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { urlArchivo, firmarArchivos } from '../lib/archivos'
+import { urlArchivo, firmarArchivos, refHojaVida } from '../lib/archivos'
 import Skeleton from './Skeleton'
 import FilePreview from './FilePreview'
 import { getFileIcon } from './FilePreview'
@@ -97,7 +97,7 @@ export default function DriveOrganizado() {
         supabase.from('tarea_entrega_archivos').select('id, entrega_id, storage_path, nombre_archivo, tipo'),
         supabase.from('ninos').select('id, nombre_completo'),
       ])
-      await firmarArchivos([...(actArchivos.data || []), ...(devoArchivos.data || [])])
+      await firmarArchivos([...(actArchivos.data || []), ...(devoArchivos.data || []), ...(perfiles.data || []).map((p) => refHojaVida(p.hoja_vida_url)).filter(Boolean)])
       setDatos({
         actividades: acts.data || [], actividadArchivos: actArchivos.data || [],
         devocionales: devos.data || [], devocionalArchivos: devoArchivos.data || [],
@@ -216,8 +216,8 @@ export default function DriveOrganizado() {
     result.materiales = agruparPorMes(matItems)
 
     result.hojas_vida = datos.perfiles.filter(p => p.hoja_vida_url).map(p => ({
-      nombre: `${p.nombre_completo} — Hoja de vida`, url: p.hoja_vida_url, fuente: p.nombre_completo, mime: null, subidoPor: p.nombre_completo, tipoArchivo: tipoDeArchivo(null, p.hoja_vida_url),
-    }))
+      nombre: `${p.nombre_completo} — Hoja de vida`, url: (() => { const r = refHojaVida(p.hoja_vida_url); return r ? urlArchivo(r.bucket, r.storage_path) : null })(), fuente: p.nombre_completo, mime: null, subidoPor: p.nombre_completo, tipoArchivo: tipoDeArchivo(null, p.hoja_vida_url),
+    })).filter((h) => h.url) // solo quien puede verlas (admin/coordinador)
 
     return result
   }, [datos])

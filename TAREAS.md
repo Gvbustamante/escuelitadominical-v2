@@ -20,11 +20,13 @@ Marca `[x]` cuando se complete.
 - [x] Proyecto "Escuelita Dominical - v2" ya tiene `modulos_activos` (text[]). Correr la migración solo en proyectos de iglesias nuevas/otras.
 - [x] **Drive privado** (enlaces firmados de 1 h). Base de prueba ✅.
 - [x] **Planeación con varios archivos** (PDF, Word, PowerPoint, imágenes). Base de prueba ✅.
+- [x] **Hojas de vida privadas** (solo admin/coordinador). Base de prueba ✅.
 - [x] **PDF de planeación privados** (bucket `planeaciones`, solo equipo). Base de prueba ✅.
 - [x] Pantallas unificadas: Equipo = pestañas Equipo / Familias (hoja de vida en el detalle); Planeación = Cronograma + "Quién enseña" (cobertura) + Horario semanal.
 - [ ] Bumblebee usa el bucket `bumblebee-images` dentro del proyecto de Escuelita → moverlo a su propio proyecto.
 
 ## 🗄️ SQL pendiente en PRODUCCIÓN (lo corre Gisella/Carlos)
+- [ ] **Boston**: `supabase/actualizacion_hojas_vida_privado.sql` (tras respaldo). Los 3 anteriores (drive, planeaciones, planeacion_archivos) ya están en Boston ✅.
 - [ ] `supabase/actualizacion_planeacion_archivos.sql` — después del de abajo (planeaciones_privado). Varios archivos por planeación.
 - [ ] `supabase/actualizacion_planeaciones_privado.sql` — igual: solo cuando Boston reciba este código. La app mueve sola los PDF viejos la primera vez que un admin abre Planeación.
 - [ ] `supabase/actualizacion_drive_privado.sql` — solo cuando Boston reciba el código del Drive privado (si no, sus archivos del Drive dejan de abrir).
