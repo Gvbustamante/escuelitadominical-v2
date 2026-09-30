@@ -4,6 +4,7 @@ import { useNivelesEstrella, badgeActual } from '../lib/nivelesEstrella'
 import { BADGE_CLASSES } from '../lib/colors'
 import Modal from './Modal'
 import PadreContacto from './PadreContacto'
+import { fechaCorta } from '../lib/fechas'
 
 function calcularEdad(fecha) {
   if (!fecha) return '—'
@@ -95,7 +96,7 @@ export default function DetalleNinoModal({ nino, nivel, padres = [], open, onClo
                 <ul className="flex flex-col gap-1 text-sm">
                   {historial.asistencia.map((a, i) => (
                     <li key={i} className="flex items-center justify-between border-b border-ink/5 py-1">
-                      <span>{a.fecha}</span>
+                      <span>{fechaCorta(a.fecha)}</span>
                       <span className={`badge ${a.presente ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
                         {a.presente ? 'Presente' : 'Ausente'}
                       </span>

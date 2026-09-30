@@ -238,7 +238,7 @@ export default function Clases() {
                     </div>
                   </td>
                   <td data-label="Edades" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
-                    {nivel.edad_min ?? '?'} - {nivel.edad_max ?? '?'} años
+                    {nivel.edad_min == null && nivel.edad_max == null ? 'Sin definir' : nivel.edad_min == null ? `Hasta ${nivel.edad_max} años` : nivel.edad_max == null ? `Desde ${nivel.edad_min} años` : `${nivel.edad_min} – ${nivel.edad_max} años`}
                   </td>
                   <td data-label="Docentes" className="px-3 py-2 sm:px-4 sm:py-3">
                     <div className="flex flex-wrap items-center gap-1">

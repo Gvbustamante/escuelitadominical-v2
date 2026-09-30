@@ -20,6 +20,7 @@ import ActivityFiles from '../../components/ActivityFiles'
 import { hoyLocal } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import TituloPagina from '../../components/ui/TituloPagina'
+import EmptyState from '../../components/EmptyState'
 
 function hoyISO() {
   return hoyLocal()
@@ -291,7 +292,7 @@ export default function Actividades() {
   }
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/70">No tienes niveles asignados todavía.</p>
+  if (clases.length === 0) return <EmptyState icon="🎒" titulo="Todavía no tienes niveles asignados" texto="Pide al administrador que te asigne a un nivel en la sección Niveles." />
 
   // Filtrado por búsqueda + mes
   const actividadesFiltradas = (actividades || []).filter((a) =>

@@ -8,6 +8,7 @@ import ProgresoNinoModal from '../../components/ProgresoNinoModal'
 import AlertasAusencia from '../../components/AlertasAusencia'
 import TomarAsistenciaInline from '../../components/TomarAsistenciaInline'
 import TituloPagina from '../../components/ui/TituloPagina'
+import EmptyState from '../../components/EmptyState'
 
 export default function Asistencia() {
   const { user } = useAuth()
@@ -28,7 +29,7 @@ export default function Asistencia() {
   }, [load])
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/70">No tienes niveles asignados todavía.</p>
+  if (clases.length === 0) return <EmptyState icon="🎒" titulo="Todavía no tienes niveles asignados" texto="Pide al administrador que te asigne a un nivel en la sección Niveles." />
 
   const nivelActual = clases.find((c) => c.id === nivelId)
 

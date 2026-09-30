@@ -11,6 +11,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useConfigIglesia } from '../lib/configIglesia'
 import { moduloActivo } from '../lib/modulos'
 import { urlArchivoPlaneacion, archivoPlaneacion } from '../components/PlaneacionClaseModal'
+import { fechaLarga } from '../lib/fechas'
 
 const ROLES_PLANEACION = ['superadmin', 'admin', 'coordinador', 'docente']
 
@@ -134,7 +135,7 @@ export default function DevocionalDetalle() {
               )}
             </div>
             <h1 className="text-2xl font-bold text-white sm:text-4xl drop-shadow-lg">{devocional.titulo}</h1>
-            <p className="mt-1 text-sm font-bold text-white/70">{devocional.fecha}</p>
+            <p className="mt-1 text-sm font-bold text-white/70">{fechaLarga(devocional.fecha)}</p>
           </div>
         </div>
       )}
@@ -152,7 +153,7 @@ export default function DevocionalDetalle() {
                 <p className="mt-1 text-sm font-bold uppercase text-sky-600">{devocional.nivel.nombre}</p>
               )}
             </div>
-            <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/70">{devocional.fecha}</span>
+            <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/70">{fechaLarga(devocional.fecha)}</span>
           </div>
         </div>
       )}

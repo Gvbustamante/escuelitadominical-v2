@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
-import { useAuth } from '../contexts/AuthContext'
 import { useMisHijos } from '../lib/useMisHijos'
 import Spinner from '../components/Spinner'
 import HijoSelector from '../components/HijoSelector'
@@ -43,7 +42,6 @@ const COLORES_AVATAR = [
 ]
 
 export default function MiFamilia() {
-  const { user, profile } = useAuth()
   const navigate = useNavigate()
   const hijos = useMisHijos()
   const [selectedId, setSelectedId] = useState(null)

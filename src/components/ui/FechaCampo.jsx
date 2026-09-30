@@ -1,8 +1,8 @@
 import { useRef } from 'react'
+import { fechaLarga, fechaCorta } from '../../lib/fechas'
 
 function formatear(iso) {
-  if (!iso) return ''
-  return new Date(iso + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  return fechaLarga(iso)
 }
 
 function sumarDias(iso, n) {
@@ -32,7 +32,14 @@ export default function FechaCampo({ value, onChange, required, flechas = false,
         <button type="button" onClick={() => onChange(sumarDias(value, -paso))} aria-label="Anterior" title="Anterior" className="rounded-full px-3 py-1.5 text-xl font-bold leading-none text-ink/65 hover:bg-ink/5">‹</button>
       )}
       <button type="button" onClick={abrir} aria-label={`${ariaLabel}: ${formatear(value) || 'sin elegir'}. Cambiar`} className="input flex min-w-0 flex-1 items-center justify-between gap-2 text-left">
-        <span className={`truncate capitalize ${value ? '' : 'text-ink/50'}`}>{formatear(value) || placeholder}</span>
+        <span className={`truncate ${value ? '' : 'text-ink/50'}`}>
+          {value ? (
+            <>
+              <span className="sm:hidden">{fechaCorta(value)}</span>
+              <span className="hidden sm:inline">{formatear(value)}</span>
+            </>
+          ) : placeholder}
+        </span>
         <span aria-hidden="true">📅</span>
       </button>
       {flechas && value && (

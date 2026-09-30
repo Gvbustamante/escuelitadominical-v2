@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { capitalizar } from '../lib/fechas'
 import Modal from './Modal'
 import RichTextEditor from './RichTextEditor'
 import RichTextView from './RichTextView'
@@ -127,13 +128,13 @@ export default function PrepararClaseModal({ open, onClose, nivel, fecha, userId
     siguiente('planeacion')
   }
 
-  const fechaLarga = fecha ? new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' }) : ''
+  const fechaLarga = fecha ? capitalizar(new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })) : ''
 
   return (
     <Modal open={open} onClose={onClose} wide title={`Preparar clase — ${nivel?.nombre || ''}`}>
       <div className="flex flex-col gap-4">
         <div className="-mt-2 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-bold capitalize text-ink/75">📅 {fechaLarga}</p>
+          <p className="text-sm font-bold text-ink/75">📅 {fechaLarga}</p>
           <p className={`text-sm font-bold ${listos === 3 ? 'text-grass-700' : 'text-ink/65'}`}>{listos === 3 ? '🎉 Clase lista' : `${listos} de 3 listos`}</p>
         </div>
 

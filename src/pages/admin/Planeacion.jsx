@@ -10,6 +10,7 @@ import PrepararClaseModal from '../../components/PrepararClaseModal'
 import { moverPdfsPlaneacionAPrivado } from '../../components/PlaneacionClaseModal'
 import CronogramaNiveles from '../../components/CronogramaNiveles'
 import TituloPagina from '../../components/ui/TituloPagina'
+import { capitalizar, fechaLarga } from '../../lib/fechas'
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -262,7 +263,7 @@ export default function Planeacion() {
             </div>
             <div className="flex items-center gap-1">
               <button type="button" onClick={() => irA(-1)} aria-label={escala === 'semana' ? 'Semana anterior' : 'Mes anterior'} title={escala === 'semana' ? 'Semana anterior' : 'Mes anterior'} className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5">‹</button>
-              <span className="min-w-[9rem] text-center text-base font-bold capitalize">{tituloRango}</span>
+              <span className="min-w-[9rem] text-center text-base font-bold">{capitalizar(tituloRango)}</span>
               <button type="button" onClick={() => irA(1)} aria-label={escala === 'semana' ? 'Semana siguiente' : 'Mes siguiente'} title={escala === 'semana' ? 'Semana siguiente' : 'Mes siguiente'} className="rounded-full px-3 py-1 text-xl font-bold text-ink/65 hover:bg-ink/5">›</button>
             </div>
             <button type="button" onClick={irAHoy} className="rounded-full bg-sunshine-100 px-3 py-1.5 text-sm font-bold text-sunshine-800 hover:bg-sunshine-200">Hoy</button>
@@ -302,7 +303,7 @@ export default function Planeacion() {
                 <section className="card flex flex-col gap-3" aria-labelledby="quien-ensena">
                   <div>
                     <h2 id="quien-ensena" className="text-lg font-bold">
-                      👥 Quién enseña · <span className="capitalize">{new Date(selectedDay + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+                      👥 Quién enseña · <span>{fechaLarga(selectedDay)}</span>
                     </h2>
                     <p className="text-sm text-ink/70">Toca una fecha del cronograma para cambiar de día. Si alguien falta, elige quién cubre.</p>
                   </div>

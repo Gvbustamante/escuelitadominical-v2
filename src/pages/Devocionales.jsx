@@ -13,7 +13,7 @@ import MultiFilePicker from '../components/MultiFilePicker'
 import DrivePicker from '../components/DrivePicker'
 import CitasBiblicasAdmin from './admin/CitasBiblicasAdmin'
 import { getVideoEmbedUrl } from '../lib/videoEmbed'
-import { hoyLocal } from '../lib/fechas'
+import { hoyLocal, fechaCorta } from '../lib/fechas'
 import FechaCampo from '../components/ui/FechaCampo'
 import MesSelector from '../components/ui/MesSelector'
 import FilterBar from '../components/ui/FilterBar'
@@ -36,12 +36,6 @@ function formatFecha(iso) {
   if (!iso) return ''
   const d = new Date(iso + 'T12:00:00')
   return d.toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })
-}
-
-function formatFechaLarga(iso) {
-  if (!iso) return ''
-  const d = new Date(iso + 'T12:00:00')
-  return d.toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' })
 }
 
 function stripHtml(html) {
@@ -444,7 +438,7 @@ export default function Devocionales() {
                   <div className="flex flex-1 flex-col gap-3 p-4">
                     {/* 1. Fecha y clase */}
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-sm font-extrabold capitalize text-sky-700">📅 {formatFechaLarga(d.fecha)}</span>
+                      <span className="text-sm font-extrabold text-sky-700">📅 {fechaCorta(d.fecha)}</span>
                       <span className="badge bg-sky-100 text-sky-700">{d.nivel?.nombre || 'Todos los niveles'}</span>
                     </div>
 

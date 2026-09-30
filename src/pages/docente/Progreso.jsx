@@ -9,9 +9,10 @@ import RewardBurst from '../../components/RewardBurst'
 import VistaToggle from '../../components/VistaToggle'
 import { useNivelesEstrella, badgeActual } from '../../lib/nivelesEstrella'
 import { mensajeAleatorio, playSound } from '../../lib/gamification'
-import { hoyLocal } from '../../lib/fechas'
+import { hoyLocal, fechaCorta, fechaLarga } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import TituloPagina from '../../components/ui/TituloPagina'
+import EmptyState from '../../components/EmptyState'
 
 const COMPORTAMIENTOS = ['Excelente', 'Bueno', 'Regular', 'Necesita apoyo']
 const EMOCIONES = ['😊 Feliz', '🤩 Emocionado', '😐 Tranquilo', '😢 Triste', '😡 Molesto', '😴 Cansado']
@@ -103,7 +104,7 @@ export default function Progreso() {
   }
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/70">No tienes niveles asignados todavía.</p>
+  if (clases.length === 0) return <EmptyState icon="🎒" titulo="Todavía no tienes niveles asignados" texto="Pide al administrador que te asigne a un nivel en la sección Niveles." />
 
   return (
     <div className="flex flex-col gap-6">
@@ -189,7 +190,7 @@ export default function Progreso() {
                 </div>
                 {ultima ? (
                   <div className="mt-2 text-sm text-ink/75">
-                    <p>Última nota: {ultima.fecha}</p>
+                    <p>Última nota: {fechaCorta(ultima.fecha)}</p>
                     {ultima.emocion && <p>{ultima.emocion}</p>}
                     {ultima.comportamiento && <p>Comportamiento: {ultima.comportamiento}</p>}
                   </div>
@@ -288,7 +289,7 @@ export default function Progreso() {
           )}
           {(notasPorNino[historialNino?.id] || []).map((nota) => (
             <div key={nota.id} className="rounded-2xl bg-ink/5 p-3">
-              <p className="text-sm font-bold text-ink/70">{nota.fecha}</p>
+              <p className="text-sm font-bold text-ink/70">{fechaLarga(nota.fecha)}</p>
               {nota.emocion && <p>{nota.emocion}</p>}
               {nota.comportamiento && <p className="text-sm">Comportamiento: {nota.comportamiento}</p>}
               {nota.logros && <p className="mt-1 text-sm text-ink/70">{nota.logros}</p>}

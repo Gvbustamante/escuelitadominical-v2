@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
-import { hoyLocal, fechaLocal } from '../../lib/fechas'
+import { hoyLocal, fechaLocal, capitalizar } from '../../lib/fechas'
 import { DOT_CLASSES } from '../../lib/colors'
 import PrepararClaseModal from '../PrepararClaseModal'
 
@@ -96,14 +96,14 @@ export default function ProximaClase({ nivelIds, userId, puedePreparar = true })
   }
 
   const esHoy = datos.fecha === hoy
-  const fechaTxt = new Date(datos.fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })
+  const fechaTxt = capitalizar(new Date(datos.fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' }))
   const sinPreparar = datos.niveles.filter((n) => !(n.est.e && n.est.a && n.est.p)).length
 
   return (
     <section className="card !p-0 overflow-hidden" aria-labelledby="proxima-clase">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ink/5 bg-sky-50/70 px-4 py-3 sm:px-5">
         <div>
-          <h2 id="proxima-clase" className="text-lg font-bold">📅 Próxima clase · <span className="capitalize">{fechaTxt}</span></h2>
+          <h2 id="proxima-clase" className="text-lg font-bold">📅 Próxima clase · <span>{fechaTxt}</span></h2>
           <p className="text-sm text-ink/70">
             <span className={`mr-2 rounded-full px-2 py-0.5 text-xs font-extrabold ${esHoy ? 'bg-grass-600 text-white' : 'bg-white text-sky-700'}`}>{cuando(datos.fecha, hoy)}</span>
             {datos.niveles.length === 0 ? 'Sin niveles' : sinPreparar === 0 ? 'Todos los niveles están listos ✅' : `${sinPreparar} de ${datos.niveles.length} nivel${datos.niveles.length === 1 ? '' : 'es'} por preparar`}

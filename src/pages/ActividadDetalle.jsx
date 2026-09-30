@@ -13,6 +13,7 @@ import TareaHijoWidget from '../components/TareaHijoWidget'
 import MiEntregaEquipoWidget from '../components/MiEntregaEquipoWidget'
 import FilePreview, { getFileIcon } from '../components/FilePreview'
 import { getVideoEmbedUrl } from '../lib/videoEmbed'
+import { fechaCorta, fechaLarga } from '../lib/fechas'
 
 const STAFF = ['superadmin', 'admin', 'coordinador']
 
@@ -174,7 +175,7 @@ export default function ActividadDetalle() {
                   <p className="mt-1 text-sm font-bold uppercase text-sky-600">{actividad.nivel.nombre}</p>
                 )}
               </div>
-              <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/70">{actividad.fecha}</span>
+              <span className="rounded-xl bg-ink/5 px-3 py-1 text-sm font-bold text-ink/70">{fechaLarga(actividad.fecha)}</span>
             </div>
 
             {/* Contenido */}
@@ -369,7 +370,7 @@ export default function ActividadDetalle() {
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-bold">{a.titulo}</p>
-                        <p className="text-xs text-ink/65">{a.fecha}</p>
+                        <p className="text-xs text-ink/65">{fechaCorta(a.fecha)}</p>
                       </div>
                     </button>
                   )

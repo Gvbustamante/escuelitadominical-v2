@@ -5,7 +5,7 @@ import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
-import { hoyLocal } from '../../lib/fechas'
+import { hoyLocal, fechaLarga } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import TituloPagina from '../../components/ui/TituloPagina'
 
@@ -94,7 +94,7 @@ export default function AgendaAdmin() {
               <div>
                 <p className="font-bold">{ev.titulo}</p>
                 <p className="text-xs font-bold uppercase text-sky-600">{ev.nivel?.nombre || 'Toda la escuelita'}</p>
-                <p className="text-sm text-ink/70">{ev.fecha}</p>
+                <p className="text-sm text-ink/70">{fechaLarga(ev.fecha)}</p>
                 {ev.descripcion && <p className="mt-1 text-sm text-ink/75">{ev.descripcion}</p>}
               </div>
               <button aria-label="Eliminar evento" title="Eliminar evento" onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/65 hover:text-coral-600">

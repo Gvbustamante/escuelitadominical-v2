@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppLogo from '../components/AppLogo'
-import heroImg from '../assets/hero-ninos-cruz.jpg'
 import appScreen from '../assets/kidsmin-screen-clases.png'
 import loginScreen from '../assets/kidsmin-screen-login.png'
 

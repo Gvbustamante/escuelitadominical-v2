@@ -6,9 +6,10 @@ import Spinner from '../../components/Spinner'
 import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import CalendarioAgenda from '../../components/CalendarioAgenda'
-import { hoyLocal } from '../../lib/fechas'
+import { hoyLocal, fechaLarga } from '../../lib/fechas'
 import FechaCampo from '../../components/ui/FechaCampo'
 import TituloPagina from '../../components/ui/TituloPagina'
+import EmptyState from '../../components/EmptyState'
 
 function hoyISO() {
   return hoyLocal()
@@ -59,7 +60,7 @@ export default function Agenda() {
   }
 
   if (!clases) return <Spinner />
-  if (clases.length === 0) return <p className="card text-ink/70">No tienes niveles asignados todavía.</p>
+  if (clases.length === 0) return <EmptyState icon="🎒" titulo="Todavía no tienes niveles asignados" texto="Pide al administrador que te asigne a un nivel en la sección Niveles." />
 
   const hoy = hoyISO()
   const eventosDelDia = eventos ? (selectedDay ? eventos.filter((e) => e.fecha === selectedDay) : eventos) : []
@@ -100,7 +101,7 @@ export default function Agenda() {
               <div key={ev.id} className={`card flex items-center justify-between gap-4 ${ev.fecha < hoy ? 'opacity-50' : ''}`}>
                 <div>
                   <p className="font-bold">{ev.titulo}</p>
-                  <p className="text-sm text-ink/70">{ev.fecha}</p>
+                  <p className="text-sm text-ink/70">{fechaLarga(ev.fecha)}</p>
                   {ev.descripcion && <p className="text-sm text-ink/70">{ev.descripcion}</p>}
                 </div>
                 <button aria-label="Eliminar evento" title="Eliminar evento" onClick={() => setConfirmEliminar(ev.id)} className="text-2xl text-ink/65 hover:text-coral-600">

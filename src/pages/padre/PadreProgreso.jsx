@@ -5,6 +5,7 @@ import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
 import RewardsPanel from '../../components/RewardsPanel'
 import TituloPagina from '../../components/ui/TituloPagina'
+import { fechaLarga } from '../../lib/fechas'
 
 export default function PadreProgreso() {
   const hijos = useMisHijos()
@@ -64,7 +65,7 @@ export default function PadreProgreso() {
           <div className="mt-4 flex flex-col gap-3">
             {(notasPorHijo[h.id] || []).map((nota) => (
               <div key={nota.id} className="card">
-                <p className="text-sm font-bold text-ink/65">{nota.fecha}</p>
+                <p className="text-sm font-bold text-ink/65">{fechaLarga(nota.fecha)}</p>
                 {nota.emocion && <p className="mt-1 text-lg">{nota.emocion}</p>}
                 {nota.comportamiento && (
                   <p className="mt-1 text-sm font-bold text-sky-600">Comportamiento: {nota.comportamiento}</p>

@@ -7,6 +7,7 @@ import CitaDelDia from '../../components/CitaDelDia'
 import ProximaAgenda from '../../components/ProximaAgenda'
 import MiClase from '../../components/MiClase'
 import ProximaClase from '../../components/inicio/ProximaClase'
+import { capitalizar } from '../../lib/fechas'
 
 /** Inicio del docente: su próxima clase (preparar y tomar asistencia) y los cuidados de sus niños. */
 export default function DocenteHome() {
@@ -40,7 +41,7 @@ export default function DocenteHome() {
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-2xl font-bold sm:text-3xl">¡Hola, {profile.nombre_completo.split(' ')[0]}! 🌟</h1>
-        <p className="capitalize text-ink/70">{fechaHoy}</p>
+        <p className="text-ink/70">{capitalizar(fechaHoy)}</p>
       </div>
 
       {nivelIds.length === 0 && !puedeElegirClase && (

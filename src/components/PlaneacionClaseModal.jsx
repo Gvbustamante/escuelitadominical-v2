@@ -4,6 +4,7 @@ import Modal from './Modal'
 import RichTextEditor from './RichTextEditor'
 import PdfViewer from './PdfViewer'
 import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
+import { capitalizar } from '../lib/fechas'
 
 // PDFs en bucket privado 'planeaciones'. Los antiguos quedaron en 'actividades' con ruta 'planeaciones/...'.
 const BUCKET = 'planeaciones'
@@ -287,11 +288,11 @@ export function PlaneacionClaseForm({ nivel, fecha, planeacion, userId, onSaved,
 
 export default function PlaneacionClaseModal({ open, onClose, nivel, fecha, planeacion, userId, onSaved }) {
   const fechaLarga = fecha
-    ? new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })
+    ? capitalizar(new Date(fecha + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' }))
     : ''
   return (
     <Modal open={open} onClose={onClose} wide title={`Planeación — ${nivel?.nombre || ''}`}>
-      <p className="-mt-2 mb-4 text-sm font-bold capitalize text-ink/75">{fechaLarga}</p>
+      <p className="-mt-2 mb-4 text-sm font-bold text-ink/75">{fechaLarga}</p>
       {open && (
         <PlaneacionClaseForm
           nivel={nivel}

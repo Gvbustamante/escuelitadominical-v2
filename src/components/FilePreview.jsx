@@ -1,5 +1,4 @@
 import PdfViewer from './PdfViewer'
-import { useState } from 'react'
 
 /**
  * Modal de previsualización de archivos. Soporta:

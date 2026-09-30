@@ -7,7 +7,6 @@ import { useMisHijos } from '../../lib/useMisHijos'
 import { coincide } from '../../lib/busqueda'
 import Spinner from '../../components/Spinner'
 import HijoSelector from '../../components/HijoSelector'
-import RichTextView from '../../components/RichTextView'
 import TareaHijoWidget from '../../components/TareaHijoWidget'
 import { getVideoEmbedUrl } from '../../lib/videoEmbed'
 import { hoyLocal } from '../../lib/fechas'
@@ -108,7 +107,7 @@ export default function PadreActividades() {
 
   async function reaccionar(actividadId, tipo) {
     const actividad = actividades.find((a) => a.id === actividadId)
-    const mia = actividad.actividad_reacciones.find((r) => r.padre_id === user.id)
+    const mia = (actividad.actividad_reacciones || []).find((r) => r.padre_id === user.id)
     if (mia && mia.tipo === tipo) {
       await supabase.from('actividad_reacciones').delete().eq('actividad_id', actividadId).eq('padre_id', user.id)
     } else {
@@ -165,7 +164,7 @@ export default function PadreActividades() {
 
             <div className="flex flex-col gap-4">
               {acts.map((a, i) => {
-                const mia = a.actividad_reacciones.find((r) => r.padre_id === user.id)
+                const mia = (a.actividad_reacciones || []).find((r) => r.padre_id === user.id)
                 const archivos = a.actividad_archivos || []
                 const fotos = archivos.filter(esFoto)
                 const otros = archivos.filter((f) => !esFoto(f))
@@ -302,7 +301,7 @@ export default function PadreActividades() {
                           onClick={() => navigate(`/actividades/${a.id}`)}
                           className="ml-auto text-xs font-bold text-ink/65 hover:text-sky-600"
                         >
-                          {a.actividad_reacciones.length} reacciones · Ver →
+                          {(a.actividad_reacciones || []).length} reacciones · Ver →
                         </button>
                       </div>
                     </div>

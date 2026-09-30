@@ -7,7 +7,7 @@ import ProximaAgenda from '../../components/ProximaAgenda'
 import PrimerosPasos from '../../components/PrimerosPasos'
 import ProximaClase from '../../components/inicio/ProximaClase'
 import AlertasAdmin from '../../components/inicio/AlertasAdmin'
-import { hoyLocal } from '../../lib/fechas'
+import { hoyLocal, capitalizar } from '../../lib/fechas'
 
 function Numero({ to, icon, valor, label, tono }) {
   const TONO = { sky: 'bg-sky-100 text-sky-700', grass: 'bg-grass-100 text-grass-700', sunshine: 'bg-sunshine-100 text-sunshine-800', grape: 'bg-grape-100 text-grape-700' }
@@ -47,7 +47,7 @@ export default function AdminHome({ extra }) {
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-2xl font-bold sm:text-3xl">¡Hola, {profile.nombre_completo.split(' ')[0]}! 👋</h1>
-        <p className="capitalize text-ink/70">{fechaHoy}</p>
+        <p className="text-ink/70">{capitalizar(fechaHoy)}</p>
       </div>
 
       <PrimerosPasos />

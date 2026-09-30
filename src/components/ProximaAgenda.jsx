@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
-import { hoyLocal, fechaLocal } from '../lib/fechas'
+import { hoyLocal, fechaLocal, fechaCorta } from '../lib/fechas'
 
 function hoyISO() {
   return hoyLocal()
@@ -112,7 +112,7 @@ export default function ProximaAgenda({ nivelIds, soloTareasPendientes = false, 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold">{it.titulo}</p>
               <p className="text-xs text-ink/65">
-                {it.fecha}
+                {fechaCorta(it.fecha)}
                 {it.nivel ? ` · ${it.nivel}` : ''}
                 {it.tipo === 'tarea' && soloTareasPendientes ? ' · pendiente' : ''}
               </p>

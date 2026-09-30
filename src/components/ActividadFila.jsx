@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { urlArchivo, useArchivosFirmados } from '../lib/archivos'
+import { fechaCorta } from '../lib/fechas'
 
 function fileUrl(path, bucket = 'actividades') {
   return urlArchivo(bucket, path)
@@ -51,7 +52,7 @@ export default function ActividadFila({ a, onEdit, onDelete, onVerEntregas, onDu
           {a.es_tarea && <span className="badge bg-sky-100 text-sky-700">📝 Tarea</span>}
         </div>
         <div className="flex items-center gap-2 text-xs text-ink/65">
-          <span className="sm:hidden">{a.fecha}</span>
+          <span className="sm:hidden">{fechaCorta(a.fecha)}</span>
           {fotos.length > 0 && <span>📸 {fotos.length}</span>}
           {otros.length > 0 && <span>📎 {otros.length}</span>}
         </div>

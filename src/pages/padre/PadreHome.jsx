@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMisHijos } from '../../lib/useMisHijos'
 import { useNivelesEstrella, badgeActual } from '../../lib/nivelesEstrella'
-import { hoyLocal } from '../../lib/fechas'
+import { hoyLocal, fechaLarga } from '../../lib/fechas'
 import Spinner from '../../components/Spinner'
 import { BADGE_CLASSES } from '../../lib/colors'
 import CitaDelDia from '../../components/CitaDelDia'
@@ -78,7 +78,7 @@ function HijoCard({ hijo, proximaClase }) {
 
       {proximaClase && (
         <p className="text-sm text-ink/80">
-          📅 Próxima clase: <span className="font-bold capitalize">{new Date(proximaClase + 'T00:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+          📅 Próxima clase: <span className="font-bold">{fechaLarga(proximaClase)}</span>
         </p>
       )}
 

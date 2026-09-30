@@ -17,4 +17,4 @@ export function mensajeAleatorio() {
 // Estructura preparada para audio futuro (narración y efectos de sonido).
 // Hoy no reproduce nada: solo deja el punto de enganche listo para cuando
 // haya archivos de audio. Ej. futuro: new Audio(`/sounds/${name}.mp3`).play()
-export function playSound(_name) {}
+export function playSound() {}
