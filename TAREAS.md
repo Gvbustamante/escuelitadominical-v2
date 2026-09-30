@@ -24,7 +24,9 @@ Marca `[x]` cuando se complete.
 - [x] **Hojas de vida privadas** (solo admin/coordinador). Base de prueba ✅.
 - [x] **PDF de planeación privados** (bucket `planeaciones`, solo equipo). Base de prueba ✅.
 - [x] Pantallas unificadas: Equipo = pestañas Equipo / Familias (hoja de vida en el detalle); Planeación = Cronograma + "Quién enseña" (cobertura) + Horario semanal.
-- [ ] Bumblebee usa el bucket `bumblebee-images` dentro del proyecto de Escuelita → moverlo a su propio proyecto.
+- [x] Bumblebee ya no crea "padres" en Escuelita y se arregló la creación de cuentas (fallaba desde el 17/sep en la base de prueba). Ver `supabase/separar_bumblebee.sql`.
+- [ ] Bumblebee paso 3: su app todavía guarda el progreso en la base de Escuelita (6 cuentas, 957 intentos). Cuando apunte a su proyecto, copiar cuentas + progreso y borrar todo `bumblebee_*` de Escuelita.
+- [ ] `admin_create_invited_user` no deja crear cuentas a un superadmin (hoy no hay superadmins; revisar en multi-tenant).
 
 ## 🗄️ SQL pendiente en PRODUCCIÓN (lo corre Gisella/Carlos)
 - [x] **Boston** al día: drive, planeaciones, planeacion_archivos, hojas_vida y archivos_privados ✅ (30/sep).
