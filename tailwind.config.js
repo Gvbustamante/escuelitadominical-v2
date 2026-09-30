@@ -28,7 +28,7 @@ export default {
           50: '#f7f1ff', 100: '#ebe0ff', 200: '#d5c1ff', 300: '#b998ff',
           400: '#9b5de5', 500: '#8339d6', 600: '#6c25b8', 700: '#571c93',
         },
-        cream: '#f4faff',
+        cream: '#eaf0f6',
         ink: '#15202e',
       },
       borderRadius: {
