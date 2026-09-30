@@ -78,6 +78,11 @@ export default function Clases() {
     setHorarioDocentes((prev) => ({ ...prev, [horarioId]: docenteId || undefined }))
   }
 
+  async function quitarDocente(nivelId, docenteId) {
+    await supabase.from('docentes_niveles').delete().eq('nivel_id', nivelId).eq('docente_id', docenteId)
+    load()
+  }
+
   function toggleDocente(id) {
     setSelectedDocentes((prev) => (prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]))
   }
@@ -235,21 +240,34 @@ export default function Clases() {
                     {nivel.edad_min ?? '?'} - {nivel.edad_max ?? '?'} años
                   </td>
                   <td data-label="Docentes" className="px-3 py-2 sm:px-4 sm:py-3">
-                    {docs.length === 0 ? (
-                      <span className="text-sm text-ink/65">Sin asignar</span>
-                    ) : (
-                      <div className="flex flex-wrap gap-1">
-                        {docs.map((a) => {
-                          const doc = docentes.find((d) => d.id === a.docente_id)
-                          if (!doc) return null
-                          return (
-                            <span key={a.docente_id} className={`badge text-xs ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
-                              {doc.nombre_completo.split(' ').slice(0, 2).join(' ')}
-                            </span>
-                          )
-                        })}
-                      </div>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1">
+                      {docs.map((a) => {
+                        const doc = docentes.find((d) => d.id === a.docente_id)
+                        if (!doc) return null
+                        const corto = doc.nombre_completo.split(' ').slice(0, 2).join(' ')
+                        return (
+                          <span key={a.docente_id} className={`badge gap-1 text-xs ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
+                            {corto}
+                            <button
+                              type="button"
+                              onClick={() => quitarDocente(nivel.id, a.docente_id)}
+                              aria-label={`Quitar a ${corto} de ${nivel.nombre}`}
+                              title="Quitar de este nivel"
+                              className="-mr-1 rounded-full px-1 leading-none opacity-70 hover:opacity-100"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        )
+                      })}
+                      <button
+                        type="button"
+                        onClick={() => openEdit(nivel)}
+                        className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700 hover:bg-sky-100"
+                      >
+                        {docs.length === 0 ? '+ Asignar docentes' : '+ Asignar'}
+                      </button>
+                    </div>
                   </td>
                   <td data-label="Estado" className="px-3 py-2 sm:px-4 sm:py-3">
                     <span className={`badge ${nivel.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
@@ -351,9 +369,9 @@ export default function Clases() {
             </div>
           </div>
           {horarios.length > 1 && (
-            <div>
-              <label className="label">Docente fijo por horario (opcional)</label>
-              <p className="mb-2 text-xs text-ink/65">
+            <details className="rounded-xl bg-ink/[0.03] px-3 py-2" open={Object.values(horarioDocentes).some(Boolean)}>
+              <summary className="cursor-pointer text-sm font-bold text-ink/75">Avanzado: docente fijo por horario</summary>
+              <p className="mb-2 mt-2 text-xs text-ink/65">
                 Si hay más de un servicio el mismo día, di quién cubre cada uno. Se vincula automáticamente arriba.
               </p>
               <div className="flex flex-col gap-2">
@@ -378,7 +396,7 @@ export default function Clases() {
                   </div>
                 ))}
               </div>
-            </div>
+            </details>
           )}
           {error && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-600">{error}</p>}
           <button disabled={busy} className="btn-primary justify-center">

@@ -44,8 +44,8 @@ Marca `[x]` cuando se complete.
 ## 🧭 Flujos (ver FLUJOS_UX.md)
 - [x] Renombrar "Clase" → "Nivel" en pantallas (grupo = Nivel, sesión = Clase).
 - [x] Asistencia: guardado automático + ⭐ en la fila + "⭐ a todos" + deshacer.
-- [ ] Nuevo niño con padre en el mismo formulario.
-- [ ] Nueva cuenta docente con niveles; asignar desde la lista de Niveles; horario a "Avanzado".
+- [x] Nuevo niño → sigue directo a vincular padre/madre (omitible) → WhatsApp con datos → "Registrar otro niño".
+- [x] Nueva cuenta docente con niveles (varios); asignar/quitar desde la lista de Niveles; horario en "Avanzado".
 - [ ] "Preparar clase": Enseñanza + Actividad + Planeación en una ventana con fecha y nivel puestos.
 - [ ] Cronograma (niveles × días) con docentes y estado; calendario Mes / Semana.
 

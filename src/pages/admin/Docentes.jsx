@@ -42,6 +42,8 @@ export default function Docentes() {
   const [busquedaNino, setBusquedaNino] = useState('')
   const [ninoSeleccionado, setNinoSeleccionado] = useState(null)
   const [parentesco, setParentesco] = useState('')
+  const [nivelesTodos, setNivelesTodos] = useState([])
+  const [nivelesElegidos, setNivelesElegidos] = useState([])
   const [error, setError] = useState('')
   const [creado, setCreado] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -102,9 +104,17 @@ export default function Docentes() {
     setBusquedaNino('')
     setNinoSeleccionado(null)
     setParentesco('')
+    setNivelesElegidos([])
     setError('')
     setCreado(null)
     setModalOpen(true)
+    supabase.from('niveles').select('id, nombre').eq('activo', true).order('orden').then(({ data }) => setNivelesTodos(data || []))
+  }
+
+  const esEquipo = ['docente', 'coordinador', 'admin'].includes(form.role)
+
+  function toggleNivel(id) {
+    setNivelesElegidos((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }
 
   async function handleInvite(e) {
@@ -116,14 +126,24 @@ export default function Docentes() {
     setBusy(true)
     setError('')
     try {
-      const { password } = await crearUsuario({
+      const { id, password } = await crearUsuario({
         ...form,
         email: form.email || undefined,
         whatsapp: form.whatsapp || undefined,
         nino_id: form.role === 'padre' ? ninoSeleccionado.id : undefined,
         parentesco: form.role === 'padre' ? parentesco : undefined,
       })
-      setCreado({ cedula: form.cedula, password, nombre: form.nombre_completo })
+      // Asignar a los niveles elegidos (uno o varios) en el mismo paso.
+      let avisoNiveles = ''
+      if (esEquipo && nivelesElegidos.length > 0) {
+        const { error: nivErr } = await supabase
+          .from('docentes_niveles')
+          .insert(nivelesElegidos.map((nivel_id) => ({ docente_id: id, nivel_id })))
+        avisoNiveles = nivErr
+          ? 'La cuenta se creó, pero no se pudo asignar a los niveles. Asígnalo desde Niveles.'
+          : `Asignado/a a: ${nivelesTodos.filter((n) => nivelesElegidos.includes(n.id)).map((n) => n.nombre).join(', ')}`
+      }
+      setCreado({ cedula: form.cedula, password, nombre: form.nombre_completo, avisoNiveles })
       load()
     } catch (err) {
       setError(err.message)
@@ -334,10 +354,24 @@ export default function Docentes() {
               <p className="mt-2 text-xs font-extrabold uppercase text-ink/65">Contraseña</p>
               <p className="text-xl font-extrabold text-grass-700">{creado.password}</p>
             </div>
+            {creado.avisoNiveles && <p className="rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-800">{creado.avisoNiveles}</p>}
             <p className="text-sm text-ink/70">Comunícale estos datos para que pueda entrar.</p>
-            <button className="btn-primary justify-center" onClick={() => setModalOpen(false)}>
-              Listo
-            </button>
+            <a
+              className="btn-secondary justify-center"
+              target="_blank"
+              rel="noreferrer"
+              href={`https://wa.me/?text=${encodeURIComponent(`Hola ${creado.nombre.split(' ')[0]} 👋 Ya tienes tu cuenta en la escuelita.\nEntra en: ${window.location.origin}\nUsuario: ${creado.cedula}\nContraseña: ${creado.password}`)}`}
+            >
+              📲 Enviar por WhatsApp
+            </a>
+            <div className="flex gap-2">
+              <button className="btn-secondary flex-1 justify-center" onClick={() => setModalOpen(false)}>
+                Listo
+              </button>
+              <button className="btn-primary flex-1 justify-center" onClick={openInvite}>
+                + Crear otra
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleInvite} className="flex flex-col gap-4">
@@ -380,6 +414,28 @@ export default function Docentes() {
                 ))}
               </select>
             </div>
+            {esEquipo && nivelesTodos.length > 0 && (
+              <div>
+                <label className="label">¿En qué niveles enseña o ayuda? (opcional)</label>
+                <div className="flex flex-wrap gap-2">
+                  {nivelesTodos.map((n) => {
+                    const on = nivelesElegidos.includes(n.id)
+                    return (
+                      <button
+                        key={n.id}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => toggleNivel(n.id)}
+                        className={`rounded-full px-3 py-2 text-sm font-bold transition-colors ${on ? 'bg-sky-400 text-white' : 'bg-ink/5 text-ink/75 hover:bg-sky-50'}`}
+                      >
+                        {on ? '✓ ' : ''}{n.nombre}
+                      </button>
+                    )
+                  })}
+                </div>
+                <p className="mt-1 text-xs text-ink/65">Puedes elegir varios. Un nivel puede tener uno o más docentes.</p>
+              </div>
+            )}
 
             <div>
               <label className="label">Correo electrónico (opcional)</label>

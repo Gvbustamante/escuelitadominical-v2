@@ -72,6 +72,7 @@ export default function Ninos() {
   const [inviteMsg, setInviteMsg] = useState('')
   const [inviteBusy, setInviteBusy] = useState(false)
   const [creado, setCreado] = useState(null)
+  const [recienCreado, setRecienCreado] = useState(false)
   const [todosPerfiles, setTodosPerfiles] = useState([])
   const [busquedaPerfil, setBusquedaPerfil] = useState('')
   const [perfilSeleccionado, setPerfilSeleccionado] = useState(null)
@@ -173,14 +174,16 @@ export default function Ninos() {
       alergias: form.alergias || null,
       notas: form.notas || null,
     }
-    const { error } = editing
-      ? await supabase.from('ninos').update(payload).eq('id', editing.id)
-      : await supabase.from('ninos').insert({ ...payload, creado_por: user.id })
+    const { data: guardado, error } = editing
+      ? await supabase.from('ninos').update(payload).eq('id', editing.id).select().single()
+      : await supabase.from('ninos').insert({ ...payload, creado_por: user.id }).select().single()
 
     setBusy(false)
     if (error) return setError(error.message)
     setModalOpen(false)
     load()
+    // Niño nuevo: seguir directo con su padre/madre, sin tener que buscarlo en la lista.
+    if (!editing && guardado && puedeVincularPadre) openInvite(guardado, true)
   }
 
   async function toggleActivo(nino) {
@@ -248,7 +251,8 @@ export default function Ninos() {
     load()
   }
 
-  function openInvite(nino) {
+  function openInvite(nino, desdeAlta = false) {
+    setRecienCreado(desdeAlta)
     setInviteModal(nino)
     setModoVinculo('nueva')
     setInviteForm({ cedula: '', nombre_completo: '', parentesco: '' })
@@ -308,6 +312,20 @@ export default function Ninos() {
         (p.cedula || '').includes(busquedaPerfil),
     )
     .slice(0, 8)
+
+  // Botones al terminar de vincular: cerrar o seguir registrando niños.
+  const finAlta = (
+    <div className="flex gap-2">
+      <button type="button" className="btn-secondary flex-1 justify-center" onClick={() => setInviteModal(null)}>
+        Listo
+      </button>
+      {puedeAgregar && (
+        <button type="button" className="btn-primary flex-1 justify-center" onClick={() => { setInviteModal(null); openNew() }}>
+          + Registrar otro niño
+        </button>
+      )}
+    </div>
+  )
 
   if (!ninos) {
     return (
@@ -586,12 +604,26 @@ export default function Ninos() {
               <p className="text-xl font-extrabold text-grass-700">{creado.password}</p>
             </div>
             <p className="text-sm text-ink/70">Comunícale estos datos para que pueda entrar.</p>
-            <button className="btn-primary justify-center" onClick={() => setInviteModal(null)}>
-              Listo
-            </button>
+            <a
+              className="btn-secondary justify-center"
+              target="_blank"
+              rel="noreferrer"
+              href={`https://wa.me/?text=${encodeURIComponent(`Hola ${creado.nombre.split(' ')[0]} 👋 Ya tienes tu cuenta en la escuelita.\nEntra en: ${window.location.origin}\nUsuario: ${creado.cedula}\nContraseña: ${creado.password}`)}`}
+            >
+              📲 Enviar por WhatsApp
+            </a>
+            {finAlta}
           </div>
         ) : (
           <div className="flex flex-col gap-4">
+            {recienCreado && (
+              <div className="flex flex-wrap items-center justify-between gap-2 rounded-chunky bg-grass-50 px-3 py-2">
+                <p className="text-sm font-bold text-grass-800">✅ {inviteModal?.nombre_completo} quedó registrado/a. Ahora vincula a su padre/madre.</p>
+                <button type="button" onClick={() => setInviteModal(null)} className="text-sm font-bold text-ink/65 underline">
+                  Omitir por ahora
+                </button>
+              </div>
+            )}
             <div className="flex gap-2">
               <button
                 type="button"
@@ -707,9 +739,13 @@ export default function Ninos() {
                   </div>
                 )}
                 {inviteMsg && <p className="text-sm font-bold">{inviteMsg}</p>}
-                <button disabled={inviteBusy || !perfilSeleccionado} className="btn-primary justify-center">
-                  {inviteBusy ? 'Vinculando...' : 'Vincular'}
-                </button>
+                {inviteMsg.startsWith('✅') ? (
+                  finAlta
+                ) : (
+                  <button disabled={inviteBusy || !perfilSeleccionado} className="btn-primary justify-center">
+                    {inviteBusy ? 'Vinculando...' : 'Vincular'}
+                  </button>
+                )}
               </form>
             )}
           </div>
