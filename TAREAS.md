@@ -25,7 +25,11 @@ Marca `[x]` cuando se complete.
 - [x] `supabase/actualizacion_planeacion_clase.sql`
 
 ## 🏗️ Técnico / escalabilidad
-- [ ] Migrar a **multi-tenant**: un solo proyecto Supabase + un solo deploy, columna `iglesia_id` en todas las tablas + RLS por iglesia.
+- [ ] Migrar a **multi-tenant** (ver MULTITENANT.md — decisiones tomadas 30/sep: 1 cuenta = 1 iglesia, un solo sitio, Boston Kids aparte por ahora).
+  - [ ] Fase 1: base de datos + prueba de aislamiento (en pruebas)
+  - [ ] Fase 2: app (registro de iglesia, demo, archivos por iglesia)
+  - [ ] Fase 3: panel de la dueña
+  - [ ] Fase 4: pasar Boston Kids
 - [ ] Plan para mover las iglesias existentes (una base por iglesia) al proyecto único.
 - [ ] Alta automática de iglesia nueva (formulario, sin SQL manual).
 - [ ] Tabla `planes` → módulos incluidos por plan; la iglesia solo apaga lo que su plan incluye.
