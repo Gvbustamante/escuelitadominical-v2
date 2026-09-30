@@ -31,6 +31,14 @@ function claveOculto(userId) {
   return `primeros-pasos-oculto:${userId}`
 }
 
+export function primerosPasosOculto(userId) {
+  try { return localStorage.getItem(claveOculto(userId)) === '1' } catch { return false }
+}
+
+export function mostrarPrimerosPasos(userId) {
+  try { localStorage.removeItem(claveOculto(userId)) } catch { /* sin almacenamiento */ }
+}
+
 /** Lista de configuración inicial para admins. Se oculta sola cuando todo está hecho. */
 export default function PrimerosPasos() {
   const { user } = useAuth()
@@ -69,7 +77,7 @@ export default function PrimerosPasos() {
           <button type="button" onClick={() => setAbierto((a) => !a)} className="rounded-full bg-ink/5 px-3 py-1.5 text-sm font-bold text-ink/75 hover:bg-ink/10">
             {abierto ? 'Contraer' : 'Ver pasos'}
           </button>
-          <button type="button" onClick={ocultar} className="rounded-full px-3 py-1.5 text-sm font-bold text-ink/65 hover:bg-ink/5">
+          <button type="button" onClick={ocultar} title="Puedes volver a mostrarla desde Ayuda" className="rounded-full px-3 py-1.5 text-sm font-bold text-ink/65 hover:bg-ink/5">
             Ocultar
           </button>
         </div>

@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { primerosPasosOculto, mostrarPrimerosPasos } from '../components/PrimerosPasos'
 import { useAuth } from '../contexts/AuthContext'
 import GobeLogo from '../components/GobeLogo'
 
@@ -262,12 +264,30 @@ function RolesTab({ role }) {
  * Ajustes).
  */
 export function AyudaContenido() {
-  const { profile } = useAuth()
+  const { profile, user } = useAuth()
+  const navigate = useNavigate()
   const { Guide } = GUIDES[profile.role] || GUIDES.padre
   const [tab, setTab] = useState('guia')
+  const esAdmin = ['superadmin', 'admin', 'coordinador'].includes(profile.role)
+  const pasosOcultos = esAdmin && primerosPasosOculto(user?.id)
 
   return (
     <div className="flex flex-col gap-6">
+      {pasosOcultos && (
+        <div className="card flex max-w-2xl flex-wrap items-center justify-between gap-3 border-2 border-sky-200">
+          <div>
+            <p className="font-bold">🚀 Primeros pasos</p>
+            <p className="text-sm text-ink/75">Ocultaste la lista de configuración del Inicio. Puedes volver a mostrarla.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => { mostrarPrimerosPasos(user?.id); navigate('/') }}
+            className="btn-primary !py-2 !text-sm"
+          >
+            Mostrar en Inicio
+          </button>
+        </div>
+      )}
       <div className="flex gap-2">
         <button
           onClick={() => setTab('guia')}
