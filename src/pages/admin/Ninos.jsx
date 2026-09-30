@@ -16,6 +16,7 @@ import { generarCodigoFacil } from '../../lib/codigoFacil'
 import EmptyState from '../../components/EmptyState'
 import { hoyLocal } from '../../lib/fechas'
 import TituloPagina from '../../components/ui/TituloPagina'
+import ActionMenu from '../../components/ui/ActionMenu'
 
 const STAFF = ['superadmin', 'admin', 'coordinador']
 
@@ -91,7 +92,7 @@ export default function Ninos() {
     const queries = [
       supabase.from('ninos').select('*').order('nombre_completo'),
       supabase.from('niveles').select('*').eq('activo', true),
-      supabase.from('ninos_padres').select('nino_id, parentesco, padre:profiles(id, nombre_completo, telefono, pausado)'),
+      supabase.from('ninos_padres').select('nino_id, parentesco, padre:profiles(id, nombre_completo, telefono, whatsapp, pausado)'),
       supabase.from('reconocimientos').select('nino_id'),
       supabase.from('asistencia').select('nino_id, presente').gte('fecha', inicioMes).eq('presente', true),
     ]
@@ -426,10 +427,24 @@ export default function Ninos() {
                   const edad = calcularEdad(nino.fecha_nacimiento)
                   const inactivo = !nino.activo || nino.pausado
 
+                  const puedeEste = !esDocente || misNivelIds?.has(nino.nivel_id)
+                  const acciones = [
+                    { label: 'Ver ficha', icon: '👁️', onClick: () => setDetalleNino(nino) },
+                    { label: 'Editar', icon: '✏️', onClick: () => openEdit(nino), oculto: !(puedeEditar && puedeEste) },
+                    { label: padres.length ? 'Agregar padre/madre' : 'Vincular padre/madre', icon: '👪', onClick: () => openInvite(nino), oculto: !(puedeVincularPadre && puedeEste) },
+                    { label: nino.pausado ? 'Reanudar' : 'Pausar', icon: nino.pausado ? '▶️' : '⏸️', onClick: () => togglePausado(nino), oculto: !esStaff },
+                    { label: nino.activo ? 'Desactivar' : 'Activar', icon: nino.activo ? '🚫' : '✅', onClick: () => handleToggleClick(nino), oculto: !esStaff, peligro: nino.activo },
+                  ]
+
                   return (
                     <div
                       key={nino.id}
-                      className={`flex items-center gap-3 px-3 py-2.5 transition-colors hover:bg-sky-50/50 sm:px-4 sm:py-3 ${
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setDetalleNino(nino)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') setDetalleNino(nino) }}
+                      aria-label={`Ver ficha de ${nino.nombre_completo}`}
+                      className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors hover:bg-sky-50/50 focus-visible:bg-sky-50 focus-visible:outline-none sm:px-4 sm:py-3 ${
                         inactivo ? 'opacity-50' : ''
                       }`}
                     >
@@ -437,74 +452,51 @@ export default function Ninos() {
 
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                          {nino.sexo && <span className="text-sm">{nino.sexo === 'M' ? '👦' : '👧'}</span>}
-                          <span className="truncate text-sm font-bold leading-tight">{nino.nombre_completo}</span>
-                          {edad !== null && (
-                            <span className="text-xs text-ink/65">{edad}a</span>
-                          )}
+                          <span className="truncate text-sm font-bold leading-tight sm:text-base">{nino.nombre_completo}</span>
+                          {edad !== null && <span className="text-xs text-ink/65">{edad} años</span>}
                           {nivel && (
                             <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-bold leading-none ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
                               {nivel.nombre}
                             </span>
                           )}
-                          {nino.alergias && (
-                            <span className="text-xs text-coral-600" title={nino.alergias}>⚠️</span>
-                          )}
                           {!nino.activo && (
                             <span className="rounded-full bg-coral-100 px-1.5 py-0.5 text-xs font-bold leading-none text-coral-700">Inactivo</span>
                           )}
-                          {nino.pausado && (
-                            <span className="text-xs text-ink/65">⏸️</span>
+                          {nino.pausado && <span className="rounded-full bg-ink/5 px-1.5 py-0.5 text-xs font-bold leading-none text-ink/70">⏸️ Pausado</span>}
+                        </div>
+                        {nino.alergias && (
+                          <p className="mt-0.5 truncate text-xs font-bold text-coral-700">⚠️ Alergia: {nino.alergias}</p>
+                        )}
+                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0">
+                          {padres.length === 0 ? (
+                            <span className="text-xs font-bold text-coral-600">Sin padre/madre vinculado</span>
+                          ) : (
+                            padres.map((p, j) => {
+                              const wa = whatsappLink(p.padre?.whatsapp || p.padre?.telefono)
+                              return (
+                                <span key={j} className="inline-flex items-center gap-1 text-xs text-ink/70">
+                                  👪 {p.padre?.nombre_completo}
+                                  {wa && (
+                                    <a href={wa} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} aria-label={`WhatsApp de ${p.padre?.nombre_completo}`} title="WhatsApp" className="text-grass-700 hover:text-grass-800">💬</a>
+                                  )}
+                                </span>
+                              )
+                            })
                           )}
                         </div>
-                        {padres.length > 0 && (
-                          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0">
-                            {padres.map((p, j) => (
-                              <span key={j} className="inline-flex items-center gap-0.5 text-xs text-ink/65">
-                                {p.padre?.nombre_completo}
-                                {whatsappLink(p.padre?.telefono) && (
-                                  <a href={whatsappLink(p.padre.telefono)} target="_blank" rel="noreferrer" className="text-grass-500 hover:text-grass-700">💬</a>
-                                )}
-                              </span>
-                            ))}
-                          </div>
-                        )}
                       </div>
 
                       <div className="hidden shrink-0 items-center gap-3 sm:flex">
-                        <span className="text-base leading-none" title={`${badge.nombre} · ${numEstrellas} estrellas`}>{badge.emoji}</span>
-                        <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-bold leading-none ${
-                          asistMes > 0 ? 'bg-grass-100 text-grass-700' : 'bg-ink/5 text-ink/65'
-                        }`}>
-                          ✅{asistMes}
+                        <span className="text-sm font-bold text-sunshine-800" title={`${badge.nombre} · ${numEstrellas} estrellas`}>{badge.emoji} {numEstrellas}⭐</span>
+                        <span
+                          title="Clases a las que vino este mes"
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold ${asistMes > 0 ? 'bg-grass-100 text-grass-800' : 'bg-ink/5 text-ink/65'}`}
+                        >
+                          {asistMes} {asistMes === 1 ? 'clase' : 'clases'} este mes
                         </span>
                       </div>
 
-                      <div className="flex shrink-0 items-center gap-0.5">
-                        <button aria-label="Detalle" className="rounded-lg p-1.5 text-xs text-sky-600 hover:bg-sky-100" onClick={() => setDetalleNino(nino)} title="Detalle">
-                          👁️
-                        </button>
-                        {puedeEditar && (!esDocente || misNivelIds?.has(nino.nivel_id)) && (
-                          <button aria-label="Editar" className="rounded-lg p-1.5 text-xs text-sky-600 hover:bg-sky-100" onClick={() => openEdit(nino)} title="Editar">
-                            ✏️
-                          </button>
-                        )}
-                        {puedeVincularPadre && (!esDocente || misNivelIds?.has(nino.nivel_id)) && (
-                          <button aria-label="Vincular padre" className="rounded-lg p-1.5 text-xs text-sky-600 hover:bg-sky-100" onClick={() => openInvite(nino)} title="Vincular padre">
-                            👪
-                          </button>
-                        )}
-                        {esStaff && (
-                          <>
-                            <button aria-label={nino.pausado ? 'Reanudar' : 'Pausar'} className="rounded-lg p-1.5 text-xs text-ink/65 hover:bg-ink/5" onClick={() => togglePausado(nino)} title={nino.pausado ? 'Reanudar' : 'Pausar'}>
-                              {nino.pausado ? '▶️' : '⏸️'}
-                            </button>
-                            <button aria-label={nino.activo ? 'Desactivar' : 'Activar'} className="rounded-lg p-1.5 text-xs text-ink/65 hover:bg-ink/5" onClick={() => handleToggleClick(nino)} title={nino.activo ? 'Desactivar' : 'Activar'}>
-                              {nino.activo ? '🚫' : '✅'}
-                            </button>
-                          </>
-                        )}
-                      </div>
+                      <ActionMenu acciones={acciones} label={`Acciones de ${nino.nombre_completo}`} />
                     </div>
                   )
                 })}

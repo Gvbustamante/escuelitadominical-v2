@@ -10,6 +10,7 @@ import DetalleUsuarioModal from '../../components/DetalleUsuarioModal'
 import Avatar from '../../components/Avatar'
 import { whatsappLink } from '../../lib/whatsapp'
 import TituloPagina from '../../components/ui/TituloPagina'
+import ActionMenu from '../../components/ui/ActionMenu'
 import { urlArchivo, useArchivosFirmados, refHojaVida } from '../../lib/archivos'
 
 const ROLE_LABEL = { superadmin: 'Administrador', admin: 'Administrador', coordinador: 'Coordinador', docente: 'Docente', padre: 'Padre / Madre' }
@@ -256,89 +257,65 @@ export default function Docentes() {
             </button>
           </div>
 
-          <div className="card overflow-x-auto p-0">
-            <table className="tabla-tarjetas w-full text-left">
-              <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/70">
-                <tr>
-                  <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
-                  <th className="px-3 py-2 sm:px-4 sm:py-3">Rol</th>
-                  <th className="px-3 py-2 sm:px-4 sm:py-3">Usuario</th>
-                  <th className="px-3 py-2 sm:px-4 sm:py-3">{vista === 'familias' ? 'Hijos' : 'Nivel'}</th>
-                  <th className="px-3 py-2 sm:px-4 sm:py-3">Estado</th>
-                  <th className="px-3 py-2 sm:px-4 sm:py-3">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtrados.map((u) => (
-                  <tr key={u.id} className={`border-t border-ink/5 ${!u.activo ? 'opacity-50' : ''}`}>
-                    <td data-titulo className="px-3 py-2 sm:px-4 sm:py-3 font-bold">
-                      <div className="flex items-center gap-2">
+          {filtrados.length === 0 ? (
+            <p className="card text-center text-ink/65">{vista === 'familias' ? 'No hay familias que coincidan.' : 'No hay cuentas que coincidan.'}</p>
+          ) : (
+            <div className="card overflow-hidden !p-0">
+              <ul className="flex flex-col divide-y divide-ink/5">
+                {filtrados.map((u) => {
+                  const esAdminYo = ['superadmin', 'admin'].includes(profile.role)
+                  const wa = whatsappLink(u.whatsapp || u.telefono)
+                  const hv = urlHV(u)
+                  const detalle = ROLES_EQUIPO.includes(u.role)
+                    ? clasesPorDocente[u.id]?.join(', ') || (u.role === 'docente' ? 'Sin nivel asignado' : '')
+                    : hijosPorPadre[u.id]?.join(', ') || 'Sin hijos vinculados'
+                  const alerta = (u.role === 'docente' && !clasesPorDocente[u.id]?.length) || (u.role === 'padre' && !hijosPorPadre[u.id]?.length)
+                  const acciones = [
+                    { label: 'Ver detalle', icon: '👁️', onClick: () => setDetallePersona(u) },
+                    { label: 'Escribir por WhatsApp', icon: '💬', onClick: () => window.open(wa, '_blank', 'noopener'), oculto: !wa },
+                    { label: 'Ver hoja de vida', icon: '📄', onClick: () => window.open(hv, '_blank', 'noopener'), oculto: !hv },
+                    { label: u.activo ? 'Desactivar' : 'Activar', icon: u.activo ? '🚫' : '✅', onClick: () => handleToggleClick(u), oculto: !esAdminYo || u.id === profile.id, peligro: u.activo },
+                    { label: 'Borrar cuenta', icon: '🗑️', onClick: () => setConfirmBorrar(u), oculto: !(esAdminYo && llevaInactivo3Meses(u)), peligro: true },
+                  ]
+                  return (
+                    <li
+                      key={u.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setDetallePersona(u)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') setDetallePersona(u) }}
+                      aria-label={`Ver detalle de ${u.nombre_completo}`}
+                      className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors hover:bg-sky-50/50 focus-visible:bg-sky-50 focus-visible:outline-none sm:px-4 sm:py-3 ${!u.activo ? 'opacity-60' : ''}`}
+                    >
+                      <span className="relative shrink-0">
                         <Avatar nombre={u.nombre_completo} size="sm" />
-                        <span>{u.nombre_completo}</span>
-                      </div>
-                    </td>
-                    <td data-label="Rol" className="px-3 py-2 sm:px-4 sm:py-3">
-                      <span className={`badge ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
-                    </td>
-                    <td data-label="Usuario" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">{u.cedula || '—'}</td>
-                    <td data-label={vista === 'familias' ? 'Hijos' : 'Nivel'} className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
-                      {['superadmin', 'admin', 'coordinador', 'docente'].includes(u.role)
-                        ? clasesPorDocente[u.id]?.join(', ') || (u.role === 'docente' ? 'Sin asignar' : '—')
-                        : u.role === 'padre'
-                          ? hijosPorPadre[u.id]?.join(', ') || 'Sin vincular'
-                          : '—'}
-                    </td>
-                    <td data-label="Estado" className="px-3 py-2 sm:px-4 sm:py-3">
-                      <span className={`badge ${u.activo ? 'bg-grass-100 text-grass-700' : 'bg-coral-100 text-coral-700'}`}>
-                        {u.activo ? 'Activo' : 'Inactivo'}
+                        <span
+                          className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-white ${u.activo ? 'bg-grass-500' : 'bg-coral-500'}`}
+                          title={u.activo ? 'Activo' : 'Inactivo'}
+                          aria-label={u.activo ? 'Activo' : 'Inactivo'}
+                        />
                       </span>
-                    </td>
-                    <td data-acciones className="px-3 py-2 sm:px-4 sm:py-3">
-                      <div className="flex flex-wrap gap-2">
-                        {whatsappLink(u.whatsapp || u.telefono) && (
-                          <a
-                            href={whatsappLink(u.whatsapp || u.telefono)}
-                            target="_blank"
-                            rel="noreferrer"
-                            title="Abrir WhatsApp"
-                            className="btn-success !px-2 !py-1 !text-xs"
-                          >
-                            💬
-                          </a>
-                        )}
-                        {urlHV(u) && (
-                          <a href={urlHV(u)} target="_blank" rel="noreferrer" title="Ver hoja de vida" aria-label="Ver hoja de vida" className="rounded-lg bg-grape-50 px-2 py-1 text-xs font-bold text-grape-700 hover:bg-grape-100">📄</a>
-                        )}
-                        <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => setDetallePersona(u)}>
-                          Ver detalle
-                        </button>
-                        {['superadmin', 'admin'].includes(profile.role) && u.id !== profile.id && (
-                          <button className="btn-secondary !py-1 !px-3 !text-xs" onClick={() => handleToggleClick(u)}>
-                            {u.activo ? 'Desactivar' : 'Activar'}
-                          </button>
-                        )}
-                        {['superadmin', 'admin'].includes(profile.role) && llevaInactivo3Meses(u) && (
-                          <button
-                            className="rounded-lg bg-coral-100 px-3 py-1 text-xs font-bold text-coral-700 hover:bg-coral-200"
-                            onClick={() => setConfirmBorrar(u)}
-                          >
-                            🗑️ Borrar
-                          </button>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                          <span className="truncate text-sm font-bold sm:text-base">{u.nombre_completo}</span>
+                          <span className={`badge text-xs ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role]}</span>
+                          {!u.activo && <span className="badge bg-coral-100 text-xs text-coral-700">Inactivo</span>}
+                          {hv && <span className="text-xs" title="Tiene hoja de vida" aria-label="Tiene hoja de vida">📄</span>}
+                        </div>
+                        {detalle && (
+                          <p className={`truncate text-xs ${alerta ? 'font-bold text-coral-600' : 'text-ink/70'}`}>
+                            {vista === 'familias' && !alerta ? '👪 ' : ''}{detalle}
+                          </p>
                         )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-                {filtrados.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-6 text-center text-ink/65">
-                      {vista === 'familias' ? 'No hay familias que coincidan.' : 'No hay cuentas que coincidan.'}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                      <span className="hidden shrink-0 text-xs text-ink/65 sm:block" title="Usuario para entrar">👤 {u.cedula || '—'}</span>
+                      <ActionMenu acciones={acciones} label={`Acciones de ${u.nombre_completo}`} />
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )}
         </>
       )}
 
