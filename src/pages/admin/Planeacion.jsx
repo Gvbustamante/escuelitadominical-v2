@@ -11,6 +11,7 @@ import { moverPdfsPlaneacionAPrivado } from '../../components/PlaneacionClaseMod
 import CronogramaNiveles from '../../components/CronogramaNiveles'
 import TituloPagina from '../../components/ui/TituloPagina'
 import { capitalizar, fechaLarga } from '../../lib/fechas'
+import { nivelesDelDia, nivelTieneClaseEn } from '../../lib/diasNivel'
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -181,21 +182,25 @@ export default function Planeacion() {
     return niveles.filter((n) => misNivelIds.has(n.id))
   }, [niveles, asignaciones, esDocente, user?.id])
 
+  // Cuenta clases (nivel × día) que tocan según los días de cada nivel.
   const resumenMes = useMemo(() => {
     let planeadas = 0
     let sinPlanear = 0
     for (const iso of fechasRango) {
       const diaSem = new Date(iso + 'T00:00:00').getDay()
       if (!diasClaseSet.has(diaSem)) continue
-      const tieneContenido =
-        actividadesMes.some((a) => a.fecha === iso) ||
-        devocionalesMes.some((dv) => dv.fecha === iso) ||
-        planeacionesMes.some((pl) => pl.fecha === iso)
-      if (tieneContenido) planeadas++
-      else sinPlanear++
+      for (const nivel of nivelesVisibles) {
+        if (!nivelTieneClaseEn(nivel, iso)) continue
+        const tieneContenido =
+          actividadesMes.some((a) => a.fecha === iso && a.nivel_id === nivel.id) ||
+          devocionalesMes.some((dv) => dv.fecha === iso && (!dv.nivel_id || dv.nivel_id === nivel.id)) ||
+          planeacionesMes.some((pl) => pl.fecha === iso && pl.nivel_id === nivel.id)
+        if (tieneContenido) planeadas++
+        else sinPlanear++
+      }
     }
     return { planeadas, sinPlanear }
-  }, [actividadesMes, devocionalesMes, planeacionesMes, diasClaseSet, fechasRango])
+  }, [actividadesMes, devocionalesMes, planeacionesMes, diasClaseSet, fechasRango, nivelesVisibles])
 
   async function asignarCobertura(nivelId, horarioId, docenteId) {
     if (!docenteId) {
@@ -269,7 +274,7 @@ export default function Planeacion() {
             <button type="button" onClick={irAHoy} className="rounded-full bg-sunshine-100 px-3 py-1.5 text-sm font-bold text-sunshine-800 hover:bg-sunshine-200">Hoy</button>
             {diasClaseSet.size > 0 && (
               <span className="ml-auto flex gap-2 text-xs font-bold">
-                <span className="rounded-full bg-grass-50 px-3 py-1.5 text-grass-800">{resumenMes.planeadas} con contenido</span>
+                <span className="rounded-full bg-grass-50 px-3 py-1.5 text-grass-800">{resumenMes.planeadas} {resumenMes.planeadas === 1 ? 'clase con contenido' : 'clases con contenido'}</span>
                 <span className={`rounded-full px-3 py-1.5 ${resumenMes.sinPlanear > 0 ? 'bg-coral-50 text-coral-700' : 'bg-grass-50 text-grass-800'}`}>{resumenMes.sinPlanear} sin planear</span>
               </span>
             )}
@@ -312,7 +317,7 @@ export default function Planeacion() {
                   )}
                   {!esDiaClase && <p className="rounded-xl bg-sunshine-50 px-3 py-2 text-sm font-bold text-sunshine-800">Este día no es día de clase.</p>}
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                    {nivelesVisibles.map((nivel) => {
+                    {nivelesDelDia(nivelesVisibles, selectedDay).map((nivel) => {
                       const color = nivel.color || 'sky'
                       const fijosGenerales = asignaciones.filter((a) => a.nivel_id === nivel.id).map((a) => a.docente?.nombre_completo).filter(Boolean)
                       const soloUnHorario = horariosDelDia.length <= 1

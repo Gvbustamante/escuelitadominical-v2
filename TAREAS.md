@@ -14,7 +14,8 @@ Marca `[x]` cuando se complete.
 - [x] **Materiales: permitir PDF** — selector acepta fotos y PDF; columna "Archivos".
 - [x] **Edad en vez de fecha de nacimiento** — pedir solo edad, guardar año aproximado para que la edad suba sola cada año. Fecha exacta opcional.
 - [x] **Planeación de clase** — en Planeación, cada clase/día: escribir (con guía) y/o subir PDF con vista previa. Tabla `planeacion_clase`.
-- [ ] **Días de clase por nivel** — cada nivel elige en qué días activos tiene clase (ej. sábado solo Tweens). Columna `niveles.dias_semana int[]` (vacía = todos los días). Configurar en Niveles con chips de días. Respetarlo en: Próxima clase (Inicio), Asistencia, Cronograma/Planeación (casilla gris "—", no cuenta como "sin planear"), Reportes y Alertas. Luego (opcional): excepciones por fecha puntual ("este domingo no hay Tweens").
+- [x] **Días de clase por nivel** — en Niveles cada nivel marca sus días (chips). Se respeta en Próxima clase, Asistencia (aviso/bloqueo), Cronograma (casilla gris "—"), "Quién enseña", resumen de Planeación, Reporte docentes, Inicio de padres y paneles de hoy. Columna `niveles.dias_semana` (ambas bases ✅).
+- [ ] Días por nivel — excepciones por fecha puntual ("este domingo no hay Tweens").
 - [ ] **Planeación con IA (plan Pro)** — subir PDF y que la IA llene título, versículo, historia, objetivos y materiales. Calcular costo por PDF antes.
 
 ## 🔧 Pendiente inmediato
@@ -52,6 +53,7 @@ Marca `[x]` cuando se complete.
 - [ ] Pasar a Supabase Pro ($25/mes) con el primer cliente de pago (backups diarios, sin pausa por inactividad).
 
 ## 💰 Negocio — decidir modelo de cobro
+- [x] **Plan gratuito (decidido 1/oct):** máx. **2 docentes y 25 niños**; módulos propuestos: Asistencia, Devocionales, Actividades, Agenda, Progreso (sin Planeación, Bitácora, Drive, Comunidad, Reportes). Se implementa en el multi-tenant (tabla `planes`, límites en la base).
 - [ ] ¿Cobrar por **módulos**, por **docentes**, por **niños**, o combinación (plan base + límite de niños/docentes)?
 - [ ] ¿Periodo: **mensual, trimestral, semestral o anual**? ¿Descuento por pago anual (ej. 2 meses gratis)?
 - [ ] **Demo gratis**: ¿cuántos días (14 / 30)? ¿con todos los módulos? ¿qué pasa con los datos al terminar?

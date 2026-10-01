@@ -11,6 +11,7 @@ import CitaDelDia from '../../components/CitaDelDia'
 import ProximaAgenda from '../../components/ProximaAgenda'
 import { proximoDiaClase } from '../../components/inicio/ProximaClase'
 import Emo from '../../components/ui/Emo'
+import { nivelTieneDia } from '../../lib/diasNivel'
 
 function calcularEdad(fecha) {
   if (!fecha) return null
@@ -106,13 +107,16 @@ function HijoCard({ hijo, proximaClase }) {
 export default function PadreHome() {
   const { profile } = useAuth()
   const hijos = useMisHijos()
-  const [proximaClase, setProximaClase] = useState(null)
+  const [diasActivos, setDiasActivos] = useState(null)
 
   useEffect(() => {
     supabase.from('dias_clase').select('dia_semana, activo').then(({ data }) => {
-      setProximaClase(proximoDiaClase(new Set((data || []).filter((d) => d.activo).map((d) => d.dia_semana))))
+      setDiasActivos((data || []).filter((d) => d.activo).map((d) => d.dia_semana))
     })
   }, [])
+
+  // Próxima clase de cada hijo según los días de su nivel.
+  const proximaDe = (hijo) => (diasActivos ? proximoDiaClase(new Set(diasActivos.filter((d) => nivelTieneDia(hijo.nivel, d)))) : null)
 
   if (!hijos) return <Spinner />
 
@@ -130,7 +134,7 @@ export default function PadreHome() {
       ) : (
         <div className="grid gap-5 lg:grid-cols-3">
           <div className="grid gap-4 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-2">
-            {hijos.map((h) => <HijoCard key={h.id} hijo={h} proximaClase={proximaClase} />)}
+            {hijos.map((h) => <HijoCard key={h.id} hijo={h} proximaClase={proximaDe(h)} />)}
           </div>
           <aside className="flex flex-col gap-5">
             <ProximaAgenda nivelIds={nivelIds} soloTareasPendientes hijoIds={hijos.map((h) => h.id)} />

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import Skeleton from './Skeleton'
 import { hoyLocal } from '../lib/fechas'
+import { nivelTieneDia } from '../lib/diasNivel'
 
 function hoyISO() {
   return hoyLocal()
@@ -29,9 +30,9 @@ export default function CoberturaHoy() {
         return
       }
 
-      const [{ data: niveles }, { data: horarios }, { data: docentesNiveles }, { data: asigHorario }, { data: coberturaHoy }, { data: ninos }, { data: asistenciaHoy }] =
+      const [{ data: nivelesTodos }, { data: horarios }, { data: docentesNiveles }, { data: asigHorario }, { data: coberturaHoy }, { data: ninos }, { data: asistenciaHoy }] =
         await Promise.all([
-          supabase.from('niveles').select('id, nombre').eq('activo', true).order('edad_min', { ascending: true, nullsFirst: true }),
+          supabase.from('niveles').select('id, nombre, dias_semana').eq('activo', true).order('edad_min', { ascending: true, nullsFirst: true }),
           supabase.from('horarios').select('*').eq('activo', true).order('orden'),
           supabase.from('docentes_niveles').select('nivel_id, docente:profiles(nombre_completo)'),
           supabase.from('asignacion_horario').select('nivel_id, horario_id, docente:profiles(nombre_completo)'),
@@ -40,6 +41,8 @@ export default function CoberturaHoy() {
           supabase.from('asistencia').select('nivel_id, tomada_por:profiles(nombre_completo)').eq('fecha', hoy),
         ])
 
+      // Solo los niveles que tienen clase hoy (días por nivel).
+      const niveles = (nivelesTodos || []).filter((n) => nivelTieneDia(n, diaSemana))
       const horaAhora = horaActualHHMM()
       const yaPaso = (h) => !h.hora || h.hora.slice(0, 5) <= horaAhora
 

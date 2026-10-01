@@ -1,4 +1,5 @@
 import { DOT_CLASSES } from '../lib/colors'
+import { nivelTieneClaseEn } from '../lib/diasNivel'
 
 const STRIPE = {
   sky: 'border-l-sky-400',
@@ -107,6 +108,19 @@ export default function CronogramaNiveles({
                   </span>
                 </th>
                 {dias.map((fecha) => {
+                  if (!nivelTieneClaseEn(nivel, fecha)) {
+                    return (
+                      <td key={fecha} className={`border-t border-ink/5 p-1.5 align-top ${fecha === hoy ? 'bg-sunshine-50/60' : ''}`}>
+                        <span
+                          className="flex h-full min-h-[5.25rem] w-full items-center justify-center rounded-xl bg-ink/[0.04] text-sm font-bold text-ink/45"
+                          title={`${nivel.nombre} no tiene clase este día`}
+                          aria-label={`${nivel.nombre} no tiene clase este día`}
+                        >
+                          —
+                        </span>
+                      </td>
+                    )
+                  }
                   const docs = docentesDe(nivel.id, fecha)
                   const est = estadoDe(nivel.id, fecha)
                   const listos = Object.values(est).filter(Boolean).length

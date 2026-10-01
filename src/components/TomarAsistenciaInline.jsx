@@ -7,6 +7,7 @@ import Avatar from './Avatar'
 import RewardBurst from './RewardBurst'
 import FechaCampo from './ui/FechaCampo'
 import { fechaLarga } from '../lib/fechas'
+import { nivelTieneDia, NOMBRE_DIA } from '../lib/diasNivel'
 
 // Fecha local (no UTC): un domingo a las 8 p. m. en América sigue siendo domingo.
 function hoyISO() {
@@ -50,6 +51,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
   const [estadoGuardado, setEstadoGuardado] = useState('') // '' | 'guardando' | 'guardado' | 'error'
   const [toast, setToast] = useState(null)
   const [diasClaseSet, setDiasClaseSet] = useState(null)
+  const [nivelDias, setNivelDias] = useState(null) // días del nivel (null = todos)
   const [eligiendo, setEligiendo] = useState(null) // nino_id | 'todos' | null
   const [busyEstrella, setBusyEstrella] = useState(false)
   const celebradoRef = useRef(false)
@@ -64,6 +66,11 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
       setDiasClaseSet(new Set(activos))
     })
   }, [])
+
+  useEffect(() => {
+    if (!nivelId) return
+    supabase.from('niveles').select('dias_semana').eq('id', nivelId).maybeSingle().then(({ data }) => setNivelDias(data?.dias_semana || null))
+  }, [nivelId])
 
   useEffect(() => {
     if (!nivelId) return
@@ -91,7 +98,9 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
 
   const esHoy = fecha === hoyISO()
   const diaSemana = new Date(fecha + 'T00:00:00').getDay()
-  const esDiaClase = diasClaseSet ? diasClaseSet.has(diaSemana) : true
+  const esDiaEscuelita = diasClaseSet ? diasClaseSet.has(diaSemana) : true
+  const esDiaDelNivel = nivelTieneDia({ dias_semana: nivelDias }, diaSemana)
+  const esDiaClase = esDiaEscuelita && esDiaDelNivel
   // El docente corrige durante el día de clase; los demás días queda cerrado. El staff siempre puede.
   const bloqueado = !esStaff && (!esHoy || !esDiaClase)
 
@@ -214,8 +223,10 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
     return (
       <div className="card flex flex-col items-center gap-3 py-12 text-center">
         <span className="text-4xl">📅</span>
-        <p className="font-bold text-ink/65">Hoy no es día de clase</p>
-        <p className="text-sm text-ink/65">Solo puedes tomar asistencia los días de clase</p>
+        <p className="font-bold text-ink/65">
+          {esDiaEscuelita ? `${nivelNombre || 'Este nivel'} no tiene clase los ${NOMBRE_DIA[diaSemana].toLowerCase()}` : 'Hoy no es día de clase'}
+        </p>
+        <p className="text-sm text-ink/65">Solo puedes tomar asistencia los días de clase de tu nivel</p>
       </div>
     )
   }
@@ -254,6 +265,12 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
             )}
           </div>
         </div>
+
+        {esStaff && diasClaseSet && !esDiaClase && (
+          <p className="border-b border-ink/5 bg-sunshine-50 px-4 py-2 text-sm font-bold text-sunshine-800">
+            ⚠️ {esDiaEscuelita ? `${nivelNombre || 'Este nivel'} no tiene clase los ${NOMBRE_DIA[diaSemana].toLowerCase()}.` : 'Este día no es día de clase.'} Puedes registrar igual si fue una clase especial.
+          </p>
+        )}
 
         {cargando ? (
           <div className="flex items-center justify-center py-12">

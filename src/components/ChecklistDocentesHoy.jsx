@@ -5,6 +5,7 @@ import Avatar from './Avatar'
 import Skeleton from './Skeleton'
 import { hoyLocal } from '../lib/fechas'
 import Emo from './ui/Emo'
+import { nivelTieneDia } from '../lib/diasNivel'
 
 function hoyISO() {
   return hoyLocal()
@@ -38,7 +39,7 @@ export default function ChecklistDocentesHoy() {
             .in('role', ['docente', 'coordinador'])
             .eq('activo', true)
             .order('nombre_completo'),
-          supabase.from('docentes_niveles').select('docente_id, nivel:niveles(id, nombre)'),
+          supabase.from('docentes_niveles').select('docente_id, nivel:niveles(id, nombre, dias_semana)'),
           supabase.from('asistencia').select('tomada_por, nivel_id, created_at, nivel:niveles(nombre)').eq('fecha', hoy),
           supabase.from('bitacora_clase').select('docente_id, momento, created_at, nivel:niveles(nombre)').eq('fecha', hoy),
           supabase.from('actividades').select('docente_id, titulo, created_at, nivel:niveles(nombre)').eq('fecha', hoy),
@@ -53,7 +54,12 @@ export default function ChecklistDocentesHoy() {
         clasesMap[dn.docente_id].push(dn.nivel.nombre)
       })
 
-      const filas = (docentes || []).map((doc) => {
+      // Solo cuenta a quien tiene clase hoy (sin niveles asignados = cuenta igual).
+      const tieneClaseHoy = (doc) => {
+        const suyos = (docentesNiveles || []).filter((dn) => dn.docente_id === doc.id && dn.nivel)
+        return suyos.length === 0 || suyos.some((dn) => nivelTieneDia(dn.nivel, diaSemana))
+      }
+      const filas = (docentes || []).filter(tieneClaseHoy).map((doc) => {
         const asist = (asistencia || []).filter((a) => a.tomada_por === doc.id)
         const bita = (bitacora || []).filter((b) => b.docente_id === doc.id)
         const acts = (actividades || []).filter((a) => a.docente_id === doc.id)

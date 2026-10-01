@@ -8,6 +8,8 @@ import TomarAsistenciaInline from '../../components/TomarAsistenciaInline'
 import EmptyState from '../../components/EmptyState'
 import TituloPagina from '../../components/ui/TituloPagina'
 import NivelChips from '../../components/ui/NivelChips'
+import { nivelTieneClaseEn } from '../../lib/diasNivel'
+import { hoyLocal } from '../../lib/fechas'
 
 export default function AsistenciaAdmin() {
   const { user } = useAuth()
@@ -26,7 +28,8 @@ export default function AsistenciaAdmin() {
       .order('nombre')
       .then(({ data }) => {
         setNiveles(data || [])
-        setNivelId((data || [])[0]?.id || '')
+        const lista = data || []
+        setNivelId((lista.find((n) => nivelTieneClaseEn(n, hoyLocal())) || lista[0])?.id || '')
       })
   }, [])
 

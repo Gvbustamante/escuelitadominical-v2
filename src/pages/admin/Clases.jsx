@@ -6,6 +6,7 @@ import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 import TituloPagina from '../../components/ui/TituloPagina'
+import { CORTO_DIA, NOMBRE_DIA, nivelTieneDia } from '../../lib/diasNivel'
 
 const COLOR_OPTIONS = ['sky', 'grass', 'sunshine', 'coral', 'grape']
 const DIA_LABEL = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -17,6 +18,7 @@ export default function Clases() {
   const [asignaciones, setAsignaciones] = useState([])
   const [horarios, setHorarios] = useState([])
   const [asignacionesHorario, setAsignacionesHorario] = useState([])
+  const [diasActivos, setDiasActivos] = useState([]) // días de clase activos de la escuelita
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ nombre: '', edad_min: '', edad_max: '', color: 'sky' })
@@ -28,13 +30,15 @@ export default function Clases() {
   const [confirmBusy, setConfirmBusy] = useState(false)
 
   const load = useCallback(async () => {
-    const [{ data: n }, { data: d }, { data: a }, { data: h }, { data: ah }] = await Promise.all([
+    const [{ data: n }, { data: d }, { data: a }, { data: h }, { data: ah }, { data: dc }] = await Promise.all([
       supabase.from('niveles').select('*').order('orden', { ascending: true }),
       supabase.from('profiles').select('id, nombre_completo, role').in('role', ['superadmin', 'admin', 'coordinador', 'docente']).eq('activo', true).order('nombre_completo'),
       supabase.from('docentes_niveles').select('*'),
       supabase.from('horarios').select('*').eq('activo', true).order('orden'),
       supabase.from('asignacion_horario').select('*'),
+      supabase.from('dias_clase').select('dia_semana, activo'),
     ])
+    setDiasActivos((dc || []).filter((x) => x.activo).map((x) => x.dia_semana).sort((x, y) => x - y))
     setNiveles(n || [])
     setDocentes(d || [])
     setAsignaciones(a || [])
@@ -77,6 +81,24 @@ export default function Clases() {
 
   function setHorarioDocente(horarioId, docenteId) {
     setHorarioDocentes((prev) => ({ ...prev, [horarioId]: docenteId || undefined }))
+  }
+
+  // Marca/desmarca un día de clase para el nivel. Todos marcados = null (sigue a la escuelita).
+  async function alternarDia(nivel, dia) {
+    const actuales = diasActivos.filter((d) => nivelTieneDia(nivel, d))
+    const nuevos = actuales.includes(dia) ? actuales.filter((d) => d !== dia) : [...actuales, dia].sort((x, y) => x - y)
+    if (nuevos.length === 0) {
+      setError(`"${nivel.nombre}" debe tener al menos un día de clase. Si ya no se da, desactiva el nivel.`)
+      return
+    }
+    setError('')
+    const valor = nuevos.length === diasActivos.length ? null : nuevos
+    setNiveles((prev) => prev.map((n) => (n.id === nivel.id ? { ...n, dias_semana: valor } : n)))
+    const { error: e } = await supabase.from('niveles').update({ dias_semana: valor }).eq('id', nivel.id)
+    if (e) {
+      setError('No se pudo guardar el día: ' + e.message)
+      load()
+    }
   }
 
   async function quitarDocente(nivelId, docenteId) {
@@ -196,12 +218,19 @@ export default function Clases() {
         </button>
       </div>
 
+      {diasActivos.length > 1 && (
+        <p className="text-sm text-ink/70">
+          <strong>Días de clase:</strong> toca un día para quitarlo o agregarlo a un nivel (ej. si el sábado solo hay Tweens).
+        </p>
+      )}
+      {error && !modalOpen && <p className="rounded-xl bg-coral-50 px-3 py-2 text-sm font-bold text-coral-700">{error}</p>}
       <div className="card overflow-x-auto p-0">
         <table className="tabla-tarjetas w-full text-left">
           <thead className="bg-sky-50 text-sm font-bold uppercase text-ink/70">
             <tr>
               <th className="px-3 py-2 sm:px-4 sm:py-3">Nombre</th>
               <th className="px-3 py-2 sm:px-4 sm:py-3">Edades</th>
+              <th className="px-3 py-2 sm:px-4 sm:py-3">Días de clase</th>
               <th className="px-3 py-2 sm:px-4 sm:py-3">Docentes</th>
               <th className="px-3 py-2 sm:px-4 sm:py-3">Estado</th>
               <th className="px-3 py-2 sm:px-4 sm:py-3">Acciones</th>
@@ -239,6 +268,33 @@ export default function Clases() {
                   </td>
                   <td data-label="Edades" className="px-3 py-2 sm:px-4 sm:py-3 text-ink/75">
                     {nivel.edad_min == null && nivel.edad_max == null ? 'Sin definir' : nivel.edad_min == null ? `Hasta ${nivel.edad_max} años` : nivel.edad_max == null ? `Desde ${nivel.edad_min} años` : `${nivel.edad_min} – ${nivel.edad_max} años`}
+                  </td>
+                  <td data-label="Días de clase" className="px-3 py-2 sm:px-4 sm:py-3">
+                    {diasActivos.length === 0 ? (
+                      <span className="text-sm text-ink/65">Configura los días en Ajustes</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-1" role="group" aria-label={`Días de clase de ${nivel.nombre}`}>
+                        {diasActivos.map((d) => {
+                          const on = nivelTieneDia(nivel, d)
+                          const unico = diasActivos.length === 1
+                          return (
+                            <button
+                              key={d}
+                              type="button"
+                              disabled={unico}
+                              aria-pressed={on}
+                              onClick={() => alternarDia(nivel, d)}
+                              title={unico ? 'La escuelita tiene un solo día de clase' : `${on ? 'Quitar' : 'Agregar'} ${NOMBRE_DIA[d]}`}
+                              className={`rounded-full px-2.5 py-1 text-xs font-bold transition-colors ${
+                                on ? 'bg-grass-600 text-white' : 'bg-white text-ink/60 ring-1 ring-ink/15 line-through hover:bg-grass-50'
+                              } disabled:cursor-default`}
+                            >
+                              {CORTO_DIA[d]}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
                   </td>
                   <td data-label="Docentes" className="px-3 py-2 sm:px-4 sm:py-3">
                     <div className="flex flex-wrap items-center gap-1">
@@ -292,7 +348,7 @@ export default function Clases() {
             })}
             {niveles.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-ink/65">
+                <td colSpan={6} className="px-4 py-6 text-center text-ink/65">
                   Aún no hay clases. ¡Crea la primera!
                 </td>
               </tr>

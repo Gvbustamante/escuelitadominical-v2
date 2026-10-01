@@ -1606,3 +1606,7 @@ create policy "pqr evidencia borrar" on storage.objects for delete to authentica
 
 -- Revisora (cambiar el id en cada base):
 -- insert into public.pqr_revisores (user_id) values ('<id de Gisella>') on conflict do nothing;
+
+-- ---------- DÍAS DE CLASE POR NIVEL ----------
+alter table public.niveles add column if not exists dias_semana smallint[];
+comment on column public.niveles.dias_semana is 'Días (0=dom..6=sáb) en que el nivel tiene clase. null = todos los días activos de dias_clase.';

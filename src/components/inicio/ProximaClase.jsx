@@ -5,6 +5,7 @@ import { hoyLocal, fechaLocal, capitalizar } from '../../lib/fechas'
 import { DOT_CLASSES } from '../../lib/colors'
 import PrepararClaseModal from '../PrepararClaseModal'
 import Emo from '../ui/Emo'
+import { nivelTieneClaseEn } from '../../lib/diasNivel'
 
 const STRIPE = { sky: 'border-l-sky-400', grass: 'border-l-grass-400', sunshine: 'border-l-sunshine-400', coral: 'border-l-coral-400', grape: 'border-l-grape-400' }
 const PASOS = [
@@ -45,7 +46,7 @@ export default function ProximaClase({ nivelIds, userId, puedePreparar = true })
     const { data: dias } = await supabase.from('dias_clase').select('dia_semana, activo')
     const fecha = proximoDiaClase(new Set((dias || []).filter((d) => d.activo).map((d) => d.dia_semana)))
     if (!fecha) return setDatos({ fecha: null, niveles: [] })
-    let qNiv = supabase.from('niveles').select('id, nombre, color, orden').eq('activo', true).order('orden')
+    let qNiv = supabase.from('niveles').select('id, nombre, color, orden, dias_semana').eq('activo', true).order('orden')
     if (ids) qNiv = qNiv.in('id', ids.length ? ids : ['00000000-0000-0000-0000-000000000000'])
     const [{ data: niveles }, { data: devos }, { data: acts }, { data: plans }, { data: asis }, { data: asign }, { data: cob }, { data: ninos }] = await Promise.all([
       qNiv,
@@ -59,7 +60,8 @@ export default function ProximaClase({ nivelIds, userId, puedePreparar = true })
     ])
     setDatos({
       fecha,
-      niveles: (niveles || []).map((n) => {
+      // Solo los niveles que tienen clase ese día (días por nivel).
+      niveles: (niveles || []).filter((n) => nivelTieneClaseEn(n, fecha)).map((n) => {
         const cubre = (cob || []).filter((c) => c.nivel_id === n.id).map((c) => c.docente?.nombre_completo).filter(Boolean)
         const fijos = (asign || []).filter((a) => a.nivel_id === n.id).map((a) => a.docente?.nombre_completo).filter(Boolean)
         const registros = (asis || []).filter((a) => a.nivel_id === n.id)

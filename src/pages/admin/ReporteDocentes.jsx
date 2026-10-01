@@ -8,18 +8,22 @@ import { hoyLocal, fechaLocal } from '../../lib/fechas'
 import MesSelector from '../../components/ui/MesSelector'
 import TituloPagina from '../../components/ui/TituloPagina'
 import Emo from '../../components/ui/Emo'
+import { nivelTieneDia } from '../../lib/diasNivel'
 
 function hoyYYYYMM() {
   return hoyLocal().slice(0, 7)
 }
 
-function diasDeClaseEnMes(diasClase, yyyyMM) {
+// niveles (opcional): solo cuenta los días en que alguno de esos niveles tiene clase (días por nivel).
+function diasDeClaseEnMes(diasClase, yyyyMM, niveles) {
   const [y, m] = yyyyMM.split('-').map(Number)
   const totalDias = new Date(y, m, 0).getDate()
   let count = 0
   for (let d = 1; d <= totalDias; d++) {
     const diaSemana = new Date(y, m - 1, d).getDay()
-    if (diasClase.some((dc) => dc.dia_semana === diaSemana && dc.activo)) count++
+    if (!diasClase.some((dc) => dc.dia_semana === diaSemana && dc.activo)) continue
+    if (niveles?.length && !niveles.some((n) => nivelTieneDia(n, diaSemana))) continue
+    count++
   }
   return count
 }
@@ -120,7 +124,7 @@ export default function ReporteDocentes() {
         .select('creado_por, nombre_completo, created_at')
         .gte('created_at', inicioTs)
         .lte('created_at', finTs),
-      supabase.from('docentes_niveles').select('docente_id, nivel:niveles(nombre)'),
+      supabase.from('docentes_niveles').select('docente_id, nivel:niveles(nombre, dias_semana)'),
     ])
 
     setDocentes(profs || [])
@@ -161,12 +165,12 @@ export default function ReporteDocentes() {
       const progresos = (progresoData || []).filter((p) => p.docente_id === doc.id)
       const ninosAgregados = (ninosData || []).filter((n) => n.creado_por === doc.id)
       const diasActivo = new Set([...fechasAsistencia, ...fechasBitacora, ...fechasCobertura])
-      const clases = (docentesNiveles || [])
-        .filter((dn) => dn.docente_id === doc.id)
-        .map((dn) => dn.nivel?.nombre)
-        .filter(Boolean)
+      const misNiveles = (docentesNiveles || []).filter((dn) => dn.docente_id === doc.id && dn.nivel).map((dn) => dn.nivel)
+      const clases = misNiveles.map((n) => n.nombre)
+      // Días que le tocaban: los de sus niveles (si tiene), si no los de la escuelita.
+      const diasEsperados = misNiveles.length && diasClase ? diasDeClaseEnMes(diasClase, mes, misNiveles) : totalDiasClase
 
-      const pct = totalDiasClase > 0 ? Math.round((diasActivo.size / totalDiasClase) * 100) : 0
+      const pct = diasEsperados > 0 ? Math.round((diasActivo.size / diasEsperados) * 100) : 0
 
       return {
         id: doc.id,
@@ -184,12 +188,13 @@ export default function ReporteDocentes() {
         ninosAgregadosList: ninosAgregados,
         diasCobertura: fechasCobertura.size,
         diasActivo: diasActivo.size,
+        diasEsperados,
         pct: Math.min(pct, 100),
         fechasAsistencia: [...fechasAsistencia].sort(),
         fechasBitacora: [...fechasBitacora].sort(),
       }
     })
-  }, [docentes, asistenciaData, bitacoraData, actividadData, coberturaData, progresoData, ninosData, docentesNiveles, totalDiasClase])
+  }, [docentes, asistenciaData, bitacoraData, actividadData, coberturaData, progresoData, ninosData, docentesNiveles, totalDiasClase, diasClase, mes])
 
   async function abrirHistorial(doc) {
     setSeleccionado(doc.id)
@@ -357,7 +362,7 @@ export default function ReporteDocentes() {
                         {item.pct}%
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-ink/65">{item.diasActivo} de {totalDiasClase} días activo</p>
+                    <p className="mt-1 text-xs text-ink/65">{item.diasActivo} de {item.diasEsperados} días activo</p>
                   </div>
                 </div>
                 <div className="flex border-t border-ink/5">
@@ -461,7 +466,7 @@ export default function ReporteDocentes() {
       </Modal>
 
       <p className="text-center text-xs text-ink/65">
-        El cumplimiento mide los días que el docente tuvo alguna actividad registrada (asistencia, bitácora o cobertura) vs. los {totalDiasClase} días de clase del mes.
+        El cumplimiento mide los días que el docente tuvo alguna actividad registrada (asistencia, bitácora o cobertura) vs. los días de clase del mes de sus niveles (si un nivel no tiene clase un día, ese día no cuenta).
       </p>
     </div>
   )

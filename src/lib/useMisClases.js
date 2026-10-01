@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
+import { nivelTieneClaseEn } from './diasNivel'
+import { hoyLocal } from './fechas'
 
 export function useMisClases() {
   const { user } = useAuth()
@@ -17,7 +19,9 @@ export function useMisClases() {
       }
       const { data: niveles } = await supabase.from('niveles').select('*').in('id', nivelIds).order('nombre')
       setClases(niveles || [])
-      setNivelId((niveles || [])[0]?.id || '')
+      // Empieza en un nivel que tenga clase hoy (días por nivel), si hay.
+      const lista = niveles || []
+      setNivelId((lista.find((n) => nivelTieneClaseEn(n, hoyLocal())) || lista[0])?.id || '')
     }
     load()
   }, [user.id])
