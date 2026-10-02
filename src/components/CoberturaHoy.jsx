@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import Skeleton from './Skeleton'
 import { hoyLocal } from '../lib/fechas'
-import { nivelTieneDia } from '../lib/diasNivel'
+import { nivelTieneClaseEn, cargarExcepciones } from '../lib/diasNivel'
 
 function hoyISO() {
   return hoyLocal()
@@ -22,7 +22,7 @@ export default function CoberturaHoy() {
       const hoy = hoyISO()
       const diaSemana = new Date().getDay()
 
-      const { data: diasClase } = await supabase.from('dias_clase').select('dia_semana, activo')
+      const [{ data: diasClase }] = await Promise.all([supabase.from('dias_clase').select('dia_semana, activo'), cargarExcepciones()])
       const esDiaClase = (diasClase || []).some((d) => d.dia_semana === diaSemana && d.activo)
 
       if (!esDiaClase) {
@@ -42,7 +42,7 @@ export default function CoberturaHoy() {
         ])
 
       // Solo los niveles que tienen clase hoy (días por nivel).
-      const niveles = (nivelesTodos || []).filter((n) => nivelTieneDia(n, diaSemana))
+      const niveles = (nivelesTodos || []).filter((n) => nivelTieneClaseEn(n, hoy))
       const horaAhora = horaActualHHMM()
       const yaPaso = (h) => !h.hora || h.hora.slice(0, 5) <= horaAhora
 

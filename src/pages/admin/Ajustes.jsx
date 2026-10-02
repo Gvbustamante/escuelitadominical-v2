@@ -13,6 +13,7 @@ import { MODULOS_KEYS } from '../../lib/modulos'
 import TituloPagina from '../../components/ui/TituloPagina'
 import Emo from '../../components/ui/Emo'
 import { School, Star, Users, Package, ListTree, KeyRound, CalendarDays, UserCog } from 'lucide-react'
+import ExcepcionesClase from '../../components/ExcepcionesClase'
 
 const DIAS_SEMANA = [
   { dia_semana: 0, label: 'Domingo' },
@@ -490,6 +491,7 @@ export default function Ajustes() {
               </button>
             </form>
           </div>
+          <ExcepcionesClase />
         </>
       )}
 

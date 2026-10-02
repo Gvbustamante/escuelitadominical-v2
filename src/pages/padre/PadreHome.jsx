@@ -4,14 +4,13 @@ import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMisHijos } from '../../lib/useMisHijos'
 import { useNivelesEstrella, badgeActual } from '../../lib/nivelesEstrella'
-import { hoyLocal, fechaLarga } from '../../lib/fechas'
+import { hoyLocal, fechaLarga, fechaLocal } from '../../lib/fechas'
 import Spinner from '../../components/Spinner'
 import { BADGE_CLASSES } from '../../lib/colors'
 import CitaDelDia from '../../components/CitaDelDia'
 import ProximaAgenda from '../../components/ProximaAgenda'
-import { proximoDiaClase } from '../../components/inicio/ProximaClase'
 import Emo from '../../components/ui/Emo'
-import { nivelTieneDia } from '../../lib/diasNivel'
+import { nivelTieneClaseEn, useExcepciones } from '../../lib/diasNivel'
 
 function calcularEdad(fecha) {
   if (!fecha) return null
@@ -115,8 +114,18 @@ export default function PadreHome() {
     })
   }, [])
 
-  // Próxima clase de cada hijo según los días de su nivel.
-  const proximaDe = (hijo) => (diasActivos ? proximoDiaClase(new Set(diasActivos.filter((d) => nivelTieneDia(hijo.nivel, d)))) : null)
+  useExcepciones()
+  // Próxima clase de cada hijo según los días de su nivel y los días sin clase.
+  const proximaDe = (hijo) => {
+    if (!diasActivos?.length) return null
+    const d = new Date()
+    for (let i = 0; i < 60; i++) {
+      const iso = fechaLocal(d)
+      if (diasActivos.includes(d.getDay()) && nivelTieneClaseEn(hijo.nivel || { id: hijo.nivel_id }, iso)) return iso
+      d.setDate(d.getDate() + 1)
+    }
+    return null
+  }
 
   if (!hijos) return <Spinner />
 

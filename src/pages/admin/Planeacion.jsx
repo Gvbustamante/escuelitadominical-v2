@@ -11,7 +11,7 @@ import { moverPdfsPlaneacionAPrivado } from '../../components/PlaneacionClaseMod
 import CronogramaNiveles from '../../components/CronogramaNiveles'
 import TituloPagina from '../../components/ui/TituloPagina'
 import { capitalizar, fechaLarga } from '../../lib/fechas'
-import { nivelesDelDia, nivelTieneClaseEn } from '../../lib/diasNivel'
+import { nivelesDelDia, nivelTieneClaseEn, useExcepciones } from '../../lib/diasNivel'
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -47,6 +47,7 @@ export default function Planeacion() {
   const { user, profile } = useAuth()
   const navigate = useNavigate()
   const esDocente = profile?.role === 'docente'
+  const excepciones = useExcepciones()
   const [cursor, setCursor] = useState(() => {
     const h = new Date()
     return { year: h.getFullYear(), month: h.getMonth() }
@@ -200,7 +201,7 @@ export default function Planeacion() {
       }
     }
     return { planeadas, sinPlanear }
-  }, [actividadesMes, devocionalesMes, planeacionesMes, diasClaseSet, fechasRango, nivelesVisibles])
+  }, [actividadesMes, devocionalesMes, planeacionesMes, diasClaseSet, fechasRango, nivelesVisibles, excepciones])
 
   async function asignarCobertura(nivelId, horarioId, docenteId) {
     if (!docenteId) {
@@ -316,6 +317,9 @@ export default function Planeacion() {
                     <p className="text-sm text-ink/70">Para elegir quién cubre cuando alguien falta, crea los horarios en <button type="button" onClick={() => navigate('/ajustes?s=horarios')} className="font-bold text-sky-700 hover:underline">Ajustes → Días y horarios</button>.</p>
                   )}
                   {!esDiaClase && <p className="rounded-xl bg-sunshine-50 px-3 py-2 text-sm font-bold text-sunshine-800">Este día no es día de clase.</p>}
+                  {nivelesDelDia(nivelesVisibles, selectedDay).length === 0 && (
+                    <p className="rounded-xl bg-ink/5 px-3 py-2 text-sm font-bold text-ink/70">🚫 Ningún nivel tiene clase este día.</p>
+                  )}
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                     {nivelesDelDia(nivelesVisibles, selectedDay).map((nivel) => {
                       const color = nivel.color || 'sky'

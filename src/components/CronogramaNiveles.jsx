@@ -1,5 +1,5 @@
 import { DOT_CLASSES } from '../lib/colors'
-import { nivelTieneClaseEn } from '../lib/diasNivel'
+import { nivelTieneClaseEn, excepcionDe, useExcepciones } from '../lib/diasNivel'
 
 const STRIPE = {
   sky: 'border-l-sky-400',
@@ -38,6 +38,7 @@ export default function CronogramaNiveles({
   diaSeleccionado,
   onDia,
 }) {
+  useExcepciones()
   if (niveles.length === 0 || dias.length === 0) return null
 
   function docentesDe(nivelId, fecha) {
@@ -109,14 +110,16 @@ export default function CronogramaNiveles({
                 </th>
                 {dias.map((fecha) => {
                   if (!nivelTieneClaseEn(nivel, fecha)) {
+                    const exc = excepcionDe(nivel.id, fecha)
+                    const texto = exc ? `Sin clase${exc.motivo ? `: ${exc.motivo}` : ''}` : `${nivel.nombre} no tiene clase este día`
                     return (
                       <td key={fecha} className={`border-t border-ink/5 p-1.5 align-top ${fecha === hoy ? 'bg-sunshine-50/60' : ''}`}>
                         <span
                           className="flex h-full min-h-[5.25rem] w-full items-center justify-center rounded-xl bg-ink/[0.04] text-sm font-bold text-ink/45"
-                          title={`${nivel.nombre} no tiene clase este día`}
-                          aria-label={`${nivel.nombre} no tiene clase este día`}
+                          title={texto}
+                          aria-label={texto}
                         >
-                          —
+                          {exc ? <span className="px-1 text-center text-xs leading-tight">🚫 {exc.motivo || 'Sin clase'}</span> : '—'}
                         </span>
                       </td>
                     )

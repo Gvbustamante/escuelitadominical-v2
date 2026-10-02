@@ -5,7 +5,7 @@ import Avatar from './Avatar'
 import Skeleton from './Skeleton'
 import { hoyLocal } from '../lib/fechas'
 import Emo from './ui/Emo'
-import { nivelTieneDia } from '../lib/diasNivel'
+import { nivelTieneClaseEn, cargarExcepciones } from '../lib/diasNivel'
 
 function hoyISO() {
   return hoyLocal()
@@ -20,7 +20,7 @@ export default function ChecklistDocentesHoy() {
       const hoy = hoyISO()
       const diaSemana = new Date().getDay()
 
-      const { data: diasClase } = await supabase.from('dias_clase').select('dia_semana, activo')
+      const [{ data: diasClase }] = await Promise.all([supabase.from('dias_clase').select('dia_semana, activo'), cargarExcepciones()])
       const esDiaClase = (diasClase || []).some((d) => d.dia_semana === diaSemana && d.activo)
 
       if (!esDiaClase) {
@@ -57,7 +57,7 @@ export default function ChecklistDocentesHoy() {
       // Solo cuenta a quien tiene clase hoy (sin niveles asignados = cuenta igual).
       const tieneClaseHoy = (doc) => {
         const suyos = (docentesNiveles || []).filter((dn) => dn.docente_id === doc.id && dn.nivel)
-        return suyos.length === 0 || suyos.some((dn) => nivelTieneDia(dn.nivel, diaSemana))
+        return suyos.length === 0 || suyos.some((dn) => nivelTieneClaseEn(dn.nivel, hoy))
       }
       const filas = (docentes || []).filter(tieneClaseHoy).map((doc) => {
         const asist = (asistencia || []).filter((a) => a.tomada_por === doc.id)

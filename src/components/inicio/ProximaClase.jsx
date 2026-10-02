@@ -5,7 +5,7 @@ import { hoyLocal, fechaLocal, capitalizar } from '../../lib/fechas'
 import { DOT_CLASSES } from '../../lib/colors'
 import PrepararClaseModal from '../PrepararClaseModal'
 import Emo from '../ui/Emo'
-import { nivelTieneClaseEn } from '../../lib/diasNivel'
+import { nivelTieneClaseEn, cargarExcepciones } from '../../lib/diasNivel'
 
 const STRIPE = { sky: 'border-l-sky-400', grass: 'border-l-grass-400', sunshine: 'border-l-sunshine-400', coral: 'border-l-coral-400', grape: 'border-l-grape-400' }
 const PASOS = [
@@ -43,13 +43,22 @@ export default function ProximaClase({ nivelIds, userId, puedePreparar = true })
 
   const cargar = useCallback(async () => {
     const ids = nivelKey === null ? null : nivelKey.split(',').filter(Boolean)
-    const { data: dias } = await supabase.from('dias_clase').select('dia_semana, activo')
-    const fecha = proximoDiaClase(new Set((dias || []).filter((d) => d.activo).map((d) => d.dia_semana)))
-    if (!fecha) return setDatos({ fecha: null, niveles: [] })
     let qNiv = supabase.from('niveles').select('id, nombre, color, orden, dias_semana').eq('activo', true).order('orden')
     if (ids) qNiv = qNiv.in('id', ids.length ? ids : ['00000000-0000-0000-0000-000000000000'])
-    const [{ data: niveles }, { data: devos }, { data: acts }, { data: plans }, { data: asis }, { data: asign }, { data: cob }, { data: ninos }] = await Promise.all([
-      qNiv,
+    const [{ data: dias }, { data: niveles }] = await Promise.all([supabase.from('dias_clase').select('dia_semana, activo'), qNiv, cargarExcepciones()])
+    // Próximo día con clase para alguno de estos niveles (días por nivel + excepciones por fecha).
+    const activos = new Set((dias || []).filter((d) => d.activo).map((d) => d.dia_semana))
+    let fecha = null
+    if (activos.size) {
+      const d = new Date()
+      for (let i = 0; i < 60 && !fecha; i++) {
+        const iso = fechaLocal(d)
+        if (activos.has(d.getDay()) && (niveles || []).some((n) => nivelTieneClaseEn(n, iso))) fecha = iso
+        d.setDate(d.getDate() + 1)
+      }
+    }
+    if (!fecha) return setDatos({ fecha: null, niveles: [], sinDias: activos.size === 0 })
+    const [{ data: devos }, { data: acts }, { data: plans }, { data: asis }, { data: asign }, { data: cob }, { data: ninos }] = await Promise.all([
       supabase.from('devocionales_ninos').select('id, titulo, nivel_id').eq('fecha', fecha),
       supabase.from('actividades').select('id, nivel_id').eq('fecha', fecha),
       supabase.from('planeacion_clase').select('id, nivel_id').eq('fecha', fecha),
@@ -91,9 +100,9 @@ export default function ProximaClase({ nivelIds, userId, puedePreparar = true })
       <div className="card flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="font-bold">📅 Próxima clase</p>
-          <p className="text-sm text-ink/70">Todavía no hay días de clase configurados.</p>
+          <p className="text-sm text-ink/70">{datos.sinDias ? 'Todavía no hay días de clase configurados.' : 'No hay clases programadas en las próximas semanas.'}</p>
         </div>
-        <Link to="/ajustes?s=horarios" className="btn-primary !py-2 !text-sm">Configurar días de clase</Link>
+        <Link to="/ajustes?s=horarios" className="btn-primary !py-2 !text-sm">{datos.sinDias ? 'Configurar días de clase' : 'Ver días y horarios'}</Link>
       </div>
     )
   }

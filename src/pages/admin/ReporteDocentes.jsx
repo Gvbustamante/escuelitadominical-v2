@@ -8,7 +8,7 @@ import { hoyLocal, fechaLocal } from '../../lib/fechas'
 import MesSelector from '../../components/ui/MesSelector'
 import TituloPagina from '../../components/ui/TituloPagina'
 import Emo from '../../components/ui/Emo'
-import { nivelTieneDia } from '../../lib/diasNivel'
+import { nivelTieneClaseEn, sinClaseGeneral, useExcepciones } from '../../lib/diasNivel'
 
 function hoyYYYYMM() {
   return hoyLocal().slice(0, 7)
@@ -21,8 +21,10 @@ function diasDeClaseEnMes(diasClase, yyyyMM, niveles) {
   let count = 0
   for (let d = 1; d <= totalDias; d++) {
     const diaSemana = new Date(y, m - 1, d).getDay()
+    const iso = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
     if (!diasClase.some((dc) => dc.dia_semana === diaSemana && dc.activo)) continue
-    if (niveles?.length && !niveles.some((n) => nivelTieneDia(n, diaSemana))) continue
+    if (sinClaseGeneral(iso)) continue
+    if (niveles?.length && !niveles.some((n) => nivelTieneClaseEn(n, iso))) continue
     count++
   }
   return count
@@ -56,6 +58,7 @@ function fechaCorta(f) {
 }
 
 export default function ReporteDocentes() {
+  const excepciones = useExcepciones()
   const [mes, setMes] = useState(hoyYYYYMM())
   const [docentes, setDocentes] = useState(null)
   const [diasClase, setDiasClase] = useState(null)
@@ -124,7 +127,7 @@ export default function ReporteDocentes() {
         .select('creado_por, nombre_completo, created_at')
         .gte('created_at', inicioTs)
         .lte('created_at', finTs),
-      supabase.from('docentes_niveles').select('docente_id, nivel:niveles(nombre, dias_semana)'),
+      supabase.from('docentes_niveles').select('docente_id, nivel:niveles(id, nombre, dias_semana)'),
     ])
 
     setDocentes(profs || [])
@@ -145,7 +148,7 @@ export default function ReporteDocentes() {
   const totalDiasClase = useMemo(() => {
     if (!diasClase) return 0
     return diasDeClaseEnMes(diasClase, mes)
-  }, [diasClase, mes])
+  }, [diasClase, mes, excepciones])
 
   const reporte = useMemo(() => {
     if (!docentes || !asistenciaData || !bitacoraData || !actividadData) return null
@@ -194,7 +197,7 @@ export default function ReporteDocentes() {
         fechasBitacora: [...fechasBitacora].sort(),
       }
     })
-  }, [docentes, asistenciaData, bitacoraData, actividadData, coberturaData, progresoData, ninosData, docentesNiveles, totalDiasClase, diasClase, mes])
+  }, [docentes, asistenciaData, bitacoraData, actividadData, coberturaData, progresoData, ninosData, docentesNiveles, totalDiasClase, diasClase, mes, excepciones])
 
   async function abrirHistorial(doc) {
     setSeleccionado(doc.id)

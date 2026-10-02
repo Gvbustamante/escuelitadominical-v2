@@ -7,7 +7,7 @@ import Avatar from './Avatar'
 import RewardBurst from './RewardBurst'
 import FechaCampo from './ui/FechaCampo'
 import { fechaLarga } from '../lib/fechas'
-import { nivelTieneDia, NOMBRE_DIA } from '../lib/diasNivel'
+import { nivelTieneDia, NOMBRE_DIA, excepcionDe, useExcepciones } from '../lib/diasNivel'
 
 // Fecha local (no UTC): un domingo a las 8 p. m. en América sigue siendo domingo.
 function hoyISO() {
@@ -52,6 +52,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
   const [toast, setToast] = useState(null)
   const [diasClaseSet, setDiasClaseSet] = useState(null)
   const [nivelDias, setNivelDias] = useState(null) // días del nivel (null = todos)
+  useExcepciones()
   const [eligiendo, setEligiendo] = useState(null) // nino_id | 'todos' | null
   const [busyEstrella, setBusyEstrella] = useState(false)
   const celebradoRef = useRef(false)
@@ -100,7 +101,8 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
   const diaSemana = new Date(fecha + 'T00:00:00').getDay()
   const esDiaEscuelita = diasClaseSet ? diasClaseSet.has(diaSemana) : true
   const esDiaDelNivel = nivelTieneDia({ dias_semana: nivelDias }, diaSemana)
-  const esDiaClase = esDiaEscuelita && esDiaDelNivel
+  const excepcion = excepcionDe(nivelId, fecha)
+  const esDiaClase = esDiaEscuelita && esDiaDelNivel && !excepcion
   // El docente corrige durante el día de clase; los demás días queda cerrado. El staff siempre puede.
   const bloqueado = !esStaff && (!esHoy || !esDiaClase)
 
@@ -224,7 +226,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
       <div className="card flex flex-col items-center gap-3 py-12 text-center">
         <span className="text-4xl">📅</span>
         <p className="font-bold text-ink/65">
-          {esDiaEscuelita ? `${nivelNombre || 'Este nivel'} no tiene clase los ${NOMBRE_DIA[diaSemana].toLowerCase()}` : 'Hoy no es día de clase'}
+          {excepcion ? `Hoy no hay clase${excepcion.motivo ? `: ${excepcion.motivo}` : ''}` : esDiaEscuelita ? `${nivelNombre || 'Este nivel'} no tiene clase los ${NOMBRE_DIA[diaSemana].toLowerCase()}` : 'Hoy no es día de clase'}
         </p>
         <p className="text-sm text-ink/65">Solo puedes tomar asistencia los días de clase de tu nivel</p>
       </div>
@@ -268,7 +270,7 @@ export default function TomarAsistenciaInline({ nivelId, nivelNombre, ninos, use
 
         {esStaff && diasClaseSet && !esDiaClase && (
           <p className="border-b border-ink/5 bg-sunshine-50 px-4 py-2 text-sm font-bold text-sunshine-800">
-            ⚠️ {esDiaEscuelita ? `${nivelNombre || 'Este nivel'} no tiene clase los ${NOMBRE_DIA[diaSemana].toLowerCase()}.` : 'Este día no es día de clase.'} Puedes registrar igual si fue una clase especial.
+            ⚠️ {excepcion ? `Este día no hay clase${excepcion.motivo ? ` (${excepcion.motivo})` : ''}.` : esDiaEscuelita ? `${nivelNombre || 'Este nivel'} no tiene clase los ${NOMBRE_DIA[diaSemana].toLowerCase()}.` : 'Este día no es día de clase.'} Puedes registrar igual si fue una clase especial.
           </p>
         )}
 
