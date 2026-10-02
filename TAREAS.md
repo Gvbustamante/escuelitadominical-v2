@@ -42,7 +42,7 @@ Marca `[x]` cuando se complete.
 
 ## 🏗️ Técnico / escalabilidad
 - [ ] Migrar a **multi-tenant** (ver MULTITENANT.md — decisiones tomadas 30/sep: 1 cuenta = 1 iglesia, un solo sitio, Boston Kids se integra al final, cuando el multi-tenant esté estable).
-  - [~] Fase 1: base de datos + prueba de aislamiento (en pruebas) — SQL listo y probado en local (100/100). Falta correrlo en la base de pruebas.
+  - [~] Fase 1: base de datos aplicada en pruebas (2/oct), falta pegar `supabase/multitenant_fase1_pegar.sql` (llaves por iglesia) y correr la prueba de aislamiento.
   - [ ] Fase 2: app (registro de iglesia, demo, archivos por iglesia)
   - [ ] Fase 3: panel de la dueña
   - [ ] Fase 4: pasar Boston Kids
