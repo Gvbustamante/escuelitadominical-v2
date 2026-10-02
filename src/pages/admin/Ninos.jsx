@@ -9,7 +9,7 @@ import Modal from '../../components/Modal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DetalleNinoModal from '../../components/DetalleNinoModal'
 import Avatar from '../../components/Avatar'
-import { BADGE_CLASSES } from '../../lib/colors'
+import { BADGE_CLASSES, DOT_CLASSES } from '../../lib/colors'
 import { whatsappLink } from '../../lib/whatsapp'
 import { exportExcel } from '../../lib/exportExcel'
 import { generarCodigoFacil } from '../../lib/codigoFacil'
@@ -42,6 +42,14 @@ function fechaDesdeEdad(edad, fechaActual) {
   const mm = String(hoy.getMonth() + 1).padStart(2, '0')
   const dd = String(hoy.getDate()).padStart(2, '0')
   return `${hoy.getFullYear() - n}-${mm}-${dd}`
+}
+
+const BG_GRUPO = {
+  sky: 'bg-sky-50 text-sky-800',
+  grass: 'bg-grass-50 text-grass-800',
+  sunshine: 'bg-sunshine-50 text-sunshine-800',
+  coral: 'bg-coral-50 text-coral-800',
+  grape: 'bg-grape-50 text-grape-800',
 }
 
 export default function Ninos() {
@@ -141,6 +149,17 @@ export default function Ninos() {
       })
       .filter((n) => n.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()))
   }, [ninosVisibles, filtro, filtroNivel, busqueda, misNivelIds])
+
+  // Lista agrupada por nivel (en el orden de los niveles) y al final los que no tienen nivel.
+  const grupos = useMemo(() => {
+    const orden = [...niveles].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0) || a.nombre.localeCompare(b.nombre))
+    const lista = orden
+      .map((n) => ({ id: n.id, nombre: n.nombre, color: n.color, ninos: filtrados.filter((x) => x.nivel_id === n.id) }))
+      .filter((g) => g.ninos.length > 0)
+    const sinNivel = filtrados.filter((x) => !nivelesById[x.nivel_id])
+    if (sinNivel.length) lista.push({ id: '__sin__', nombre: 'Sin nivel', color: null, ninos: sinNivel })
+    return lista
+  }, [niveles, nivelesById, filtrados])
 
   function openNew() {
     setEditing(null)
@@ -418,8 +437,17 @@ export default function Ninos() {
             </div>
           ) : (
             <div className="card overflow-hidden !p-0">
+              {grupos.map((g) => (
+              <section key={g.id} aria-label={`${g.nombre}: ${g.ninos.length} ${g.ninos.length === 1 ? 'niño' : 'niños'}`}>
+              {grupos.length > 1 || g.id === '__sin__' ? (
+                <h3 className={`flex items-center gap-2 border-b border-ink/5 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide sm:px-4 ${g.color ? BG_GRUPO[g.color] || BG_GRUPO.sky : 'bg-ink/5 text-ink/70'}`}>
+                  {g.color && <span className={`h-2.5 w-2.5 rounded-full ${DOT_CLASSES[g.color] || DOT_CLASSES.sky}`} aria-hidden="true" />}
+                  <span className="normal-case text-sm">{g.nombre}</span>
+                  <span className="ml-auto tabular-nums opacity-80">{g.ninos.length}</span>
+                </h3>
+              ) : null}
               <div className="flex flex-col divide-y divide-ink/5">
-                {filtrados.map((nino) => {
+                {g.ninos.map((nino) => {
                   const nivel = nivelesById[nino.nivel_id]
                   const padres = padresPorNino[nino.id] || []
                   const numEstrellas = estrellasPorNino[nino.id] || 0
@@ -455,7 +483,7 @@ export default function Ninos() {
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                           <span className="truncate text-sm font-bold leading-tight sm:text-base">{nino.nombre_completo}</span>
                           {edad !== null && <span className="text-xs text-ink/65">{edad} años</span>}
-                          {nivel && (
+                          {nivel && grupos.length <= 1 && (
                             <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-bold leading-none ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
                               {nivel.nombre}
                             </span>
@@ -502,6 +530,8 @@ export default function Ninos() {
                   )
                 })}
               </div>
+              </section>
+              ))}
             </div>
           )}
 
