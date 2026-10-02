@@ -24,6 +24,15 @@
 - Funciones que crean usuarios (`admin_create_invited_user`, etc.): el usuario nuevo queda en la iglesia de quien lo crea.
 - **Prueba de aislamiento automática**: 2 iglesias de prueba; se verifica que ninguna ve ni modifica datos de la otra en todas las tablas.
 
+## Fase 1 — cómo quedó (2 oct 2026)
+- Archivos: `supabase/multitenant_fase1.sql` (migración) y `supabase/multitenant_prueba_aislamiento.sql` (prueba, no guarda nada).
+- Aislamiento con **una política RESTRICTIVA por tabla** ("aislamiento iglesia"): las políticas que ya existían no se tocaron.
+- Datos actuales → iglesia `a0000000-0000-4000-8000-000000000001` (Sharat, plan Completo).
+- Planes: `gratis` (2 docentes = docente + coordinador activos, 25 niños activos, 5 módulos) y `completo` (sin límites). Límite en la base (trigger `limite_plan`, error `LIMITE_PLAN:`).
+- Dueña: `plataforma_admins` (Gisella). `resumen_iglesias()` = lista con conteos; `entrar_iglesia(id)` = toda la app muestra esa iglesia; `entrar_iglesia(null)` = volver. `crear_iglesia(nombre, plan, días demo)` + `sembrar_iglesia` (días, permisos, estrellas, motivos, horario, config).
+- Respaldo previo: schema `respaldo_mt_fase1`.
+- Pendiente fase 2: archivos (storage) por iglesia, registro "Crea tu escuelita", módulos según plan en la app, aviso de demo.
+
 ## Fases (todo primero en la base de PRUEBAS)
 1. **Base de datos**: `iglesias`, `iglesia_id` en las 36 tablas, `mi_iglesia()`, permisos nuevos, únicos por iglesia, prueba de aislamiento. Los datos actuales de pruebas quedan en la iglesia "Sharat".
 2. **App**: registro de iglesia nueva ("Crea tu escuelita") con demo, configuración por iglesia, archivos por iglesia, aviso de demo por vencer.

@@ -87,7 +87,9 @@ export default function Ajustes() {
     const actual = diasClase.find((d) => d.dia_semana === dia_semana)
     const nuevoActivo = !actual?.activo
     setDiasClase((prev) => prev.map((d) => (d.dia_semana === dia_semana ? { ...d, activo: nuevoActivo } : d)))
-    await supabase.from('dias_clase').upsert({ dia_semana, activo: nuevoActivo }, { onConflict: 'dia_semana' })
+    // Actualizar y, si no existe la fila, crearla (sirve con y sin multi-tenant).
+    const { data: upd } = await supabase.from('dias_clase').update({ activo: nuevoActivo }).eq('dia_semana', dia_semana).select('dia_semana')
+    if (!upd?.length) await supabase.from('dias_clase').insert({ dia_semana, activo: nuevoActivo })
   }
 
   async function agregarHorario(e) {

@@ -18,6 +18,7 @@ import { hoyLocal } from '../../lib/fechas'
 import TituloPagina from '../../components/ui/TituloPagina'
 import ActionMenu from '../../components/ui/ActionMenu'
 import Emo from '../../components/ui/Emo'
+import { mensajeError } from '../../lib/errores'
 
 const STAFF = ['superadmin', 'admin', 'coordinador']
 
@@ -211,7 +212,7 @@ export default function Ninos() {
       : await supabase.from('ninos').insert({ ...payload, creado_por: user.id }).select().single()
 
     setBusy(false)
-    if (error) return setError(error.message)
+    if (error) return setError(mensajeError(error.message))
     setModalOpen(false)
     load()
     // Niño nuevo: seguir directo con su padre/madre, sin tener que buscarlo en la lista.
@@ -219,7 +220,8 @@ export default function Ninos() {
   }
 
   async function toggleActivo(nino) {
-    await supabase.from('ninos').update({ activo: !nino.activo }).eq('id', nino.id)
+    const { error } = await supabase.from('ninos').update({ activo: !nino.activo }).eq('id', nino.id)
+    if (error) window.alert(mensajeError(error.message))
     load()
   }
 

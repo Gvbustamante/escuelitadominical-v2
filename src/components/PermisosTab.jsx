@@ -27,9 +27,14 @@ export default function PermisosTab() {
     setBusyKey(key)
     setError('')
     const actual = permisos?.find((p) => p.rol === rol && p.permiso === permiso)
-    const { error: upsertError } = await supabase
+    // Actualizar y, si no existe la fila, crearla (sirve con y sin multi-tenant).
+    const { data: upd, error: updError } = await supabase
       .from('permisos_rol')
-      .upsert({ rol, permiso, activo: !actual?.activo }, { onConflict: 'rol,permiso' })
+      .update({ activo: !actual?.activo })
+      .eq('rol', rol)
+      .eq('permiso', permiso)
+      .select('id')
+    const upsertError = updError || (!upd?.length && (await supabase.from('permisos_rol').insert({ rol, permiso, activo: !actual?.activo })).error)
     if (upsertError) {
       setError(upsertError.message)
       setBusyKey('')

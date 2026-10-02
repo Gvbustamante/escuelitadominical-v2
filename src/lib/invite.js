@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { mensajeError } from './errores'
 
 export async function crearUsuario({ cedula, nombre_completo, role, nino_id, parentesco, email, whatsapp }) {
   const { data, error } = await supabase.rpc('admin_create_invited_user', {
@@ -8,7 +9,7 @@ export async function crearUsuario({ cedula, nombre_completo, role, nino_id, par
     p_nino_id: nino_id ?? null,
     p_parentesco: parentesco ?? null,
   })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(mensajeError(error.message))
   const row = Array.isArray(data) ? data[0] : data
 
   if (email || whatsapp) {
