@@ -16,7 +16,7 @@ Marca `[x]` cuando se complete.
 - [x] **Planeación de clase** — en Planeación, cada clase/día: escribir (con guía) y/o subir PDF con vista previa. Tabla `planeacion_clase`.
 - [x] **Días de clase por nivel** — en Niveles cada nivel marca sus días (chips). Se respeta en Próxima clase, Asistencia (aviso/bloqueo), Cronograma (casilla gris "—"), "Quién enseña", resumen de Planeación, Reporte docentes, Inicio de padres y paneles de hoy. Columna `niveles.dias_semana` (ambas bases ✅).
 - [x] Niños: lista dividida por nivel + conteo de niños y niñas por grupo.
-- [~] Días sin clase por fecha (excepciones) — código listo (Ajustes → Días y horarios). **Falta crear la tabla**: `supabase/actualizacion_excepciones_clase.sql` en las dos bases (la escritura desde Claude salió cancelada; aprobar o correr en el SQL Editor).
+- [x] Días sin clase por fecha (excepciones) — Ajustes → Días y horarios. Tabla `excepciones_clase` creada en las dos bases.
 - [ ] **Planeación con IA (plan Pro)** — subir PDF y que la IA llene título, versículo, historia, objetivos y materiales. Calcular costo por PDF antes.
 
 ## 🔧 Pendiente inmediato

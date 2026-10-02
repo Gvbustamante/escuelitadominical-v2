@@ -1,4 +1,4 @@
--- ⚠️ PENDIENTE de aplicar en las dos bases (la app ya lo usa; sin la tabla funciona igual, sin excepciones).
+-- ✅ Aplicado en las dos bases (pruebas y Boston) el 2026-10-02.
 -- Excepciones por fecha: "ese día no hay clase" para un nivel, o para toda la escuelita (nivel_id null).
 -- Ej.: feriado (toda la escuelita) o retiro de Tweens (solo ese nivel). Idempotente.
 create table if not exists public.excepciones_clase (
