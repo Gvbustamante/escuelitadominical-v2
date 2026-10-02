@@ -150,6 +150,15 @@ export default function Ninos() {
       .filter((n) => n.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()))
   }, [ninosVisibles, filtro, filtroNivel, busqueda, misNivelIds])
 
+  // Cuántos niños y niñas hay en una lista (sexo: 'M' niño, 'F' niña; sin dato aparte).
+  const conteoSexo = (lista) => ({
+    ninos: lista.filter((x) => x.sexo === 'M').length,
+    ninas: lista.filter((x) => x.sexo === 'F').length,
+    sinDato: lista.filter((x) => x.sexo !== 'M' && x.sexo !== 'F').length,
+  })
+  const textoSexo = ({ ninos, ninas, sinDato }) =>
+    [`${ninos} ${ninos === 1 ? 'niño' : 'niños'}`, `${ninas} ${ninas === 1 ? 'niña' : 'niñas'}`, sinDato ? `${sinDato} sin dato` : null].filter(Boolean).join(' · ')
+
   // Lista agrupada por nivel (en el orden de los niveles) y al final los que no tienen nivel.
   const grupos = useMemo(() => {
     const orden = [...niveles].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0) || a.nombre.localeCompare(b.nombre))
@@ -375,7 +384,7 @@ export default function Ninos() {
         <div>
           <TituloPagina ruta="/ninos">Niños</TituloPagina>
           <p className="text-ink/70">
-            {filtrados.length} de {ninosVisibles.length} en total
+            {filtrados.length} de {ninosVisibles.length} en total · {textoSexo(conteoSexo(filtrados))}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -439,13 +448,25 @@ export default function Ninos() {
             <div className="card overflow-hidden !p-0">
               {grupos.map((g) => (
               <section key={g.id} aria-label={`${g.nombre}: ${g.ninos.length} ${g.ninos.length === 1 ? 'niño' : 'niños'}`}>
-              {grupos.length > 1 || g.id === '__sin__' ? (
+              {(
                 <h3 className={`flex items-center gap-2 border-b border-ink/5 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide sm:px-4 ${g.color ? BG_GRUPO[g.color] || BG_GRUPO.sky : 'bg-ink/5 text-ink/70'}`}>
                   {g.color && <span className={`h-2.5 w-2.5 rounded-full ${DOT_CLASSES[g.color] || DOT_CLASSES.sky}`} aria-hidden="true" />}
                   <span className="normal-case text-sm">{g.nombre}</span>
-                  <span className="ml-auto tabular-nums opacity-80">{g.ninos.length}</span>
+                  <span className="ml-auto flex items-center gap-2 normal-case tabular-nums">
+                    {(() => {
+                      const c = conteoSexo(g.ninos)
+                      return (
+                        <>
+                          <span title="Niños" aria-label={`${c.ninos} niños`}>👦 {c.ninos}</span>
+                          <span title="Niñas" aria-label={`${c.ninas} niñas`}>👧 {c.ninas}</span>
+                          {c.sinDato > 0 && <span title="Sin dato de sexo" className="opacity-70">? {c.sinDato}</span>}
+                          <span className="rounded-full bg-white/70 px-2 font-extrabold">{g.ninos.length}</span>
+                        </>
+                      )
+                    })()}
+                  </span>
                 </h3>
-              ) : null}
+              )}
               <div className="flex flex-col divide-y divide-ink/5">
                 {g.ninos.map((nino) => {
                   const nivel = nivelesById[nino.nivel_id]
@@ -483,7 +504,7 @@ export default function Ninos() {
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                           <span className="truncate text-sm font-bold leading-tight sm:text-base">{nino.nombre_completo}</span>
                           {edad !== null && <span className="text-xs text-ink/65">{edad} años</span>}
-                          {nivel && grupos.length <= 1 && (
+                          {nivel && !grupos.length && (
                             <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-bold leading-none ${BADGE_CLASSES[nivel.color] || BADGE_CLASSES.sky}`}>
                               {nivel.nombre}
                             </span>
